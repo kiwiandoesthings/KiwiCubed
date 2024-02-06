@@ -4,11 +4,19 @@
 #include <Chunk.h>
 #include <VertexArrayObject.h>
 
-Chunk::Chunk(int xPos, int yPos, int zPos) : xPos(xPos), yPos(yPos), zPos(zPos)
+
+Chunk::Chunk(int x, int y, int z)
 {
-    //Block* blocks = new Block[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
-    //Block *blocks = malloc(CHUNK_SIZE * sizeof(*blocks));
-    Block* blocks = new Block[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
+    xPos = x;
+	yPos = y;
+	zPos = z;
+    blocks = new Block * *[CHUNK_SIZE];
+    for (int i = 0; i < CHUNK_SIZE; ++i) {
+        blocks[i] = new Block * [CHUNK_SIZE];
+        for (int j = 0; j < CHUNK_SIZE; ++j) {
+            blocks[i][j] = new Block[CHUNK_SIZE];
+        }
+    }
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);

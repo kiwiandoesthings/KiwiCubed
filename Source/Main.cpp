@@ -61,7 +61,7 @@ int main()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	Chunk myChunk(0, 0, 0);  // Create an instance of Chunk
-	//Chunk myChunk2(1, 0, 0);  // Create an instance of Chunk
+	Chunk myChunk2(1, 0, 0);  // Create an instance of Chunk
 
 	// Create and bind shaders
 	Shader shaderProgram("Resources/Shaders/Vertex.vert", "Resources/Shaders/Fragment.frag");
@@ -156,9 +156,12 @@ int main()
 		test_img.Bind();
 		//vertexArrayObject.Bind();
 		//glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(float), GL_UNSIGNED_INT, 0);
-
+		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk.xPos, myChunk.yPos, myChunk.zPos);
+		std::cout << myChunk.xPos << " " << myChunk.yPos << " " << myChunk.zPos << std::endl;
 		myChunk.Render();
-		//myChunk2.Render();
+		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk2.xPos, myChunk2.yPos, myChunk2.zPos);
+		std::cout << myChunk2.xPos << " " << myChunk2.yPos << " " << myChunk2.zPos << std::endl;
+		myChunk2.Render();
 
 		glfwSwapBuffers(window);
 

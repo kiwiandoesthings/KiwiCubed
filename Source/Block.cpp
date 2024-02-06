@@ -79,10 +79,10 @@ bool Block::IsSolid(int x, int y, int z, int CHUNK_SIZE) {
 
 	// Check if the block is solid based on terrain height
 	if (y <= terrainHeight) {
-		return false;
+		return true;
 	}
 	else {
-		return true;
+		return false;
 	}
 }
 
