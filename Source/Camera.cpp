@@ -24,6 +24,10 @@ void Camera::UpdateMatrix(float FOV, float nearPlane, float farPlane)
 	CameraMatrix = projectionMatrix * viewProjectionMatrix;
 }
 
+void Camera::SetPosition(float cameraX, float cameraY, float cameraZ) {
+	Position = glm::vec3(cameraX, cameraY, cameraZ);
+}
+
 void Camera::Inputs(GLFWwindow* window)
 {
 	if (cursorFree == false) {

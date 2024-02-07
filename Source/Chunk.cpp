@@ -8,8 +8,8 @@
 Chunk::Chunk(int x, int y, int z)
 {
     chunkX = x;
-	chunkY = y;
-	chunkZ = z;
+    chunkY = y;
+    chunkZ = z;
     blocks = new Block * *[chunkSize];
     for (int i = 0; i < chunkSize; ++i) {
         blocks[i] = new Block * [chunkSize];
@@ -53,18 +53,18 @@ void Chunk::GenerateMesh(std::vector<GLfloat>& vertices, std::vector<GLuint>& in
                 if (x - 1 >= 0) {
                     blocks[x - 1][y][z].GenerateBlock(x - 1, y, z, chunkX, chunkY, chunkZ, chunkSize);
                 }
-				if (y + 1 <= chunkSize - 1) {
-					blocks[x][y + 1][z].GenerateBlock(x, y + 1, z, chunkX, chunkY, chunkZ, chunkSize);
-				}
-				if (y - 1 >= 0) {
-					blocks[x][y - 1][z].GenerateBlock(x, y - 1, z, chunkX, chunkY, chunkZ, chunkSize);
-				}
-				if (z + 1 <= chunkSize - 1) {
-					blocks[x][y][z + 1].GenerateBlock(x, y, z + 1, chunkX, chunkY, chunkZ, chunkSize);
-				}
-				if (z - 1 >= 0) {
-					blocks[x][y][z - 1].GenerateBlock(x, y, z - 1, chunkX, chunkY, chunkZ, chunkSize);
-				}
+                if (y + 1 <= chunkSize - 1) {
+                    blocks[x][y + 1][z].GenerateBlock(x, y + 1, z, chunkX, chunkY, chunkZ, chunkSize);
+                }
+                if (y - 1 >= 0) {
+                    blocks[x][y - 1][z].GenerateBlock(x, y - 1, z, chunkX, chunkY, chunkZ, chunkSize);
+                }
+                if (z + 1 <= chunkSize - 1) {
+                    blocks[x][y][z + 1].GenerateBlock(x, y, z + 1, chunkX, chunkY, chunkZ, chunkSize);
+                }
+                if (z - 1 >= 0) {
+                    blocks[x][y][z - 1].GenerateBlock(x, y, z - 1, chunkX, chunkY, chunkZ, chunkSize);
+                }
 
                 if (x + 1 <= chunkSize - 1 && blocks[x + 1][y][z].GetSolid() == 0 && blocks[x][y][z].GetSolid() == 1) {
                     shouldAddFace[Right].shouldAdd = true;

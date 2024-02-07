@@ -14,17 +14,19 @@
 #include <Camera.h>
 #include <Chunk.h>
 #include <IndexBufferObject.h>
+#include <Player.h>
 #include <Shader.h>
 #include <Texture.h>
 #include <VertexBufferObject.h>
 #include <VertexArrayObject.h>
 
+
+Player player(20, 50, 20);
 // Create needed variables
 int windowWidth = 600;
 int windowHeight = 600;
 const char* windowTitle = "Voxel Engine Test";
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-Camera camera(windowWidth, windowHeight, glm::vec3(0.0f, 0.0f, 2.0f));
 
 int main()
 {
@@ -60,23 +62,10 @@ int main()
 	glViewport(0, 0, windowWidth, windowHeight);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	Chunk myChunk(0, 0, 0);  // Create an instance of Chunk
-	Chunk myChunk2(1, 0, 0);  // Create an instance of Chunk
-
-	// Create and bind shaders
 	Shader shaderProgram("Resources/Shaders/Vertex.vert", "Resources/Shaders/Fragment.frag");
 
-	//VertexArrayObject vertexArrayObject;
-	//vertexArrayObject.Bind();
-	//VertexBufferObject vertexBufferObject(vertices, sizeof(vertices));
-	//IndexBufferObject indexBufferObject(indices, sizeof(indices));
-	//vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	////vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	//vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-	//vertexArrayObject.Unbind();
-	//vertexBufferObject.Unbind();
-	//indexBufferObject.Unbind();
+	Chunk myChunk(0, 0, 0);  // Create an instance of Chunk
+	Chunk myChunk2(1, 0, 0);  // Create an instance of Chunk
 
 	//Texture test_img("Resources/Textures/Blocks/test_img.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	Texture test_img("Resources/Textures/Blocks/test_img_alt.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
@@ -91,13 +80,9 @@ int main()
 
 		shaderProgram.Bind();
 
-		camera.Inputs(window);
-		camera.UpdateMatrix(80.0f, 0.1f, 1000.0f);
-		camera.Matrix(shaderProgram, "camMatrix");
+		player.Update(window, shaderProgram, "camMatrix", 0, 0, 2);
 
 		test_img.Bind();
-		//vertexArrayObject.Bind();
-		//glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(float), GL_UNSIGNED_INT, 0);
 		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk.chunkX, myChunk.chunkY, myChunk.chunkZ);
 		myChunk.Render();
 		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk2.chunkX, myChunk2.chunkY, myChunk2.chunkZ);
@@ -109,9 +94,6 @@ int main()
 	}
 
 	// Clean up once the program has exited
-	//vertexArrayObject.Delete();
-	//vertexBufferObject.Delete();
-	//indexBufferObject.Delete();
 	test_img.Delete();
 	shaderProgram.Delete();
 	glfwDestroyWindow(window);
@@ -123,5 +105,5 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 	float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-	camera.UpdateWindowSize(width, height);
+	player.UpdateWindowSize(width, height);
 }
