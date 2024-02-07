@@ -5,8 +5,7 @@
 
 GLfloat faceVertices[] = {
 	// Positions       // Texture Coordinates
-	// 
-	//Front
+	// Front
 	0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
 	1.0f, 0.0f, 0.0f,  0.0f, 0.0f,
 	1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
@@ -44,57 +43,69 @@ GLfloat faceVertices[] = {
 };
 
 GLuint faceIndices[] = {
-	0, 1, 2,  // Front
+	// Front
+	0, 1, 2,
 	2, 3, 0,
 
-	4, 5, 6,  // Back
+	// Back
+	4, 5, 6,
 	6, 7, 4,
 
-	8, 9, 10,  // Left
+	// Left
+	8, 9, 10,
 	10, 11, 8,
 
-	12, 13, 14,  // Right
+	//Right
+	12, 13, 14,
 	14, 15, 12,
 
-	16, 17, 18,  // Top
+	//Top
+	16, 17, 18,
 	18, 19, 16,
 
-	20, 21, 22,  // Bottom
+	//Bottom
+	20, 21, 22,
 	22, 23, 20
 };
 
-Block::Block(int xPos, int yPos, int zPos) : xPos(xPos), yPos(yPos), zPos(zPos) {
-    std::cout << xPos << " " << yPos << " " << zPos << " " << std::endl;
+Block::Block(int blockX, int blockY, int blockZ) : blockX(blockX), blockY(blockY), blockZ(blockZ) {
 }
 
-bool Block::IsSolid(int x, int y, int z, int CHUNK_SIZE) {
-	// Generate terrain heights using FastNoiseLite
-	FastNoiseLite noise;
-	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+void Block::GenerateBlock(int blockX, int blockY, int blockZ, int chunkX, int chunkY, int chunkZ, int chunkSize) {
+	if (GetSolid() == -1) {
+		// Generate terrain heights using FastNoiseLite
+		FastNoiseLite noise;
+		noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 
-	// Adjust the scale according to your terrain preferences
-	float noiseValue = noise.GetNoise((float)x, (float)z);
 
-	int terrainHeight = static_cast<int>(noiseValue * CHUNK_SIZE);
+		// Adjust the scale according to your terrain preferences
+		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockZ + (chunkZ * chunkSize));
 
-	// Check if the block is solid based on terrain height
-	if (y <= terrainHeight) {
-		return true;
-	}
-	else {
-		return false;
+		int terrainHeight = static_cast<int>(noiseValue * chunkSize);
+
+		// Check if the block is solid based on terrain height
+		if (blockY <= terrainHeight) {
+			SetSolid(1);
+		}
+		else {
+			SetSolid(0);
+		}
 	}
 }
 
-void Block::SetSolid(bool solid) {
+void Block::SetSolid(int solid) {
 	isSolid = solid;
 }
 
-void Block::GenerateMesh(int x, int y, int z, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection) {
-	addFace(vertices, indices, x, y, z, faceDirection);
+int Block::GetSolid() {
+	return isSolid;
 }
 
-void Block::addFace(std::vector<GLfloat>&vertices, std::vector<GLuint>&indices, int x, int y, int z, FaceDirection faceDirection) { 
+void Block::GenerateMesh(int x, int y, int z, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection) {
+	AddFace(vertices, indices, x, y, z, faceDirection);
+}
+
+void Block::AddFace(std::vector<GLfloat>&vertices, std::vector<GLuint>&indices, int x, int y, int z, FaceDirection faceDirection) { 
 	// Calculate offset based on block position
 	GLfloat xOffset = static_cast<GLfloat>(x);
 	GLfloat yOffset = static_cast<GLfloat>(y);

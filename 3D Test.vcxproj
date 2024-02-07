@@ -24,10 +24,12 @@
     <ClCompile Include="Source\Chunk.cpp" />
     <ClCompile Include="Source\IndexBufferObject.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\VertexArrayObject.cpp" />
     <ClCompile Include="Source\VertexBufferObject.cpp" />
+    <ClCompile Include="Source\World.cpp" />
     <ClCompile Include="Vendor\GLAD\src\glad.c" />
     <ClCompile Include="Vendor\stb\stb.cpp" />
   </ItemGroup>
@@ -40,10 +42,12 @@
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Chunk.h" />
     <ClInclude Include="Source\IndexBufferObject.h" />
+    <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\VertexArrayObject.h" />
     <ClInclude Include="Source\VertexBufferObject.h" />
+    <ClInclude Include="Source\World.h" />
     <ClInclude Include="Vendor\FastNoise\FastNoise.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

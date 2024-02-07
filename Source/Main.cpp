@@ -66,65 +66,6 @@ int main()
 	// Create and bind shaders
 	Shader shaderProgram("Resources/Shaders/Vertex.vert", "Resources/Shaders/Fragment.frag");
 
-	GLfloat vertices[] = {
-		// Positions          // Texture Coordinates
-		// Front
-		-0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,   0.0f, 1.0f,
-
-		// Back
-		-0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
-
-		// Left
-		-0.5f,  0.5f, -0.5f,   0.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
-
-		// Right
-		 0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
-
-		 // Top
-		 -0.5f,  0.5f,  0.5f,   0.0f, 0.0f,
-		  0.5f,  0.5f,  0.5f,   1.0f, 0.0f,
-		  0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-		 -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,
-
-		 // Bottom
-		 -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
-		  0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
-		  0.5f, -0.5f, -0.5f,   1.0f, 1.0f,
-		 -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,
-	};
-
-	GLuint indices[] = {
-		0, 1, 2,  // Front
-		2, 3, 0,
-
-		4, 5, 6,  // Back
-		6, 7, 4,
-
-		8, 9, 10,  // Left
-		10, 11, 8,
-
-		12, 13, 14,  // Right
-		14, 15, 12,
-
-		16, 17, 18,  // Top
-		18, 19, 16,
-
-		20, 21, 22,  // Bottom
-		22, 23, 20,
-	};
-
 	//VertexArrayObject vertexArrayObject;
 	//vertexArrayObject.Bind();
 	//VertexBufferObject vertexBufferObject(vertices, sizeof(vertices));
@@ -137,7 +78,8 @@ int main()
 	//vertexBufferObject.Unbind();
 	//indexBufferObject.Unbind();
 
-	Texture test_img("Resources/Textures/Blocks/test_img.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	//Texture test_img("Resources/Textures/Blocks/test_img.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture test_img("Resources/Textures/Blocks/test_img_alt.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -156,11 +98,9 @@ int main()
 		test_img.Bind();
 		//vertexArrayObject.Bind();
 		//glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(float), GL_UNSIGNED_INT, 0);
-		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk.xPos, myChunk.yPos, myChunk.zPos);
-		std::cout << myChunk.xPos << " " << myChunk.yPos << " " << myChunk.zPos << std::endl;
+		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk.chunkX, myChunk.chunkY, myChunk.chunkZ);
 		myChunk.Render();
-		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk2.xPos, myChunk2.yPos, myChunk2.zPos);
-		std::cout << myChunk2.xPos << " " << myChunk2.yPos << " " << myChunk2.zPos << std::endl;
+		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk2.chunkX, myChunk2.chunkY, myChunk2.chunkZ);
 		myChunk2.Render();
 
 		glfwSwapBuffers(window);

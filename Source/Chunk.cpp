@@ -7,30 +7,16 @@
 
 Chunk::Chunk(int x, int y, int z)
 {
-    xPos = x;
-	yPos = y;
-	zPos = z;
-    blocks = new Block * *[CHUNK_SIZE];
-    for (int i = 0; i < CHUNK_SIZE; ++i) {
-        blocks[i] = new Block * [CHUNK_SIZE];
-        for (int j = 0; j < CHUNK_SIZE; ++j) {
-            blocks[i][j] = new Block[CHUNK_SIZE];
+    chunkX = x;
+	chunkY = y;
+	chunkZ = z;
+    blocks = new Block * *[chunkSize];
+    for (int i = 0; i < chunkSize; ++i) {
+        blocks[i] = new Block * [chunkSize];
+        for (int j = 0; j < chunkSize; ++j) {
+            blocks[i][j] = new Block[chunkSize];
         }
     }
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);  // Attribute 0 is for positions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
-    glEnableVertexAttribArray(1);  // Attribute 1 is for texture coordinates
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-    // Unbind VAO to prevent accidental changes
-    glBindVertexArray(0);
 
     GenerateMesh(vertices, indices);
 }
@@ -57,40 +43,60 @@ void Chunk::GenerateMesh(std::vector<GLfloat>& vertices, std::vector<GLuint>& in
 
     auto start_time = std::chrono::high_resolution_clock::now();
     // Generate mesh for all the blocks in a chunk by querying blocks around it and marking faces to be generated
-    for (int x = 0; x < CHUNK_SIZE; ++x) {
-        for (int y = 0; y < CHUNK_SIZE; ++y) {
-            for (int z = 0; z < CHUNK_SIZE; ++z) {
-                if (x + 1 <= CHUNK_SIZE - 1 && blocks[x + 1][y][z].IsSolid(x + 1, y, z, CHUNK_SIZE) == false && blocks[x][y][z].IsSolid(x, y, z, CHUNK_SIZE) == true) {
+    for (int x = 0; x < chunkSize; ++x) {
+        for (int y = 0; y < chunkSize; ++y) {
+            for (int z = 0; z < chunkSize; ++z) {
+                blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize);
+                if (x + 1 <= chunkSize - 1) {
+                    blocks[x + 1][y][z].GenerateBlock(x + 1, y, z, chunkX, chunkY, chunkZ, chunkSize);
+                }
+                if (x - 1 >= 0) {
+                    blocks[x - 1][y][z].GenerateBlock(x - 1, y, z, chunkX, chunkY, chunkZ, chunkSize);
+                }
+				if (y + 1 <= chunkSize - 1) {
+					blocks[x][y + 1][z].GenerateBlock(x, y + 1, z, chunkX, chunkY, chunkZ, chunkSize);
+				}
+				if (y - 1 >= 0) {
+					blocks[x][y - 1][z].GenerateBlock(x, y - 1, z, chunkX, chunkY, chunkZ, chunkSize);
+				}
+				if (z + 1 <= chunkSize - 1) {
+					blocks[x][y][z + 1].GenerateBlock(x, y, z + 1, chunkX, chunkY, chunkZ, chunkSize);
+				}
+				if (z - 1 >= 0) {
+					blocks[x][y][z - 1].GenerateBlock(x, y, z - 1, chunkX, chunkY, chunkZ, chunkSize);
+				}
+
+                if (x + 1 <= chunkSize - 1 && blocks[x + 1][y][z].GetSolid() == 0 && blocks[x][y][z].GetSolid() == 1) {
                     shouldAddFace[Right].shouldAdd = true;
                 }
                 else {
                     shouldAddFace[Right].shouldAdd = false;
                 }
-                if (x - 1 >= 0 && blocks[x - 1][y][z].IsSolid(x - 1, y, z, CHUNK_SIZE) == false && blocks[x][y][z].IsSolid(x, y, z, CHUNK_SIZE) == true) {
+                if (x - 1 >= 0 && blocks[x - 1][y][z].GetSolid() == 0 && blocks[x][y][z].GetSolid() == 1) {
                     shouldAddFace[Left].shouldAdd = true;
                 }
                 else {
                     shouldAddFace[Left].shouldAdd = false;
                 }
-                if (y + 1 <= CHUNK_SIZE - 1 && blocks[x][y + 1][z].IsSolid(x, y + 1, z, CHUNK_SIZE) == false && blocks[x][y][z].IsSolid(x, y, z, CHUNK_SIZE) == true) {
+                if (y + 1 <= chunkSize - 1 && blocks[x][y + 1][z].GetSolid() == 0 && blocks[x][y][z].GetSolid() == 1) {
                     shouldAddFace[Top].shouldAdd = true;
                 }
                 else {
                     shouldAddFace[Top].shouldAdd = false;
                 }
-                if (y - 1 >= 0 && blocks[x][y - 1][z].IsSolid(x, y - 1, z, CHUNK_SIZE) == false && blocks[x][y][z].IsSolid(x, y, z, CHUNK_SIZE) == true) {
+                if (y - 1 >= 0 && blocks[x][y - 1][z].GetSolid() == 0 && blocks[x][y][z].GetSolid() == 1) {
                     shouldAddFace[Bottom].shouldAdd = true;
                 }
                 else {
                     shouldAddFace[Bottom].shouldAdd = false;
                 }
-                if (z + 1 <= CHUNK_SIZE - 1 && blocks[x][y][z + 1].IsSolid(x, y, z + 1, CHUNK_SIZE) == false && blocks[x][y][z].IsSolid(x, y, z, CHUNK_SIZE) == true) {
+                if (z + 1 <= chunkSize - 1 && blocks[x][y][z + 1].GetSolid() == 0 && blocks[x][y][z].GetSolid() == 1) {
                     shouldAddFace[Back].shouldAdd = true;
                 }
                 else {
                     shouldAddFace[Back].shouldAdd = false;
                 }
-                if (z - 1 >= 0 && blocks[x][y][z - 1].IsSolid(x, y, z - 1, CHUNK_SIZE) == false && blocks[x][y][z].IsSolid(x, y, z, CHUNK_SIZE) == true) {
+                if (z - 1 >= 0 && blocks[x][y][z - 1].GetSolid() == 0 && blocks[x][y][z].GetSolid() == 1) {
                     shouldAddFace[Front].shouldAdd = true;
                 }
                 else {
@@ -124,25 +130,18 @@ void Chunk::GenerateMesh(std::vector<GLfloat>& vertices, std::vector<GLuint>& in
 }
 
 void Chunk::Render() {
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);  // Attribute 0 is for positions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
-    glEnableVertexAttribArray(1);  // Attribute 1 is for texture coordinates
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    vertexArrayObject.Bind();
+    vertexBufferObject.Bind();
+    vertexBufferObject.Setup(vertices.size() * sizeof(GLfloat), vertices.data());
+    indexBufferObject.Bind();
+    indexBufferObject.Setup(indices.size() * sizeof(GLuint), indices.data());
+    vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
+    vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glBindVertexArray(0);  // Unbind VAO
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 Chunk::~Chunk() {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
+    vertexArrayObject.Delete();
+    vertexBufferObject.Delete();
+    indexBufferObject.Delete();
 }

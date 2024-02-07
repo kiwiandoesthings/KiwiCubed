@@ -12,11 +12,13 @@
 
 class Chunk {
 public:
-    static const int CHUNK_SIZE = 32;
+    static const int chunkSize = 32;
     Block*** blocks;
-    int xPos;
-    int yPos;
-    int zPos;
+    int chunkX;
+    int chunkY;
+    int chunkZ;
+
+
     Chunk(int x, int y, int z);
     ~Chunk();
 
@@ -27,7 +29,7 @@ private:
     std::vector<GLfloat> vertices;  // Vertex data
     std::vector<GLuint> indices;    // Index data
 
-    GLuint vao;
-    GLuint vbo;
-    GLuint ebo;
+	VertexArrayObject vertexArrayObject;
+	VertexBufferObject vertexBufferObject;
+	IndexBufferObject indexBufferObject;
 };
