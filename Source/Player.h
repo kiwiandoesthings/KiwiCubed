@@ -13,6 +13,7 @@ class Player {
 		void SetCameraMatrix(Shader& shader, const char* uniform);
 		void UpdateWindowSize(int windowWidth, int windowHeight);
 		void Update(GLFWwindow* window, Shader& shader, const char* uniform, int newPlayerX, int newPlayerY, int newPlayerZ);
+		Camera GetCameraInstance();
 
 	private:
 		int playerX, playerY, playerZ;

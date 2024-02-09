@@ -9,20 +9,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <Camera.h>
+
 
 class Window {
 	private:
 		GLFWwindow* window;
-
-		void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-			glViewport(0, 0, width, height);
-			float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-			glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-			//camera.UpdateWindowSize(width, height);
-		}
+		Camera* camera/* = Camera(600, 600, glm::vec3(0, 0, 0))*/;
 
 	public:
-		Window(int windowWidth, int windowHeight, const char* windowTitle);
+		Window(int windowWidth, int windowHeight, const char* windowTitle, Camera* camera, GLFWframebuffersizefun callback);
 		~Window();
 
 		int GetWidth();
@@ -32,4 +28,5 @@ class Window {
 
 		int windowWidth, windowHeight;
 		const char* windowTitle;
+
 };

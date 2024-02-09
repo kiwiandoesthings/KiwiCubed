@@ -1,3 +1,8 @@
+// In loving memory of Riley.
+// ~2008-2/8/2024
+// R.I.P.
+
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -19,14 +24,12 @@
 #include <Texture.h>
 #include <VertexBufferObject.h>
 #include <VertexArrayObject.h>
+#include <Window.h>
 
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 Player player(20, 50, 20);
-// Create needed variables
-int windowWidth = 600;
-int windowHeight = 600;
-const char* windowTitle = "Voxel Engine Test";
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int main()
 {
@@ -37,30 +40,13 @@ int main()
 		std::cerr << "Initialization / Error: Failed to initialize GLFW" << std::endl;
 		return -1;
 	}
-
-	// Give GLFW hints
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	// Create GLFW window
-	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
-	if (!window)
-	{
-		std::cerr << "Initialization / Error: Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-	//glfwSetWindowSizeCallback(window, window_size_callback);
+	Camera camera(600, 600, glm::vec3(0, 0, 0));
+	Window window(600, 600, "Voxel Engine", player.GetCameraInstance(), framebuffer_size_callback);
 
 	// Initialize GLAD
 	gladLoadGL();
 
 	// Set things up before main game loop
-	glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
-	glViewport(0, 0, windowWidth, windowHeight);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	Shader shaderProgram("Resources/Shaders/Vertex.vert", "Resources/Shaders/Fragment.frag");
 
@@ -73,14 +59,14 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Main game loop
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(window.GetWindowInstance()))
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.8f, 0.4f, 0.6f, 1.0f);
 
 		shaderProgram.Bind();
 
-		player.Update(window, shaderProgram, "camMatrix", 0, 0, 2);
+		player.Update(window.GetWindowInstance(), shaderProgram, "camMatrix", 0, 0, 2);
 
 		test_img.Bind();
 		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk.chunkX, myChunk.chunkY, myChunk.chunkZ);
@@ -88,7 +74,7 @@ int main()
 		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk2.chunkX, myChunk2.chunkY, myChunk2.chunkZ);
 		myChunk2.Render();
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(window.GetWindowInstance());
 
 		glfwPollEvents();
 	}
@@ -96,14 +82,13 @@ int main()
 	// Clean up once the program has exited
 	test_img.Delete();
 	shaderProgram.Delete();
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(window.GetWindowInstance());
 	glfwTerminate();
 	return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
 	glViewport(0, 0, width, height);
-	float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 	player.UpdateWindowSize(width, height);
 }

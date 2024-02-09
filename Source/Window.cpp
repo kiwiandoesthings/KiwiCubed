@@ -1,7 +1,6 @@
 #include <Window.h>
 
-//void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-Window::Window(int windowWidth, int windowHeight, const char* windowTitle) {
+Window::Window(int windowWidth, int windowHeight, const char* windowTitle, Camera* camera, GLFWframebuffersizefun callback) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
@@ -16,8 +15,9 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle) {
 		std::cerr << "Initialization / Error: Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 	}
-	//glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, callback);
+	this->camera = camera;
 }
 
 int Window::GetWidth() {
@@ -40,10 +40,3 @@ Window::~Window() {
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
-
-//void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-//	glViewport(0, 0, width, height);
-//	float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-//	glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-//	//camera.UpdateWindowSize(width, height);
-//}
