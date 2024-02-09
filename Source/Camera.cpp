@@ -117,5 +117,4 @@ void Camera::UpdateWindowSize(int windowWidth, int windowHeight)
 	Camera::height = windowHeight;
 
 	UpdateMatrix(80.0f, 0.1f, 1000.0f);
-	std::cout << windowWidth << " " << windowHeight << std::endl;
 }

@@ -1,6 +1,7 @@
 #include <Window.h>
 
-Window::Window(int windowWidth, int windowHeight, const char* windowTitle, Camera* camera, GLFWframebuffersizefun callback) {
+
+Window::Window(int windowWidth, int windowHeight, const char* windowTitle, GLFWframebuffersizefun callback) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
@@ -15,9 +16,8 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle, Camer
 		std::cerr << "Initialization / Error: Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 	}
-	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, callback);
-	this->camera = camera;
+	glfwMakeContextCurrent(window);
 }
 
 int Window::GetWidth() {

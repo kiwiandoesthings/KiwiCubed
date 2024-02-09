@@ -3,6 +3,8 @@
 // R.I.P.
 
 
+
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -27,9 +29,12 @@
 #include <Window.h>
 
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
 Player player(20, 50, 20);
+// Create needed variables
+int windowWidth = 600;
+int windowHeight = 600;
+const char* windowTitle = "Voxel Engine Test";
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int main()
 {
@@ -40,13 +45,16 @@ int main()
 		std::cerr << "Initialization / Error: Failed to initialize GLFW" << std::endl;
 		return -1;
 	}
-	Camera camera(600, 600, glm::vec3(0, 0, 0));
-	Window window(600, 600, "Voxel Engine", player.GetCameraInstance(), framebuffer_size_callback);
+
+	// Create window
+	Window window(windowWidth, windowHeight, windowTitle, framebuffer_size_callback);
 
 	// Initialize GLAD
 	gladLoadGL();
 
 	// Set things up before main game loop
+	glfwGetFramebufferSize(window.GetWindowInstance(), &windowWidth, &windowHeight);
+	glViewport(0, 0, 600, 600);
 
 	Shader shaderProgram("Resources/Shaders/Vertex.vert", "Resources/Shaders/Fragment.frag");
 
@@ -87,8 +95,9 @@ int main()
 	return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
+	float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 	player.UpdateWindowSize(width, height);
 }

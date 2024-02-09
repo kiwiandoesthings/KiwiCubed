@@ -28,10 +28,6 @@ void Player::Update(GLFWwindow* window, Shader& shader, const char* uniform, int
 	SetCameraMatrix(shader, uniform);
 }
 
-Camera Player::GetCameraInstance() {
-	return camera;
-}
-
 Player::~Player() {
 
 }
