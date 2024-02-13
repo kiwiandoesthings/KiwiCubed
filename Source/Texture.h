@@ -1,4 +1,6 @@
-#include<glad/glad.h>
+#pragma once
+
+#include <GLError.h>
 
 #include<stb/stb_image.h>
 

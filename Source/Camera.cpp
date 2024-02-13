@@ -10,7 +10,7 @@ Camera::Camera(int width, int height, glm::vec3 position)
 
 void Camera::Matrix(Shader& shader, const char* uniform)
 {
-	glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgramID, uniform), 1, GL_FALSE, glm::value_ptr(CameraMatrix));
+	GLCall(glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgramID, uniform), 1, GL_FALSE, glm::value_ptr(CameraMatrix)));
 }
 
 void Camera::UpdateMatrix(float FOV, float nearPlane, float farPlane)
@@ -53,11 +53,11 @@ void Camera::Inputs(GLFWwindow* window)
 		}
 		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 		{
-			speed = 0.04f;
+			speed = 0.4f;
 		}
 		else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE)
 		{
-			speed = 0.04f;
+			speed = 0.4f;
 		}
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		{

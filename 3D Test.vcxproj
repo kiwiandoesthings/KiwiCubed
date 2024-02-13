@@ -39,6 +39,7 @@
     <ClInclude Include="Source\Block.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Chunk.h" />
+    <ClInclude Include="Source\GLError.h" />
     <ClInclude Include="Source\IndexBufferObject.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Texture.h" />

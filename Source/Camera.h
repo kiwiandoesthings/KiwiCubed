@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLAD/glad.h>
+#include <GLError.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
