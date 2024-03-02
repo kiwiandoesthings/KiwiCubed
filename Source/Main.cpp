@@ -23,6 +23,7 @@
 #include <Camera.h>
 #include <Chunk.h>
 #include <IndexBufferObject.h>
+#include <Player.h>
 #include <Shader.h>
 #include <SingleplayerHandler.h>
 #include <Texture.h>
@@ -33,7 +34,6 @@
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-Camera camera(windowWidth, windowHeight, glm::vec3(0.0f, 0.0f, 2.0f));
 
 int windowWidth = 640;
 int windowHeight = 480;
@@ -96,9 +96,6 @@ int main() {
 	}
 
 	// Clean up once the program has exited
-	//vertexArrayObject.Delete();
-	//vertexBufferObject.Delete();
-	//indexBufferObject.Delete();
 	test_img.Delete();
 	shaderProgram.Delete();
 	glfwDestroyWindow(globalWindow.GetWindowInstance());

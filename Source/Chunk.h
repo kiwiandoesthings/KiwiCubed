@@ -41,9 +41,6 @@ public:
     void SetStartIndex(int newStartIndex);
     void SetEndIndex(int newEndIndex);
 
-    // Methods for manipulating and rendering the chunk
-    // ...
-
 private:
     World* fPtrWorld;
     std::vector<GLfloat> vertices;  // Vertex data
