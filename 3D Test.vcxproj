@@ -25,6 +25,7 @@
     <ClCompile Include="Source\IndexBufferObject.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\SingleplayerHandler.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\VertexArrayObject.cpp" />
     <ClCompile Include="Source\VertexBufferObject.cpp" />
@@ -42,6 +43,7 @@
     <ClInclude Include="Source\GLError.h" />
     <ClInclude Include="Source\IndexBufferObject.h" />
     <ClInclude Include="Source\Shader.h" />
+    <ClInclude Include="Source\SingleplayerHandler.h" />
     <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\VertexArrayObject.h" />
     <ClInclude Include="Source\VertexBufferObject.h" />

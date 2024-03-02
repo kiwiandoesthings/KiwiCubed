@@ -2,8 +2,8 @@
 
 VertexArrayObject::VertexArrayObject()
 {
-	GLCall(glGenVertexArrays(1, &vertexArrayObjectID));
-	std::cout << "Vertex Array Object Setup / Info: Successfully created vertex array with ID of " << vertexArrayObjectID << std::endl;
+	glGenVertexArrays(1, &vertexArrayObjectID);
+	//std::cout << "Vertex Array Object Setup / Info: Successfully created vertex array with ID of " << vertexArrayObjectID << std::endl;
 }
 
 void VertexArrayObject::LinkAttribute(VertexBufferObject& vertexBufferObject, GLuint layout, GLuint componentCount, GLenum type, GLboolean isNormalized, GLsizeiptr stride, void* offset)

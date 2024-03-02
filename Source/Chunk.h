@@ -2,37 +2,57 @@
 
 #include <glad/glad.h>
 
-#include <iostream>
 #include <vector>
 
 #include <Block.h>
 #include <IndexBufferObject.h>
+#include <Shader.h>
 #include <VertexArrayObject.h>
 #include <VertexBufferObject.h>
 
+
+class World;
+
+
 class Chunk {
 public:
-    static const int CHUNK_SIZE = 48;
-    Chunk(int xPos, int yPos, int zPos);
+    static const int chunkSize = 32;
+    Block*** blocks;
+    int chunkX;
+    int chunkY;
+    int chunkZ;
+    bool isAllocated;
+
+    Chunk() : chunkX(0), chunkY(0), chunkZ(0), blocks(0), isAllocated(false), fPtrWorld(fPtrWorld) {}
+    Chunk(int chunkX, int chunkY, int chunkZ);
     ~Chunk();
 
-    void GenerateMesh(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices);
-    void Render();
+    void AllocateChunk();
+    void GenerateBlocks();
+    void GenerateMesh(World& World);
+    void GenerateBlockMesh(int x, int y, int z);
+    void Render(Shader shaderProgram);
+
+    std::vector<GLfloat> GetVertices() const;
+    std::vector<GLuint> GetIndices() const;
+
+    int GetStartIndex() const;
+    int GetEndIndex() const;
+    void SetStartIndex(int newStartIndex);
+    void SetEndIndex(int newEndIndex);
 
     // Methods for manipulating and rendering the chunk
     // ...
 
 private:
-    Block blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-
-    int xPos;
-    int yPos;
-    int zPos;
-
+    World* fPtrWorld;
     std::vector<GLfloat> vertices;  // Vertex data
     std::vector<GLuint> indices;    // Index data
 
-    GLuint vao;
-    GLuint vbo;
-    GLuint ebo;
+    int startIndex;
+    int endIndex;
+
+	VertexArrayObject vertexArrayObject;
+	VertexBufferObject vertexBufferObject;
+	IndexBufferObject indexBufferObject;
 };

@@ -10,6 +10,7 @@
 #include <glm/gtx/vector_angle.hpp>
 
 #include <Shader.h>
+#include <Window.h>
 
 class Camera
 {
@@ -30,8 +31,9 @@ class Camera
 
 		Camera(int width, int height, glm::vec3 position);
 
-		void Matrix(Shader& shader, const char* uniform);
-		void UpdateMatrix(float FOV, float nearPlane, float farPlane);
-		void Inputs(GLFWwindow* window);
-		void UpdateWindowSize(int windowWidth, int windowHeight);
+	void Matrix(Shader& shader, const char* uniform);
+	void UpdateMatrix(float FOV, float nearPlane, float farPlane);
+	void SetPosition(float cameraX, float cameraY, float cameraZ);
+	void Inputs(GLFWwindow* windowInstance, Window window);
+	void UpdateWindowSize(int windowWidth, int windowHeight);
 };

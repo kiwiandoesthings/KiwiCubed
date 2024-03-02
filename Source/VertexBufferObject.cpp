@@ -3,6 +3,7 @@
 VertexBufferObject::VertexBufferObject(GLfloat* verticies, GLsizeiptr size)
 {
 	glGenBuffers(1, &vertexBufferObjectID);
+	//std::cout << "Vertex Buffer Object Setup / Info: Successfully created vertex buffer with ID of " << vertexBufferObjectID << std::endl;
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjectID);
 	glBufferData(GL_ARRAY_BUFFER, size, verticies, GL_STATIC_DRAW);
 	std::cout << "Vertex Buffer Object Setup / Info: Successfully created vertex buffer with ID of " << vertexBufferObjectID << std::endl;

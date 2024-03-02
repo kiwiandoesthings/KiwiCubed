@@ -63,8 +63,7 @@ GLuint faceIndices[] = {
 	22, 23, 20
 };
 
-Block::Block(int xPos, int yPos, int zPos) : xPos(xPos), yPos(yPos), zPos(zPos) {
-    std::cout << xPos << " " << yPos << " " << zPos << " " << std::endl;
+Block::Block(int blockX, int blockY, int blockZ) : blockX(blockX), blockY(blockY), blockZ(blockZ), isSolid(-1) {
 }
 
 bool Block::IsSolid(int x, int y, int z, int CHUNK_SIZE) {
@@ -72,17 +71,19 @@ bool Block::IsSolid(int x, int y, int z, int CHUNK_SIZE) {
 	FastNoiseLite noise;
 	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 
-	// Adjust the scale according to your terrain preferences
-	float noiseValue = noise.GetNoise((float)x, (float)z);
+
+		// Adjust the scale according to your terrain preferences
+		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
 
 	int terrainHeight = static_cast<int>(noiseValue * CHUNK_SIZE);
 
-	// Check if the block is solid based on terrain height
-	if (y <= terrainHeight) {
-		return false;
-	}
-	else {
-		return true;
+		// Check if the block is solid based on terrain height
+		if (noiseValue > 0) {
+			SetSolid(1);
+		}
+		else {
+			SetSolid(0);
+		}
 	}
 }
 
