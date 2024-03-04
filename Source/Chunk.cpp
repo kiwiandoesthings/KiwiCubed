@@ -67,13 +67,13 @@ void Chunk::GenerateBlocks() {
         }
     }
     auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
-    std::cout << "Chunk Generation / Info: World generation took " << duration << " microseconds" << std::endl;
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+    std::cout << "Chunk Generation / Info: World generation took " << duration << " ms" << std::endl;
 }
 
 void Chunk::GenerateMesh(World& world) {
     if (isAllocated == false) {
-        std::cout << "Chunk Generation / Error: Trying to generate mesh for unallocated chunk" << std::endl;
+        std::cout << "Chunk Generation / Error: Trying to generate mesh for unallocated chunk. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
         return;
     }
     // Clear existing data
@@ -103,8 +103,8 @@ void Chunk::GenerateMesh(World& world) {
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
-    std::cout << "Chunk Generation / Info: Chunk mesh generation took " << duration << " microseconds" << std::endl;
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+    std::cout << "Chunk Generation / Info: Chunk mesh generation took " << duration << " ms" << std::endl;
 }
 
 void Chunk::GenerateBlockMesh(int x, int y, int z) {
@@ -166,17 +166,17 @@ void Chunk::GenerateBlockMesh(int x, int y, int z) {
 }
 
 // Ignore this old method
-//void Chunk::Render(Shader shaderProgram) {
-//    //glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), (GLfloat)chunkX, (GLfloat)chunkY, (GLfloat)chunkZ);
-//    vertexArrayObject.Bind();
-//    vertexBufferObject.Bind();
-//    vertexBufferObject.Setup(vertices.size() * sizeof(GLfloat), vertices.data());
-//    indexBufferObject.Bind();
-//    indexBufferObject.Setup(indices.size() * sizeof(GLuint), indices.data());
-//    vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
-//    vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-//    //glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
-//}
+void Chunk::Render(/*Shader shaderProgram*/) {
+    //glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), (GLfloat)chunkX, (GLfloat)chunkY, (GLfloat)chunkZ);
+    vertexArrayObject.Bind();
+    vertexBufferObject.Bind();
+    vertexBufferObject.Setup(vertices.size() * sizeof(GLfloat), vertices.data());
+    indexBufferObject.Bind();
+    indexBufferObject.Setup(indices.size() * sizeof(GLuint), indices.data());
+    vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
+    vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    GLCall(glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0));
+}
 
 std::vector<GLfloat> Chunk::GetVertices() const {
     return Chunk::vertices;

@@ -1,21 +1,15 @@
 #include <Window.h>
 
 
-Window::Window(int windowWidth, int windowHeight, const char* windowTitle, GLFWframebuffersizefun callback) : callback(nullptr), isFocused(false), firstClick(true) {
+Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isFocused(false), firstClick(true) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	if (!glfwInit())
-	{
-		std::cerr << "Initialization / Error: Failed to initialize GLFW" << std::endl;
-		//return -1;
-	}
-	else {
-		std::cout << "Initialization / Info: Successfully initialized GLFW" << std::endl;
-	}
+
 	// Create GLFW window
 	window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
 	if (!window)
@@ -26,7 +20,6 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle, GLFWf
 	else {
 		std::cout << "Initialization / Info: Successfully created GLFW window" << std::endl;
 	}
-	//glfwSetFramebufferSizeCallback(window, callback);
 	glfwMakeContextCurrent(window);
 }
 
@@ -59,7 +52,6 @@ void Window::Inputs() {
 void Window::UpdateWindowSize(int windowWidth, int windowHeight) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
-
 }
 
 int Window::GetWidth() {

@@ -5,18 +5,20 @@
 #include <iostream>
 
 #define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
-    x;\
-    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#define GLCall(x) \
+    GLClearError(); \
+    x; \
+    if (!GLLogCall(#x, __FILE__, __LINE__)) __debugbreak()
 
 static void GLClearError() {
     while (glGetError() != GL_NO_ERROR);
 }
 
 static bool GLLogCall(const char* function, const char* file, int line) {
+    bool hasError = false;
     while (GLenum error = glGetError()) {
-        std::cout << "OpenGL Error / Error: " << error << " at line " << line << " in function " << function << " in file " << file << std::endl;
-        return false;
+        std::cout << "[[OpenGL Function Call]] / Error: " << error << " at line " << line << " in function " << function << " in file " << file << std::endl;
+        hasError = true;
     }
-    return true;
+    return !hasError;
 }

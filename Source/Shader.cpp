@@ -3,11 +3,16 @@
 
 Shader::Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath)
 {
-	std::string vertexSource = ParseShader(vertexFilePath);
-	std::string fragmentSource = ParseShader(fragmentFilePath);
+    std::string vertexSource = ParseShader(vertexFilePath);
+    std::string fragmentSource = ParseShader(fragmentFilePath);
 
-    shaderProgramID = CreateShader(vertexSource, fragmentSource);
-    std::cout << "Shader Setup / Info: Successfully created shader program with ID of " << shaderProgramID << std::endl;
+    if (!fragmentSource.empty() || !vertexSource.empty()) {
+        shaderProgramID = CreateShader(vertexSource, fragmentSource);
+        std::cout << "Shader Setup / Info: Successfully created shader program with ID of " << shaderProgramID << std::endl;
+    }
+    else {
+        std::cerr << "Shader Setup / Error: Shader file(s) not found, aborting shader creation" << std::endl;
+    }
 }
 
 std::string Shader::ParseShader(const std::string& filePath)

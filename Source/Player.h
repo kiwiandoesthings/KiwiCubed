@@ -9,10 +9,9 @@ public:
 	Player(int playerX, int playerY, int playerZ);
 	~Player();
 
-	void UpdatePosition(int playerX, int playerY, int playerZ);
+	void UpdatePosition(Window* window, int playerX, int playerY, int playerZ);
 	void SetCameraMatrix(Shader& shader, const char* uniform);
-	void UpdateWindowSize(int windowWidth, int windowHeight);
-	void Update(GLFWwindow* windowInstance, Window window, Shader& shader, const char* uniform, int newPlayerX, int newPlayerY, int newPlayerZ);
+	void Update(Window* window, Shader& shader, const char* uniform, int newPlayerX, int newPlayerY, int newPlayerZ);
 
 	std::tuple<int, int, int> GetPosition();
 

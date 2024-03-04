@@ -6,12 +6,12 @@
 
 class SingleplayerHandler {
 	public:
+		World singlePlayerWorld = World();
+		bool isLoadedIntoSingleplayerWorld;
+
 		SingleplayerHandler();
 		~SingleplayerHandler();
 
 		void StartSingleplayerWorld();
 		void EndSingleplayerWorld();
-
-		World singlePlayerWorld = World();
-		bool isLoadedIntoSingleplayerWorld;
 };

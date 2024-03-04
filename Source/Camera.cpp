@@ -13,8 +13,11 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 	GLCall(glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgramID, uniform), 1, GL_FALSE, glm::value_ptr(CameraMatrix)));
 }
 
-void Camera::UpdateMatrix(float FOV, float nearPlane, float farPlane)
+void Camera::UpdateMatrix(Window* window, float FOV, float nearPlane, float farPlane)
 {
+	width = window->GetWidth();
+	height = window->GetHeight();
+
 	glm::mat4 viewMatrix = glm::mat4(1.0f);
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 
@@ -28,9 +31,10 @@ void Camera::SetPosition(float cameraX, float cameraY, float cameraZ) {
 	Position = glm::vec3(cameraX, cameraY, cameraZ);
 }
 
-void Camera::Inputs(GLFWwindow* windowInstance, Window window)
+void Camera::Inputs(Window* window)
 {
-	if (cursorFree == false) {
+	GLFWwindow* windowInstance = window->GetWindowInstance();
+	if (window->isFocused) {
 		if (glfwGetKey(windowInstance, GLFW_KEY_W) == GLFW_PRESS)
 		{
 			Position += speed * Orientation;
@@ -63,39 +67,28 @@ void Camera::Inputs(GLFWwindow* windowInstance, Window window)
 		{
 			speed = 0.4f;
 		}
-		if (glfwGetKey(windowInstance, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	}
+
+	if (window->isFocused) {
+		double mouseX;
+		double mouseY;
+
+		// Fetches the coordinates of the cursor
+		glfwGetCursorPos(windowInstance, &mouseX, &mouseY);
+
+		float rotX = sensitivity * (float)(mouseY - (window->GetHeight() / 2)) / window->GetHeight();
+		float rotY = sensitivity * (float)(mouseX - (window->GetWidth() / 2)) / window->GetWidth();
+
+		glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, UpDirection)));
+
+		// Decides whether or not the next vertical Orientation is legal or not
+		if (abs(glm::angle(newOrientation, UpDirection) - glm::radians(90.0f)) <= glm::radians(85.0f))
 		{
-			cursorFree = true;
+			Orientation = newOrientation;
 		}
+
+		Orientation = glm::rotate(Orientation, glm::radians(-rotY), UpDirection);
+
+		glfwSetCursorPos(windowInstance, (window->GetWidth() / 2), (window->GetHeight() / 2));
 	}
-
-	double mouseX;
-	double mouseY;
-	// Fetches the coordinates of the cursor
-	glfwGetCursorPos(windowInstance, &mouseX, &mouseY);
-	if (window.isFocused) {
-		//glfwSetCursorPos(windowInstance, (window.GetWidth() / 2), (window.GetHeight() / 2));
-	}
-	float rotX = sensitivity * (float)(mouseY - (height / 2)) / height;
-	float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
-
-	// Calculates upcoming vertical change in the Orientation
-	glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, UpDirection)));
-
-	// Decides whether or not the next vertical Orientation is legal or not
-	if (abs(glm::angle(newOrientation, UpDirection) - glm::radians(90.0f)) <= glm::radians(85.0f))
-	{
-		Orientation = newOrientation;
-	}
-
-	// Rotates the Orientation left and right
-	Orientation = glm::rotate(Orientation, glm::radians(-rotY), UpDirection);
-}
-
-void Camera::UpdateWindowSize(int windowWidth, int windowHeight)
-{
-	Camera::width = windowWidth;
-	Camera::height = windowHeight;
-
-	UpdateMatrix(80.0f, 0.1f, 1000.0f);
 }

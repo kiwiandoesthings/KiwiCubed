@@ -2,7 +2,7 @@
 
 VertexArrayObject::VertexArrayObject()
 {
-	glGenVertexArrays(1, &vertexArrayObjectID);
+	GLCall(glGenVertexArrays(1, &vertexArrayObjectID));
 	//std::cout << "Vertex Array Object Setup / Info: Successfully created vertex array with ID of " << vertexArrayObjectID << std::endl;
 }
 

@@ -12,13 +12,13 @@
 
 class World {
 	public:
+		Player player = Player(0, 0, 0);
+
 		World();
 		~World();
 
 		void Render();
 		void GenerateChunk(int const chunkX, int const chunkY, int const chunkZ);
-
-		Player player = Player(0, 0, 0);
 
 	private:
 		int worldSize = 2;

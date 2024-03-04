@@ -1,7 +1,7 @@
 #include <SingleplayerHandler.h>
 
 
-SingleplayerHandler::SingleplayerHandler() {
+SingleplayerHandler::SingleplayerHandler() : isLoadedIntoSingleplayerWorld(false) {
 
 }
 

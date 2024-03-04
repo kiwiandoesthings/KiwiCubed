@@ -31,7 +31,7 @@ public:
     void GenerateBlocks();
     void GenerateMesh(World& World);
     void GenerateBlockMesh(int x, int y, int z);
-    void Render(Shader shaderProgram);
+    void Render(/*Shader shaderProgram*/);
 
     std::vector<GLfloat> GetVertices() const;
     std::vector<GLuint> GetIndices() const;

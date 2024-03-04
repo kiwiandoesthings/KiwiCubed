@@ -9,16 +9,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <GLError.h>
+
 
 class Window {
 	private:
 		GLFWwindow* window;
-		GLFWframebuffersizefun callback;
 		bool firstClick;
 
 	public:
-		Window() : windowWidth(640), windowHeight(480), windowTitle("Failed to retrieve window title"), callback(nullptr), isFocused(false), firstClick(true) {}
-		Window(int windowWidth, int windowHeight, const char* windowTitle, GLFWframebuffersizefun callback);
+		Window() : windowWidth(640), windowHeight(480), windowTitle("Failed to retrieve window title"), isFocused(false), firstClick(true) {}
+		Window(int windowWidth, int windowHeight, const char* windowTitle);
 		~Window();
 
 		void Inputs();
