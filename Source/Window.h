@@ -1,5 +1,6 @@
 #pragma once
 
+#include <GLError.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -18,9 +19,8 @@ class Window {
 		bool firstClick;
 
 	public:
-		Window() : windowWidth(640), windowHeight(480), windowTitle("Failed to retrieve window title"), isFocused(false), firstClick(true) {}
+		Window() : windowWidth(640), windowHeight(480), windowTitle("Failed to retrieve window title"), isFocused(false), firstClick(true), window(window) {}
 		Window(int windowWidth, int windowHeight, const char* windowTitle);
-		~Window();
 
 		void Inputs();
 
@@ -29,6 +29,8 @@ class Window {
 		int GetHeight();
 		const char* GetTitle();
 		GLFWwindow* GetWindowInstance();
+
+		void Delete();
 
 		int windowWidth, windowHeight;
 		const char* windowTitle;

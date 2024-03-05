@@ -1,12 +1,13 @@
 // In loving memory of Riley.
 // ~2008-2/8/2024
 // R.I.P.
-// 
-// 
-// 
-//
-// 
-// 
+
+
+
+
+
+
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -14,27 +15,17 @@
 #include <sstream>
 #include <string>
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/glm.hpp>
-#include <stb/stb_image.h>
-
-#include <Block.h>
-#include <Camera.h>
-#include <Chunk.h>
-#include <IndexBufferObject.h>
-#include <Player.h>
 #include <Shader.h>
 #include <SingleplayerHandler.h>
 #include <Texture.h>
-#include <VertexBufferObject.h>
-#include <VertexArrayObject.h>
 #include <Window.h>
 #include <World.h>
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+
+// TODO: Replace with JSON file loading or something
 int windowWidth = 640;
 int windowHeight = 480;
 const char* windowTitle = "Voxel Engine Test";
@@ -72,6 +63,7 @@ int main() {
 	windowWidth = globalWindow.GetWidth();
 	windowHeight = globalWindow.GetHeight();
 	GLCall(glViewport(0, 0, windowWidth, windowHeight));
+	GLCall(glEnable(GL_DEPTH_TEST));
 	
 	// Create a singleplayer world
 	SingleplayerHandler singleplayerHandler = SingleplayerHandler();
@@ -82,16 +74,18 @@ int main() {
 
 	// Create a debug texture
 	Texture test_img("Resources/Textures/Blocks/test_img_alt.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
-
-	GLCall(glEnable(GL_DEPTH_TEST));
 	
+	// Start generating a chunk in the singleplayer world
 	singleplayerHandler.singlePlayerWorld.GenerateChunk(0, 0, 0);
+	singleplayerHandler.singlePlayerWorld.GenerateChunk(1, 0, 0);
 
+	// Bind stuff
 	test_img.Bind();
 	shaderProgram.Bind();
 	
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
+
 		// Make background ~pink~
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 		GLCall(glClearColor(0.8f, 0.4f, 0.6f, 1.0f));
@@ -113,7 +107,7 @@ int main() {
 
 	// Clean up once the program has exited
 	test_img.Delete();
-	//shaderProgram.Delete();
+	shaderProgram.Delete();
 	glfwDestroyWindow(globalWindow.GetWindowInstance());
 	glfwTerminate();
 	return 0;

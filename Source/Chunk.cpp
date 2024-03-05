@@ -1,33 +1,17 @@
-#include <iostream>
-
-#include <chrono>
-#include <unordered_map>
-
 #include <Chunk.h>
 
-
-struct ShouldAdd {
-    bool shouldAdd;
-};
 
 std::unordered_map<FaceDirection, ShouldAdd> shouldAddFace;
 
 
-Chunk::Chunk(int chunkX, int chunkY, int chunkZ)
-{
+Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), fPtrWorld(nullptr), startIndex(0), endIndex(0), blocks(blocks) {
     Chunk::chunkX = chunkX;
     Chunk::chunkY = chunkY;
     Chunk::chunkZ = chunkZ;
-    blocks = new Block * *[chunkSize];
-    for (int i = 0; i < chunkSize; ++i) {
-        blocks[i] = new Block * [chunkSize];
-        for (int j = 0; j < chunkSize; ++j) {
-            blocks[i][j] = new Block[chunkSize];
-        }
-    }
 }
 
 void Chunk::AllocateChunk() {
+    // Allocate memory for all the blocks in the chunk
     blocks = new Block * *[chunkSize];
     for (int i = 0; i < chunkSize; ++i) {
         blocks[i] = new Block * [chunkSize];
@@ -35,55 +19,34 @@ void Chunk::AllocateChunk() {
             blocks[i][j] = new Block[chunkSize];
         }
     }
-
+    
     isAllocated = true;
 }
 
 void Chunk::GenerateBlocks() {
+    // Generates all the blocks in the chunk
     auto start_time = std::chrono::high_resolution_clock::now();
     for (int x = 0; x < chunkSize; ++x) {
         for (int y = 0; y < chunkSize; ++y) {
             for (int z = 0; z < chunkSize; ++z) {
                 blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize);
-                if (x + 1 <= chunkSize - 1) {
-                    blocks[x + 1][y][z].GenerateBlock(x + 1, y, z, chunkX, chunkY, chunkZ, chunkSize);
-                }
-                if (x - 1 >= 0) {
-                    blocks[x - 1][y][z].GenerateBlock(x - 1, y, z, chunkX, chunkY, chunkZ, chunkSize);
-                }
-                if (y + 1 <= chunkSize - 1) {
-                    blocks[x][y + 1][z].GenerateBlock(x, y + 1, z, chunkX, chunkY, chunkZ, chunkSize);
-                }
-                if (y - 1 >= 0) {
-                    blocks[x][y - 1][z].GenerateBlock(x, y - 1, z, chunkX, chunkY, chunkZ, chunkSize);
-                }
-                if (z + 1 <= chunkSize - 1) {
-                    blocks[x][y][z + 1].GenerateBlock(x, y, z + 1, chunkX, chunkY, chunkZ, chunkSize);
-                }
-                if (z - 1 >= 0) {
-                    blocks[x][y][z - 1].GenerateBlock(x, y, z - 1, chunkX, chunkY, chunkZ, chunkSize);
-                }
             }
         }
     }
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-    std::cout << "Chunk Generation / Info: World generation took " << duration << " ms" << std::endl;
+    std::cout << "Chunk Generation / Info: Chunk world generation took " << duration << " ms" << std::endl;
 }
 
 void Chunk::GenerateMesh(World& world) {
     if (isAllocated == false) {
-        std::cout << "Chunk Generation / Error: Trying to generate mesh for unallocated chunk. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
+        std::cout << "Chunk Generation / Error: Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
         return;
     }
+
     // Clear existing data
     vertices.clear();
     indices.clear();
-
-    vertices.reserve(24 * chunkSize * chunkSize * chunkSize);
-    indices.reserve(36 * chunkSize * chunkSize * chunkSize);
-
-    //auto start_time = std::chrono::high_resolution_clock::now();
 
     GenerateBlocks();
 
@@ -94,7 +57,7 @@ void Chunk::GenerateMesh(World& world) {
         for (int y = 0; y < chunkSize; ++y) {
             for (int z = 0; z < chunkSize; ++z) {
                 int currentBlockSolid = blocks[x][y][z].GetSolid();
-                
+
                 if (currentBlockSolid == 1) {
                     GenerateBlockMesh(x, y, z);
                 }
@@ -108,60 +71,35 @@ void Chunk::GenerateMesh(World& world) {
 }
 
 void Chunk::GenerateBlockMesh(int x, int y, int z) {
+    // Clear all the faces that were added
+    for (auto& entry : shouldAddFace) {
+        entry.second.shouldAdd = false;
+    }
+
+    // Check each face for blocks around it and generate mesh for faces that should be added
     if (x + 1 <= chunkSize - 1 && blocks[x + 1][y][z].GetSolid() == 0) {
         shouldAddFace[RIGHT].shouldAdd = true;
-    }
-    else {
-        shouldAddFace[RIGHT].shouldAdd = false;
+        blocks[x][y][z].AddFace(x, y, z, vertices, indices, RIGHT);
     }
     if (x - 1 >= 0 && blocks[x - 1][y][z].GetSolid() == 0) {
         shouldAddFace[LEFT].shouldAdd = true;
-    }
-    else {
-        shouldAddFace[LEFT].shouldAdd = false;
+        blocks[x][y][z].AddFace(x, y, z, vertices, indices, LEFT);
     }
     if (y + 1 <= chunkSize - 1 && blocks[x][y + 1][z].GetSolid() == 0) {
         shouldAddFace[TOP].shouldAdd = true;
-    }
-    else {
-        shouldAddFace[TOP].shouldAdd = false;
+        blocks[x][y][z].AddFace(x, y, z, vertices, indices, TOP);
     }
     if (y - 1 >= 0 && blocks[x][y - 1][z].GetSolid() == 0) {
         shouldAddFace[BOTTOM].shouldAdd = true;
-    }
-    else {
-        shouldAddFace[BOTTOM].shouldAdd = false;
+        blocks[x][y][z].AddFace(x, y, z, vertices, indices, BOTTOM);
     }
     if (z + 1 <= chunkSize - 1 && blocks[x][y][z + 1].GetSolid() == 0) {
         shouldAddFace[BACK].shouldAdd = true;
-    }
-    else {
-        shouldAddFace[BACK].shouldAdd = false;
+        blocks[x][y][z].AddFace(x, y, z, vertices, indices, BACK);
     }
     if (z - 1 >= 0 && blocks[x][y][z - 1].GetSolid() == 0) {
         shouldAddFace[FRONT].shouldAdd = true;
-    }
-    else {
-        shouldAddFace[FRONT].shouldAdd = false;
-    }
-
-    if (shouldAddFace[FRONT].shouldAdd == true) {
-        blocks[x][y][z].GenerateMesh(x, y, z, vertices, indices, FRONT);
-    }
-    if (shouldAddFace[BACK].shouldAdd == true) {
-        blocks[x][y][z].GenerateMesh(x, y, z, Chunk::vertices, indices, BACK);
-    }
-    if (shouldAddFace[LEFT].shouldAdd == true) {
-        blocks[x][y][z].GenerateMesh(x, y, z, Chunk::vertices, indices, LEFT);
-    }
-    if (shouldAddFace[RIGHT].shouldAdd == true) {
-        blocks[x][y][z].GenerateMesh(x, y, z, Chunk::vertices, indices, RIGHT);
-    }
-    if (shouldAddFace[TOP].shouldAdd == true) {
-        blocks[x][y][z].GenerateMesh(x, y, z, Chunk::vertices, indices, TOP);
-    }
-    if (shouldAddFace[BOTTOM].shouldAdd == true) {
-        blocks[x][y][z].GenerateMesh(x, y, z, Chunk::vertices, indices, BOTTOM);
+        blocks[x][y][z].AddFace(x, y, z, vertices, indices, FRONT);
     }
 }
 

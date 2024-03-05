@@ -1,14 +1,24 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <GLError.h>
+#include <GLAD/glad.h>
 
+#include <iostream>
 #include <vector>
+
+#include <chrono>
+#include <unordered_map>
 
 #include <Block.h>
 #include <IndexBufferObject.h>
 #include <Shader.h>
 #include <VertexArrayObject.h>
 #include <VertexBufferObject.h>
+
+
+struct ShouldAdd {
+    bool shouldAdd;
+};
 
 
 class World;
@@ -23,7 +33,7 @@ public:
     int chunkZ;
     bool isAllocated;
 
-    Chunk() : chunkX(0), chunkY(0), chunkZ(0), blocks(0), isAllocated(false), fPtrWorld(fPtrWorld) {}
+    Chunk() : chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), fPtrWorld(nullptr), startIndex(0), endIndex(0), blocks(blocks) {}
     Chunk(int chunkX, int chunkY, int chunkZ);
     ~Chunk();
 
@@ -43,8 +53,8 @@ public:
 
 private:
     World* fPtrWorld;
-    std::vector<GLfloat> vertices;  // Vertex data
-    std::vector<GLuint> indices;    // Index data
+    std::vector<GLfloat> vertices;
+    std::vector<GLuint> indices;  
 
     int startIndex;
     int endIndex;

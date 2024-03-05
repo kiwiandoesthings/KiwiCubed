@@ -1,7 +1,7 @@
 #include <Window.h>
 
 
-Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isFocused(false), firstClick(true) {
+Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isFocused(false), firstClick(true), window(window) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
@@ -70,7 +70,7 @@ GLFWwindow* Window::GetWindowInstance() {
 	return Window::window;
 }
 
-Window::~Window() {
+void Window::Delete() {
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }

@@ -1,7 +1,7 @@
 #pragma once
 
+#include <GLError.h>
 #include <glad/glad.h>
-#include <GL/gl.h>
 
 #include <vector>
 

@@ -1,5 +1,3 @@
-#include <FastNoise/FastNoise.h>
-
 #include <Block.h>
 
 
@@ -69,21 +67,18 @@ GLuint faceIndices[] = {
 };
 
 Block::Block(int blockX, int blockY, int blockZ) : blockX(blockX), blockY(blockY), blockZ(blockZ), isSolid(-1) {
+
 }
 
 void Block::GenerateBlock(int blockX, int blockY, int blockZ, int chunkX, int chunkY, int chunkZ, int chunkSize) {
 	if (GetSolid() == -1) {
-		// Generate terrain heights using FastNoiseLite
+		// Setup FastNoiseLite
 		FastNoiseLite noise;
 		noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 
-
-		// Adjust the scale according to your terrain preferences
+		// Get the noise value for the block
 		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
 
-		int terrainHeight = static_cast<int>(noiseValue * chunkSize);
-
-		// Check if the block is solid based on terrain height
 		if (noiseValue > 0) {
 			SetSolid(1);
 		}
@@ -93,39 +88,36 @@ void Block::GenerateBlock(int blockX, int blockY, int blockZ, int chunkX, int ch
 	}
 }
 
+void Block::AddFace(int x, int y, int z, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection) {
+	// Calculate offset based on block position
+	GLfloat xOffset = static_cast<GLfloat>(x);
+	GLfloat yOffset = static_cast<GLfloat>(y);
+	GLfloat zOffset = static_cast<GLfloat>(z);
+
+	size_t vertexOffset = static_cast<size_t>(faceDirection) * 20;
+
+	// Append face vertices with offset to the chunk's vertex array
+	for (size_t i = vertexOffset; i < vertexOffset + 20; i += 5) {
+		vertices.push_back(faceVertices[i] + xOffset);
+		vertices.push_back(faceVertices[i + 1] + yOffset);
+		vertices.push_back(faceVertices[i + 2] + zOffset);
+		vertices.push_back(faceVertices[i + 3]); // Texture coordinate s
+		vertices.push_back(faceVertices[i + 4]); // Texture coordinate t
+	}
+
+	// Calculate indices for the face
+	GLuint baseIndex = static_cast<GLuint>(vertices.size()) / vertexSize - 4;
+
+	// Push all indices for the face
+	for (size_t i = 0; i < 6; ++i) {
+		indices.push_back(baseIndex + faceIndices[i]);
+	}
+}
+
 void Block::SetSolid(int solid) {
 	isSolid = solid;
 }
 
 int Block::GetSolid() {
 	return isSolid;
-}
-
-void Block::GenerateMesh(int x, int y, int z, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection) {
-	AddFace(vertices, indices, x, y, z, faceDirection);
-}
-
-void Block::AddFace(std::vector<GLfloat>&vertices, std::vector<GLuint>&indices, int x, int y, int z, FaceDirection faceDirection) { 
-	// Calculate offset based on block position
-	GLfloat xOffset = static_cast<GLfloat>(x);
-	GLfloat yOffset = static_cast<GLfloat>(y);
-	GLfloat zOffset = static_cast<GLfloat>(z);
-
-
-	int vertexOffset = static_cast<int>(faceDirection) * (20 * sizeof(GLfloat)) / sizeof(GLfloat);
-	// Append face vertices with offset to the chunk's vertex array
-	for (int i = vertexOffset; i < sizeof(faceVertices) / sizeof(GLfloat) / 6 + vertexOffset; i += vertexSize) {
-		vertices.push_back(faceVertices[i] + xOffset);
-		vertices.push_back(faceVertices[i + 1] + yOffset);
-		vertices.push_back(faceVertices[i + 2] + zOffset);
-		vertices.push_back(faceVertices[i + 3]);  // Texture coordinate s
-		vertices.push_back(faceVertices[i + 4]);  // Texture coordinate t
-	}
-
-	// Calculate indices for the face
-	GLuint baseIndex = static_cast<GLuint>(vertices.size()) / vertexSize - (sizeof(faceVertices) / sizeof(GLfloat)) / vertexSize;
-
-	for (GLuint i = 0; i < sizeof(faceIndices) / sizeof(GLuint); ++i) {
-		indices.push_back(baseIndex + faceIndices[i]);
-	}
 }

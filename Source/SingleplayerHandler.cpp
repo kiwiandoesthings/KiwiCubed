@@ -13,6 +13,6 @@ void SingleplayerHandler::EndSingleplayerWorld() {
 	isLoadedIntoSingleplayerWorld = false;
 }
 
-SingleplayerHandler::~SingleplayerHandler() {
+void SingleplayerHandler::Delete() {
 
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <GLError.h>
 #include <glad/glad.h>
 
 #include <World.h>
@@ -10,8 +11,9 @@ class SingleplayerHandler {
 		bool isLoadedIntoSingleplayerWorld;
 
 		SingleplayerHandler();
-		~SingleplayerHandler();
 
 		void StartSingleplayerWorld();
 		void EndSingleplayerWorld();
+
+		void Delete();
 };
