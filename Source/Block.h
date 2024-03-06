@@ -1,9 +1,12 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <GLError.h>
+#include <GLAD/glad.h>
 
 #include <iostream>
 #include <vector>
+
+#include <FastNoise/FastNoise.h>
 
 
 enum FaceDirection {
@@ -20,7 +23,6 @@ class Block {
 	public:
 		static const int vertexSize = 5; // 3 for position, 2 for texture coordinates
 
-		// Default constructor
 		Block() : blockX(0), blockY(0), blockZ(0), isSolid(-1) {}
 		Block(int blockX, int blockY, int blockZ);
 
@@ -28,9 +30,7 @@ class Block {
 		void SetSolid(int solid);
 		int GetSolid();
 
-		// Method to generate mesh data for the block
-		void GenerateMesh(int x, int y, int z, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection);
-		void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, int x, int y, int z, FaceDirection faceDir);
+		void AddFace(int x, int y, int z, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection);
 
 	private:
 		int blockX;
@@ -38,5 +38,4 @@ class Block {
 		int blockZ;
 
 		int isSolid;
-
 };

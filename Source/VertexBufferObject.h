@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <GLError.h>
 
 #include <iostream>
 #include <vector>

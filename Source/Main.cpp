@@ -5,6 +5,9 @@
 
 
 
+
+
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -12,32 +15,22 @@
 #include <sstream>
 #include <string>
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/glm.hpp>
-#include <stb/stb_image.h>
-
-#include <Block.h>
-#include <Camera.h>
-#include <Chunk.h>
-#include <IndexBufferObject.h>
-#include <Player.h>
 #include <Shader.h>
+#include <SingleplayerHandler.h>
 #include <Texture.h>
-#include <VertexBufferObject.h>
-#include <VertexArrayObject.h>
 #include <Window.h>
+#include <World.h>
 
 
-Player player(20, 50, 20);
-// Create needed variables
-int windowWidth = 600;
-int windowHeight = 600;
-const char* windowTitle = "Voxel Engine Test";
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-int main()
-{
+
+// TODO: Replace with JSON file loading or something
+int windowWidth = 640;
+int windowHeight = 480;
+const char* windowTitle = "Voxel Engine Test";
+
+int main() {
 
 	// Initialize GLFW
 	if (!glfwInit())
@@ -45,59 +38,85 @@ int main()
 		std::cerr << "Initialization / Error: Failed to initialize GLFW" << std::endl;
 		return -1;
 	}
+	else {
+		std::cout << "Initialization / Info: Successfully initialized GLFW" << std::endl;
+	}
 
-	// Create window
-	Window window(windowWidth, windowHeight, windowTitle, framebuffer_size_callback);
+	// Create a window
+	Window globalWindow = Window(windowWidth, windowHeight, windowTitle);
+
+	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
+	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
 
 	// Initialize GLAD
-	gladLoadGL();
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Initialization / Error: Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
+	else {
+		std::cout << "Initialization / Info: Successfully initialized GLAD" << std::endl;
+	}
+
 
 	// Set things up before main game loop
-	glfwGetFramebufferSize(window.GetWindowInstance(), &windowWidth, &windowHeight);
-	glViewport(0, 0, 600, 600);
+	windowWidth = globalWindow.GetWidth();
+	windowHeight = globalWindow.GetHeight();
+	GLCall(glViewport(0, 0, windowWidth, windowHeight));
+	GLCall(glEnable(GL_DEPTH_TEST));
+	
+	// Create a singleplayer world
+	SingleplayerHandler singleplayerHandler = SingleplayerHandler();
+	singleplayerHandler.StartSingleplayerWorld();
 
+	// Create a debug shader
 	Shader shaderProgram("Resources/Shaders/Vertex.vert", "Resources/Shaders/Fragment.frag");
 
-	Chunk myChunk(0, 0, 0);  // Create an instance of Chunk
-	Chunk myChunk2(1, 0, 0);  // Create an instance of Chunk
-
-	//Texture test_img("Resources/Textures/Blocks/test_img.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	// Create a debug texture
 	Texture test_img("Resources/Textures/Blocks/test_img_alt.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+	
+	// Start generating a chunk in the singleplayer world
+	singleplayerHandler.singlePlayerWorld.GenerateChunk(0, 0, 0);
+	singleplayerHandler.singlePlayerWorld.GenerateChunk(1, 0, 0);
 
-	glEnable(GL_DEPTH_TEST);
-
+	// Bind stuff
+	test_img.Bind();
+	shaderProgram.Bind();
+	
 	// Main game loop
-	while (!glfwWindowShouldClose(window.GetWindowInstance()))
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.8f, 0.4f, 0.6f, 1.0f);
+	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
 
-		shaderProgram.Bind();
+		// Make background ~pink~
+		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+		GLCall(glClearColor(0.8f, 0.4f, 0.6f, 1.0f));
+		
+		// Do rendering stuff
+		globalWindow.Inputs();
+		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
+			singleplayerHandler.singlePlayerWorld.player.Update(&globalWindow, shaderProgram, "windowViewMatrix", 0, 0, 0);
+		}
 
-		player.Update(window.GetWindowInstance(), shaderProgram, "camMatrix", 0, 0, 2);
+		//std::cout << std::get<0>(singleplayerHandler.singlePlayerWorld.player.GetPosition()) << " " << std::get<1>(singleplayerHandler.singlePlayerWorld.player.GetPosition()) << " " << std::get<2>(singleplayerHandler.singlePlayerWorld.player.GetPosition()) << std::endl;
 
-		test_img.Bind();
-		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk.chunkX, myChunk.chunkY, myChunk.chunkZ);
-		myChunk.Render();
-		glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), myChunk2.chunkX, myChunk2.chunkY, myChunk2.chunkZ);
-		myChunk2.Render();
+		singleplayerHandler.singlePlayerWorld.Render();
 
-		glfwSwapBuffers(window.GetWindowInstance());
-
+		// Do GLFW crap
+		glfwSwapBuffers(globalWindow.GetWindowInstance());
 		glfwPollEvents();
 	}
 
 	// Clean up once the program has exited
 	test_img.Delete();
 	shaderProgram.Delete();
-	glfwDestroyWindow(window.GetWindowInstance());
+	glfwDestroyWindow(globalWindow.GetWindowInstance());
 	glfwTerminate();
 	return 0;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
-	float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-	player.UpdateWindowSize(width, height);
+	Window* globalWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	if (globalWindow) {
+		globalWindow->UpdateWindowSize(width, height);
+	}
 }

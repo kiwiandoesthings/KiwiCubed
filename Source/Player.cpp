@@ -2,32 +2,28 @@
 
 
 Player::Player(int playerX, int playerY, int playerZ) {
-	Player::playerX = playerX;
-	Player::playerY = playerY;
-	Player::playerZ = playerZ;
-
-	camera.SetPosition(playerX, playerY, playerZ);
+	camera.SetPosition((float)playerX, (float)playerY, (float)playerZ);
 }
 
-void Player::UpdatePosition(int newPlayerX, int newPlayerY, int newPlayerZ) {
+void Player::Update(Window* window, Shader& shader, const char* uniform, int newPlayerX, int newPlayerY, int newPlayerZ) {
+	camera.Inputs(window);
+	UpdatePosition(window, newPlayerX, newPlayerY, newPlayerZ);
+	SetCameraMatrix(shader, uniform);
+}
+
+void Player::UpdatePosition(Window* window, int newPlayerX, int newPlayerY, int newPlayerZ) {
 	playerPosition = glm::vec3(newPlayerX, newPlayerY, newPlayerZ);
-	camera.UpdateMatrix(80.0f, 0.1f, 1000.0f);
+	camera.UpdateMatrix(window, 80.0f, 0.1f, 1000.0f);
 }
 
 void Player::SetCameraMatrix(Shader& shader, const char* uniform) {
 	camera.Matrix(shader, uniform);
 }
 
-void Player::UpdateWindowSize(int windowWidth, int windowHeight) {
-	camera.UpdateWindowSize(windowWidth, windowHeight);
+std::tuple<int, int, int> Player::GetPosition() {
+	return std::make_tuple((int)playerPosition.x, (int)playerPosition.y, (int)playerPosition.z);
 }
 
-void Player::Update(GLFWwindow* window, Shader& shader, const char* uniform, int newPlayerX, int newPlayerY, int newPlayerZ) {
-	camera.Inputs(window);
-	UpdatePosition(newPlayerX, newPlayerY, newPlayerZ);
-	SetCameraMatrix(shader, uniform);
-}
-
-Player::~Player() {
+void Player::Delete() {
 
 }

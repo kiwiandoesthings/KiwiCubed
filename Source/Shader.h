@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <GLError.h>
 
 #include <iostream>
 #include <string>
@@ -10,7 +10,9 @@
 
 class Shader
 {
-	public: GLuint shaderProgramID;
+	public: 
+		GLuint shaderProgramID;
+
 		Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath);
 
 		void Bind();

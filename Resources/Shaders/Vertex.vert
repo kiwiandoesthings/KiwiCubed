@@ -5,16 +5,16 @@ layout (location = 1) in vec2 aTex;
 
 out vec2 texCoord;
 
-uniform mat4 camMatrix;
-uniform vec3 chunkPosition;
+uniform mat4 windowViewMatrix;
+//uniform vec3 chunkPosition;
 
 void main()
 {
 	vec4 worldPosition = vec4(aPos, 1.0);
-	worldPosition.x += chunkPosition.x * 32;
-	worldPosition.y += chunkPosition.y * 32;
-	worldPosition.z += chunkPosition.z * 32;
+	worldPosition.x += /*chunkPosition.x * 32*/ 0;
+	worldPosition.y += /*chunkPosition.y * 32*/ 0;
+	worldPosition.z += /*chunkPosition.z * 32*/ 0;
 
-	gl_Position = camMatrix * worldPosition;
+	gl_Position = windowViewMatrix * worldPosition;
 	texCoord = aTex;
 }
