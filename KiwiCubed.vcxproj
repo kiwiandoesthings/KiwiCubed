@@ -25,6 +25,7 @@
     <ClCompile Include="Source\IndexBufferObject.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
     <ClCompile Include="Source\SingleplayerHandler.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
@@ -46,6 +47,7 @@
     <ClInclude Include="Source\GLError.h" />
     <ClInclude Include="Source\IndexBufferObject.h" />
     <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\SingleplayerHandler.h" />
     <ClInclude Include="Source\Texture.h" />

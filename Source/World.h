@@ -1,33 +1,59 @@
 #pragma once
 
 #include <GLError.h>
-#include <glad/glad.h>
+#include <GLAD/glad.h>
 
 #include <vector>
 
 #include <Chunk.h>
 #include <Player.h>
+#include <Renderer.h>
 #include <Shader.h>
 
 
+typedef  struct {
+	GLuint count;
+	GLuint instanceCount;
+	GLuint firstIndex;
+	GLuint baseVertex;
+	GLuint baseInstance;
+} DrawElementsIndirectCommand;
+
+
 class World {
-	public:
-		Player player = Player(0, 0, 0);
+public:
+	Player player = Player(0, 0, 0);
 
-		World();
-		~World();
+	World();
+	~World();
 
-		void Render();
-		void GenerateChunk(int const chunkX, int const chunkY, int const chunkZ);
+	void Render(Shader shaderProgram);
+	void GenerateWorld();
+	void GenerateChunk(int chunkX, int chunkY, int chunkZ);
 
-	private:
-		int worldSize = 2;
-		Chunk*** chunks;
+private:
+	const int worldSize = 2;
+	const int chunksize = 32;
+	Chunk*** chunks;
 
-		std::vector<GLfloat> vertices;
-		std::vector<GLuint> indices;
+	int totalChunks;
+	float totalMemoryUsage;
 
-		IndexBufferObject indexBufferObject;
-		VertexArrayObject vertexArrayObject;
-		VertexBufferObject vertexBufferObject;
+	std::vector<GLfloat> vertices;
+	std::vector<GLuint> indices;
+
+	GLuint indirectBuffer;
+
+	int drawCount;
+	std::vector<DrawElementsIndirectCommand> commands;
+	size_t currentVertexOffset = 0;
+	size_t currentIndexOffset = 0;
+
+	int latestEndIndex = 0;
+
+	Renderer renderer;
+
+	IndexBufferObject indexBufferObject;
+	VertexArrayObject vertexArrayObject;
+	VertexBufferObject vertexBufferObject;
 };

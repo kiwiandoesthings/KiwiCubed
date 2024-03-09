@@ -16,11 +16,6 @@
 #include <VertexBufferObject.h>
 
 
-struct ShouldAdd {
-    bool shouldAdd;
-};
-
-
 class World;
 
 
@@ -33,33 +28,41 @@ public:
     int chunkZ;
     bool isAllocated;
 
-    Chunk() : chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), fPtrWorld(nullptr), startIndex(0), endIndex(0), blocks(blocks) {}
+    Chunk() : chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), fPtrWorld(nullptr), startIndex(0), endIndex(0), chunkIndex(0), blocks(blocks) {}
     Chunk(int chunkX, int chunkY, int chunkZ);
     ~Chunk();
 
     void AllocateChunk();
     void GenerateBlocks();
     void GenerateMesh(World& World);
-    void GenerateBlockMesh(int x, int y, int z);
-    void Render(/*Shader shaderProgram*/);
+    void Render(Shader shaderProgram);
 
-    std::vector<GLfloat> GetVertices() const;
-    std::vector<GLuint> GetIndices() const;
+    void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
 
-    int GetStartIndex() const;
-    int GetEndIndex() const;
+    std::vector<GLfloat> GetVertices();
+    std::vector<GLuint> GetIndices();
+
     void SetStartIndex(int newStartIndex);
+    int GetStartIndex();
+
     void SetEndIndex(int newEndIndex);
+    int GetEndIndex();
+
+    void SetChunkIndex(int newChunkIndex);
+    int GetChunkIndex();
+
 
 private:
     World* fPtrWorld;
     std::vector<GLfloat> vertices;
-    std::vector<GLuint> indices;  
+    std::vector<GLuint> indices;
 
     int startIndex;
     int endIndex;
 
-	VertexArrayObject vertexArrayObject;
-	VertexBufferObject vertexBufferObject;
-	IndexBufferObject indexBufferObject;
+    int chunkIndex;
+
+    //VertexArrayObject vertexArrayObject;
+    //VertexBufferObject vertexBufferObject;
+    //IndexBufferObject indexBufferObject;
 };
