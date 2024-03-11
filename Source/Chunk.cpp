@@ -1,7 +1,7 @@
 #include <Chunk.h>
 
 
-Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), fPtrWorld(nullptr), startIndex(0), endIndex(0), chunkIndex(0), blocks(blocks) {
+Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isEmpty(false), totalBlocks(0), fPtrWorld(nullptr), startIndex(0), endIndex(0), chunkIndex(0), blocks(blocks) {
     Chunk::chunkX = chunkX;
     Chunk::chunkY = chunkY;
     Chunk::chunkZ = chunkZ;
@@ -14,15 +14,15 @@ void Chunk::AllocateChunk() {
         blocks[i] = new Block * [chunkSize];
         for (int j = 0; j < chunkSize; ++j) {
             blocks[i][j] = new Block[chunkSize];
+            totalBlocks += chunkSize;
         }
     }
-
     isAllocated = true;
 }
 
 void Chunk::GenerateBlocks() {
     // Generates all the blocks in the chunk
-    auto start_time = std::chrono::high_resolution_clock::now();
+    //auto start_time = std::chrono::high_resolution_clock::now();
     for (int x = 0; x < chunkSize; ++x) {
         for (int y = 0; y < chunkSize; ++y) {
             for (int z = 0; z < chunkSize; ++z) {
@@ -30,14 +30,15 @@ void Chunk::GenerateBlocks() {
             }
         }
     }
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-    //std::cout << "Chunk Generation / Info: Chunk world generation took " << duration << " ms" << std::endl;
+    totalMemoryUsage = sizeof(Chunk) + (sizeof(Block) * totalBlocks) + sizeof(vertices) + sizeof(indices);
+    //auto end_time = std::chrono::high_resolution_clock::now();
+    //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+    //std::cout << "Chunk World Generation / Info: Chunk world generation took " << duration << " ms" << std::endl;
 }
 
 void Chunk::GenerateMesh(World& world) {
     if (isAllocated == false) {
-        std::cout << "Chunk Generation / Error: Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
+        std::cout << "Chunk Mesh Generation / Error: Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
         return;
     }
 
@@ -47,33 +48,44 @@ void Chunk::GenerateMesh(World& world) {
 
     GenerateBlocks();
 
+    if (IsArrayEmpty(blocks)) {
+        isEmpty = true;
+        //std::cout << "Chunk Mesh Generation / Info: Chunk is empty, skipping mesh generation" << std::endl;
+        return;
+    }
+    
+    isEmpty = false;
+
     //auto start_time = std::chrono::high_resolution_clock::now();
 
     // Generate mesh for all the blocks in a chunk by querying blocks around it and marking faces to be generated
     for (int x = 0; x < chunkSize; ++x) {
         for (int y = 0; y < chunkSize; ++y) {
             for (int z = 0; z < chunkSize; ++z) {
-                int currentBlockSolid = blocks[x][y][z].GetSolid();
 
-                if (currentBlockSolid == 1) {
+                if (blocks[x][y][z].GetSolid() == 1) {
+                    Block& block = blocks[x][y][z];
+
+                    
+
                     // Check each face for blocks around it and generate mesh for faces that should be added
                     if (x + 1 <= chunkSize - 1 && blocks[x + 1][y][z].GetSolid() == 0) {
-                        blocks[x][y][z].AddFace(x, y, z, vertices, indices, RIGHT);
+                        block.AddFace(vertices, indices, RIGHT,  chunkX, chunkY, chunkZ, chunkSize);
                     }
                     if (x - 1 >= 0 && blocks[x - 1][y][z].GetSolid() == 0) {
-                        blocks[x][y][z].AddFace(x, y, z, vertices, indices, LEFT);
+                        block.AddFace(vertices, indices, LEFT,   chunkX, chunkY, chunkZ, chunkSize);
                     }
                     if (y + 1 <= chunkSize - 1 && blocks[x][y + 1][z].GetSolid() == 0) {
-                        blocks[x][y][z].AddFace(x, y, z, vertices, indices, TOP);
+                        block.AddFace(vertices, indices, TOP,    chunkX, chunkY, chunkZ, chunkSize);
                     }
                     if (y - 1 >= 0 && blocks[x][y - 1][z].GetSolid() == 0) {
-                        blocks[x][y][z].AddFace(x, y, z, vertices, indices, BOTTOM);
+                        block.AddFace(vertices, indices, BOTTOM, chunkX, chunkY, chunkZ, chunkSize);
                     }
                     if (z + 1 <= chunkSize - 1 && blocks[x][y][z + 1].GetSolid() == 0) {
-                        blocks[x][y][z].AddFace(x, y, z, vertices, indices, BACK);
+                        block.AddFace(vertices, indices, BACK,   chunkX, chunkY, chunkZ, chunkSize);
                     }
                     if (z - 1 >= 0 && blocks[x][y][z - 1].GetSolid() == 0) {
-                        blocks[x][y][z].AddFace(x, y, z, vertices, indices, FRONT);
+                        block.AddFace(vertices, indices, FRONT,  chunkX, chunkY, chunkZ, chunkSize);
                     }
                 }
             }
@@ -102,6 +114,10 @@ void Chunk::SetPosition(int newChunkX, int newChunkY, int newChunkZ) {
     chunkX = newChunkX;
     chunkY = newChunkY;
     chunkZ = newChunkZ;
+}
+
+int Chunk::GetTotalBlocks() {
+    return totalBlocks;
 }
 
 std::vector<GLfloat> Chunk::GetVertices() {
@@ -134,6 +150,20 @@ void Chunk::SetChunkIndex(int newChunkIndex) {
 
 int Chunk::GetChunkIndex() {
     return chunkIndex;
+}
+
+bool Chunk::IsArrayEmpty(Block*** blocks) {
+    for (int x = 0; x < chunkSize; ++x) {
+        for (int y = 0; y < chunkSize; ++y) {
+            for (int z = 0; z < chunkSize; ++z) {
+                if (blocks[x][y][z].GetSolid() == 1) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 Chunk::~Chunk() {

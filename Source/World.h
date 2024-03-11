@@ -32,7 +32,7 @@ public:
 	void GenerateChunk(int chunkX, int chunkY, int chunkZ);
 
 private:
-	const int worldSize = 2;
+	const int worldSize = 4;
 	const int chunksize = 32;
 	Chunk*** chunks;
 

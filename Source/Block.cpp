@@ -66,11 +66,15 @@ GLuint faceIndices[] = {
 	22, 23, 20
 };
 
-Block::Block(int blockX, int blockY, int blockZ) : blockX(blockX), blockY(blockY), blockZ(blockZ), isSolid(-1) {
+
+Block::Block(int blockX, int blockY, int blockZ) : blockX(0), blockY(0), blockZ(0), isSolid(-1) {
 
 }
 
-void Block::GenerateBlock(int blockX, int blockY, int blockZ, int chunkX, int chunkY, int chunkZ, int chunkSize) {
+void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunkX, int chunkY, int chunkZ, int chunkSize) {
+	blockX = newBlockX;
+	blockY = newBlockY;
+	blockZ = newBlockZ;
 	if (GetSolid() == -1) {
 		// Setup FastNoiseLite
 		FastNoiseLite noise;
@@ -88,14 +92,14 @@ void Block::GenerateBlock(int blockX, int blockY, int blockZ, int chunkX, int ch
 	}
 }
 
-void Block::AddFace(int x, int y, int z, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection) {
+void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, int chunkSize) {
 	// Calculate offset based on block position
-	GLfloat xOffset = static_cast<GLfloat>(x);
-	GLfloat yOffset = static_cast<GLfloat>(y);
-	GLfloat zOffset = static_cast<GLfloat>(z);
-
+	GLfloat xOffset = static_cast<GLfloat>(blockX + (chunkX * chunkSize));
+	GLfloat yOffset = static_cast<GLfloat>(blockY + (chunkY * chunkSize));
+	GLfloat zOffset = static_cast<GLfloat>(blockZ + (chunkY * chunkSize));
+	
 	size_t vertexOffset = static_cast<size_t>(faceDirection) * 20;
-
+	
 	// Append face vertices with offset to the chunk's vertex array
 	for (size_t i = vertexOffset; i < vertexOffset + 20; i += 5) {
 		vertices.push_back(faceVertices[i] + xOffset);
@@ -104,10 +108,10 @@ void Block::AddFace(int x, int y, int z, std::vector<GLfloat>& vertices, std::ve
 		vertices.push_back(faceVertices[i + 3]); // Texture coordinate s
 		vertices.push_back(faceVertices[i + 4]); // Texture coordinate t
 	}
-
+	
 	// Calculate indices for the face
 	GLuint baseIndex = static_cast<GLuint>(vertices.size()) / vertexSize - 4;
-
+	
 	// Push all indices for the face
 	for (size_t i = 0; i < 6; ++i) {
 		indices.push_back(baseIndex + faceIndices[i]);

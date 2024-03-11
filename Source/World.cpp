@@ -1,7 +1,7 @@
 #include <World.h>
 
 
-World::World() : totalChunks(0) {
+World::World() : totalChunks(0), totalMemoryUsage(0) {
     chunks = new Chunk * *[worldSize];
     for (int i = 0; i < worldSize; ++i) {
         chunks[i] = new Chunk * [worldSize];
@@ -50,11 +50,16 @@ void World::GenerateWorld() {
         }
     }
 
+    // Calculate the memory usage of the chunk and at it to total memory usage
+    float sizeInBytes = sizeof(World) + sizeof(vertices) + sizeof(indices);
+    float sizeInMegabytes = sizeInBytes / (1024.0f * 1024.0f);
+    totalMemoryUsage += sizeInMegabytes;
+
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-    std::cout << "World / Info: Total world preparation with chunk count of " << worldSize * worldSize * worldSize << " took " << duration << " ms" << " or roughly " << duration / (worldSize * worldSize * worldSize) << " ms per chunk" << std::endl;
-    // Memory profiling is also very work in progress
-    std::cout << "World / Info: Memory usage of world is " << totalMemoryUsage << " megabytes" << std::endl;
+    std::cout << "World Creation / Info: Total world preparation with chunk count of " << worldSize * worldSize * worldSize << " took " << duration << " ms" << " or roughly " << duration / (worldSize * worldSize * worldSize) << " ms per chunk (slightly innacurate as empty chunks are skipped)" << std::endl;
+    // Memory profiling is also super very work in progress
+    std::cout << "World Creation / Info: Memory usage of world is " << totalMemoryUsage << " megabytes" << std::endl;
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ) {
@@ -68,9 +73,15 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ) {
     }
     chunk.GenerateMesh(*this);
 
+    if (chunk.isEmpty) {
+        std::cout << "World Creation / Info: Chunk is empty, so skipping appending to world mesh" << std::endl;
+        return;
+    }
+
     // Get the numbers ready
     std::vector<GLfloat> chunkVertices = chunk.GetVertices();
     std::vector<GLuint> chunkIndices = chunk.GetIndices();
+
     int startIndex = (int)vertices.size() / 3;
     int numVertices = (int)chunkVertices.size() / 3;
     int numIndices = (int)chunkIndices.size();
@@ -104,15 +115,15 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ) {
     totalChunks++;
 
     // Calculate the memory usage of the chunk and at it to total memory usage
-    size_t sizeInBytes = (chunk.GetVertices().size() * sizeof(GLfloat)) + (indicesCount * sizeof(GLuint) * sizeof(GLuint));
+    float sizeInBytes = chunk.totalMemoryUsage;
     float sizeInMegabytes = sizeInBytes / (1024.0f * 1024.0f);
     totalMemoryUsage += sizeInMegabytes;
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
-    //std::cout << "Chunk Generation / Info: Appending chunk mesh to world mesh took, " << duration << " ms" << std::endl;
-    //std::cout << "Chunk Generation / Info: Chunk start index set to, " << chunk.GetStartIndex() << " and end index set to, " << chunk.GetEndIndex() << std::endl;
+    //std::cout << "World Creation / Info: Appending chunk mesh to world mesh took, " << duration << " ms" << std::endl;
+    //std::cout << "World Creation / Info: Chunk start index set to, " << chunk.GetStartIndex() << " and end index set to, " << chunk.GetEndIndex() << std::endl;
 }
 
 World::~World() {

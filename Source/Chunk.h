@@ -16,19 +16,23 @@
 #include <VertexBufferObject.h>
 
 
+
+
 class World;
 
 
 class Chunk {
 public:
-    static const int chunkSize = 32;
+    const int chunkSize = 32;
     Block*** blocks;
     int chunkX;
     int chunkY;
     int chunkZ;
     bool isAllocated;
+    bool isEmpty;
+    float totalMemoryUsage;
 
-    Chunk() : chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), fPtrWorld(nullptr), startIndex(0), endIndex(0), chunkIndex(0), blocks(blocks) {}
+    Chunk() : chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isEmpty(false), totalBlocks(0), totalMemoryUsage(0.0f), fPtrWorld(nullptr), startIndex(0), endIndex(0), chunkIndex(0), blocks(blocks) {}
     Chunk(int chunkX, int chunkY, int chunkZ);
     ~Chunk();
 
@@ -38,6 +42,8 @@ public:
     void Render(Shader shaderProgram);
 
     void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
+
+    int GetTotalBlocks();
 
     std::vector<GLfloat> GetVertices();
     std::vector<GLuint> GetIndices();
@@ -56,6 +62,8 @@ private:
     World* fPtrWorld;
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;
+    
+    int totalBlocks;
 
     int startIndex;
     int endIndex;
@@ -65,4 +73,6 @@ private:
     //VertexArrayObject vertexArrayObject;
     //VertexBufferObject vertexBufferObject;
     //IndexBufferObject indexBufferObject;
+
+    bool IsArrayEmpty(Block*** blocks);
 };
