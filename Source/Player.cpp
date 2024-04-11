@@ -7,11 +7,11 @@ Player::Player(int playerX, int playerY, int playerZ) {
 
 void Player::Update(Window* window, Shader& shader, const char* uniform, int newPlayerX, int newPlayerY, int newPlayerZ) {
 	camera.Inputs(window);
-	UpdatePosition(window, newPlayerX, newPlayerY, newPlayerZ);
+	SetPosition(window, newPlayerX, newPlayerY, newPlayerZ);
 	SetCameraMatrix(shader, uniform);
 }
 
-void Player::UpdatePosition(Window* window, int newPlayerX, int newPlayerY, int newPlayerZ) {
+void Player::SetPosition(Window* window, int newPlayerX, int newPlayerY, int newPlayerZ) {
 	playerPosition = glm::vec3(newPlayerX, newPlayerY, newPlayerZ);
 	camera.UpdateMatrix(window, 80.0f, 0.1f, 1000.0f);
 }

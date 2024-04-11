@@ -54,7 +54,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
     return shaderProgramID;
 }
 
-unsigned int Shader::CreateShader(std::string& vertexShader, std::string& fragmentShader)
+unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
     unsigned int shaderProgram = glCreateProgram();
     unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
@@ -69,6 +69,17 @@ unsigned int Shader::CreateShader(std::string& vertexShader, std::string& fragme
     GLCall(glDeleteShader(fs));
 
     return shaderProgram;
+}
+
+void Shader::SetUniform4fv(const char* uniform, glm::mat4 value) {
+    unsigned int uniformLocation = glGetUniformLocation(shaderProgramID, uniform);
+
+    if (uniformLocation == -1) {
+        std::cout << "Shader Uniform Setting / Error: Could not find uniform: " << uniform << " in the specified shader with ID of " << shaderProgramID << " at" << std::endl;
+        return;
+    }
+
+    GLCall(glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value)));
 }
 
 void Shader::Bind()

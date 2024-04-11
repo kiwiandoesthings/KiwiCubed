@@ -1,10 +1,14 @@
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <GLError.h>
-#include <glad/glad.h>
+#include <GLAD/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,10 +28,15 @@ class Window {
 
 		void Inputs();
 
-		void UpdateWindowSize(int windowWidth, int windowHeight);
+		void UpdateWindowSize(int newWindowWidth, int newWindowHeight);
+
 		int GetWidth();
+
 		int GetHeight();
+
 		const char* GetTitle();
+		void SetTitle(const char* newTitle);
+
 		GLFWwindow* GetWindowInstance();
 
 		void Delete();

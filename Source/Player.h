@@ -1,7 +1,7 @@
 #pragma once
 
 #include <GLError.h>
-#include <glad/glad.h>
+#include <GLAD/glad.h>
 
 #include <Camera.h>
 
@@ -10,10 +10,12 @@ public:
 	Player(int playerX, int playerY, int playerZ);
 
 	void Update(Window* window, Shader& shader, const char* uniform, int newPlayerX, int newPlayerY, int newPlayerZ);
-	void UpdatePosition(Window* window, int playerX, int playerY, int playerZ);
+
+	void SetPosition(Window* window, int playerX, int playerY, int playerZ);
+	std::tuple<int, int, int> GetPosition();
+
 	void SetCameraMatrix(Shader& shader, const char* uniform);
 
-	std::tuple<int, int, int> GetPosition();
 
 	void Delete();
 

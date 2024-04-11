@@ -8,7 +8,7 @@ GLfloat faceVertices[] = {
 	1.0f, 0.0f, 0.0f,  0.0f, 0.0f,
 	1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
 	0.0f, 1.0f, 0.0f,  1.0f, 1.0f,
-	
+
 	// Back
 	0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
 	1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
@@ -66,33 +66,36 @@ GLuint faceIndices[] = {
 	22, 23, 20
 };
 
-Block::Block(int blockX, int blockY, int blockZ) : blockX(blockX), blockY(blockY), blockZ(blockZ), isSolid(-1) {
+
+Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(-1) {
 
 }
 
-void Block::GenerateBlock(int blockX, int blockY, int blockZ, int chunkX, int chunkY, int chunkZ, int chunkSize) {
-	if (GetSolid() == -1) {
+void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunkX, int chunkY, int chunkZ, int chunkSize) {
+	blockX = newBlockX;
+	blockY = newBlockY;
+	blockZ = newBlockZ;
+	if (GetType() == -1) {
 		// Setup FastNoiseLite
 		FastNoiseLite noise;
 		noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 
 		// Get the noise value for the block
 		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
-
 		if (noiseValue > 0) {
-			SetSolid(1);
+			SetType(1);
 		}
 		else {
-			SetSolid(0);
+			SetType(0);
 		}
 	}
 }
 
-void Block::AddFace(int x, int y, int z, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection) {
+void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, int chunkSize) {
 	// Calculate offset based on block position
-	GLfloat xOffset = static_cast<GLfloat>(x);
-	GLfloat yOffset = static_cast<GLfloat>(y);
-	GLfloat zOffset = static_cast<GLfloat>(z);
+	GLfloat xOffset = static_cast<GLfloat>(blockX + (chunkX * chunkSize));
+	GLfloat yOffset = static_cast<GLfloat>(blockY + (chunkY * chunkSize));
+	GLfloat zOffset = static_cast<GLfloat>(blockZ + (chunkZ * chunkSize));
 
 	size_t vertexOffset = static_cast<size_t>(faceDirection) * 20;
 
@@ -114,10 +117,10 @@ void Block::AddFace(int x, int y, int z, std::vector<GLfloat>& vertices, std::ve
 	}
 }
 
-void Block::SetSolid(int solid) {
-	isSolid = solid;
+int Block::GetType() {
+	return type;
 }
 
-int Block::GetSolid() {
-	return isSolid;
+void Block::SetType(int newType) {
+	type = newType;
 }

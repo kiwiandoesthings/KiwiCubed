@@ -6,7 +6,7 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isF
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -37,6 +37,9 @@ void Window::Inputs() {
 	if (isFocused && !firstClick)
 	{
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		if (glfwRawMouseMotionSupported()) {
+			glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		}
 	}
 	if (isFocused && firstClick)
 	{
@@ -49,25 +52,29 @@ void Window::Inputs() {
 	}
 }
 
-void Window::UpdateWindowSize(int windowWidth, int windowHeight) {
-	Window::windowWidth = windowWidth;
-	Window::windowHeight = windowHeight;
+void Window::UpdateWindowSize(int newWindowWidth, int newWindowHeight) {
+	windowWidth = newWindowWidth;
+	windowHeight = newWindowHeight;
 }
 
 int Window::GetWidth() {
-	return Window::windowWidth;
+	return windowWidth;
 }
 
 int Window::GetHeight() {
-	return Window::windowHeight;
+	return windowHeight;
 }
 
 const char* Window::GetTitle() {
-	return Window::windowTitle;
+	return windowTitle;
+}
+
+void Window::SetTitle(const char* newTitle) {
+	glfwSetWindowTitle(window, newTitle);
 }
 
 GLFWwindow* Window::GetWindowInstance() {
-	return Window::window;
+	return window;
 }
 
 void Window::Delete() {

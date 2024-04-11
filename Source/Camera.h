@@ -21,6 +21,10 @@ class Camera
 		glm::vec3 upDirection = glm::vec3(0.0f, 1.0f, 0.0f);
 		glm::mat4 cameraMatrix = glm::mat4(1.0f);
 
+		float yaw = -90.0f;
+		float pitch;
+		float roll;
+
 		int width;
 		int height;
 
@@ -28,6 +32,7 @@ class Camera
 		float sensitivity = 100.0f;
 
 		Camera(int width, int height, glm::vec3 position);
+		~Camera();
 
 		void Matrix(Shader& shader, const char* uniform);
 		void UpdateMatrix(Window* window, float FOV, float nearPlane, float farPlane);
