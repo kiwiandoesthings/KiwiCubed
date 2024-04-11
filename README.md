@@ -1,7 +1,7 @@
 # Kiwi³
 ## Very extremely early tech test
 
-v0.0.0.1 (idk, version system subject to change)
+v0.0.1pre-alpha (version system subject to change)
 
 I FINALLY HAVE A NAME FOR THE ENGINE
 
