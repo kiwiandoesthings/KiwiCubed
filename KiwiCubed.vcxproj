@@ -19,18 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Block.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Chunk.cpp" />
     <ClCompile Include="Source\IndexBufferObject.cpp" />
+    <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
     <ClCompile Include="Source\SingleplayerHandler.cpp" />
+    <ClCompile Include="Source\ChunkHandler.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\VertexArrayObject.cpp" />
     <ClCompile Include="Source\VertexBufferObject.cpp" />
+    <ClCompile Include="Source\Block.cpp" />
     <ClCompile Include="Source\Window.cpp" />
     <ClCompile Include="Source\World.cpp" />
     <ClCompile Include="Vendor\GLAD\src\glad.c" />
@@ -41,18 +43,19 @@
     <None Include="Resources\Shaders\Vertex.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Block.h" />
     <ClInclude Include="Source\Camera.h" />
-    <ClInclude Include="Source\Chunk.h" />
     <ClInclude Include="Source\GLError.h" />
     <ClInclude Include="Source\IndexBufferObject.h" />
+    <ClInclude Include="Source\Input.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\SingleplayerHandler.h" />
+    <ClInclude Include="Source\ChunkHandler.h" />
     <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\VertexArrayObject.h" />
     <ClInclude Include="Source\VertexBufferObject.h" />
+    <ClInclude Include="Source\Block.h" />
     <ClInclude Include="Source\Window.h" />
     <ClInclude Include="Source\World.h" />
     <ClInclude Include="Vendor\FastNoise\FastNoise.h" />

@@ -1,23 +1,36 @@
 #pragma once
 
 #include <GLError.h>
-#include <GLAD/glad.h>
+#include <glad/glad.h>
 
+#include <map>
 #include <vector>
 
-#include <Chunk.h>
 #include <Player.h>
 #include <Renderer.h>
 #include <Shader.h>
+#include <ChunkHandler.h>
 
 
-typedef  struct {
-	GLuint count;
-	GLuint instanceCount;
-	GLuint firstIndex;
-	GLuint baseVertex;
-	GLuint baseInstance;
-} DrawElementsIndirectCommand;
+class Chunk;
+
+// Maybe later, right now, this is deprecated
+//struct DrawElementsIndirectCommand {
+//	GLuint count;
+//	GLuint instanceCount;
+//	GLuint firstIndex;
+//	GLuint baseVertex;
+//	glm::vec3 baseInstance;
+//};
+
+//struct ChunkData {
+//	glm::vec3 position;
+//	// Future other data
+//};
+//
+//struct Position {
+//	int chunkX, chunkY, chunkZ;
+//};
 
 
 class World {
@@ -31,29 +44,38 @@ public:
 	void GenerateWorld();
 	void GenerateChunk(int chunkX, int chunkY, int chunkZ);
 
+	Chunk GetChunk(int chunkX, int chunkY, int chunkZ);
+
 private:
 	const int worldSize = 4;
 	const int chunksize = 32;
-	Chunk*** chunks;
+	ChunkHandler sparseVoxelOctree;
 
 	int totalChunks;
 	float totalMemoryUsage;
 
-	std::vector<GLfloat> vertices;
-	std::vector<GLuint> indices;
+	// ALL deprecated member variables from other render methods
+	//std::vector<Position> chunkLocations;
 
-	GLuint indirectBuffer;
+	//std::vector<GLfloat> vertices;
+	//std::vector<GLuint> indices;
 
-	int drawCount;
-	std::vector<DrawElementsIndirectCommand> commands;
-	size_t currentVertexOffset = 0;
-	size_t currentIndexOffset = 0;
+	//GLuint indirectBufferObject;
+	//GLuint chunkDataBufferObject;
 
-	int latestEndIndex = 0;
+	//int drawCount;
 
-	Renderer renderer;
+	//std::vector<DrawElementsIndirectCommand> commands;
+	//std::vector<ChunkData> chunkData;
 
-	IndexBufferObject indexBufferObject;
-	VertexArrayObject vertexArrayObject;
-	VertexBufferObject vertexBufferObject;
+	//size_t currentVertexOffset = 0;
+	//size_t currentIndexOffset = 0;
+
+	//int latestEndIndex = 0;
+
+	//Renderer renderer;
+
+	//IndexBufferObject indexBufferObject;
+	//VertexArrayObject vertexArrayObject;
+	//VertexBufferObject vertexBufferObject;
 };

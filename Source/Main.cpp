@@ -2,25 +2,24 @@
 // ~2008-2/8/2024
 // R.I.P.
 
+char versionString[128];
 
 
 
-
-
-
-#include <GLAD/glad.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <time.h>
 
+#include <Input.h>
 #include <Renderer.h>
 #include <Shader.h>
 #include <SingleplayerHandler.h>
 #include <Texture.h>
 #include <Window.h>
-#include <World.h>
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -30,6 +29,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 int windowWidth = 640;
 int windowHeight = 480;
 const char* windowTitle = "KiwiCubed Engine";
+
 
 int main() {
 
@@ -45,11 +45,14 @@ int main() {
 
 	// Create a window
 	Window globalWindow = Window(windowWidth, windowHeight, windowTitle);
+	strcpy_s(versionString, "KiwiCubed Engine ");
+	strcat_s(versionString, "v0.0.1pre-alpha");
+	globalWindow.SetTitle(versionString);
 
 	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
 	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
 
-	// Initialize GLAD
+	// Initialize glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Initialization / Error: Failed to initialize GLAD" << std::endl;
@@ -87,6 +90,10 @@ int main() {
 
 	Renderer renderer = Renderer();
 
+	InputHandler inputHandler = InputHandler(&globalWindow);
+
+	int frames = 0;
+
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
 
@@ -98,14 +105,14 @@ int main() {
 		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
 			singleplayerHandler.singlePlayerWorld.player.Update(&globalWindow, shaderProgram, "windowViewMatrix", 0, 0, 0);
 		}
-
-		//std::cout << std::get<0>(singleplayerHandler.singlePlayerWorld.player.GetPosition()) << " " << std::get<1>(singleplayerHandler.singlePlayerWorld.player.GetPosition()) << " " << std::get<2>(singleplayerHandler.singlePlayerWorld.player.GetPosition()) << std::endl;
-
+		
 		singleplayerHandler.singlePlayerWorld.Render(shaderProgram);
 
 		// Do GLFW crap
 		glfwSwapBuffers(globalWindow.GetWindowInstance());
 		glfwPollEvents();
+
+		++frames;
 	}
 
 	// Clean up once the program has exited

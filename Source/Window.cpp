@@ -52,25 +52,29 @@ void Window::Inputs() {
 	}
 }
 
-void Window::UpdateWindowSize(int windowWidth, int windowHeight) {
-	Window::windowWidth = windowWidth;
-	Window::windowHeight = windowHeight;
+void Window::UpdateWindowSize(int newWindowWidth, int newWindowHeight) {
+	windowWidth = newWindowWidth;
+	windowHeight = newWindowHeight;
 }
 
 int Window::GetWidth() {
-	return Window::windowWidth;
+	return windowWidth;
 }
 
 int Window::GetHeight() {
-	return Window::windowHeight;
+	return windowHeight;
 }
 
 const char* Window::GetTitle() {
-	return Window::windowTitle;
+	return windowTitle;
+}
+
+void Window::SetTitle(const char* newTitle) {
+	glfwSetWindowTitle(window, newTitle);
 }
 
 GLFWwindow* Window::GetWindowInstance() {
-	return Window::window;
+	return window;
 }
 
 void Window::Delete() {

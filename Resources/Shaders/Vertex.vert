@@ -1,20 +1,18 @@
 #version 330 core
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTex;
+layout (location = 0) in vec3 blockPosition;
+layout (location = 1) in vec2 textureCoordinate;
 
-out vec2 texCoord;
+out vec2 textureCoordinateOut;
+out vec3 blockPositionOut;
 
 uniform mat4 windowViewMatrix;
-//uniform vec3 chunkPosition;
 
 void main()
 {
-	vec4 worldPosition = vec4(aPos, 1.0);
-	worldPosition.x += /*chunkPosition.x * 32*/ 0;
-	worldPosition.y += /*chunkPosition.y * 32*/ 0;
-	worldPosition.z += /*chunkPosition.z * 32*/ 0;
+	vec4 worldPosition = vec4(blockPosition, 1.0);
 
 	gl_Position = windowViewMatrix * worldPosition;
-	texCoord = aTex;
+	textureCoordinateOut = textureCoordinate;
+	blockPositionOut = blockPosition;
 }

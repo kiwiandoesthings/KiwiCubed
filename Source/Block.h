@@ -7,35 +7,33 @@
 #include <vector>
 
 #include <FastNoise/FastNoise.h>
+#include <glm/vec3.hpp>
 
 
 enum FaceDirection {
-	FRONT,
-	BACK,
-	LEFT,
-	RIGHT,
-	TOP,
-	BOTTOM
+    FRONT,
+    BACK,
+    LEFT,
+    RIGHT,
+    TOP,
+    BOTTOM
 };
 
 
 class Block {
-	public:
-		char vertexSize = 5; // 3 for position, 2 for texture coordinates
+    public:
+        Block() : blockX(0), blockY(0), blockZ(0), type(-1) {}
+        Block(int type);
 
-		Block() : blockX(0), blockY(0), blockZ(0), isSolid(-1) {}
-		Block(int blockX, int blockY, int blockZ);
+        void GenerateBlock(int blockX, int blockY, int blockZ, int chunkX, int chunkY, int chunkZ, int chunkSize);
+        void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, int chunkSize);
+        
+        int GetType();
+        void SetType(int newType);
 
-		void GenerateBlock (int blockX, int blockY, int blockZ, int chunkX, int chunkY, int chunkZ, int chunkSize);
-		void SetSolid(int solid);
-		int GetSolid();
+    private:
+        int blockX, blockY, blockZ;
 
-		void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, int chunkSize);
-
-	private:
-		int blockX;
-		int blockY;
-		int blockZ;
-
-		char isSolid;
+		char vertexSize = 5;
+        int type;
 };
