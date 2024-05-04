@@ -13,7 +13,6 @@ void Chunk::AllocateChunk() {
             blocks[i] = new Block * [chunkSize];
             for (int j = 0; j < chunkSize; ++j) {
                 blocks[i][j] = new Block[chunkSize];
-                totalBlocks += chunkSize;
             }
         }
 
@@ -31,21 +30,17 @@ void Chunk::GenerateBlocks() {
             return;
         }
 
-        // Generates all the blocks in the chunk
-        //auto start_time = std::chrono::high_resolution_clock::now();
-
         for (int x = 0; x < chunkSize; ++x) {
             for (int y = 0; y < chunkSize; ++y) {
                 for (int z = 0; z < chunkSize; ++z) {
                     blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize);
+                    if (blocks[x][y][z].GetType() == 1) {
+                        totalBlocks++;
+                    }
                 }
             }
         }
         totalMemoryUsage = (float)sizeof(Chunk) + (sizeof(Block) * totalBlocks) + sizeof(vertices) + sizeof(indices);
-
-        //auto end_time = std::chrono::high_resolution_clock::now();
-        //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-        //std::cout << "Chunk World Generation / Info: Chunk world generation took " << duration << " ms" << std::endl;
     }
     else {
         std::cerr << "Chunk Block Generation / Warn: Trying to generate blocks after they had already been generated, aborting" << std::endl;
@@ -55,14 +50,13 @@ void Chunk::GenerateBlocks() {
     isGenerated = true;
 }
 
-void Chunk::GenerateMesh(ChunkHandler& sparseVoxelOctree) {
+void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
     if (!isMeshed) {
         if (!isAllocated) {
             std::cerr << "Chunk Mesh Generation / Warn: Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
             return;
         }
 
-        // Clear existing data
         vertices.clear();
         indices.clear();
 
@@ -78,12 +72,12 @@ void Chunk::GenerateMesh(ChunkHandler& sparseVoxelOctree) {
 
         isEmpty = false;
 
-        Chunk* positiveXChunk = sparseVoxelOctree.GetChunk(chunkX + 1, chunkY, chunkZ);
-        Chunk* negativeXChunk = sparseVoxelOctree.GetChunk(chunkX - 1, chunkY, chunkZ);
-        Chunk* positiveYChunk = sparseVoxelOctree.GetChunk(chunkX, chunkY + 1, chunkZ);
-        Chunk* negativeYChunk = sparseVoxelOctree.GetChunk(chunkX, chunkY - 1, chunkZ);
-        Chunk* positiveZChunk = sparseVoxelOctree.GetChunk(chunkX, chunkY, chunkZ + 1);
-        Chunk* negativeZChunk = sparseVoxelOctree.GetChunk(chunkX, chunkY, chunkZ - 1);
+        Chunk* positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ);
+        Chunk* negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ);
+        Chunk* positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ);
+        Chunk* negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ);
+        Chunk* positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1);
+        Chunk* negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1);
 
         for (int x = 0; x < chunkSize; ++x) {
             for (int y = 0; y < chunkSize; ++y) {
@@ -111,19 +105,23 @@ void Chunk::GenerateMesh(ChunkHandler& sparseVoxelOctree) {
                             block.AddFace(vertices, indices, FRONT, chunkX, chunkY, chunkZ, chunkSize);
                         }
 
-                        // Check each face for blocks around it and generate mesh for faces that should be added
+                        // Check if the block is out of the current chunk, and the other chunk exists
                         if (x + 1 > chunkSize - 1 && positiveXChunk != nullptr) {
+                            // Allocate the chunk if it isn't already
                             if (!positiveXChunk->isAllocated) {
                                 positiveXChunk->AllocateChunk();
                             }
+                            // Set the position, and generate the chunk if it isn't already
                             positiveXChunk->SetPosition(chunkX + 1, chunkY, chunkZ);
                             if (!positiveXChunk->isGenerated) {
                                 positiveXChunk->GenerateBlocks();
                             }
+                            // Allow for correct meshing between chunks
                             if (positiveXChunk->blocks[0][y][z].GetType() == 0) {
                                 block.AddFace(vertices, indices, RIGHT, chunkX, chunkY, chunkZ, chunkSize);
                             }
                         }
+                        // Mesh the insides of the chunk
                         else if (x + 1 <= chunkSize - 1 && blocks[x + 1][y][z].GetType() == 0) {
                             block.AddFace(vertices, indices, RIGHT, chunkX, chunkY, chunkZ, chunkSize);
                         }
@@ -152,7 +150,7 @@ void Chunk::GenerateMesh(ChunkHandler& sparseVoxelOctree) {
                             if (!positiveYChunk->isGenerated) {
                                 positiveYChunk->GenerateBlocks();
                             }
-                            if (positiveYChunk->blocks[x][0][z].GetType() == 0) {
+                            if (positiveYChunk->blocks[x][1][z].GetType() == 0) {
                                 block.AddFace(vertices, indices, TOP, chunkX, chunkY, chunkZ, chunkSize);
                             }
                         }
@@ -258,42 +256,41 @@ std::vector<GLuint> Chunk::GetIndices() {
     return indices;
 }
 
-//void Chunk::SetStartIndex(int newStartIndex) {
-//    startIndex = newStartIndex;
-//}
-//
-//int Chunk::GetStartIndex() {
-//    return startIndex;
-//}
-//
-//void Chunk::SetEndIndex(int newEndIndex) {
-//    endIndex = newEndIndex;
-//}
-//
-//int Chunk::GetEndIndex() {
-//    return endIndex;
-//}
-//
-//void Chunk::SetChunkIndex(int newChunkIndex) {
-//    chunkIndex = newChunkIndex;
-//}
-//
-//int Chunk::GetChunkIndex() {
-//    return chunkIndex;
-//}
+int Chunk::GetMemoryUsage() {
+    return 20 * totalBlocks;
+}
+
+void Chunk::SetStartIndex(int newStartIndex) {
+    startIndex = newStartIndex;
+}
+
+int Chunk::GetStartIndex() {
+    return startIndex;
+}
+
+void Chunk::SetEndIndex(int newEndIndex) {
+    endIndex = newEndIndex;
+}
+
+int Chunk::GetEndIndex() {
+    return endIndex;
+}
+
+void Chunk::SetChunkIndex(int newChunkIndex) {
+    chunkIndex = newChunkIndex;
+}
+
+int Chunk::GetChunkIndex() {
+    return chunkIndex;
+}
 
 bool Chunk::IsArrayEmpty(Block*** blocks) {
-    for (int x = 0; x < chunkSize; ++x) {
-        for (int y = 0; y < chunkSize; ++y) {
-            for (int z = 0; z < chunkSize; ++z) {
-                if (blocks[x][y][z].GetType() == 1) {
-                    return false;
-                }
-            }
-        }
+    if (totalBlocks > 0) {
+        return false;
     }
-
-    return true;
+    else {
+        return true;
+    }
 }
 
 Chunk::~Chunk() {

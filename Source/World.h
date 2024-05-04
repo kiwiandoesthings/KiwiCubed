@@ -15,22 +15,22 @@
 class Chunk;
 
 // Maybe later, right now, this is deprecated
-//struct DrawElementsIndirectCommand {
-//	GLuint count;
-//	GLuint instanceCount;
-//	GLuint firstIndex;
-//	GLuint baseVertex;
-//	glm::vec3 baseInstance;
-//};
+struct DrawElementsIndirectCommand {
+	GLuint count;
+	GLuint instanceCount;
+	GLuint firstIndex;
+	GLuint baseVertex;
+	GLuint baseInstance;
+};
 
-//struct ChunkData {
-//	glm::vec3 position;
-//	// Future other data
-//};
-//
-//struct Position {
-//	int chunkX, chunkY, chunkZ;
-//};
+struct ChunkData {
+	glm::vec3 position;
+	// Future other data
+};
+
+struct Position {
+	int chunkX, chunkY, chunkZ;
+};
 
 
 class World {
@@ -42,40 +42,47 @@ public:
 
 	void Render(Shader shaderProgram);
 	void GenerateWorld();
-	void GenerateChunk(int chunkX, int chunkY, int chunkZ);
+	void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk chunk);
 
 	Chunk GetChunk(int chunkX, int chunkY, int chunkZ);
 
 private:
-	const int worldSize = 4;
+	const int worldSize = 1;
 	const int chunksize = 32;
-	ChunkHandler sparseVoxelOctree;
+	ChunkHandler chunkHandler;
 
 	int totalChunks;
 	float totalMemoryUsage;
 
 	// ALL deprecated member variables from other render methods
-	//std::vector<Position> chunkLocations;
+	std::vector<Position> chunkLocations;
 
-	//std::vector<GLfloat> vertices;
-	//std::vector<GLuint> indices;
+	std::vector<GLfloat> vertices;
+	std::vector<GLuint> indices;
 
-	//GLuint indirectBufferObject;
-	//GLuint chunkDataBufferObject;
 
-	//int drawCount;
+	size_t offset = 0;
+	std::vector<GLsizei> offsets;
+	std::vector<GLsizei> counts;
 
-	//std::vector<DrawElementsIndirectCommand> commands;
-	//std::vector<ChunkData> chunkData;
+	GLuint indirectBufferObject;
+	GLuint chunkDataBufferObject;
 
-	//size_t currentVertexOffset = 0;
-	//size_t currentIndexOffset = 0;
+	int drawCount;
 
-	//int latestEndIndex = 0;
+	std::vector<DrawElementsIndirectCommand> commands;
+	std::vector<ChunkData> chunkData;
 
-	//Renderer renderer;
+	size_t currentVertexOffset = 0;
+	size_t currentIndexOffset = 0;
+
+	int latestEndIndex = 0;
+
+	Renderer renderer;
 
 	//IndexBufferObject indexBufferObject;
 	//VertexArrayObject vertexArrayObject;
 	//VertexBufferObject vertexBufferObject;
+
+	GLuint VAO, EBO, VBO;
 };

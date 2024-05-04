@@ -58,7 +58,7 @@ class Chunk {
     
         void AllocateChunk();
         void GenerateBlocks();
-        void GenerateMesh(ChunkHandler& sparseVoxelOctree);
+        void GenerateMesh(ChunkHandler& chunkHandler);
         void Render(Shader shaderProgram);
     
         void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
@@ -67,16 +67,18 @@ class Chunk {
     
         std::vector<GLfloat> GetVertices();
         std::vector<GLuint> GetIndices();
+
+        int GetMemoryUsage();
         
         // Deprecated stuffs
-        //void SetStartIndex(int newStartIndex);
-        //int GetStartIndex();
-        //
-        //void SetEndIndex(int newEndIndex);
-        //int GetEndIndex();
-        //
-        //void SetChunkIndex(int newChunkIndex);
-        //int GetChunkIndex();
+        void SetStartIndex(int newStartIndex);
+        int GetStartIndex();
+        
+        void SetEndIndex(int newEndIndex);
+        int GetEndIndex();
+        
+        void SetChunkIndex(int newChunkIndex);
+        int GetChunkIndex();
     
     
     private:
@@ -85,10 +87,10 @@ class Chunk {
     
         int totalBlocks;
     
-        //int startIndex;
-        //int endIndex;
-        //
-        //int chunkIndex;
+        int startIndex;
+        int endIndex;
+        
+        int chunkIndex;
     
         VertexArrayObject vertexArrayObject;
         VertexBufferObject vertexBufferObject;

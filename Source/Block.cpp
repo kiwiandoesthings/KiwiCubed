@@ -79,6 +79,7 @@ void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunk
 		// Setup FastNoiseLite
 		FastNoiseLite noise;
 		noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+		noise.SetSeed(120);
 
 		// Get the noise value for the block
 		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
@@ -88,6 +89,13 @@ void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunk
 		else {
 			SetType(0);
 		}
+		//if (blockX == 0 && blockY == 0 && blockZ == 0) {
+		//	SetType(1);
+		//}
+		//else {
+		//	SetType(0);
+		//}
+		//SetType(1);
 	}
 }
 
@@ -96,7 +104,6 @@ void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices
 	GLfloat xOffset = static_cast<GLfloat>(blockX + (chunkX * chunkSize));
 	GLfloat yOffset = static_cast<GLfloat>(blockY + (chunkY * chunkSize));
 	GLfloat zOffset = static_cast<GLfloat>(blockZ + (chunkZ * chunkSize));
-
 	size_t vertexOffset = static_cast<size_t>(faceDirection) * 20;
 
 	// Append face vertices with offset to the chunk's vertex array
