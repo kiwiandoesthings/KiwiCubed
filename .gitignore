@@ -39,7 +39,11 @@ bld/
 #wwwroot/
 
 # PyCharm config folders
-.idea0
+.idea
+/idea/
+idea/
+/idea
+# I don't even know
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/
