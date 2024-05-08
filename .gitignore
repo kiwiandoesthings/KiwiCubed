@@ -40,9 +40,6 @@ bld/
 
 # PyCharm config folders
 .idea
-/idea/
-idea/
-/idea
 # I don't even know
 
 # Visual Studio 2017 auto generated files
