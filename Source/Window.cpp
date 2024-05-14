@@ -10,16 +10,23 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isF
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-	// Create GLFW window
-	window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
+	// Create the GLFW window
+	window = glfwCreateWindow(windowWidth, windowHeight, windowTitle,nullptr, nullptr);
+
+	int newWindowWidth, newWindowHeight;
+	glfwGetFramebufferSize(window, &newWindowWidth, &newWindowHeight);
+	Window::windowWidth = newWindowWidth;
+	Window::windowHeight = newWindowHeight;
+
 	if (!window)
 	{
-		std::cerr << "Initialization / Error: Failed to create GLFW window" << std::endl;
+		std::cerr << "[Initialization / Error] Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 	}
 	else {
-		std::cout << "Initialization / Info: Successfully created GLFW window" << std::endl;
+		std::cout << "[Initialization / Info] Successfully created GLFW window" << std::endl;
 	}
 	glfwMakeContextCurrent(window);
 }
@@ -30,7 +37,7 @@ void Window::Inputs() {
 		isFocused = false;
 		firstClick = true;
 	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !isFocused)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !isFocused)
 	{
 		isFocused = true;
 		firstClick = false;

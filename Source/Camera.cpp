@@ -85,10 +85,10 @@ void Camera::Inputs(Window* window) {
 		pitch += rotationX;
 
 		// Clamp pitch to prevent the camera from flipping out
-		if (pitch > 89.0f)
-			pitch = 89.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
+		if (pitch > 89.9f)
+			pitch = 89.9f;
+		if (pitch < -89.9f)
+			pitch = -89.9f;
 
 		// wha..? (learnopengl.com)
 		glm::vec3 facing;
@@ -97,7 +97,7 @@ void Camera::Inputs(Window* window) {
 		facing.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 		orientation = glm::normalize(facing);
 
-		// We don't want anyone to be able to move the mouse off the screen, like in Roblox
+		// We don't want anyone to be able to move the mouse off the screen, that would be very very very bad and horrible and would make the game absolutely unplayable
 		glfwSetCursorPos(windowInstance, (window->GetWidth() / 2), (window->GetHeight() / 2));
 	}
 }

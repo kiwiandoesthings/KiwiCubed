@@ -67,67 +67,47 @@ GLuint faceIndices[] = {
 };
 
 
-Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(-1) {
+Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(NULL) {
 
 }
 
 void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunkX, int chunkY, int chunkZ, int chunkSize) {
-	blockX = newBlockX;
-	blockY = newBlockY;
-	blockZ = newBlockZ;
-	if (GetType() == -1) {
+	if (GetType() == NULL) {
+		blockX = newBlockX;
+		blockY = newBlockY;
+		blockZ = newBlockZ;
+
 		// Setup FastNoiseLite
 		FastNoiseLite noise;
 		noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 		noise.SetSeed(120);
 
-		// Get the noise value for the block
-		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
-		if (noiseValue > 0) {
-			SetType(1);
-		}
-		else {
-			SetType(0);
-		}
-		//if (blockX == 0 && blockY == 0 && blockZ == 0) {
-		//	SetType(1);
-		//}
-		//else {
-		//	SetType(0);
-		//}
-		//SetType(1);
+		//float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
+		//type = (noiseValue > 0) ? 1 : 0;
+		type = 1;
 	}
 }
 
 void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, int chunkSize) {
-	// Calculate offset based on block position
-	GLfloat xOffset = static_cast<GLfloat>(blockX + (chunkX * chunkSize));
-	GLfloat yOffset = static_cast<GLfloat>(blockY + (chunkY * chunkSize));
-	GLfloat zOffset = static_cast<GLfloat>(blockZ + (chunkZ * chunkSize));
-	size_t vertexOffset = static_cast<size_t>(faceDirection) * 20;
+	size_t vertexOffset = (size_t)faceDirection * 20;
+	size_t baseIndex = vertices.size() / 5;
 
-	// Append face vertices with offset to the chunk's vertex array
 	for (size_t i = vertexOffset; i < vertexOffset + 20; i += 5) {
-		vertices.push_back(faceVertices[i] + xOffset);
-		vertices.push_back(faceVertices[i + 1] + yOffset);
-		vertices.push_back(faceVertices[i + 2] + zOffset);
-		vertices.push_back(faceVertices[i + 3]); // Texture coordinate s
-		vertices.push_back(faceVertices[i + 4]); // Texture coordinate t
+		vertices.emplace_back(faceVertices[i] +      (GLfloat)blockX + (chunkX * chunkSize));
+		vertices.emplace_back(faceVertices[i  + 1] + (GLfloat)blockY + (chunkY * chunkSize));
+		vertices.emplace_back(faceVertices[i  + 2] + (GLfloat)blockZ + (chunkZ * chunkSize));
+		vertices.emplace_back(faceVertices[i  + 3]);
+		vertices.emplace_back(faceVertices[i  + 4]);
 	}
 
-	// Calculate indices for the face
-	GLuint baseIndex = static_cast<GLuint>(vertices.size()) / vertexSize - 4;
-
-	// Push all indices for the face
 	for (size_t i = 0; i < 6; ++i) {
-		indices.push_back(baseIndex + faceIndices[i]);
+		indices.emplace_back(baseIndex + faceIndices[i]);
 	}
 }
-
-int Block::GetType() {
+bool Block::GetType() {
 	return type;
 }
 
-void Block::SetType(int newType) {
+void Block::SetType(bool newType) {
 	type = newType;
 }

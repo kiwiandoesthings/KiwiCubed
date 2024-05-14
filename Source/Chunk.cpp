@@ -15,18 +15,18 @@ void Chunk::AllocateChunk() {
                 blocks[i][j] = new Block[chunkSize];
             }
         }
-
-        isAllocated = true;
     }
     else {
-        std::cerr << "Chunk Allocation / Warn: Trying to allocate chunk after it had already been allocated, aborting" << std::endl;
+        std::cerr << "[Chunk Setup / Warn] Trying to allocate chunk after it had already been allocated, aborting" << std::endl;
     }
+
+    isAllocated = true;
 }
 
 void Chunk::GenerateBlocks() {
     if (!isGenerated) {
         if (!isAllocated) {
-            std::cerr << "Chunk Block Generation / Warn: Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
+            std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
             return;
         }
 
@@ -40,10 +40,10 @@ void Chunk::GenerateBlocks() {
                 }
             }
         }
-        totalMemoryUsage = (float)sizeof(Chunk) + (sizeof(Block) * totalBlocks) + sizeof(vertices) + sizeof(indices);
+        //totalMemoryUsage = (float)sizeof(Chunk) + (sizeof(Block) * totalBlocks) + sizeof(vertices) + sizeof(indices);
     }
     else {
-        std::cerr << "Chunk Block Generation / Warn: Trying to generate blocks after they had already been generated, aborting" << std::endl;
+        std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks after they had already been generated, aborting" << std::endl;
         return;
     }
 
@@ -53,181 +53,79 @@ void Chunk::GenerateBlocks() {
 void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
     if (!isMeshed) {
         if (!isAllocated) {
-            std::cerr << "Chunk Mesh Generation / Warn: Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
+            std::cerr << "[Chunk Mesh Generation / Warn] Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
+            return;
+        }
+
+        if (!isGenerated) {
+            GenerateBlocks();
+        }
+
+        if (IsEmpty()) {
+            std::cout << "[Chunk Mesh Generation / Info] Chunk is empty, skipping mesh generation" << std::endl;
             return;
         }
 
         vertices.clear();
         indices.clear();
 
-        if (!isGenerated) {
-            GenerateBlocks();
-        }
-
-        if (IsArrayEmpty(blocks)) {
-            isEmpty = true;
-            std::cout << "Chunk Mesh Generation / Info: Chunk is empty, skipping mesh generation" << std::endl;
-            return;
-        }
-
-        isEmpty = false;
-
-        Chunk* positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ);
-        Chunk* negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ);
-        Chunk* positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ);
-        Chunk* negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ);
-        Chunk* positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1);
-        Chunk* negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1);
+        Chunk* neighborChunks[6] = {
+            chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ),     // Positive X
+            chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ),     // Negative X
+            chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ),     // Positive Y
+            chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ),     // Negative Y
+            chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1),     // Positive Z
+            chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1)      // Negative Z
+        };
 
         for (int x = 0; x < chunkSize; ++x) {
             for (int y = 0; y < chunkSize; ++y) {
                 for (int z = 0; z < chunkSize; ++z) {
-
                     if (blocks[x][y][z].GetType() == 1) {
                         Block& block = blocks[x][y][z];
 
-                        if (x + 1 > chunkSize - 1 && positiveXChunk == nullptr) {
-                            block.AddFace(vertices, indices, RIGHT, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-                        if (x - 1 < 0 && negativeXChunk == nullptr) {
-                            block.AddFace(vertices, indices, LEFT, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-                        if (y + 1 > chunkSize - 1 && positiveYChunk == nullptr) {
-                            block.AddFace(vertices, indices, TOP, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-                        if (y - 1 < 0 && negativeYChunk == nullptr) {
-                            block.AddFace(vertices, indices, BOTTOM, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-                        if (z + 1 > chunkSize - 1 && positiveZChunk == nullptr) {
-                            block.AddFace(vertices, indices, BACK, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-                        if (z - 1 < 0 && negativeZChunk == nullptr) {
-                            block.AddFace(vertices, indices, FRONT, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-
-                        // Check if the block is out of the current chunk, and the other chunk exists
-                        if (x + 1 > chunkSize - 1 && positiveXChunk != nullptr) {
-                            // Allocate the chunk if it isn't already
-                            if (!positiveXChunk->isAllocated) {
-                                positiveXChunk->AllocateChunk();
+                        for (int direction = 0; direction < 6; ++direction) {
+                            FaceDirection faceDirection = static_cast<FaceDirection>(direction);
+                            bool shouldAddFace = false;
+                        
+                            switch (faceDirection) {
+                                case RIGHT:
+                                    shouldAddFace = (x == chunkSize - 1 && !neighborChunks[0]) || (x < chunkSize - 1 && blocks[x + 1][y][z].GetType() == 0);
+                                    break;
+                                case LEFT:
+                                    shouldAddFace = (x == 0 && !neighborChunks[1]) || (x > 0 && blocks[x - 1][y][z].GetType() == 0);
+                                    break;
+                                case TOP:
+                                    shouldAddFace = (y == chunkSize - 1 && !neighborChunks[2]) || (y < chunkSize - 1 && blocks[x][y + 1][z].GetType() == 0);
+                                    break;
+                                case BOTTOM:
+                                    shouldAddFace = (y == 0 && !neighborChunks[3]) || (y > 0 && blocks[x][y - 1][z].GetType() == 0);
+                                    break;
+                                case BACK:
+                                    shouldAddFace = (z == chunkSize - 1 && !neighborChunks[4]) || (z < chunkSize - 1 && blocks[x][y][z + 1].GetType() == 0);
+                                    break;
+                                case FRONT:
+                                    shouldAddFace = (z == 0 && !neighborChunks[5]) || (z > 0 && blocks[x][y][z - 1].GetType() == 0);
+                                    break;
                             }
-                            // Set the position, and generate the chunk if it isn't already
-                            positiveXChunk->SetPosition(chunkX + 1, chunkY, chunkZ);
-                            if (!positiveXChunk->isGenerated) {
-                                positiveXChunk->GenerateBlocks();
+                        
+                            if (shouldAddFace) {
+                                block.AddFace(vertices, indices, faceDirection, chunkX, chunkY, chunkZ, chunkSize);
                             }
-                            // Allow for correct meshing between chunks
-                            if (positiveXChunk->blocks[0][y][z].GetType() == 0) {
-                                block.AddFace(vertices, indices, RIGHT, chunkX, chunkY, chunkZ, chunkSize);
-                            }
-                        }
-                        // Mesh the insides of the chunk
-                        else if (x + 1 <= chunkSize - 1 && blocks[x + 1][y][z].GetType() == 0) {
-                            block.AddFace(vertices, indices, RIGHT, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-
-                        if (x - 1 < 0 && negativeXChunk != nullptr) {
-                            if (!negativeXChunk->isAllocated) {
-                                negativeXChunk->AllocateChunk();
-                            }
-                            negativeXChunk->SetPosition(chunkX - 1, chunkY, chunkZ);
-                            if (!negativeXChunk->isGenerated) {
-                                negativeXChunk->GenerateBlocks();
-                            }
-                            if (negativeXChunk->blocks[chunkSize - 1][y][z].GetType() == 0) {
-                                block.AddFace(vertices, indices, LEFT, chunkX, chunkY, chunkZ, chunkSize);
-                            }
-                        }
-                        else if (x - 1 >= 0 && blocks[x - 1][y][z].GetType() == 0) {
-                            block.AddFace(vertices, indices, LEFT, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-
-                        if (y + 1 > chunkSize - 1 && positiveYChunk != nullptr) {
-                            if (!positiveYChunk->isAllocated) {
-                                positiveYChunk->AllocateChunk();
-                            }
-                            positiveYChunk->SetPosition(chunkX, chunkY + 1, chunkZ);
-                            if (!positiveYChunk->isGenerated) {
-                                positiveYChunk->GenerateBlocks();
-                            }
-                            if (positiveYChunk->blocks[x][1][z].GetType() == 0) {
-                                block.AddFace(vertices, indices, TOP, chunkX, chunkY, chunkZ, chunkSize);
-                            }
-                        }
-                        else if (y + 1 <= chunkSize - 1 && blocks[x][y + 1][z].GetType() == 0) {
-                            block.AddFace(vertices, indices, TOP, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-
-                        if (y - 1 < 0 && negativeYChunk != nullptr) {
-                            if (!negativeYChunk->isAllocated) {
-                                negativeYChunk->AllocateChunk();
-                            }
-                            negativeYChunk->SetPosition(chunkX, chunkY - 1, chunkZ);
-                            if (!negativeYChunk->isGenerated) {
-                                negativeYChunk->GenerateBlocks();
-                            }
-                            if (negativeYChunk->blocks[x][chunkSize - 1][z].GetType() == 0) {
-                                block.AddFace(vertices, indices, BOTTOM, chunkX, chunkY, chunkZ, chunkSize);
-                            }
-                        }
-                        else if (y - 1 >= 0 && blocks[x][y - 1][z].GetType() == 0) {
-                            block.AddFace(vertices, indices, BOTTOM, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-
-                        if (z + 1 > chunkSize - 1 && positiveZChunk != nullptr) {
-                            if (!positiveZChunk->isAllocated) {
-                                positiveZChunk->AllocateChunk();
-                            }
-                            positiveZChunk->SetPosition(chunkX, chunkY, chunkZ + 1);
-                            if (!positiveZChunk->isGenerated) {
-                                positiveZChunk->GenerateBlocks();
-                            }
-                            if (positiveZChunk->blocks[x][y][0].GetType() == 0) {
-                                block.AddFace(vertices, indices, BACK, chunkX, chunkY, chunkZ, chunkSize);
-                            }
-                        }
-                        else if (z + 1 <= chunkSize - 1 && blocks[x][y][z + 1].GetType() == 0) {
-                            block.AddFace(vertices, indices, BACK, chunkX, chunkY, chunkZ, chunkSize);
-                        }
-
-                        if (z - 1 < 0 && negativeZChunk != nullptr) {
-                            if (!negativeZChunk->isAllocated) {
-                                negativeZChunk->AllocateChunk();
-                            }
-                            negativeZChunk->SetPosition(chunkX, chunkY, chunkZ - 1);
-                            if (!negativeZChunk->isGenerated) {
-                                negativeZChunk->GenerateBlocks();
-                            }
-                            if (negativeZChunk->blocks[x][y][chunkSize - 1].GetType() == 0) {
-                                block.AddFace(vertices, indices, FRONT, chunkX, chunkY, chunkZ, chunkSize);
-                            }
-                        }
-                        else if (z - 1 >= 0 && blocks[x][y][z - 1].GetType() == 0) {
-                            block.AddFace(vertices, indices, FRONT, chunkX, chunkY, chunkZ, chunkSize);
                         }
                     }
                 }
             }
         }
-
-        //auto start_time = std::chrono::high_resolution_clock::now();
-
-        // Generate mesh for all the blocks in a chunk by querying blocks around it and marking faces to be generated
-
-
-        //auto end_time = std::chrono::high_resolution_clock::now();
-        //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-        //std::cout << "Chunk Generation / Info: Chunk mesh generation took " << duration << " ms" << std::endl;
     }
 
     isMeshed = true;
 }
 
-void Chunk::Render(Shader shaderProgram) {
+void Chunk::Render() {
     if (isEmpty) {
         return;
     }
-    glUniform3f(glGetUniformLocation(shaderProgram.shaderProgramID, "chunkPosition"), (GLfloat)chunkX, (GLfloat)chunkY, (GLfloat)chunkZ);
     vertexArrayObject.Bind();
     vertexBufferObject.Bind();
     vertexBufferObject.Setup(vertices.size() * sizeof(GLfloat), vertices.data());
@@ -284,11 +182,13 @@ int Chunk::GetChunkIndex() {
     return chunkIndex;
 }
 
-bool Chunk::IsArrayEmpty(Block*** blocks) {
+bool Chunk::IsEmpty() {
     if (totalBlocks > 0) {
+        isEmpty = false;
         return false;
     }
     else {
+        isEmpty = true;
         return true;
     }
 }

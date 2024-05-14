@@ -4,6 +4,7 @@ layout (location = 0) in vec3 blockPosition;
 layout (location = 1) in vec2 textureCoordinate;
 
 out vec2 textureCoordinateOut;
+out vec3 blockPositionOut;
 
 uniform mat4 windowViewMatrix;
 
@@ -13,11 +14,5 @@ void main()
 
 	gl_Position = windowViewMatrix * worldPosition;
 	textureCoordinateOut = textureCoordinate;
+	blockPositionOut = blockPosition;
 }
-
-//#version 330 core
-//layout(location = 0) in vec3 aPos;
-//uniform mat4 windowViewMatrix;
-//void main() {
-//	gl_Position = windowViewMatrix * vec4(aPos, 1.0);
-//}

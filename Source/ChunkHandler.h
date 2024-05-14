@@ -59,7 +59,7 @@ class Chunk {
         void AllocateChunk();
         void GenerateBlocks();
         void GenerateMesh(ChunkHandler& chunkHandler);
-        void Render(Shader shaderProgram);
+        void Render();
     
         void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
     
@@ -79,11 +79,14 @@ class Chunk {
         
         void SetChunkIndex(int newChunkIndex);
         int GetChunkIndex();
-    
+
+        bool IsEmpty();
     
     private:
         std::vector<GLfloat> vertices;
         std::vector<GLuint> indices;
+
+        std::vector<GLfloat> yes;
     
         int totalBlocks;
     
@@ -95,6 +98,4 @@ class Chunk {
         VertexArrayObject vertexArrayObject;
         VertexBufferObject vertexBufferObject;
         IndexBufferObject indexBufferObject;
-    
-        bool IsArrayEmpty(Block*** blocks);
 };

@@ -34,55 +34,48 @@ struct Position {
 
 
 class World {
-public:
-	Player player = Player(0, 0, 0);
+	public:
+		Player player = Player(0, 0, 0);
 
-	World();
-	~World();
+		World();
+		~World();
 
-	void Render(Shader shaderProgram);
-	void GenerateWorld();
-	void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk chunk);
+		void Render(Shader shaderProgram);
+		void GenerateWorld();
+		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk chunk);
 
-	Chunk GetChunk(int chunkX, int chunkY, int chunkZ);
+		Chunk GetChunk(int chunkX, int chunkY, int chunkZ);
 
-private:
-	const int worldSize = 1;
-	const int chunksize = 32;
-	ChunkHandler chunkHandler;
+	private:
+		const int worldSize = 10;
+		const int chunksize = 32;
+		ChunkHandler chunkHandler;
 
-	int totalChunks;
-	float totalMemoryUsage;
+		int totalChunks;
+		float totalMemoryUsage;
 
-	// ALL deprecated member variables from other render methods
-	std::vector<Position> chunkLocations;
+		// ALL deprecated member variables from other render methods
+		std::vector<Position> chunkLocations;
 
-	std::vector<GLfloat> vertices;
-	std::vector<GLuint> indices;
+		std::vector<GLfloat> vertices;
+		std::vector<GLuint> indices;
 
+		GLuint indirectBufferObject;
+		GLuint chunkDataBufferObject;
 
-	size_t offset = 0;
-	std::vector<GLsizei> offsets;
-	std::vector<GLsizei> counts;
+		int drawCount;
 
-	GLuint indirectBufferObject;
-	GLuint chunkDataBufferObject;
+		std::vector<DrawElementsIndirectCommand> commands;
+		std::vector<ChunkData> chunkData;
 
-	int drawCount;
+		int latestChunkVertexOffset = 0;
+		int latestChunkIndexOffset = 0;
 
-	std::vector<DrawElementsIndirectCommand> commands;
-	std::vector<ChunkData> chunkData;
+		Renderer renderer;
 
-	size_t currentVertexOffset = 0;
-	size_t currentIndexOffset = 0;
+		IndexBufferObject indexBufferObject;
+		VertexArrayObject vertexArrayObject;
+		VertexBufferObject vertexBufferObject;
 
-	int latestEndIndex = 0;
-
-	Renderer renderer;
-
-	//IndexBufferObject indexBufferObject;
-	//VertexArrayObject vertexArrayObject;
-	//VertexBufferObject vertexBufferObject;
-
-	GLuint VAO, EBO, VBO;
+		GLuint VAO, EBO, VBO;
 };

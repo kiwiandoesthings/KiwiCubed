@@ -8,10 +8,10 @@ Shader::Shader(const std::string& vertexFilePath, const std::string& fragmentFil
 
     if (!fragmentSource.empty() || !vertexSource.empty()) {
         shaderProgramID = CreateShader(vertexSource, fragmentSource);
-        std::cout << "Shader Setup / Info: Successfully created shader program with ID of " << shaderProgramID << std::endl;
+        std::cout << "[Shader Setup / Info] Successfully created shader program with ID of " << shaderProgramID << std::endl;
     }
     else {
-        std::cerr << "Shader Setup / Error: Shader file(s) not found, aborting shader creation" << std::endl;
+        std::cerr << "[Shader Setup / Error] Shader file(s) not found, aborting shader creation" << std::endl;
     }
 }
 
@@ -20,7 +20,8 @@ std::string Shader::ParseShader(const std::string& filePath)
     std::ifstream file(filePath);
     if (!file)
     {
-        std::cerr << "Shader Parsing / Warning: Could not find shader at " << filePath << std::endl;
+        std::cerr << "[Shader Parsing / Error] Could not find shader at " << filePath << std::endl;
+        return "";
     }
     std::string str;
     std::string content;
@@ -45,8 +46,8 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
         GLCall(glGetShaderiv(shaderProgramID, GL_INFO_LOG_LENGTH, &length));
         char* message = (char*)_malloca(length * sizeof(char));
         GLCall(glGetShaderInfoLog(shaderProgramID, length, &length, message));
-        std::cerr << "Shader Compilation / Error: Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
-        std::cerr << "Shader Compilation / Error: Shader compilation error message, " << message << std::endl;
+        std::cerr << "[Shader Compilation / Error] Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
+        std::cerr << "[Shader Compilation / Error] Shader compilation error message, " << message << std::endl;
         GLCall(glDeleteShader(shaderProgramID));
         return 0;
     }
@@ -75,7 +76,7 @@ void Shader::SetUniform4fv(const char* uniform, glm::mat4 value) {
     unsigned int uniformLocation = glGetUniformLocation(shaderProgramID, uniform);
 
     if (uniformLocation == -1) {
-        std::cout << "Shader Uniform Setting / Error: Could not find uniform: " << uniform << " in the specified shader with ID of " << shaderProgramID << " at" << std::endl;
+        std::cerr << "[Shader Uniform Setting / Error: Could not find uniform] " << uniform << " in the specified shader with ID of " << shaderProgramID << " at" << std::endl;
         return;
     }
 
