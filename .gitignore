@@ -41,6 +41,7 @@ bld/
 # PyCharm config folders
 .idea
 # I don't even know
+.ini
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/
