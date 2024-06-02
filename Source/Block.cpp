@@ -8,26 +8,26 @@ GLfloat faceVertices[] = {
 	1.0f, 0.0f, 0.0f,  0.0f, 0.0f,
 	1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
 	0.0f, 1.0f, 0.0f,  1.0f, 1.0f,
-
-	// Back
+	 	   	
+	// Back	
 	0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
 	1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
 	1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
 	0.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-
-	// Left
+	 	   		
+	// Left		
 	0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
 	0.0f, 1.0f, 1.0f,  1.0f, 1.0f,
 	0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
 	0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
-
-	// Right
+	 	   		
+	// Righ		
 	1.0f, 1.0f, 0.0f,  1.0f, 1.0f,
 	1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
 	1.0f, 0.0f, 1.0f,  0.0f, 0.0f,
 	1.0f, 0.0f, 0.0f,  1.0f, 0.0f,
-
-	// Top
+	 	   		 
+	// Top	
 	0.0f, 1.0f, 1.0f,  1.0f, 1.0f,
 	1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
 	1.0f, 1.0f, 0.0f,  0.0f, 0.0f,
@@ -93,9 +93,9 @@ void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices
 	size_t baseIndex = vertices.size() / 5;
 
 	for (size_t i = vertexOffset; i < vertexOffset + 20; i += 5) {
-		vertices.emplace_back(faceVertices[i] +      (GLfloat)blockX + (chunkX * chunkSize));
-		vertices.emplace_back(faceVertices[i  + 1] + (GLfloat)blockY + (chunkY * chunkSize));
-		vertices.emplace_back(faceVertices[i  + 2] + (GLfloat)blockZ + (chunkZ * chunkSize));
+		vertices.emplace_back(faceVertices[i] +      (GLuint)blockX + (chunkX * chunkSize));
+		vertices.emplace_back(faceVertices[i  + 1] + (GLuint)blockY + (chunkY * chunkSize));
+		vertices.emplace_back(faceVertices[i  + 2] + (GLuint)blockZ + (chunkZ * chunkSize));
 		vertices.emplace_back(faceVertices[i  + 3]);
 		vertices.emplace_back(faceVertices[i  + 4]);
 	}

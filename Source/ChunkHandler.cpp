@@ -6,16 +6,20 @@ ChunkHandler::ChunkHandler() {
 }
 
 Chunk* ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
-    auto it = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
-    if (it != chunks.end()) {
+    auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
+    if (chunk != chunks.end()) {
         // Return the chunk if it exists
-        return &(it->second);
+        return &(chunk->second);
     }
     else {
         // Return nullptr if not
         return nullptr;
     }
 
+}
+
+void ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
+    chunks.insert(std::make_pair(std::tuple(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
 }
 
 

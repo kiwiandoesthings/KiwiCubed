@@ -2,7 +2,6 @@
 // ~2008-2/8/2024
 // R.I.P.
 
-#pragma comment(lib, "wbemuuid.lib")
 
 char versionString[128];
 bool bitness;
@@ -17,10 +16,6 @@ extern "C"
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-
-#include <Windows.h>
-#include <comdef.h>
-#include <Wbemidl.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -43,26 +38,6 @@ extern "C"
 #include <Texture.h>
 #include <Window.h>
 
-std::wstring GetProcessorName() {
-	HKEY hKey;
-	wchar_t processorModel[256];
-	DWORD size = sizeof(processorModel);
-
-	// Open the registry key containing processor information
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
-		return L"[Initialization / Error] Failed to retrieve processor model";
-	}
-
-	// Read the ProcessorNameString value
-	if (RegQueryValueEx(hKey, L"ProcessorNameString", NULL, NULL, reinterpret_cast<LPBYTE>(processorModel), &size) != ERROR_SUCCESS) {
-		RegCloseKey(hKey);
-		return L"[Initialization / Error] Failed to retrieve processor model";
-	}
-
-	RegCloseKey(hKey);
-
-	return processorModel;
-}
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -126,7 +101,6 @@ int main() {
 	}
 	std::cout << "[Initialization / Info] Machine bitness: " << (bitness == 1 ? "64" : "32") << std::endl;
 	std::cout << "[Initialization / Info] Using OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-	std::wcout << "[Initialization / Info] Using processing device: " << GetProcessorName() << std::endl;
 	std::cout << "[Initialization / Info] Using graphics device: " << glGetString(GL_RENDERER) << std::endl;
 	std::cout << "[Initialization / Info] Using resolution: " << globalWindow.GetWidth() << " x " << globalWindow.GetHeight() << std::endl << std::endl;
 

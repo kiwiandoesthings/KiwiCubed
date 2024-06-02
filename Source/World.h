@@ -47,7 +47,7 @@ class World {
 		Chunk GetChunk(int chunkX, int chunkY, int chunkZ);
 
 	private:
-		const int worldSize = 10;
+		const int worldSize = 1;
 		const int chunksize = 32;
 		ChunkHandler chunkHandler;
 

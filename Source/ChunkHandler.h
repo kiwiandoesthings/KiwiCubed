@@ -30,14 +30,14 @@ struct TripleHash {
 
 
 class ChunkHandler {
-    private:
-    
     public:
         ChunkHandler();
         void Delete();
 
         Chunk* GetChunk(int chunkX, int chunkY, int chunkZ);
+        void AddChunk(int chunkX, int chunkY, int chunkZ);
 
+    private:
         std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 };
 
@@ -85,8 +85,6 @@ class Chunk {
     private:
         std::vector<GLfloat> vertices;
         std::vector<GLuint> indices;
-
-        std::vector<GLfloat> yes;
     
         int totalBlocks;
     

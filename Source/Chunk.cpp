@@ -62,7 +62,7 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
         }
 
         if (IsEmpty()) {
-            std::cout << "[Chunk Mesh Generation / Info] Chunk is empty, skipping mesh generation" << std::endl;
+            //std::cout << "[Chunk Mesh Generation / Info] Chunk is empty, skipping mesh generation" << std::endl;
             return;
         }
 
