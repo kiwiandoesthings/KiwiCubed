@@ -7,7 +7,8 @@ This game / engine is focused on being extremely expandable, having easy and pow
 <br/>
 
 Currently working on:
-- glMultiDrawElementsIndirect (dear god why the heck is it so hard to get this to work)
+- glMultiDrawElementsIndirect (dear god why the heck is it so hard to get this to work).
 - Chunk handling system with world class for loading, unloading and rendering.
+- Adding support for multiple textures.
 - Adding support for multiple block types, such as grass blocks and stone blocks, along with attributes for (future) gameplay.
 - Completely overhauling backend systems. Don't ask why window handling logic was in the camera class, or why the player had two sets of coordinates, one of which it didn't use.
