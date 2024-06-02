@@ -5,7 +5,6 @@ v0.0.1pre-alpha (version system subject to change)
 
 I FINALLY HAVE A NAME FOR THE ENGINE
 
-### As this is the dev branch, most builds will not work, but you can look in the readme and commits to see exactly what has been going on in the codebase. Needed a way to back up code more often, so this is what I decided to do to solve that.
 <br/>
 <br/>
 This is going to be a game engine that I will eventually build a game upon.
