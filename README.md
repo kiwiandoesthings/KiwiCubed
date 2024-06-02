@@ -1,14 +1,10 @@
 # Kiwi³
-## Very extremely early tech test
+## v0.0.1pre-alpha
+(version system subject to change)
 
-v0.0.1pre-alpha (version system subject to change)
 
-I FINALLY HAVE A NAME FOR THE ENGINE
-
+This game / engine is focused on being extremely expandable, having easy and powerful modding support, being ultra performant, and having official tools for creating content and mods that anyone can use and get the hang of.
 <br/>
-<br/>
-This is going to be a game engine that I will eventually build a game upon.
-But It should be decoupled from the game, and therefore usable for other purposes.
 
 Currently working on:
 - glMultiDrawElementsIndirect (dear god why the heck is it so hard to get this to work)
