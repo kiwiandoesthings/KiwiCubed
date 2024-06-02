@@ -1,17 +1,13 @@
 # Kiwi³
-## Very extremely early tech test
+## v0.0.1pre-alpha
+(version system subject to change)
 
-v0.0.1pre-alpha (version system subject to change)
 
-I FINALLY HAVE A NAME FOR THE ENGINE
-
-### As this is the dev branch, most builds will not work, but you can look in the readme and commits to see exactly what has been going on in the codebase. Needed a way to back up code more often, so this is what I decided to do to solve that.
+This game / engine is focused on being extremely expandable, having easy and powerful modding support, being ultra performant, and having official tools for creating content and mods that anyone can use and get the hang of.
 <br/>
-<br/>
-This is going to be a game engine that I will eventually build a game upon.
-But It should be decoupled from the game, and therefore usable for other purposes.
 
 Currently working on:
+- glMultiDrawElementsIndirect (dear god why the heck is it so hard to get this to work)
 - Chunk handling system with world class for loading, unloading and rendering.
 - Adding support for multiple block types, such as grass blocks and stone blocks, along with attributes for (future) gameplay.
 - Completely overhauling backend systems. Don't ask why window handling logic was in the camera class, or why the player had two sets of coordinates, one of which it didn't use.
