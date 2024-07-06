@@ -6,6 +6,7 @@
 char versionString[128];
 bool bitness;
 
+// Make it so on laptops, it will request the dGPU if possible, without this, you have to force it to use the dGPU
 extern "C"
 {
 	__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;

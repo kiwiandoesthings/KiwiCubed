@@ -67,7 +67,7 @@ GLuint faceIndices[] = {
 };
 
 
-Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(NULL) {
+Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(nullptr) {
 
 }
 
@@ -82,9 +82,9 @@ void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunk
 		noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 		noise.SetSeed(120);
 
-		//float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
-		//type = (noiseValue > 0) ? 1 : 0;
-		type = 1;
+		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
+		type = (noiseValue > 0) ? 1 : 0;
+		//type = 1;
 	}
 }
 
