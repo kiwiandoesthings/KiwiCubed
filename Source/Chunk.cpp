@@ -1,4 +1,5 @@
-#include <ChunkHandler.h>
+#include "ChunkHandler.h"
+#include "World.h"
 
 
 Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : blocks(blocks), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), totalMemoryUsage(0), totalBlocks(0)/*, startIndex(0), endIndex(0), chunkIndex(0)*/ {
@@ -23,29 +24,34 @@ void Chunk::AllocateChunk() {
     isAllocated = true;
 }
 
-void Chunk::GenerateBlocks() {
-    if (!isGenerated) {
-        if (!isAllocated) {
-            std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
-            return;
-        }
-
-        for (int x = 0; x < chunkSize; ++x) {
-            for (int y = 0; y < chunkSize; ++y) {
-                for (int z = 0; z < chunkSize; ++z) {
-                    blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize);
-                    if (blocks[x][y][z].GetType() == 1) {
-                        totalBlocks++;
-                    }
-                }
-            }
-        }
-        //totalMemoryUsage = (float)sizeof(Chunk) + (sizeof(Block) * totalBlocks) + sizeof(vertices) + sizeof(indices);
-    }
-    else {
+void Chunk::GenerateBlocks(World world, Chunk& callerChunk, bool updateCallerChunk) {
+    if (isGenerated) {
         std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks after they had already been generated, aborting" << std::endl;
         return;
     }
+    if (!isAllocated) {
+        std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
+        return;
+    }
+
+    for (int x = 0; x < chunkSize; ++x) {
+        for (int y = 0; y < chunkSize; ++y) {
+            for (int z = 0; z < chunkSize; ++z) {
+                blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize);
+                if (blocks[x][y][z].GetType() == 1) {
+                    totalBlocks++;
+                }
+            }
+        }
+    }
+
+    if (updateCallerChunk) {
+        //std::cout << "[Debug] Chunk generating {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" <<  std::endl;
+        //std::cout << "[Debug] Generate  caller {" << callerChunk.chunkX << ", " << callerChunk.chunkY << ", " << callerChunk.chunkZ << "}" << std::endl;
+        world.GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, *this, true, callerChunk);
+    }
+
+    //totalMemoryUsage = (float)sizeof(Chunk) + (sizeof(Block) * totalBlocks) + sizeof(vertices) + sizeof(indices);
 
     isGenerated = true;
 }
@@ -58,54 +64,139 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
         }
 
         if (!isGenerated) {
-            GenerateBlocks();
+            std::cerr << "[Chunk Mesh Generation / Warn] Trying to generate mesh for ungenerated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
+            return;
         }
 
         if (IsEmpty()) {
-            //std::cout << "[Chunk Mesh Generation / Info] Chunk is empty, skipping mesh generation" << std::endl;
+            std::cout << "[Chunk Mesh Generation / Info] Chunk is empty, skipping mesh generation" << std::endl;
             return;
         }
 
         vertices.clear();
         indices.clear();
 
-        Chunk* neighborChunks[6] = {
-            chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ),     // Positive X
-            chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ),     // Negative X
-            chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ),     // Positive Y
-            chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ),     // Negative Y
-            chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1),     // Positive Z
-            chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1)      // Negative Z
-        };
-
+        
+        Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ);     // Positive X
+        Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ);     // Negative X
+        Chunk& positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ);     // Positive Y
+        Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ);     // Negative Y
+        Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1);     // Positive Z
+        Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1);     // Negative Z
+        
+        
         for (int x = 0; x < chunkSize; ++x) {
             for (int y = 0; y < chunkSize; ++y) {
                 for (int z = 0; z < chunkSize; ++z) {
                     if (blocks[x][y][z].GetType() == 1) {
                         Block& block = blocks[x][y][z];
-
+        
                         for (int direction = 0; direction < 6; ++direction) {
                             FaceDirection faceDirection = static_cast<FaceDirection>(direction);
                             bool shouldAddFace = false;
-                        
+
                             switch (faceDirection) {
                                 case RIGHT:
-                                    shouldAddFace = (x == chunkSize - 1 && !neighborChunks[0]) || (x < chunkSize - 1 && blocks[x + 1][y][z].GetType() == 0);
+                                    if (x < chunkSize - 1) {
+                                        if (blocks[x + 1][y][z].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!positiveXChunk.isGenerated) {
+                                        break;
+                                    }
+                                    if (x == chunkSize - 1) {
+                                        if (positiveXChunk.blocks[0][y][z].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
                                     break;
                                 case LEFT:
-                                    shouldAddFace = (x == 0 && !neighborChunks[1]) || (x > 0 && blocks[x - 1][y][z].GetType() == 0);
+                                    if (x > 0) {
+                                        if (blocks[x - 1][y][z].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (x == 0 && negativeXChunk.isGenerated) {
+                                        if (negativeXChunk.blocks[chunkSize - 1][y][z].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else {
+                                        shouldAddFace = false;
+                                    }
                                     break;
                                 case TOP:
-                                    shouldAddFace = (y == chunkSize - 1 && !neighborChunks[2]) || (y < chunkSize - 1 && blocks[x][y + 1][z].GetType() == 0);
+                                    if (y < chunkSize - 1) {
+                                        if (blocks[x][y + 1][z].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (y == chunkSize - 1 && positiveYChunk.isGenerated) {
+                                        if (positiveYChunk.blocks[x][0][z].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else {
+                                        shouldAddFace = false;
+                                    }
                                     break;
                                 case BOTTOM:
-                                    shouldAddFace = (y == 0 && !neighborChunks[3]) || (y > 0 && blocks[x][y - 1][z].GetType() == 0);
+                                    if (y > 0) {
+                                        if (blocks[x][y - 1][z].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (y == 0 && negativeYChunk.isGenerated) {
+                                        if (negativeYChunk.blocks[x][chunkSize - 1][z].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else {
+                                        shouldAddFace = false;
+                                    }
                                     break;
                                 case BACK:
-                                    shouldAddFace = (z == chunkSize - 1 && !neighborChunks[4]) || (z < chunkSize - 1 && blocks[x][y][z + 1].GetType() == 0);
+                                    if (z < chunkSize - 1) {
+                                        if (blocks[x][y][z + 1].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (z == chunkSize - 1 && positiveZChunk.isGenerated) {
+                                        if (positiveZChunk.blocks[x][y][0].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else {
+                                        shouldAddFace = false;
+                                    }
                                     break;
                                 case FRONT:
-                                    shouldAddFace = (z == 0 && !neighborChunks[5]) || (z > 0 && blocks[x][y][z - 1].GetType() == 0);
+                                    if (z > 0) {
+                                        if (blocks[x][y][z - 1].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (z == 0 && negativeZChunk.isGenerated) {
+                                        if (negativeZChunk.blocks[x][y][chunkSize - 1].GetType() == 0) {
+                                            shouldAddFace = true;
+                                            break;
+                                        }
+                                    }
+                                    else {
+                                        shouldAddFace = false;
+                                    }
                                     break;
                             }
                         
@@ -126,6 +217,7 @@ void Chunk::Render() {
     if (isEmpty) {
         return;
     }
+    
     vertexArrayObject.Bind();
     vertexBufferObject.Bind();
     vertexBufferObject.Setup(vertices.size() * sizeof(GLfloat), vertices.data());

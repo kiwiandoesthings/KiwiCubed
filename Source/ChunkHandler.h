@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLError.h>
+#include "GLError.h"
 #include <glad/glad.h>
 
 #include <iostream>
@@ -8,16 +8,17 @@
 #include <unordered_map>
 #include <vector>
 
-#include <Block.h>
-#include <IndexBufferObject.h>
-#include <Shader.h>
-#include <VertexArrayObject.h>
-#include <VertexBufferObject.h>
+#include "Block.h"
+#include "IndexBufferObject.h"
+#include "Shader.h"
+#include "VertexArrayObject.h"
+#include "VertexBufferObject.h"
 
 
 const int chunkSize = 32;
 
 class Chunk;
+class World;
 
 // I don't even kind of know what is happening here
 // Seriously what the hell
@@ -34,7 +35,7 @@ class ChunkHandler {
         ChunkHandler();
         void Delete();
 
-        Chunk* GetChunk(int chunkX, int chunkY, int chunkZ);
+        Chunk& GetChunk(int chunkX, int chunkY, int chunkZ);
         void AddChunk(int chunkX, int chunkY, int chunkZ);
 
     private:
@@ -51,13 +52,14 @@ class Chunk {
         bool isGenerated = false;
         bool isMeshed = false;
         bool isEmpty;
+        bool shouldGenerate = true;
         float totalMemoryUsage;
     
         Chunk(int chunkX, int chunkY, int chunkZ);
         ~Chunk();
     
         void AllocateChunk();
-        void GenerateBlocks();
+        void GenerateBlocks(World world, Chunk& callerChunk, bool updateCallerChunk);
         void GenerateMesh(ChunkHandler& chunkHandler);
         void Render();
     

@@ -1,21 +1,22 @@
-#include <ChunkHandler.h>
+#include "ChunkHandler.h"
 
 
 ChunkHandler::ChunkHandler() {
 
 }
 
-Chunk* ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
+// Modify the GetChunk function to return a reference to the Chunk object
+Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
+    static Chunk defaultChunk = Chunk(0, 0, 0);
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk != chunks.end()) {
-        // Return the chunk if it exists
-        return &(chunk->second);
+        // Return a reference to the Chunk object
+        return chunk->second;
     }
     else {
-        // Return nullptr if not
-        return nullptr;
+        //std::cout << "[Debug]: Chunk not found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        return defaultChunk;
     }
-
 }
 
 void ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {

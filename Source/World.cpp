@@ -1,4 +1,4 @@
-#include <World.h>
+#include "World.h"
 
 
 World::World() : totalChunks(0), totalMemoryUsage(0), chunkDataBufferObject(0), indirectBufferObject(0) {
@@ -10,32 +10,20 @@ World::World() : totalChunks(0), totalMemoryUsage(0), chunkDataBufferObject(0), 
         }
     }
 
-    drawCount = worldSize * worldSize * worldSize;
-
     //GLCall(glGenBuffers(1, &chunkDataBufferObject));
     //GLCall(glBindBuffer(GL_SHADER_STORAGE_BUFFER, chunkDataBufferObject));
     //GLCall(glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ChunkData) * totalChunks, chunkData.data(), GL_STATIC_DRAW));
-
-    GLCall(glGenVertexArrays(1, &VAO));
-    GLCall(glGenBuffers(1, &VBO));
-    GLCall(glGenBuffers(1, &EBO));
-    GLCall(glGenBuffers(1, &indirectBufferObject));
-
-    // Make the buffer big enough that we DON'T NEED TO RESIZE IT (for now)
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-    GLCall(glBufferData(GL_ARRAY_BUFFER, 65563 * 20000, nullptr, GL_DYNAMIC_DRAW));
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
-    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 65563 * 20000, nullptr, GL_DYNAMIC_DRAW));
 }
 
 void World::Render(Shader shaderProgram) {
-    // The rest of this is a work in progress
-    drawCount = sizeof(commands);
-
-    GLCall(glBindVertexArray(VAO));
-    GLCall(glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBufferObject));
-    GLCall(glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, (GLsizei)commands.size(), 0));
-
+    for (int chunkX = 0; chunkX < worldSize; ++chunkX) {
+        for (int chunkY = 0; chunkY < worldSize; ++chunkY) {
+            for (int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
+                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
+                chunk.Render();
+            }
+        }
+    }
 
     // Setup the chunk data buffer
     //GLCall(glBindBuffer(GL_SHADER_STORAGE_BUFFER, chunkDataBufferObject));
@@ -51,90 +39,114 @@ void World::GenerateWorld() {
     for (int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
-                Chunk* chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
-                GenerateChunk(chunkX, chunkY, chunkZ, *chunk);
+                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
+                Chunk emptyChunk = Chunk(0, 0, 0);
+                GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, emptyChunk);
                 //totalChunkMemoryUsage += chunk->GetMemoryUsage();
             }
         }
     }
-
-    GLCall(glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBufferObject));
-    GLCall(glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(DrawElementsIndirectCommand), commands.data(), GL_STATIC_DRAW));
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0f;
 
     float chunkGenerationSpeed = static_cast<float>(duration / (worldSize * worldSize * worldSize));
 
-    std::cout << "[World Creation / Info] Finished generating world" << std::endl;
+    std::cout << std::endl << "[World Creation / Info] Finished generating world" << std::endl;
     std::cout << "[World Creation / Info] World creation with chunk count of " << worldSize * worldSize * worldSize << " took " << duration << " ms" << " or roughly " << chunkGenerationSpeed << " ms per chunk (slightly innacurate as empty chunks are skipped). With around " << (int)1000 / chunkGenerationSpeed << " chunks generated, meshed and added per second" << std::endl;
 }
 
-void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk chunk) {
-    // Basic procedures for preparing a chunk SetPosition should be done before ANYTHING ELSE, or functions relying on the chunks position will not work properly
+void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk) {
+    //std::cout << "===== {" << chunkX << ", " << chunkY << ", " << chunkZ << "} =====" << std::endl;
+    // Basic procedures for preparing a chunk, SetPosition should be done before ANYTHING ELSE, or functions relying on the chunks position will not work properly
     chunk.SetPosition(chunkX, chunkY, chunkZ);
+
+    if (!chunk.shouldGenerate) {
+        return;
+    }
     if (!chunk.isAllocated) {
         chunk.AllocateChunk();
     }
     if (!chunk.isGenerated) {
-        chunk.GenerateBlocks();
+        //std::cout << "[Debug] GENERATING {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+		chunk.GenerateBlocks(*this, chunk, false);
+	}
+
+    Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ);     // Positive X
+    Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ);     // Negative X
+    Chunk& positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ);     // Positive Y
+    Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ);     // Negative Y
+    Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1);     // Positive Z
+    Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1);     // Negative Z
+
+    if (chunkX > 0 && chunkX < worldSize - 1 && chunkY > 0 && chunkY < worldSize - 1 && chunkZ > 0 && chunkZ < worldSize - 1) {
+        if (positiveXChunk.isGenerated && negativeXChunk.isGenerated && positiveYChunk.isGenerated && negativeYChunk.isGenerated && positiveZChunk.isGenerated && negativeZChunk.isGenerated && !chunk.isMeshed) {
+            //std::cout << "[Debug] ==MESHING== {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+            chunk.GenerateMesh(chunkHandler);
+        }
+        else {
+            //PROBLEM: fuck
+            if (!positiveXChunk.isGenerated) {
+                //std::cout << "[Debug] ==1== Going for {" << chunkX + 1 << ", " << chunkY << ", " << chunkZ << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+                GenerateChunk(chunkX + 1, chunkY, chunkZ, positiveXChunk, true, chunk);
+            }
+    
+            if (!negativeXChunk.isGenerated) {
+                //std::cout << "[Debug] ==2== Going for {" << chunkX - 1 << ", " << chunkY << ", " << chunkZ << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+                GenerateChunk(chunkX - 1, chunkY, chunkZ, negativeXChunk, true, chunk);
+            }
+    
+            if (!positiveYChunk.isGenerated) {
+                //std::cout << "[Debug] ==3== Going for {" << chunkX << ", " << chunkY + 1 << ", " << chunkZ << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+                GenerateChunk(chunkX, chunkY + 1, chunkZ, positiveYChunk, true, chunk);
+            }
+    
+            if (!negativeYChunk.isGenerated) {
+                //std::cout << "[Debug] ==4== Going for {" << chunkX << ", " << chunkY - 1 << ", " << chunkZ << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+                GenerateChunk(chunkX, chunkY - 1, chunkZ, negativeYChunk, true, chunk);
+            }
+    
+            if (!positiveZChunk.isGenerated) {
+                //std::cout << "[Debug] ==5== Going for {" << chunkX << ", " << chunkY << ", " << chunkZ + 1 << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+                GenerateChunk(chunkX, chunkY, chunkZ + 1, positiveZChunk, true, chunk);
+            }
+    
+            if (!negativeZChunk.isGenerated) {
+                //std::cout << "[Debug] ==6== Going for {" << chunkX << ", " << chunkY << ", " << chunkZ - 1 << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+                GenerateChunk(chunkX, chunkY, chunkZ - 1, negativeZChunk, true, chunk);
+            }
+        }
     }
-    if (!chunk.isMeshed) {
-        chunk.GenerateMesh(chunkHandler);
+
+    // worry about this later
+    if (updateCallerChunk) {
+        GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, callerChunk, false , chunk);
     }
 
     chunkLocations.push_back({chunkX, chunkY, chunkZ});
     
     if (chunk.isEmpty) {
-        std::cout << "[World Creation / Info] Chunk (" << chunkX << ", " << chunkY << ", " << chunkZ << ")  is empty, so skipping appending to world mesh" << std::endl;
+        std::cout << "[World Creation / Info] Chunk {" << chunkX << ", " << chunkY << ", " << chunkZ << "}  is empty, so skipping appending to world mesh" << std::endl;
         return;
     }
     
     // Get the numbers ready
-    std::vector<GLfloat> chunkVertices = chunk.GetVertices();
-    std::vector<GLuint> chunkIndices = chunk.GetIndices();
-    
-    int verticesSize = (int)chunkVertices.size() * sizeof(GLfloat);
-    int indicesSize = (int)chunkIndices.size() * sizeof(GLuint);
+    //std::vector<GLfloat> chunkVertices = chunk.GetVertices();
+    //std::vector<GLuint> chunkIndices = chunk.GetIndices();
+    //
+    //int verticesSize = (int)chunkVertices.size() * sizeof(GLfloat);
+    //int indicesSize = (int)chunkIndices.size() * sizeof(GLuint);
     
     //chunk.SetStartIndex(startIndex = (startIndex == 0) ? startIndex : startIndex + 1);
     //chunk.SetEndIndex(startIndex + verticesSize);
-    //chunk.SetChunkIndex(totalChunks);
+    //chunk.SetChunkIndex(totalChunks); 
     
-    // We love doing magic here. Here's some magic that makes the glMultiDrawElementsIndirect function work
-    
-    totalChunks++;
-    
-    commands.resize(totalChunks);
-    
-    GLCall(glBindVertexArray(VAO));
-    
-    GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0));
-    GLCall(glEnableVertexAttribArray(0));
-    GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))));
-    GLCall(glEnableVertexAttribArray(1));
-    
-    DrawElementsIndirectCommand drawCommand;
-    drawCommand.count = indicesSize / sizeof(GLuint);
-    drawCommand.instanceCount = 1;
-    drawCommand.firstIndex = latestChunkIndexOffset / sizeof(GLuint);
-    drawCommand.baseVertex = latestChunkVertexOffset / sizeof(GLfloat);
-    drawCommand.baseInstance = 0;
-    commands[totalChunks - 1] = drawCommand;
-
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-    GLCall(glBufferSubData(GL_ARRAY_BUFFER, latestChunkVertexOffset, verticesSize, chunkVertices.data()));
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
-    GLCall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, latestChunkIndexOffset, indicesSize, chunkIndices.data()));
-
-    totalMemoryUsage += chunkVertices.size() + chunkIndices.size();
-    
-    latestChunkVertexOffset += verticesSize;
-    latestChunkIndexOffset += indicesSize;
-}
-
-Chunk World::GetChunk(int chunkX, int chunkY, int chunkZ) {
-    return *chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
+    //totalChunks++;
+    //
+    //totalMemoryUsage += chunkVertices.size() + chunkIndices.size();
+    //
+    //latestChunkVertexOffset += verticesSize;
+    //latestChunkIndexOffset += indicesSize;
 }
 
 World::~World() {

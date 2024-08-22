@@ -32,12 +32,12 @@ extern "C"
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
-#include <Input.h>
-#include <Renderer.h>
-#include <Shader.h>
-#include <SingleplayerHandler.h>
-#include <Texture.h>
-#include <Window.h>
+#include "Input.h"
+#include "Renderer.h"
+#include "Shader.h"
+#include "SingleplayerHandler.h"
+#include "Texture.h"
+#include "Window.h"
 
 
 
@@ -176,6 +176,9 @@ int main() {
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	if (width == 0 || height == 0) {
+		return;
+	}
 	glViewport(0, 0, width, height);
 	Window* globalWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
 	if (globalWindow) {
