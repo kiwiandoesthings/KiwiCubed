@@ -2,7 +2,7 @@
 #include "World.h"
 
 
-Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : blocks(blocks), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), totalMemoryUsage(0), totalBlocks(0)/*, startIndex(0), endIndex(0), chunkIndex(0)*/ {
+Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : blocks(blocks), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), totalMemoryUsage(0), totalBlocks(0) {
 
 }
 
@@ -50,8 +50,6 @@ void Chunk::GenerateBlocks(World world, Chunk& callerChunk, bool updateCallerChu
         //std::cout << "[Debug] Generate  caller {" << callerChunk.chunkX << ", " << callerChunk.chunkY << ", " << callerChunk.chunkZ << "}" << std::endl;
         world.GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, *this, true, callerChunk);
     }
-
-    //totalMemoryUsage = (float)sizeof(Chunk) + (sizeof(Block) * totalBlocks) + sizeof(vertices) + sizeof(indices);
 
     isGenerated = true;
 }
@@ -223,8 +221,9 @@ void Chunk::Render() {
     vertexBufferObject.Setup(vertices.size() * sizeof(GLfloat), vertices.data());
     indexBufferObject.Bind();
     indexBufferObject.Setup(indices.size() * sizeof(GLuint), indices.data());
-    vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
-    vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textureCoordinate));
+    vertexArrayObject.LinkAttribute(vertexBufferObject, 2, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textureIndex));
     GLCall(glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0));
 }
 
@@ -250,30 +249,6 @@ int Chunk::GetMemoryUsage() {
     return 20 * totalBlocks;
 }
 
-void Chunk::SetStartIndex(int newStartIndex) {
-    startIndex = newStartIndex;
-}
-
-int Chunk::GetStartIndex() {
-    return startIndex;
-}
-
-void Chunk::SetEndIndex(int newEndIndex) {
-    endIndex = newEndIndex;
-}
-
-int Chunk::GetEndIndex() {
-    return endIndex;
-}
-
-void Chunk::SetChunkIndex(int newChunkIndex) {
-    chunkIndex = newChunkIndex;
-}
-
-int Chunk::GetChunkIndex() {
-    return chunkIndex;
-}
-
 bool Chunk::IsEmpty() {
     if (totalBlocks > 0) {
         isEmpty = false;
@@ -286,7 +261,7 @@ bool Chunk::IsEmpty() {
 }
 
 Chunk::~Chunk() {
-    //xvertexArrayObject.Delete();
+    //vertexArrayObject.Delete();
     //vertexBufferObject.Delete();
     //indexBufferObject.Delete();
 }

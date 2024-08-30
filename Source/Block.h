@@ -9,6 +9,8 @@
 #include <FastNoise/FastNoise.h>
 #include <glm/vec3.hpp>
 
+#include "Renderer.h"
+
 
 enum FaceDirection {
     FRONT,
@@ -34,5 +36,5 @@ class Block {
     private:
         int blockX, blockY, blockZ;
 
-        bool type;
+        int type;
 };

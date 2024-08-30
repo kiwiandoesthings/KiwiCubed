@@ -1,11 +1,17 @@
 #pragma once
 
-#include <GLError.h>
+#include "GLError.h"
 #include <GLAD/glad.h>
 
-#include <IndexBufferObject.h>
-#include <VertexArrayObject.h>
-#include <VertexBufferObject.h>
+#include "IndexBufferObject.h"
+#include "VertexArrayObject.h"
+#include "VertexBufferObject.h"
+
+struct Vertex{
+	GLfloat position[3];
+	GLfloat textureCoordinate[2];
+	GLuint textureIndex;
+};
 
 
 class Renderer {

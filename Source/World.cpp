@@ -1,7 +1,7 @@
 #include "World.h"
 
 
-World::World() : totalChunks(0), totalMemoryUsage(0), chunkDataBufferObject(0), indirectBufferObject(0) {
+World::World() : totalChunks(0), totalMemoryUsage(0) {
     for (int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
@@ -9,10 +9,6 @@ World::World() : totalChunks(0), totalMemoryUsage(0), chunkDataBufferObject(0), 
             }
         }
     }
-
-    //GLCall(glGenBuffers(1, &chunkDataBufferObject));
-    //GLCall(glBindBuffer(GL_SHADER_STORAGE_BUFFER, chunkDataBufferObject));
-    //GLCall(glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ChunkData) * totalChunks, chunkData.data(), GL_STATIC_DRAW));
 }
 
 void World::Render(Shader shaderProgram) {
@@ -24,9 +20,6 @@ void World::Render(Shader shaderProgram) {
             }
         }
     }
-
-    // Setup the chunk data buffer
-    //GLCall(glBindBuffer(GL_SHADER_STORAGE_BUFFER, chunkDataBufferObject));
 }
 
 void World::GenerateWorld() {
@@ -122,31 +115,11 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
     if (updateCallerChunk) {
         GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, callerChunk, false , chunk);
     }
-
-    chunkLocations.push_back({chunkX, chunkY, chunkZ});
     
     if (chunk.isEmpty) {
         std::cout << "[World Creation / Info] Chunk {" << chunkX << ", " << chunkY << ", " << chunkZ << "}  is empty, so skipping appending to world mesh" << std::endl;
         return;
     }
-    
-    // Get the numbers ready
-    //std::vector<GLfloat> chunkVertices = chunk.GetVertices();
-    //std::vector<GLuint> chunkIndices = chunk.GetIndices();
-    //
-    //int verticesSize = (int)chunkVertices.size() * sizeof(GLfloat);
-    //int indicesSize = (int)chunkIndices.size() * sizeof(GLuint);
-    
-    //chunk.SetStartIndex(startIndex = (startIndex == 0) ? startIndex : startIndex + 1);
-    //chunk.SetEndIndex(startIndex + verticesSize);
-    //chunk.SetChunkIndex(totalChunks); 
-    
-    //totalChunks++;
-    //
-    //totalMemoryUsage += chunkVertices.size() + chunkIndices.size();
-    //
-    //latestChunkVertexOffset += verticesSize;
-    //latestChunkIndexOffset += indicesSize;
 }
 
 World::~World() {

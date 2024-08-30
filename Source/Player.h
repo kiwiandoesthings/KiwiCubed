@@ -1,9 +1,9 @@
 #pragma once
 
-#include <GLError.h>
+#include "GLError.h"
 #include <GLAD/glad.h>
 
-#include <Camera.h>
+#include "Camera.h"
 
 class Player {
 public:

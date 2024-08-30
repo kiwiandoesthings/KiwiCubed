@@ -1,4 +1,4 @@
-#include <Window.h>
+#include "Window.h"
 
 
 Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isFocused(false), firstClick(true), window(window) {

@@ -2,8 +2,9 @@
 
 out vec4 FragColor;
 
-in vec2 textureCoordinateOut;
 in vec3 blockPositionOut;
+in vec2 textureCoordinateOut;
+flat in uint blockTypeOut;
 
 uniform sampler2D tex0;
 
@@ -14,6 +15,7 @@ void main()
     tint = ((tint + vec3(1.0)) / 255.0 * 10);
 
 
-	vec4 baseColor = texture(tex0, textureCoordinateOut);
+	vec2 newTextureCoordinate = vec2(textureCoordinateOut.x / 2, textureCoordinateOut.y / 2);
+	vec4 baseColor = texture(tex0, newTextureCoordinate);
     FragColor = baseColor * vec4(tint, 0);
 }

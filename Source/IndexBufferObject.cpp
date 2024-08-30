@@ -1,4 +1,4 @@
-#include <IndexBufferObject.h>
+#include "IndexBufferObject.h"
 
 IndexBufferObject::IndexBufferObject()
 {

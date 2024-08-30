@@ -5,7 +5,6 @@ ChunkHandler::ChunkHandler() {
 
 }
 
-// Modify the GetChunk function to return a reference to the Chunk object
 Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
     static Chunk defaultChunk = Chunk(0, 0, 0);
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));

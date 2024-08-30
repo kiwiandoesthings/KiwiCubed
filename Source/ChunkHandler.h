@@ -10,6 +10,7 @@
 
 #include "Block.h"
 #include "IndexBufferObject.h"
+#include "Renderer.h"
 #include "Shader.h"
 #include "VertexArrayObject.h"
 #include "VertexBufferObject.h"
@@ -71,16 +72,6 @@ class Chunk {
         std::vector<GLuint> GetIndices();
 
         int GetMemoryUsage();
-        
-        // Deprecated stuffs
-        void SetStartIndex(int newStartIndex);
-        int GetStartIndex();
-        
-        void SetEndIndex(int newEndIndex);
-        int GetEndIndex();
-        
-        void SetChunkIndex(int newChunkIndex);
-        int GetChunkIndex();
 
         bool IsEmpty();
     
@@ -89,11 +80,6 @@ class Chunk {
         std::vector<GLuint> indices;
     
         int totalBlocks;
-    
-        int startIndex;
-        int endIndex;
-        
-        int chunkIndex;
     
         VertexArrayObject vertexArrayObject;
         VertexBufferObject vertexBufferObject;

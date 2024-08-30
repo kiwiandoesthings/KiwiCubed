@@ -14,30 +14,30 @@ GLfloat faceVertices[] = {
 	1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
 	1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
 	0.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-	 	   		
-	// Left		
+	 	   						  
+	// Left						  
 	0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
 	0.0f, 1.0f, 1.0f,  1.0f, 1.0f,
 	0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
 	0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
-	 	   		
-	// Righ		
+	 	   						  
+	// Right			  
 	1.0f, 1.0f, 0.0f,  1.0f, 1.0f,
 	1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
 	1.0f, 0.0f, 1.0f,  0.0f, 0.0f,
 	1.0f, 0.0f, 0.0f,  1.0f, 0.0f,
-	 	   		 
-	// Top	
+	 	   		 				  
+	// Top						  
 	0.0f, 1.0f, 1.0f,  1.0f, 1.0f,
 	1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
 	1.0f, 1.0f, 0.0f,  0.0f, 0.0f,
 	0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
-
-	// Bottom
-	0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-	1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-	1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
-	0.0f, 0.0f, 0.0f,  0.0f, 1.0f
+								  
+	// Bottom					  
+	0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+	1.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+	1.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,  0.0f, 0.0f
 };
 
 GLuint faceIndices[] = {
@@ -67,7 +67,7 @@ GLuint faceIndices[] = {
 };
 
 
-Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(nullptr) {
+Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(-1) {
 
 }
 
@@ -83,14 +83,13 @@ void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunk
 		noise.SetSeed(120);
 
 		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
-		type = (noiseValue > 0) ? 1 : 0;
-		//type = 1;
+		type = (noiseValue > 0) ? 0 : 1;
 	}
 }
 
 void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, int chunkSize) {
 	size_t vertexOffset = (size_t)faceDirection * 20;
-	size_t baseIndex = vertices.size() / 5;
+	size_t baseIndex = vertices.size() / 6;
 
 	for (size_t i = vertexOffset; i < vertexOffset + 20; i += 5) {
 		vertices.emplace_back(faceVertices[i] +      (GLuint)blockX + (chunkX * chunkSize));
@@ -98,6 +97,7 @@ void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices
 		vertices.emplace_back(faceVertices[i  + 2] + (GLuint)blockZ + (chunkZ * chunkSize));
 		vertices.emplace_back(faceVertices[i  + 3]);
 		vertices.emplace_back(faceVertices[i  + 4]);
+		vertices.emplace_back((GLuint)1);
 	}
 
 	for (size_t i = 0; i < 6; ++i) {

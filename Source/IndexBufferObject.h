@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLError.h>
+#include "GLError.h"
 
 #include <iostream>
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <GLError.h>
+#include "GLError.h"
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
-#include <Window.h>
+#include "Window.h"
 
 enum Key {
 	a = GLFW_KEY_A,

@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "Player.h"
-#include "Renderer.h"
 #include "Shader.h"
 #include "ChunkHandler.h"
 
@@ -16,7 +15,6 @@ class Chunk;
 
 struct ChunkData {
 	glm::vec3 position;
-	// Future other data
 };
 
 struct Position {
@@ -43,15 +41,8 @@ class World {
 		int totalChunks;
 		float totalMemoryUsage;
 
-		std::vector<Position> chunkLocations;
-
 		std::vector<GLfloat> vertices;
 		std::vector<GLuint> indices;
-
-		GLuint indirectBufferObject;
-		GLuint chunkDataBufferObject;
-
-		std::vector<ChunkData> chunkData;
 
 		int latestChunkVertexOffset = 0;
 		int latestChunkIndexOffset = 0;
