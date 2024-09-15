@@ -18,11 +18,17 @@ void main()
 	//vec3 tint = vec3(mod(blockPositionOut.x, 32) * 2, mod(blockPositionOut.y, 32) * 2, mod(blockPositionOut.z, 32) * 2);
     //tint = ((tint + vec3(1.0)) / 255.0 * 10);
 
-	//vec2 atlasTexCoord = textureCoordinateOut * vec2(0.5, 0.5);  // Scale to the size of the tile
-    //atlasTexCoord += vec2(blockTypeOut * 1, blockTypeOut * 1);  // Offset to the tile position
+	int atlasSize = 3;
 
-	vec2 offset = vec2(normalize(blockTypeOut), normalize(blockTypeOut));
-	vec2 newTextureCoordinate = vec2(normalize(textureCoordinateOut.x) + offset.x, normalize(textureCoordinateOut.y) + offset.y);
+	float textureIndexX = mod(blockTypeOut, atlasSize);
+	float textureIndexY = floor(blockTypeOut / atlasSize);
+
+	vec2 offset = vec2(textureIndexX, textureIndexY);
+	vec2 newTextureCoordinate = vec2(
+		(textureCoordinateOut.x / atlasSize + offset.x / atlasSize) + 0.000001, 
+		(textureCoordinateOut.y / atlasSize + offset.y / atlasSize) + 0.000001
+	);
+
 	vec4 baseColor = texture(tex0, newTextureCoordinate);
     FragColor = baseColor/* * vec4(tint, 0)*/;
 }

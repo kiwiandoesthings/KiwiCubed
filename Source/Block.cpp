@@ -83,7 +83,7 @@ void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunk
 			return;
 		}
 
-		int random = (rand() % 4) + 1;
+		int random = (rand() % 9) + 1;
 		type = random;
 		//std::cout << random << std::endl;
 	}
