@@ -71,19 +71,21 @@ Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(-1) {
 
 }
 
-void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunkX, int chunkY, int chunkZ, int chunkSize) {
+void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunkX, int chunkY, int chunkZ, int chunkSize, FastNoiseLite& noise) {
 	if (GetType() == NULL) {
 		blockX = newBlockX;
 		blockY = newBlockY;
 		blockZ = newBlockZ;
 
-		// Setup FastNoiseLite
-		FastNoiseLite noise;
-		noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-		noise.SetSeed(120);
+		float density = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
+		if (density < 0) {
+			type = 0;
+			return;
+		}
 
-		float noiseValue = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
-		type = (noiseValue > 0) ? 0 : 1;
+		int random = (rand() % 4) + 1;
+		type = random;
+		//std::cout << random << std::endl;
 	}
 }
 
@@ -97,7 +99,7 @@ void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices
 		vertices.emplace_back(faceVertices[i  + 2] + (GLuint)blockZ + (chunkZ * chunkSize));
 		vertices.emplace_back(faceVertices[i  + 3]);
 		vertices.emplace_back(faceVertices[i  + 4]);
-		vertices.emplace_back((GLuint)1);
+		vertices.emplace_back((GLfloat)type);
 	}
 
 	for (size_t i = 0; i < 6; ++i) {

@@ -2,11 +2,11 @@
 
 layout (location = 0) in vec3 blockPosition;
 layout (location = 1) in vec2 textureCoordinate;
-layout (location = 2) in uint blockType;
+layout (location = 2) in float blockType;
 
 out vec2 textureCoordinateOut;
 out vec3 blockPositionOut;
-flat out uint blockTypeOut;
+out float blockTypeOut;
 
 uniform mat4 windowViewMatrix;
 

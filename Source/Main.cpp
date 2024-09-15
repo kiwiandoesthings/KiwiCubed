@@ -118,7 +118,7 @@ int main() {
 	Shader shaderProgram("Resources/Shaders/Vertex.vert", "Resources/Shaders/Fragment.frag");
 
 	// Create a debug texture
-	Texture textureAtlas("Resources/Textures/Blocks/texture_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture textureAtlas("Resources/Textures/Blocks/tex_coords_test_img.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
 	// Start generating a chunk in the singleplayer world
 	singleplayerHandler.singlePlayerWorld.GenerateWorld();

@@ -34,11 +34,16 @@ void Chunk::GenerateBlocks(World world, Chunk& callerChunk, bool updateCallerChu
         return;
     }
 
+    FastNoiseLite noise;
+    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    noise.SetSeed(120);
+
     for (int x = 0; x < chunkSize; ++x) {
         for (int y = 0; y < chunkSize; ++y) {
             for (int z = 0; z < chunkSize; ++z) {
-                blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize);
-                if (blocks[x][y][z].GetType() == 1) {
+                blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize, noise);
+                //std::cout << blocks[x][y][z].GetType() << std::endl;
+                if (blocks[x][y][z].GetType() > 0) {
                     totalBlocks++;
                 }
             }
@@ -73,7 +78,6 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
 
         vertices.clear();
         indices.clear();
-
         
         Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ);     // Positive X
         Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ);     // Negative X
@@ -81,12 +85,12 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
         Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ);     // Negative Y
         Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1);     // Positive Z
         Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1);     // Negative Z
-        
-        
+
         for (int x = 0; x < chunkSize; ++x) {
             for (int y = 0; y < chunkSize; ++y) {
                 for (int z = 0; z < chunkSize; ++z) {
-                    if (blocks[x][y][z].GetType() == 1) {
+                    //std::cout << blocks[x][y][z].GetType() << " e" << std::endl;
+                    if (blocks[x][y][z].GetType() > 0) {
                         Block& block = blocks[x][y][z];
         
                         for (int direction = 0; direction < 6; ++direction) {
@@ -199,6 +203,7 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
                             }
                         
                             if (shouldAddFace) {
+
                                 block.AddFace(vertices, indices, faceDirection, chunkX, chunkY, chunkZ, chunkSize);
                             }
                         }
@@ -223,7 +228,7 @@ void Chunk::Render() {
     indexBufferObject.Setup(indices.size() * sizeof(GLuint), indices.data());
     vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
     vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textureCoordinate));
-    vertexArrayObject.LinkAttribute(vertexBufferObject, 2, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textureIndex));
+    vertexArrayObject.LinkAttribute(vertexBufferObject, 2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textureIndex));
     GLCall(glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0));
 }
 

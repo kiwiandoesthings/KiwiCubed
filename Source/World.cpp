@@ -28,7 +28,6 @@ void World::GenerateWorld() {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     //float totalChunkMemoryUsage = 0;
-
     for (int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
