@@ -22,7 +22,6 @@
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Chunk.cpp" />
     <ClCompile Include="Source\IndexBufferObject.cpp" />
-    <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
@@ -54,8 +53,8 @@
   <ItemGroup>
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\GLError.h" />
-    <ClInclude Include="Source\IndexBufferObject.h" />
     <ClInclude Include="Source\Input.h" />
+    <ClInclude Include="Source\IndexBufferObject.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Shader.h" />

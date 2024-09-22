@@ -8,9 +8,6 @@ in float blockTypeOut;
 
 uniform sampler2D tex0;
 
-float normalize(float value) {
-	return ((value * 16 ) / 32);
-}
 
 void main()
 {
@@ -19,16 +16,17 @@ void main()
     //tint = ((tint + vec3(1.0)) / 255.0 * 10);
 
 	int atlasSize = 3;
+    float epsilon = 0.00001;
 
-	float textureIndexX = mod(blockTypeOut, atlasSize);
-	float textureIndexY = floor(blockTypeOut / atlasSize);
+    float textureIndexX = mod(blockTypeOut + epsilon, atlasSize);
+    float textureIndexY = floor((blockTypeOut + epsilon) / atlasSize);
 
-	vec2 offset = vec2(textureIndexX, textureIndexY);
-	vec2 newTextureCoordinate = vec2(
-		(textureCoordinateOut.x / atlasSize + offset.x / atlasSize) + 0.000001, 
-		(textureCoordinateOut.y / atlasSize + offset.y / atlasSize) + 0.000001
-	);
+    vec2 offset = vec2(textureIndexX, textureIndexY);
+    vec2 newTextureCoordinate = vec2(
+        (textureCoordinateOut.x / atlasSize) + (offset.x / atlasSize), 
+        (textureCoordinateOut.y / atlasSize) + (offset.y / atlasSize)
+    );
 
 	vec4 baseColor = texture(tex0, newTextureCoordinate);
-    FragColor = baseColor/* * vec4(tint, 0)*/;
+    FragColor = baseColor;
 }

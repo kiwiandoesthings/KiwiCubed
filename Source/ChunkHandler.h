@@ -76,6 +76,8 @@ class Chunk {
         bool IsEmpty();
     
     private:
+        Renderer renderer;
+
         std::vector<GLfloat> vertices;
         std::vector<GLuint> indices;
     
