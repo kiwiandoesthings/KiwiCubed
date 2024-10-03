@@ -29,13 +29,15 @@ class World {
 		World();
 		~World();
 
+		void Setup(Window& window);
+
 		void Render(Shader shaderProgram);
 		void GenerateWorld();
 		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk);
 
 	private:
-		const int worldSize = 5;
-		const int chunksize = 32;
+		int worldSize = 5;
+		int chunksize = 32;
 		ChunkHandler chunkHandler;
 
 		int totalChunks;

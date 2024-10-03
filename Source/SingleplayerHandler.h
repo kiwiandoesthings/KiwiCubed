@@ -7,10 +7,13 @@
 
 class SingleplayerHandler {
 	public:
-		World singlePlayerWorld = World();
+		World singleplayerWorld = World();
+		Window& window;
 		bool isLoadedIntoSingleplayerWorld;
 
-		SingleplayerHandler();
+		SingleplayerHandler(Window &newWindow);
+
+		void Setup();
 
 		void StartSingleplayerWorld();
 		void EndSingleplayerWorld();

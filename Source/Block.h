@@ -35,11 +35,11 @@ class Block {
         void GenerateBlock(int blockX, int blockY, int blockZ, int chunkX, int chunkY, int chunkZ, int chunkSize, FastNoiseLite& noise);
         void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, int chunkSize);
         
-        bool GetType();
-        void SetType(bool newType);
+        unsigned int GetType() const;
+        void SetType(unsigned int newType);
 
     private:
         int blockX, blockY, blockZ;
 
-        int type;
+        unsigned int type;
 };

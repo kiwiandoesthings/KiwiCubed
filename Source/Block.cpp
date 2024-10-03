@@ -77,39 +77,41 @@ void Block::GenerateBlock(int newBlockX, int newBlockY, int newBlockZ, int chunk
 		blockY = newBlockY;
 		blockZ = newBlockZ;
 
-		float density = noise.GetNoise((float)blockX + (chunkX * chunkSize), (float)blockY + (chunkY * chunkSize), (float)blockZ + (chunkZ * chunkSize));
-		if (density < 0) {
-			type = 0;
+		float density = noise.GetNoise(static_cast<float>(blockX) + (chunkX * chunkSize), static_cast<float>(blockY) + (chunkY * chunkSize), static_cast<float>(blockZ) + (chunkZ * chunkSize));
+
+		if (density > 0) {
+			int random = (rand() % 9) + 1;
+			type = random;
 			return;
 		}
 
-		int random = (rand() % 9) + 1;
-		type = random;
+		type = 0;
 		//std::cout << random << std::endl;
+		//std::cout << type << std::endl;
 	}
 }
 
 void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, int chunkSize) {
-	size_t vertexOffset = (size_t)faceDirection * 20;
-	size_t baseIndex = vertices.size() / 6;
+	GLuint vertexOffset = static_cast<GLuint>(faceDirection * 20);
+	GLuint baseIndex = static_cast<GLuint>(vertices.size() / 6);
 
 	for (size_t i = vertexOffset; i < vertexOffset + 20; i += 5) {
-		vertices.emplace_back(faceVertices[i] +      (GLuint)blockX + (chunkX * chunkSize));
-		vertices.emplace_back(faceVertices[i  + 1] + (GLuint)blockY + (chunkY * chunkSize));
-		vertices.emplace_back(faceVertices[i  + 2] + (GLuint)blockZ + (chunkZ * chunkSize));
+		vertices.emplace_back(faceVertices[i  + 0] + static_cast<GLuint>(blockX + (chunkX * chunkSize)));
+		vertices.emplace_back(faceVertices[i  + 1] + static_cast<GLuint>(blockY + (chunkY * chunkSize)));
+		vertices.emplace_back(faceVertices[i  + 2] + static_cast<GLuint>(blockZ + (chunkZ * chunkSize)));
 		vertices.emplace_back(faceVertices[i  + 3]);
 		vertices.emplace_back(faceVertices[i  + 4]);
-		vertices.emplace_back((GLfloat)type);
+		vertices.emplace_back(static_cast<GLfloat>(type));
 	}
 
 	for (size_t i = 0; i < 6; ++i) {
-		indices.emplace_back(baseIndex + faceIndices[i]);
+		indices.emplace_back(static_cast<GLuint>(baseIndex + faceIndices[i]));
 	}
 }
-bool Block::GetType() {
+unsigned int Block::GetType() const {
 	return type;
 }
 
-void Block::SetType(bool newType) {
+void Block::SetType(unsigned int newType) {
 	type = newType;
 }

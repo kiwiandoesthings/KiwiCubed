@@ -64,8 +64,9 @@ int main() {
 	// Create a window
 	Window globalWindow = Window(windowWidth, windowHeight, windowTitle);
 	strcpy_s(versionString, windowTitle);
-	strcat_s(versionString, "v0.0.1pre-alpha");
+	strcat_s(versionString, "v0.0.2pre-alpha");
 	globalWindow.SetTitle(versionString);
+	globalWindow.Setup();
 
 	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
 	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
@@ -111,7 +112,8 @@ int main() {
 	GLCall(glEnable(GL_DEPTH_TEST));
 
 	// Create a singleplayer world
-	SingleplayerHandler singleplayerHandler = SingleplayerHandler();
+	SingleplayerHandler singleplayerHandler(globalWindow);
+	singleplayerHandler.Setup();
 	singleplayerHandler.StartSingleplayerWorld();
 
 	// Create a debug shader
@@ -121,7 +123,7 @@ int main() {
 	Texture textureAtlas("Resources/Textures/Blocks/tex_coords_test_img.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
 	// Start generating a chunk in the singleplayer world
-	singleplayerHandler.singlePlayerWorld.GenerateWorld();
+	singleplayerHandler.singleplayerWorld.GenerateWorld();
 
 	// Bind stuff
 	textureAtlas.Bind();
@@ -129,13 +131,10 @@ int main() {
 
 	Renderer renderer = Renderer();
 
-	InputHandler inputHandler = InputHandler(&globalWindow);
-
 	int frames = 0;
 
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
-
 		glfwPollEvents();
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -147,18 +146,17 @@ int main() {
 		renderer.ClearScreen(0.98f, 0.88f, 1.0f);
 
 		// Do rendering stuff
-		globalWindow.Inputs();
+		globalWindow.QueryInputs();
 		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
-			singleplayerHandler.singlePlayerWorld.player.Update(&globalWindow, shaderProgram, "windowViewMatrix", 0, 0, 0);
+			singleplayerHandler.singleplayerWorld.player.Update(&globalWindow, shaderProgram, "windowViewMatrix");
 		}
-		
-		singleplayerHandler.singlePlayerWorld.Render(shaderProgram);
+
+		singleplayerHandler.singleplayerWorld.Render(shaderProgram);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(globalWindow.GetWindowInstance());
-
 		++frames;
 	}
 

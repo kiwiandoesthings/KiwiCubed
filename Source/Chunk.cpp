@@ -230,19 +230,19 @@ void Chunk::SetPosition(int newChunkX, int newChunkY, int newChunkZ) {
     chunkZ = newChunkZ;
 }
 
-int Chunk::GetTotalBlocks() {
+int Chunk::GetTotalBlocks() const {
     return totalBlocks;
 }
 
-std::vector<GLfloat> Chunk::GetVertices() {
+std::vector<GLfloat> Chunk::GetVertices() const {
     return vertices;
 }
 
-std::vector<GLuint> Chunk::GetIndices() {
+std::vector<GLuint> Chunk::GetIndices() const {
     return indices;
 }
 
-int Chunk::GetMemoryUsage() {
+unsigned int Chunk::GetMemoryUsage() const {
     return 20 * totalBlocks;
 }
 
