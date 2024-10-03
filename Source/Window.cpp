@@ -1,7 +1,7 @@
 #include "Window.h"
 
 
-Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isFocused(false), firstClick(true), window(window) {
+Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isFocused(false), window(window) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
@@ -13,7 +13,7 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isF
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
 	// Create the GLFW window
-	window = glfwCreateWindow(windowWidth, windowHeight, windowTitle,nullptr, nullptr);
+	window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
 
 	int newWindowWidth, newWindowHeight;
 	glfwGetFramebufferSize(window, &newWindowWidth, &newWindowHeight);
@@ -29,34 +29,28 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isF
 		std::cout << "[Initialization / Info] Successfully created GLFW window" << std::endl;
 	}
 	glfwMakeContextCurrent(window);
+
+	inputHandler.SetupCallbacks(window);
 }
 
-void Window::Inputs() {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
+void Window::Setup() {
+	inputHandler.RegisterKeyCallback(std::vector<int>{GLFW_KEY_ESCAPE}, [&]() {
 		isFocused = false;
-		firstClick = true;
-	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !isFocused)
-	{
+	});
+	inputHandler.RegisterKeyCallback({GLFW_KEY_SPACE}, [&]() {
 		isFocused = true;
-		firstClick = false;
-	}
-	if (isFocused && !firstClick)
-	{
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		if (glfwRawMouseMotionSupported()) {
-			glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-		}
-	}
-	if (isFocused && firstClick)
-	{
-		firstClick = false;
-	}
-	if (!isFocused)
-	{
+		glfwSetCursorPos(window, (static_cast<float>(windowWidth / 2)), (static_cast<float>(windowHeight / 2)));
+	});
+}
+
+void Window::QueryInputs() {
+	if (!isFocused) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		firstClick = true;
+		return;
+	}
+	if (isFocused) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_CURSOR_HIDDEN);
 	}
 }
 
@@ -65,20 +59,21 @@ void Window::UpdateWindowSize(int newWindowWidth, int newWindowHeight) {
 	windowHeight = newWindowHeight;
 }
 
-int Window::GetWidth() {
+int Window::GetWidth() const {
 	return windowWidth;
 }
 
-int Window::GetHeight() {
+int Window::GetHeight() const {
 	return windowHeight;
 }
 
-const char* Window::GetTitle() {
+const char* Window::GetTitle() const {
 	return windowTitle;
 }
 
 void Window::SetTitle(const char* newTitle) {
 	glfwSetWindowTitle(window, newTitle);
+	windowTitle = newTitle;
 }
 
 GLFWwindow* Window::GetWindowInstance() {

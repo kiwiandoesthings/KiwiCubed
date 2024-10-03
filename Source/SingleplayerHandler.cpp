@@ -1,8 +1,11 @@
 #include "SingleplayerHandler.h"
 
 
-SingleplayerHandler::SingleplayerHandler() : isLoadedIntoSingleplayerWorld(false) {
+SingleplayerHandler::SingleplayerHandler(Window &newWindow) : window(newWindow), isLoadedIntoSingleplayerWorld(false) {
+}
 
+void SingleplayerHandler::Setup() {
+	singleplayerWorld.Setup(window);
 }
 
 void SingleplayerHandler::StartSingleplayerWorld() {

@@ -11,6 +11,10 @@ World::World() : totalChunks(0), totalMemoryUsage(0) {
     }
 }
 
+void World::Setup(Window& window) {
+    player.Setup(window);
+}
+
 void World::Render(Shader shaderProgram) {
     for (int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (int chunkY = 0; chunkY < worldSize; ++chunkY) {
@@ -45,7 +49,7 @@ void World::GenerateWorld() {
     float chunkGenerationSpeed = static_cast<float>(duration / (worldSize * worldSize * worldSize));
 
     std::cout << std::endl << "[World Creation / Info] Finished generating world" << std::endl;
-    std::cout << "[World Creation / Info] World creation with chunk count of " << worldSize * worldSize * worldSize << " took " << duration << " ms" << " or roughly " << chunkGenerationSpeed << " ms per chunk (slightly innacurate as empty chunks are skipped). With around " << (int)1000 / chunkGenerationSpeed << " chunks generated, meshed and added per second" << std::endl;
+    std::cout << "[World Creation / Info] World creation with chunk count of " << worldSize * worldSize * worldSize << " took " << duration << " ms" << " or roughly " << chunkGenerationSpeed << " ms per chunk (slightly innacurate as empty chunks are skipped). With around " << static_cast<int>(1000) / chunkGenerationSpeed << " chunks generated, meshed and added per second" << std::endl;
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk) {
@@ -111,6 +115,9 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
     }
 
     // worry about this later
+    // yes i lied when i said i finished this, that 'false' in the function below SHOULD be a 'true' but it isnt, and it "works"
+    // and it doesnt work when it is true
+    // i have to come back later or something i guess :pensive:
     if (updateCallerChunk) {
         GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, callerChunk, false , chunk);
     }

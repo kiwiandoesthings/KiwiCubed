@@ -2,7 +2,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <GLError.h>
+#include "GLError.h"
 #include <GLAD/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -14,27 +14,23 @@
 //#include <glm/gtc/matrix_transform.hpp>
 //#include <glm/gtc/type_ptr.hpp>
 
-#include <GLError.h>
+#include "Input.h"
 
 
 class Window {
-	private:
-		GLFWwindow* window;
-		bool firstClick;
-
 	public:
-		Window() : windowWidth(640), windowHeight(480), windowTitle("Failed to retrieve window title"), isFocused(false), firstClick(true), window(window) {}
+		Window() : windowWidth(640), windowHeight(480), windowTitle(""), isFocused(false), window(window) {}
 		Window(int windowWidth, int windowHeight, const char* windowTitle);
 
-		void Inputs();
+		void Setup();
+
+		void QueryInputs();
 
 		void UpdateWindowSize(int newWindowWidth, int newWindowHeight);
 
-		int GetWidth();
-
-		int GetHeight();
-
-		const char* GetTitle();
+		int GetWidth() const;
+		int GetHeight() const;
+		const char* GetTitle() const;
 		void SetTitle(const char* newTitle);
 
 		GLFWwindow* GetWindowInstance();
@@ -45,4 +41,8 @@ class Window {
 		const char* windowTitle;
 
 		bool isFocused;
+
+	private:
+		GLFWwindow* window;
+		InputHandler inputHandler = InputHandler();
 };

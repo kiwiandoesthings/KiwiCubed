@@ -6,20 +6,36 @@
 #include "Camera.h"
 
 class Player {
-public:
-	Player(int playerX, int playerY, int playerZ);
+	public:
+		glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
+		glm::vec3 upDirection = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	void Update(Window* window, Shader& shader, const char* uniform, int newPlayerX, int newPlayerY, int newPlayerZ);
+		float yaw = -90.0f;
+		float pitch;
+		float roll;
 
-	void SetPosition(Window* window, int playerX, int playerY, int playerZ);
-	std::tuple<int, int, int> GetPosition();
+		int width;
+		int height;
 
-	void SetCameraMatrix(Shader& shader, const char* uniform);
+		float speed = 0.004f;
+		float sensitivity = 100.0f;
 
-
-	void Delete();
-
-private:
-	glm::vec3 playerPosition = glm::vec3(0, 0, 0);
-	Camera camera = Camera(600, 600, playerPosition);
+		Player(int playerX, int playerY, int playerZ);
+	
+		void Setup(Window& window);
+	
+		void Update(Window* window, Shader& shader, const char* uniform);
+		void QueryInputs();
+	
+		void SetPosition(Window* window, int playerX, int playerY, int playerZ);
+		const std::tuple<int, int, int> GetPosition();
+	
+		void UpdateCameraMatrix(Shader& shader, const char* uniform);
+	
+		void Delete();
+	
+	private:
+		glm::vec3 playerPosition = glm::vec3(0, 0, 0);
+		std::shared_ptr<Camera> camera;
+		InputHandler inputHandler = InputHandler();
 };

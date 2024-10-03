@@ -66,12 +66,12 @@ class Chunk {
     
         void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
     
-        int GetTotalBlocks();
+        int GetTotalBlocks() const;
     
-        std::vector<GLfloat> GetVertices();
-        std::vector<GLuint> GetIndices();
+        std::vector<GLfloat> GetVertices() const;
+        std::vector<GLuint> GetIndices() const;
 
-        int GetMemoryUsage();
+        unsigned int GetMemoryUsage() const;
 
         bool IsEmpty();
     
@@ -81,7 +81,7 @@ class Chunk {
         std::vector<GLfloat> vertices;
         std::vector<GLuint> indices;
     
-        int totalBlocks;
+        unsigned int totalBlocks;
     
         VertexArrayObject vertexArrayObject;
         VertexBufferObject vertexBufferObject;
