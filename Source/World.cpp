@@ -2,9 +2,9 @@
 
 
 World::World() : totalChunks(0), totalMemoryUsage(0) {
-    for (int chunkX = 0; chunkX < worldSize; ++chunkX) {
-        for (int chunkY = 0; chunkY < worldSize; ++chunkY) {
-            for (int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
+    for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
+        for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
+            for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
                 chunkHandler.AddChunk(chunkX, chunkY, chunkZ);
             }
         }
@@ -16,10 +16,11 @@ void World::Setup(Window& window) {
 }
 
 void World::Render(Shader shaderProgram) {
-    for (int chunkX = 0; chunkX < worldSize; ++chunkX) {
-        for (int chunkY = 0; chunkY < worldSize; ++chunkY) {
-            for (int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
+    for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
+        for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
+            for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
                 Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
+                shaderProgram.Bind();
                 chunk.Render();
             }
         }
@@ -32,11 +33,10 @@ void World::GenerateWorld() {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     //float totalChunkMemoryUsage = 0;
-    for (int chunkX = 0; chunkX < worldSize; ++chunkX) {
-        for (int chunkY = 0; chunkY < worldSize; ++chunkY) {
-            for (int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
+    for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
+        for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
+            for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
                 Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
-                Chunk emptyChunk = Chunk(0, 0, 0);
                 GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, emptyChunk);
                 //totalChunkMemoryUsage += chunk->GetMemoryUsage();
             }
@@ -75,20 +75,19 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
     Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1);     // Positive Z
     Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1);     // Negative Z
 
-    if (chunkX > 0 && chunkX < worldSize - 1 && chunkY > 0 && chunkY < worldSize - 1 && chunkZ > 0 && chunkZ < worldSize - 1) {
+    if (static_cast<unsigned int>(chunkX) > 0 && static_cast<unsigned int>(chunkX) < worldSize - 1 && static_cast<unsigned int>(chunkY) > 0 && static_cast<unsigned int>(chunkY) < worldSize - 1 && static_cast<unsigned int>(chunkZ) > 0 && static_cast<unsigned int>(chunkZ) < worldSize - 1) {
         if (positiveXChunk.isGenerated && negativeXChunk.isGenerated && positiveYChunk.isGenerated && negativeYChunk.isGenerated && positiveZChunk.isGenerated && negativeZChunk.isGenerated && !chunk.isMeshed) {
             //std::cout << "[Debug] ==MESHING== {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
             chunk.GenerateMesh(chunkHandler);
         }
-        else {
-            //PROBLEM: fuck
+        else if (!updateCallerChunk) {
             if (!positiveXChunk.isGenerated) {
                 //std::cout << "[Debug] ==1== Going for {" << chunkX + 1 << ", " << chunkY << ", " << chunkZ << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
                 GenerateChunk(chunkX + 1, chunkY, chunkZ, positiveXChunk, true, chunk);
             }
     
             if (!negativeXChunk.isGenerated) {
-                //std::cout << "[Debug] ==2== Going for {" << chunkX - 1 << ", " << chunkY << ", " << chunkZ << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+                //::cout << "[Debug] ==2== Going for {" << chunkX - 1 << ", " << chunkY << ", " << chunkZ << "} From: {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
                 GenerateChunk(chunkX - 1, chunkY, chunkZ, negativeXChunk, true, chunk);
             }
     
@@ -114,20 +113,26 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
         }
     }
 
-    // worry about this later
-    // yes i lied when i said i finished this, that 'false' in the function below SHOULD be a 'true' but it isnt, and it "works"
-    // and it doesnt work when it is true
-    // i have to come back later or something i guess :pensive:
     if (updateCallerChunk) {
-        GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, callerChunk, false , chunk);
-    }
-    
-    if (chunk.isEmpty) {
-        std::cout << "[World Creation / Info] Chunk {" << chunkX << ", " << chunkY << ", " << chunkZ << "}  is empty, so skipping appending to world mesh" << std::endl;
-        return;
+        GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, callerChunk, false, chunk);
     }
 }
 
-World::~World() {
+void World::Update(Window* window) {
+    player.Update(window, chunkHandler);
+}
+
+void World::DisplayImGui() {
+    for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
+        for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
+            for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
+                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
+                chunk.DisplayImGui();
+            }
+        }
+    }
+}
+
+void World::Delete() {
 
 }

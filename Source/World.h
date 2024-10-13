@@ -24,10 +24,9 @@ struct Position {
 
 class World {
 	public:
-		Player player = Player(0, 0, 0);
+		Player player = Player(32, 35, 32);
 
 		World();
-		~World();
 
 		void Setup(Window& window);
 
@@ -35,23 +34,30 @@ class World {
 		void GenerateWorld();
 		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk);
 
-	private:
-		int worldSize = 5;
-		int chunksize = 32;
-		ChunkHandler chunkHandler;
+		void Update(Window* window);
 
-		int totalChunks;
+		void DisplayImGui();
+
+		void Delete();
+
+	private:
+		unsigned int worldSize = 5;
+
+		ChunkHandler chunkHandler;
+		Chunk emptyChunk = Chunk(0, 0, 0);
+
+		unsigned int totalChunks;
 		float totalMemoryUsage;
 
 		std::vector<GLfloat> vertices;
 		std::vector<GLuint> indices;
 
-		int latestChunkVertexOffset = 0;
-		int latestChunkIndexOffset = 0;
+		unsigned int latestChunkVertexOffset = 0;
+		unsigned int latestChunkIndexOffset = 0;
 
 		Renderer renderer;
 
 		IndexBufferObject indexBufferObject;
 		VertexArrayObject vertexArrayObject;
-		VertexBufferObject vertexBufferObject;
+		VertexBufferObject vertexBufferObject = VertexBufferObject(/*"world*/);
 };

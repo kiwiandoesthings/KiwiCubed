@@ -22,10 +22,13 @@ class Shader
 
 		Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath);
 
-		void SetUniform4fv(const char* uniform, glm::mat4 value);
+		unsigned int UniformTest(const char* uniform) const;
+		void SetUniform4fv(const char* uniform, glm::mat4 value) const;
+		void SetUniform1ui(const char* uniform, unsigned int value) const;
 
-		void Bind();
-		void Delete();
+		void Bind() const;
+		void Unbind() const;
+		void Delete() const;
 
 	private:
 		std::string ParseShader(const std::string& filePath);

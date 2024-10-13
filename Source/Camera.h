@@ -25,9 +25,8 @@ class Camera
 
 		void Setup(Window& window);
 
-		void Matrix(Shader& shader, const char* uniform);
+		void SetCameraMatrix(Shader& shader, const char* uniform) const;
 		void UpdateMatrix(float FOV, float nearPlane, float farPlane, glm::vec3 position, glm::vec3 orientation, glm::vec3 upDirection);
-		void Inputs();
 
 		Window& GetWindow();
 

@@ -21,9 +21,12 @@
   <ItemGroup>
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Chunk.cpp" />
+    <ClCompile Include="Source\DebugRenderer.cpp" />
+    <ClCompile Include="Source\Entity.cpp" />
     <ClCompile Include="Source\IndexBufferObject.cpp" />
     <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Physics.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
@@ -47,15 +50,20 @@
     <ClCompile Include="Vendor\stb\stb.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\Fragment.frag" />
-    <None Include="Resources\Shaders\Vertex.vert" />
-    <None Include="Vendor\imgui\imgui.natstepfilter" />
+    <None Include="Resources\Data\funky.json" />
+    <None Include="Resources\Shaders\Terrain_Fragment.frag" />
+    <None Include="Resources\Shaders\Terrain_Vertex.vert" />
+    <None Include="Resources\Shaders\Wireframe_Fragment.frag" />
+    <None Include="Resources\Shaders\Wireframe_Vertex.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Camera.h" />
+    <ClInclude Include="Source\DebugRenderer.h" />
+    <ClInclude Include="Source\Entity.h" />
     <ClInclude Include="Source\GLError.h" />
     <ClInclude Include="Source\Input.h" />
     <ClInclude Include="Source\IndexBufferObject.h" />
+    <ClInclude Include="Source\Physics.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Shader.h" />
@@ -72,14 +80,13 @@
     <ClInclude Include="Vendor\imgui\imgui.h" />
     <ClInclude Include="Vendor\imgui\imgui_impl_glfw.h" />
     <ClInclude Include="Vendor\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Vendor\imgui\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="Vendor\imgui\imgui_internal.h" />
     <ClInclude Include="Vendor\imgui\imgui_stdlib.h" />
     <ClInclude Include="Vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="Vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="Vendor\imgui\imstb_truetype.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="Vendor\imgui\imgui.natvis" />
+    <ClInclude Include="Vendor\imgui\misc\single_file\imgui_single_file.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -187,6 +194,7 @@
       <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalOptions>/NODEFAULTLIB:MSVCRT.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

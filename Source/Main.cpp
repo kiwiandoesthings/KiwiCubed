@@ -3,9 +3,7 @@
 // R.I.P.
 
 
-char versionString[128];
 bool bitness;
-
 // Make it so on laptops, it will request the dGPU if possible, without this, you have to force it to use the dGPU
 extern "C"
 {
@@ -22,6 +20,7 @@ extern "C"
 #include <GLFW/glfw3.h>
 
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -31,7 +30,9 @@ extern "C"
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <json/json.hpp>
 
+#include "DebugRenderer.h"
 #include "Input.h"
 #include "Renderer.h"
 #include "Shader.h"
@@ -40,16 +41,34 @@ extern "C"
 #include "Window.h"
 
 
+using json = nlohmann::json;
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 
 // TODO: Replace with JSON file loading or something
-int windowWidth = 640;
-int windowHeight = 480;
-const char* windowTitle = "KiwiCubed Engine";
+int windowWidth;
+int windowHeight;
+std::string windowTitle;
+std::string projectVersion;
 
+// This main function is getting out of hand
 int main() {
+	std::ifstream file("Resources/Data/funky.json");
+
+	if (!file.is_open()) {
+		std::cerr << "Could not open the file!" << std::endl;
+		return 1;
+	}
+
+	json jsonData;
+	file >> jsonData;
+
+	windowWidth = jsonData["init_settings"]["window_width"];
+	windowHeight = jsonData["init_settings"]["window_height"];
+	windowTitle = jsonData["init_settings"]["window_title"].get<std::string>();
+	projectVersion = jsonData["project_version"].get<std::string>();
 
 	// Initialize GLFW
 	if (!glfwInit())
@@ -62,10 +81,7 @@ int main() {
 	}
 
 	// Create a window
-	Window globalWindow = Window(windowWidth, windowHeight, windowTitle);
-	strcpy_s(versionString, windowTitle);
-	strcat_s(versionString, "v0.0.2pre-alpha");
-	globalWindow.SetTitle(versionString);
+	Window globalWindow = Window(windowWidth, windowHeight, windowTitle + projectVersion);
 	globalWindow.Setup();
 
 	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
@@ -117,21 +133,25 @@ int main() {
 	singleplayerHandler.StartSingleplayerWorld();
 
 	// Create a debug shader
-	Shader shaderProgram("Resources/Shaders/Vertex.vert", "Resources/Shaders/Fragment.frag");
+	Shader terrainShaderProgram("Resources/Shaders/Terrain_Vertex.vert", "Resources/Shaders/Terrain_Fragment.frag");
+	Shader wireframeShaderProgram("Resources/Shaders/Wireframe_Vertex.vert", "Resources/Shaders/Wireframe_Fragment.frag");
 
 	// Create a debug texture
-	Texture textureAtlas("Resources/Textures/Blocks/tex_coords_test_img.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture terrainAtlas("Resources/Textures/Blocks/stone.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	terrainAtlas.SetAtlasSize(terrainShaderProgram, 2);
 
 	// Start generating a chunk in the singleplayer world
 	singleplayerHandler.singleplayerWorld.GenerateWorld();
 
 	// Bind stuff
-	textureAtlas.Bind();
-	shaderProgram.Bind();
+	terrainAtlas.Bind();
 
 	Renderer renderer = Renderer();
+	DebugRenderer debugRenderer = DebugRenderer();
 
 	int frames = 0;
+	auto start_time = std::chrono::high_resolution_clock::now();
+	double fps = 0.0;
 
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
@@ -140,7 +160,43 @@ int main() {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		//ImGui::ShowDemoWindow();
+
+		auto end_time = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+		if (duration >= 1000.0) {
+			fps = (float)frames / (duration / 1000.0);
+			frames = 0;
+			start_time = end_time;
+		}
+
+		ImGui::Begin("Debug");
+		if (ImGui::CollapsingHeader("Player Info")) {
+			ImGui::Text("Player Name: %s", singleplayerHandler.singleplayerWorld.player.GetEntityData().name);
+			ImGui::Text("Player health: %d", static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityStats().health));
+			ImGui::Text("Player position: %f, %f, %f", 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.x, 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.y, 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.z);
+			ImGui::Text("Player orientation: %f, %f, %f", 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.x, 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.y, 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.z);
+			ImGui::Text("Player velocity: %f, %f, %f", 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.x, 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.y, 
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.z);
+			ImGui::Text("Global Chunk Position: %d, %d, %d", 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x), 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y), 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z));
+			ImGui::Text("Local Chunk Position: %d, %d, %d", 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.x), 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.y), 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.z));
+			ImGui::Text("Total frames: %d", frames);
+			ImGui::Text("FPS: %.2f", fps);
+		}
 
 		// Make background ~pink~
 		renderer.ClearScreen(0.98f, 0.88f, 1.0f);
@@ -148,11 +204,38 @@ int main() {
 		// Do rendering stuff
 		globalWindow.QueryInputs();
 		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
-			singleplayerHandler.singleplayerWorld.player.Update(&globalWindow, shaderProgram, "windowViewMatrix");
+			singleplayerHandler.singleplayerWorld.Update(&globalWindow);
+			singleplayerHandler.singleplayerWorld.player.UpdateShader(terrainShaderProgram, "windowViewMatrix");
+			singleplayerHandler.singleplayerWorld.player.UpdateShader(wireframeShaderProgram, "windowViewMatrix");
 		}
 
-		singleplayerHandler.singleplayerWorld.Render(shaderProgram);
+		if (ImGui::CollapsingHeader("Chunk Info")) {
+			singleplayerHandler.singleplayerWorld.DisplayImGui();
+		}
 
+		singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
+
+		// I can't be fucked to finish this right now
+		//GLuint indices[] = {
+		//	0, 1, 1, 2, 2, 3, 3, 0,
+		//	4, 5, 5, 6, 6, 7, 7, 4,
+		//	0, 4, 1, 5, 2, 6, 3, 7 
+		//};
+		//
+		//glm::vec3 c1 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner1;
+		//glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
+		//glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
+		//
+		//std::vector<glm::vec3> vertices = {
+		//	{c1.x + pos.x, c1.y + pos.y, c1.z + pos.z}, {c2.x + pos.x, c1.y + pos.y, c1.z + pos.z}, {c2.x + pos.x, c2.y + pos.y, c1.z + pos.z}, {c1.x + pos.x, c2.y + pos.y, c1.z + pos.z},
+		//	{c1.x + pos.x, c1.y + pos.y, c2.z + pos.z}, {c2.x + pos.x, c1.y + pos.y, c2.z + pos.z}, {c2.x + pos.x, c2.y + pos.y, c2.z + pos.z}, {c1.x + pos.x, c2.y + pos.y, c2.z + pos.z}
+		//};
+		//
+		//debugRenderer.SetupBuffers(c1, c2, pos);
+		//debugRenderer.RenderDebug(wireframeShaderProgram);
+
+
+		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

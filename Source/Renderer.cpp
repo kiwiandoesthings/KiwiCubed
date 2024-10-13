@@ -13,7 +13,7 @@ void Renderer::ClearScreen(float redValue, float blueValue, float greenValue) {
 	GLCall(glClearColor(redValue, blueValue, greenValue, 1.0f));
 }
 
-void Renderer::DrawElements(VertexArrayObject vertexArrayObject, VertexBufferObject vertexBufferObject, IndexBufferObject indexBufferObject, std::vector<GLfloat> vertices, std::vector<GLuint> indices) {
+void Renderer::DrawElements(VertexArrayObject vertexArrayObject, VertexBufferObject vertexBufferObject, IndexBufferObject indexBufferObject, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices) {
 	vertexArrayObject.Bind();
 	vertexBufferObject.Bind();
 	vertexBufferObject.Setup(vertices.size() * sizeof(GLfloat), vertices.data());

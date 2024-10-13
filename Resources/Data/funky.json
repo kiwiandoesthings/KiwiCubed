@@ -1,0 +1,8 @@
+{
+	"project_version": "0.0.3pre-alpha",
+	"init_settings": {
+		"window_width": 640,
+		"window_height": 480,
+		"window_title": "KiwiCubed Engine"
+	}
+}

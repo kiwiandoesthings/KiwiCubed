@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "ImGui.h"
+
 #include "Block.h"
 #include "IndexBufferObject.h"
 #include "Renderer.h"
@@ -52,11 +54,14 @@ class Chunk {
         bool isAllocated = false;
         bool isGenerated = false;
         bool isMeshed = false;
+        unsigned char generationStatus = 0;
         bool isEmpty;
         bool shouldGenerate = true;
-        float totalMemoryUsage;
+        unsigned int totalMemoryUsage;
     
+        Chunk() : blocks(nullptr), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), totalMemoryUsage(0), totalBlocks(0)/*, vertexBufferObject(("chunk " + std::to_string(chunkX) + " " + std::to_string(chunkY) + " " + std::to_string(chunkZ)).c_str())*/ {}
         Chunk(int chunkX, int chunkY, int chunkZ);
+
         ~Chunk();
     
         void AllocateChunk();
@@ -74,6 +79,10 @@ class Chunk {
         unsigned int GetMemoryUsage() const;
 
         bool IsEmpty();
+
+        void DisplayImGui() const;
+
+        //void Delete() const;
     
     private:
         Renderer renderer;
@@ -81,7 +90,7 @@ class Chunk {
         std::vector<GLfloat> vertices;
         std::vector<GLuint> indices;
     
-        unsigned int totalBlocks;
+        unsigned short totalBlocks;
     
         VertexArrayObject vertexArrayObject;
         VertexBufferObject vertexBufferObject;

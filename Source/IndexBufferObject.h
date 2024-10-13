@@ -11,7 +11,7 @@ class IndexBufferObject
 		IndexBufferObject();
 
 		void Setup(GLsizeiptr size, GLuint* indicies);
-		void Bind();
+		void Bind() const;
 		void Unbind();
-		void Delete();
+		void Delete() const;
 };

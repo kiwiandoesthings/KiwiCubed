@@ -4,12 +4,11 @@
 #include <GLAD/glad.h>
 
 #include "Camera.h"
+#include "Entity.h"
 
-class Player {
+
+class Player : public Entity {
 	public:
-		glm::vec3 orientation = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 upDirection = glm::vec3(0.0f, 1.0f, 0.0f);
-
 		float yaw = -90.0f;
 		float pitch;
 		float roll;
@@ -20,11 +19,13 @@ class Player {
 		float speed = 0.004f;
 		float sensitivity = 100.0f;
 
+		Player() : width(640), height(480), yaw(0), pitch(0), roll(0), Entity() {}
 		Player(int playerX, int playerY, int playerZ);
 	
 		void Setup(Window& window);
 	
-		void Update(Window* window, Shader& shader, const char* uniform);
+		void Update(Window* window, ChunkHandler& chunkHandler);
+		void UpdateShader(Shader& shader, const char* uniform);
 		void QueryInputs();
 	
 		void SetPosition(Window* window, int playerX, int playerY, int playerZ);
@@ -35,7 +36,6 @@ class Player {
 		void Delete();
 	
 	private:
-		glm::vec3 playerPosition = glm::vec3(0, 0, 0);
 		std::shared_ptr<Camera> camera;
 		InputHandler inputHandler = InputHandler();
 };

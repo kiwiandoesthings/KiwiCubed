@@ -14,7 +14,7 @@ void VertexArrayObject::LinkAttribute(VertexBufferObject& vertexBufferObject, GL
 	vertexBufferObject.Unbind();
 }
 
-void VertexArrayObject::Bind()
+void VertexArrayObject::Bind() const
 {
 	GLCall(glBindVertexArray(vertexArrayObjectID));
 }
@@ -24,7 +24,7 @@ void VertexArrayObject::Unbind()
 	GLCall(glBindVertexArray(0));
 }
 
-void VertexArrayObject::Delete()
+void VertexArrayObject::Delete() const
 {
 	GLCall(glDeleteVertexArrays(1, &vertexArrayObjectID));
 }

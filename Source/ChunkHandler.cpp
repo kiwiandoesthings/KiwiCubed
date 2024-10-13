@@ -9,7 +9,6 @@ Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
     static Chunk defaultChunk = Chunk(0, 0, 0);
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk != chunks.end()) {
-        // Return a reference to the Chunk object
         return chunk->second;
     }
     else {

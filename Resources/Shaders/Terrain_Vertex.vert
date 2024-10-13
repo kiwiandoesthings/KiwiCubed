@@ -10,6 +10,7 @@ out float blockTypeOut;
 
 uniform mat4 windowViewMatrix;
 
+
 void main()
 {
 	vec4 worldPosition = vec4(blockPosition, 1);

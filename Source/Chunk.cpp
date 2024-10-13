@@ -2,7 +2,7 @@
 #include "World.h"
 
 
-Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : blocks(blocks), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), totalMemoryUsage(0), totalBlocks(0) {
+Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : blocks(nullptr), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), totalMemoryUsage(0), totalBlocks(0)/*,vertexBufferObject(("chunk " + std::to_string(chunkX) + " " + std::to_string(chunkY) + " " + std::to_string(chunkZ)).c_str())*/ {
 
 }
 
@@ -22,6 +22,7 @@ void Chunk::AllocateChunk() {
     }
 
     isAllocated = true;
+    generationStatus = 1;
 }
 
 void Chunk::GenerateBlocks(World world, Chunk& callerChunk, bool updateCallerChunk) {
@@ -34,14 +35,10 @@ void Chunk::GenerateBlocks(World world, Chunk& callerChunk, bool updateCallerChu
         return;
     }
 
-    FastNoiseLite noise;
-    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-    noise.SetSeed(120);
-
     for (int x = 0; x < chunkSize; ++x) {
         for (int y = 0; y < chunkSize; ++y) {
             for (int z = 0; z < chunkSize; ++z) {
-                blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize, noise);
+                blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize);
                 //std::cout << blocks[x][y][z].GetType() << std::endl;
                 if (blocks[x][y][z].GetType() > 0) {
                     totalBlocks++;
@@ -57,6 +54,7 @@ void Chunk::GenerateBlocks(World world, Chunk& callerChunk, bool updateCallerChu
     }
 
     isGenerated = true;
+    generationStatus = 2;
 }
 
 void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
@@ -214,6 +212,7 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
     }
 
     isMeshed = true;
+    generationStatus = 3;
 }
 
 void Chunk::Render() {
@@ -255,6 +254,10 @@ bool Chunk::IsEmpty() {
         isEmpty = true;
         return true;
     }
+}
+
+void Chunk::DisplayImGui() const {
+    ImGui::Text("Chunk Position: {%d, %d, %d}, GS: %d, Blocks: %d, VBO: %d", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, vertexBufferObject.vertexBufferObjectID);
 }
 
 Chunk::~Chunk() {

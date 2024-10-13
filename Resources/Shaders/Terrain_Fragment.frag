@@ -7,6 +7,7 @@ in vec2 textureCoordinateOut;
 in float blockTypeOut;
 
 uniform sampler2D tex0;
+uniform uint atlasSize;
 
 
 void main()
@@ -15,7 +16,6 @@ void main()
 	//vec3 tint = vec3(mod(blockPositionOut.x, 32) * 2, mod(blockPositionOut.y, 32) * 2, mod(blockPositionOut.z, 32) * 2);
     //tint = ((tint + vec3(1.0)) / 255.0 * 10);
 
-	int atlasSize = 3;
     float epsilon = 0.00001;
 
     float textureIndexX = mod(blockTypeOut + epsilon, atlasSize);

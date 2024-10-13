@@ -10,10 +10,6 @@
 #include <iostream>
 #include <thread>
 
-//#include <glm/glm.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
-//#include <glm/gtc/type_ptr.hpp>
-
 #include "Input.h"
 
 
@@ -21,6 +17,7 @@ class Window {
 	public:
 		Window() : windowWidth(640), windowHeight(480), windowTitle(""), isFocused(false), window(window) {}
 		Window(int windowWidth, int windowHeight, const char* windowTitle);
+		Window(int windowWidth, int windowHeight, std::string windowTitle);
 
 		void Setup();
 
@@ -32,6 +29,7 @@ class Window {
 		int GetHeight() const;
 		const char* GetTitle() const;
 		void SetTitle(const char* newTitle);
+		void SetTitle(std::string newTitle);
 
 		GLFWwindow* GetWindowInstance();
 
