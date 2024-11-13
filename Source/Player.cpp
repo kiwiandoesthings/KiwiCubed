@@ -1,6 +1,11 @@
 #include "Player.h"
 
 
+static int positiveModulo(int a, int b) {
+	return (a % b + b) % b;
+}
+
+
 Player::Player(int playerX, int playerY, int playerZ) : width(640), height(480), yaw(0), pitch(0), roll(0), Entity() {
 	entityData.position = glm::vec3(playerX, playerY, playerZ);
 	
@@ -26,50 +31,64 @@ void Player::Update(Window* window, ChunkHandler& chunkHandler) {
 		return;
 	}
 
-	QueryInputs();
-	ApplyPhysics(*this, entityData.physicsBoundingBox, chunkHandler);
+	if (camera->GetWindow().isFocused) {
+		QueryInputs(chunkHandler);
+		QueryMouseInputs();
+		ApplyPhysics(*this, chunkHandler);
+	}
 
-	entityData.velocity.x = entityData.position.x - oldData.position.x;
-	entityData.velocity.y = entityData.position.y - oldData.position.y;
-	entityData.velocity.z = entityData.position.z - oldData.position.z;
+	//entityData.velocity.x = entityData.position.x - oldData.position.x;
+	//entityData.velocity.y = entityData.position.y - oldData.position.y;
+	//entityData.velocity.z = entityData.position.z - oldData.position.z;
 }
 
 void Player::UpdateShader(Shader& shader, const char* uniform) {
 	UpdateCameraMatrix(shader, uniform);
 }
 
-void Player::QueryInputs() {
+void Player::QueryInputs(ChunkHandler& chunkHandler) {
+	Window& window = camera->GetWindow();
+	if (inputHandler.GetKeyState(GLFW_KEY_W)) {
+		//entityData.position += speed * entityData.orientation;
+		entityData.velocity += speed * entityData.orientation;
+	}
+	if (inputHandler.GetKeyState(GLFW_KEY_A)) {
+		//entityData.position += speed * -glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
+		entityData.velocity += speed * -glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
+	}
+	if (inputHandler.GetKeyState(GLFW_KEY_S)) {
+		//entityData.position += speed * -entityData.orientation;
+		entityData.velocity += speed * -entityData.orientation;
+	}
+	if (inputHandler.GetKeyState(GLFW_KEY_D)) {
+		//entityData.position += speed * glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
+		entityData.velocity += speed * glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
+	}
+	if (inputHandler.GetKeyState(GLFW_KEY_SPACE)) {
+		//entityData.position += speed * entityData.upDirection;
+		entityData.velocity += speed * entityData.upDirection;
+	}
+	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_SHIFT)) {
+		//entityData.position += speed * -entityData.upDirection;
+		entityData.velocity += speed * -entityData.upDirection;
+	}
+	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_CONTROL)) {
+		speed = .8f;
+	}
+	else {
+		speed = 0.01f;
+	}
+}
+
+void Player::QueryMouseInputs() {
 	Window& window = camera->GetWindow();
 	if (!window.isFocused) {
 		return;
 	}
-	if (inputHandler.GetKeyState(GLFW_KEY_W)) {
-		entityData.position += speed * entityData.orientation;
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_A)) {
-		entityData.position += speed * -glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_S)) {
-		entityData.position += speed * -entityData.orientation;
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_D)) {
-		entityData.position += speed * glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_SPACE)) {
-		entityData.position += speed * entityData.upDirection;
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_SHIFT)) {
-		entityData.position += speed * -entityData.upDirection;
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_CONTROL)) {
-		speed = .8f;
-	} else {
-		speed = 0.01f;
-	}
 
 	inputHandler.RegisterScrollCallback(true, [this](double offset) {
 		entityStats.health += static_cast<float>(offset);
-	});
+		});
 
 	if (inputHandler.GetKeyState(GLFW_KEY_MINUS)) {
 		entityStats.health -= 0.1f;

@@ -1,8 +1,8 @@
 #include "ChunkHandler.h"
+#include "World.h"
 
 
-ChunkHandler::ChunkHandler() {
-
+ChunkHandler::ChunkHandler(World& world) : world(world) {
 }
 
 Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
@@ -19,6 +19,11 @@ Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
 
 void ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
     chunks.insert(std::make_pair(std::tuple(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
+}
+
+void ChunkHandler::GenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ) {
+    Chunk chunk = GetChunk(chunkX, chunkY, chunkZ);
+    world.GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
 }
 
 

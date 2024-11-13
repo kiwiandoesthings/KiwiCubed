@@ -21,7 +21,7 @@ struct EntityData {
 	glm::vec3 globalChunkPosition = glm::vec3(0, 0, 0);
 	glm::vec3 localChunkPosition = glm::vec3(0, 0, 0);
 
-	float terminalVelocity = 3.92f;
+	float terminalVelocity = 0.4f;
 
 	PhysicsBoundingBox physicsBoundingBox = PhysicsBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	InteractionBoundingBox interactionBoundingBox = InteractionBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));

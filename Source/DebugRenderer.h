@@ -15,7 +15,8 @@ class DebugRenderer {
 		DebugRenderer();
 		~DebugRenderer();
 
-		void SetupBuffers(glm::vec3 playerPhysicsBoundingBoxCorner1, glm::vec3 playerPhysicsBoundingBoxCorner2, glm::vec3 playerPosition);
+		void SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition);
+		void UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition);
 		void RenderDebug(Shader& wireframeShaderProgram);
 
 	private:

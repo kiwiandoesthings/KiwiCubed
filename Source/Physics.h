@@ -27,4 +27,4 @@ struct InteractionBoundingBox {
 	InteractionBoundingBox(glm::vec3 corner1, glm::vec3 corner2) : corner1(corner1), corner2(corner2) {}
 };
 
-void ApplyPhysics(Entity& entity, PhysicsBoundingBox physicsBoundingBox, ChunkHandler& chunkHandler);
+void ApplyPhysics(Entity& entity, ChunkHandler& chunkHandler);

@@ -149,6 +149,12 @@ int main() {
 	Renderer renderer = Renderer();
 	DebugRenderer debugRenderer = DebugRenderer();
 
+	glm::vec3 c1 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner1;
+	glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
+	glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
+
+	debugRenderer.SetupBuffers(c1, c2, pos);
+
 	int frames = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
 	double fps = 0.0;
@@ -215,24 +221,12 @@ int main() {
 
 		singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
 
-		// I can't be fucked to finish this right now
-		//GLuint indices[] = {
-		//	0, 1, 1, 2, 2, 3, 3, 0,
-		//	4, 5, 5, 6, 6, 7, 7, 4,
-		//	0, 4, 1, 5, 2, 6, 3, 7 
-		//};
-		//
-		//glm::vec3 c1 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner1;
-		//glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
-		//glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
-		//
-		//std::vector<glm::vec3> vertices = {
-		//	{c1.x + pos.x, c1.y + pos.y, c1.z + pos.z}, {c2.x + pos.x, c1.y + pos.y, c1.z + pos.z}, {c2.x + pos.x, c2.y + pos.y, c1.z + pos.z}, {c1.x + pos.x, c2.y + pos.y, c1.z + pos.z},
-		//	{c1.x + pos.x, c1.y + pos.y, c2.z + pos.z}, {c2.x + pos.x, c1.y + pos.y, c2.z + pos.z}, {c2.x + pos.x, c2.y + pos.y, c2.z + pos.z}, {c1.x + pos.x, c2.y + pos.y, c2.z + pos.z}
-		//};
-		//
-		//debugRenderer.SetupBuffers(c1, c2, pos);
-		//debugRenderer.RenderDebug(wireframeShaderProgram);
+		glm::vec3 c1 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner1;
+		glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
+		glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
+
+		debugRenderer.UpdateBuffers(c1, c2, pos);
+		debugRenderer.RenderDebug(wireframeShaderProgram);
 
 
 		ImGui::End();

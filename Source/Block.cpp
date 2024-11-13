@@ -79,17 +79,31 @@ void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, un
 	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 	noise.SetSeed(120);
 
-	float density = noise.GetNoise(static_cast<float>(blockX) + (chunkX * chunkSize), static_cast<float>(blockY) + (chunkY * chunkSize), static_cast<float>(blockZ) + (chunkZ * chunkSize));
+	/// Physics debug generation
+	//if ((chunkX % 2 == 0 && chunkY % 2 == 1 && chunkZ % 2 == 0)) {
+	//	int random = (rand() % 4) + 1;
+	//	type = random;
+	//	return;
+	//}
+	//if ((blockX >= 16 && blockX <= 31 && blockY >= 16 && blockY <= 31 && blockZ >= 16 && blockZ <= 31)) {
+	//	int random = (rand() % 4) + 1;
+	//	type = random;
+	//	return;
+	//}
+	//if (blockX == 16 && blockY == 16 && blockZ == 16) {
+	//	type = 1;
+	//	return;
+	//}
 
+	float density = noise.GetNoise(static_cast<float>(blockX) + (chunkX * chunkSize), static_cast<float>(blockY) + (chunkY * chunkSize), static_cast<float>(blockZ) + (chunkZ * chunkSize));
+	
 	if (density > 0) {
 		int random = (rand() % 4) + 1;
 		type = random;
 		return;
 	}
-
+	
 	type = 0;
-	//std::cout << random << std::endl;
-	//std::cout << type << std::endl;
 }
 
 void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize) {

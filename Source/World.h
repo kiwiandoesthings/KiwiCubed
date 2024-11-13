@@ -6,9 +6,9 @@
 #include <map>
 #include <vector>
 
+#include "ChunkHandler.h"
 #include "Player.h"
 #include "Shader.h"
-#include "ChunkHandler.h"
 
 
 class Chunk;
@@ -24,9 +24,9 @@ struct Position {
 
 class World {
 	public:
-		Player player = Player(32, 35, 32);
+		Player player = Player(36, 100, 80);
 
-		World();
+		World(unsigned int worldSize);
 
 		void Setup(Window& window);
 
@@ -41,10 +41,9 @@ class World {
 		void Delete();
 
 	private:
-		unsigned int worldSize = 5;
+		unsigned int worldSize;
 
 		ChunkHandler chunkHandler;
-		Chunk emptyChunk = Chunk(0, 0, 0);
 
 		unsigned int totalChunks;
 		float totalMemoryUsage;

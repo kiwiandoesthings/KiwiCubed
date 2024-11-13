@@ -26,7 +26,8 @@ class Player : public Entity {
 	
 		void Update(Window* window, ChunkHandler& chunkHandler);
 		void UpdateShader(Shader& shader, const char* uniform);
-		void QueryInputs();
+		void QueryInputs(ChunkHandler& chunkHandler);
+		void QueryMouseInputs();
 	
 		void SetPosition(Window* window, int playerX, int playerY, int playerZ);
 		const std::tuple<int, int, int> GetPosition();

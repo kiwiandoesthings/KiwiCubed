@@ -1,7 +1,7 @@
 #include "World.h"
 
 
-World::World() : totalChunks(0), totalMemoryUsage(0) {
+World::World(unsigned int worldSize) : totalChunks(0), totalMemoryUsage(0), chunkHandler(*this), worldSize(worldSize) {
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
@@ -16,14 +16,14 @@ void World::Setup(Window& window) {
 }
 
 void World::Render(Shader shaderProgram) {
-    for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
-        for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
-            for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
-                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
-                shaderProgram.Bind();
-                chunk.Render();
-            }
-        }
+    for(auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
+        const auto& key = it->first;
+        auto& chunk = it->second;
+        int chunkX = std::get<0>(key);
+        int chunkY = std::get<1>(key);
+        int chunkZ = std::get<2>(key);
+        shaderProgram.Bind();
+        chunk.Render();
     }
 }
 
@@ -37,7 +37,7 @@ void World::GenerateWorld() {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
                 Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
-                GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, emptyChunk);
+                GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
                 //totalChunkMemoryUsage += chunk->GetMemoryUsage();
             }
         }
@@ -53,7 +53,6 @@ void World::GenerateWorld() {
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk) {
-    //std::cout << "===== {" << chunkX << ", " << chunkY << ", " << chunkZ << "} =====" << std::endl;
     // Basic procedures for preparing a chunk, SetPosition should be done before ANYTHING ELSE, or functions relying on the chunks position will not work properly
     chunk.SetPosition(chunkX, chunkY, chunkZ);
 
@@ -67,6 +66,8 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
         //std::cout << "[Debug] GENERATING {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
 		chunk.GenerateBlocks(*this, chunk, false);
 	}
+
+    totalChunks++;
 
     Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ);     // Positive X
     Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ);     // Negative X

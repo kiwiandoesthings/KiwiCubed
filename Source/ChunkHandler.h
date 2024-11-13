@@ -35,14 +35,17 @@ struct TripleHash {
 
 class ChunkHandler {
     public:
-        ChunkHandler();
+        std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
+
+        ChunkHandler(World& world);
         void Delete();
 
         Chunk& GetChunk(int chunkX, int chunkY, int chunkZ);
         void AddChunk(int chunkX, int chunkY, int chunkZ);
+        void GenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ);
 
     private:
-        std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
+        World& world;
 };
 
 class Chunk {
