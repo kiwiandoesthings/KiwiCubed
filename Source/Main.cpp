@@ -20,6 +20,7 @@ extern "C"
 #include <GLFW/glfw3.h>
 
 #include <chrono>
+#include <future>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -140,10 +141,9 @@ int main() {
 	Texture terrainAtlas("Resources/Textures/Blocks/stone.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	terrainAtlas.SetAtlasSize(terrainShaderProgram, 2);
 
-	// Start generating a chunk in the singleplayer world
 	singleplayerHandler.singleplayerWorld.GenerateWorld();
+	singleplayerHandler.singleplayerWorld.SetupRenderComponents();
 
-	// Bind stuff
 	terrainAtlas.Bind();
 
 	Renderer renderer = Renderer();
@@ -178,30 +178,51 @@ int main() {
 
 		ImGui::Begin("Debug");
 		if (ImGui::CollapsingHeader("Player Info")) {
-			ImGui::Text("Player Name: %s", singleplayerHandler.singleplayerWorld.player.GetEntityData().name);
+			ImGui::Text("Player name: %s", singleplayerHandler.singleplayerWorld.player.GetEntityData().name);
 			ImGui::Text("Player health: %d", static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityStats().health));
 			ImGui::Text("Player position: %f, %f, %f", 
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.x, 
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.y, 
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.z);
 			ImGui::Text("Player orientation: %f, %f, %f", 
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.x, 
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.y, 
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.z);
+				(singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.x),
+				(singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.y), 
+				(singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.z));
 			ImGui::Text("Player velocity: %f, %f, %f", 
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.x, 
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.y, 
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.z);
-			ImGui::Text("Global Chunk Position: %d, %d, %d", 
+			ImGui::Text("Global chunk position: %d, %d, %d", 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x), 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y), 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z));
-			ImGui::Text("Local Chunk Position: %d, %d, %d", 
+			ImGui::Text("Local chunk position: %d, %d, %d", 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.x), 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.y), 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.z));
-			ImGui::Text("Total frames: %d", frames);
+			ImGui::Text("Current chunk generation status and blocks %d, %d, %d",
+				singleplayerHandler.singleplayerWorld.GetChunk(
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).generationStatus,
+				singleplayerHandler.singleplayerWorld.GetChunk(
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).GetTotalBlocks(),
+				singleplayerHandler.singleplayerWorld.GetChunk(
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).id);
+			ImGui::Text("Total frames: %d", frames);													
 			ImGui::Text("FPS: %.2f", fps);
+		}
+
+		if (ImGui::CollapsingHeader("World")) {
+			singleplayerHandler.singleplayerWorld.DisplayImGui(0);
+		}
+
+		if (ImGui::CollapsingHeader("Chunk Info")) {
+			singleplayerHandler.singleplayerWorld.DisplayImGui(1);
 		}
 
 		// Make background ~pink~
@@ -213,20 +234,16 @@ int main() {
 			singleplayerHandler.singleplayerWorld.Update(&globalWindow);
 			singleplayerHandler.singleplayerWorld.player.UpdateShader(terrainShaderProgram, "windowViewMatrix");
 			singleplayerHandler.singleplayerWorld.player.UpdateShader(wireframeShaderProgram, "windowViewMatrix");
+
+			singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
+
+			glm::vec3 c1 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner1;
+			glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
+			glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
+
+			debugRenderer.UpdateBuffers(c1, c2, pos);
+			debugRenderer.RenderDebug(wireframeShaderProgram);
 		}
-
-		if (ImGui::CollapsingHeader("Chunk Info")) {
-			singleplayerHandler.singleplayerWorld.DisplayImGui();
-		}
-
-		singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
-
-		glm::vec3 c1 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner1;
-		glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
-		glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
-
-		debugRenderer.UpdateBuffers(c1, c2, pos);
-		debugRenderer.RenderDebug(wireframeShaderProgram);
 
 
 		ImGui::End();
@@ -236,6 +253,8 @@ int main() {
 		glfwSwapBuffers(globalWindow.GetWindowInstance());
 		++frames;
 	}
+
+	singleplayerHandler.EndSingleplayerWorld();
 
 	// Clean up once the program has exited
 	std::cout << "[Cleanup / Info] Cleaned up, exiting program" << std::endl;

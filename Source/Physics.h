@@ -28,3 +28,4 @@ struct InteractionBoundingBox {
 };
 
 void ApplyPhysics(Entity& entity, ChunkHandler& chunkHandler);
+bool RaycastWorld(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, int maxDistance, ChunkHandler& chunkHandler, glm::ivec3& hitBlockPosition, glm::ivec3& hitChunkPosition, bool& isHit);

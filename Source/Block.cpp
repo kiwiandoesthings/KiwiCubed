@@ -70,14 +70,14 @@ GLuint faceIndices[] = {
 Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(0) {
 }
 
-void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, unsigned short newBlockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize) {
+void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, unsigned short newBlockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug) {
 	blockX = newBlockX;
 	blockY = newBlockY;
 	blockZ = newBlockZ;
 
 	FastNoiseLite noise;
 	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-	noise.SetSeed(120);
+	noise.SetSeed(121);
 
 	/// Physics debug generation
 	//if ((chunkX % 2 == 0 && chunkY % 2 == 1 && chunkZ % 2 == 0)) {
@@ -95,7 +95,13 @@ void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, un
 	//	return;
 	//}
 
-	float density = noise.GetNoise(static_cast<float>(blockX) + (chunkX * chunkSize), static_cast<float>(blockY) + (chunkY * chunkSize), static_cast<float>(blockZ) + (chunkZ * chunkSize));
+	int newChunkSize = static_cast<int>(chunkSize);
+
+	float density = noise.GetNoise(static_cast<float>(static_cast<int>(blockX) + (chunkX * static_cast<int>(newChunkSize))), static_cast<float>(static_cast<int>(blockY) + (chunkY * static_cast<int>(newChunkSize))), static_cast<float>(static_cast<int>(blockZ) + (chunkZ * static_cast<int>(newChunkSize))));
+
+	if (debug) {
+		//std::cout << static_cast<float>(blockX) + (chunkX * newChunkSize) << " " << static_cast<float>(blockY) + (chunkY * newChunkSize) << " " << static_cast<float>(blockZ) + (chunkZ * newChunkSize) << std::endl;
+	}
 	
 	if (density > 0) {
 		int random = (rand() % 4) + 1;
@@ -109,16 +115,16 @@ void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, un
 void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize) {
 	GLuint vertexOffset = static_cast<GLuint>(faceDirection) * 20;
 	GLuint baseIndex = static_cast<GLuint>(vertices.size() / 6);
-
+	
 	for (size_t i = vertexOffset; i < static_cast<size_t>(vertexOffset) + 20; i += 5) {
-		vertices.emplace_back(faceVertices[i  + 0] + static_cast<GLuint>(blockX + (chunkX * chunkSize)));
-		vertices.emplace_back(faceVertices[i  + 1] + static_cast<GLuint>(blockY + (chunkY * chunkSize)));
-		vertices.emplace_back(faceVertices[i  + 2] + static_cast<GLuint>(blockZ + (chunkZ * chunkSize)));
+		vertices.emplace_back(faceVertices[i  + 0] + static_cast<GLfloat>(blockX + (chunkX * static_cast<int>(chunkSize))));
+		vertices.emplace_back(faceVertices[i  + 1] + static_cast<GLfloat>(blockY + (chunkY * static_cast<int>(chunkSize))));
+		vertices.emplace_back(faceVertices[i  + 2] + static_cast<GLfloat>(blockZ + (chunkZ * static_cast<int>(chunkSize))));
 		vertices.emplace_back(faceVertices[i  + 3]);
 		vertices.emplace_back(faceVertices[i  + 4]);
 		vertices.emplace_back(static_cast<GLfloat>(type));
 	}
-
+	
 	for (size_t i = 0; i < 6; ++i) {
 		indices.emplace_back(static_cast<GLuint>(baseIndex + faceIndices[i]));
 	}

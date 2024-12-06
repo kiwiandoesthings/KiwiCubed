@@ -32,7 +32,7 @@ class Block {
         Block() : blockX(0), blockY(0), blockZ(0), type(0) {}
         Block(int type);
 
-        void GenerateBlock(unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize);
+        void GenerateBlock(unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
         void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize);
         
         unsigned int GetType() const;
