@@ -2,7 +2,6 @@
 
 #include "GLError.h"
 #include <GLAD/glad.h>
-#include "GLFW/glfw3.h"
 
 #include "IndexBufferObject.h"
 #include "VertexArrayObject.h"

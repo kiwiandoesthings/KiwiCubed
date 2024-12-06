@@ -9,17 +9,13 @@ void SingleplayerHandler::Setup() {
 }
 
 void SingleplayerHandler::StartSingleplayerWorld() {
-	singleplayerWorld.StartTickThread();
+	isLoadedIntoSingleplayerWorld = true;
 }
 
 void SingleplayerHandler::EndSingleplayerWorld() {
 	isLoadedIntoSingleplayerWorld = false;
-
-	singleplayerWorld.StopTickThread();
-
-	std::cout << "[Singleplayer World Handler / Info] Exiting singleplayer world" << std::endl;
 }
 
 void SingleplayerHandler::Delete() {
-	EndSingleplayerWorld();
+
 }

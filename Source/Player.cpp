@@ -6,7 +6,7 @@ static int positiveModulo(int a, int b) {
 }
 
 
-Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler) : width(640), height(480), yaw(0), pitch(0), roll(0), Entity(), chunkHandler(chunkHandler) {
+Player::Player(int playerX, int playerY, int playerZ) : width(640), height(480), yaw(0), pitch(0), roll(0), Entity() {
 	entityData.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
@@ -15,24 +15,16 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler
 	entityData.name = "Player";
 	
 	entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
-
-	inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this));
 }
 
 void Player::Setup(Window& window) {
+	//Player::window = window;
 	camera = std::make_shared<Camera>(window);
 	camera->Setup(window);
 	inputHandler.SetupKeyStates(window.GetWindowInstance(), std::vector<int>{GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_LEFT_CONTROL});
-
-	inputHandler.RegisterKeyCallback({ GLFW_KEY_E }, [&]() {
-		chunkHandler.Delete();
-	});
-	inputHandler.RegisterKeyCallback({ GLFW_KEY_R }, [&]() {
-		chunkHandler.GenerateWorld();
-	});
 }
 
-void Player::Update(Window* window) {
+void Player::Update(Window* window, ChunkHandler& chunkHandler) {
 	EntityData oldData = entityData;
 	if (!camera) {
 		std::cerr << "[Player Update / Warn] Trying to update player without a camera, aborting" << std::endl;
@@ -40,44 +32,44 @@ void Player::Update(Window* window) {
 	}
 
 	if (camera->GetWindow().isFocused) {
-		QueryInputs();
+		QueryInputs(chunkHandler);
 		QueryMouseInputs();
 		ApplyPhysics(*this, chunkHandler);
 	}
 
-
-	// Not yet
-	//glm::ivec3 playerChunkPosition = glm::ivec3(static_cast<int>(entityData.position.x / chunkSize), static_cast<int>(entityData.position.y / chunkSize), static_cast<int>(entityData.position.z / chunkSize));
-	//std::cout << playerChunkPosition.x << " " << playerChunkPosition.y << " " << playerChunkPosition.z << " " << chunkHandler.GetChunk(playerChunkPosition.x, playerChunkPosition.y, playerChunkPosition.z).generationStatus << std::endl;
-	//if (!chunkHandler.GetChunk(playerChunkPosition.x, playerChunkPosition.y, playerChunkPosition.z).isGenerated) {
-	//	std::cout << "Not Generated!" << std::endl;
-	//	chunkHandler.AddChunk(playerChunkPosition.x, playerChunkPosition.y, playerChunkPosition.z);
-	//	chunkHandler.GenerateAndMeshChunk(playerChunkPosition.x, playerChunkPosition.y, playerChunkPosition.z);
-	//}
+	//entityData.velocity.x = entityData.position.x - oldData.position.x;
+	//entityData.velocity.y = entityData.position.y - oldData.position.y;
+	//entityData.velocity.z = entityData.position.z - oldData.position.z;
 }
 
 void Player::UpdateShader(Shader& shader, const char* uniform) {
 	UpdateCameraMatrix(shader, uniform);
 }
 
-void Player::QueryInputs() {
+void Player::QueryInputs(ChunkHandler& chunkHandler) {
 	Window& window = camera->GetWindow();
 	if (inputHandler.GetKeyState(GLFW_KEY_W)) {
+		//entityData.position += speed * entityData.orientation;
 		entityData.velocity += speed * entityData.orientation;
 	}
 	if (inputHandler.GetKeyState(GLFW_KEY_A)) {
+		//entityData.position += speed * -glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
 		entityData.velocity += speed * -glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
 	}
 	if (inputHandler.GetKeyState(GLFW_KEY_S)) {
+		//entityData.position += speed * -entityData.orientation;
 		entityData.velocity += speed * -entityData.orientation;
 	}
 	if (inputHandler.GetKeyState(GLFW_KEY_D)) {
+		//entityData.position += speed * glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
 		entityData.velocity += speed * glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
 	}
 	if (inputHandler.GetKeyState(GLFW_KEY_SPACE)) {
+		//entityData.position += speed * entityData.upDirection;
 		entityData.velocity += speed * entityData.upDirection;
 	}
 	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_SHIFT)) {
+		//entityData.position += speed * -entityData.upDirection;
 		entityData.velocity += speed * -entityData.upDirection;
 	}
 	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_CONTROL)) {
@@ -85,39 +77,6 @@ void Player::QueryInputs() {
 	}
 	else {
 		speed = 0.01f;
-	}
-}
-
-void Player::MouseButtonCallback() {
-	glm::ivec3 chunkPosition = glm::ivec3(0, 0, 0);
-	glm::ivec3 blockPosition = glm::ivec3(0, 0, 0);
-	bool hit = 0;
-	if (RaycastWorld(entityData.position, entityData.orientation, 500, chunkHandler, blockPosition, chunkPosition, hit)) {
-		chunkHandler.RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
-		if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
-			chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
-			if (blockPosition.x == 0) {
-				chunkHandler.RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
-			}
-			if (blockPosition.x == chunkSize - 1) {
-				chunkHandler.RemeshChunk(chunkPosition.x + 1, chunkPosition.y, chunkPosition.z, false);
-			}
-			if (blockPosition.y == 0) {
-				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y - 1, chunkPosition.z, false);
-			}
-			if (blockPosition.y == chunkSize - 1) {
-				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y + 1, chunkPosition.z, false);
-			}
-			if (blockPosition.z == 0) {
-				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z - 1, false);
-			}
-			if (blockPosition.z == chunkSize - 1) {
-				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z + 1, false);
-			}
-		}
-		else {
-			chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
-		}
 	}
 }
 
@@ -129,7 +88,7 @@ void Player::QueryMouseInputs() {
 
 	inputHandler.RegisterScrollCallback(true, [this](double offset) {
 		entityStats.health += static_cast<float>(offset);
-	});
+		});
 
 	if (inputHandler.GetKeyState(GLFW_KEY_MINUS)) {
 		entityStats.health -= 0.1f;

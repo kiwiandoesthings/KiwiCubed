@@ -56,7 +56,6 @@ Window::Window(int windowWidth, int windowHeight, std::string windowTitle) : isF
 	else {
 		std::cout << "[Initialization / Info] Successfully created GLFW window" << std::endl;
 	}
-
 	glfwMakeContextCurrent(window);
 
 	inputHandler.SetupCallbacks(window);

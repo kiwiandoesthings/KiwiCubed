@@ -2,14 +2,8 @@
 #include "World.h"
 
 
-Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : blocks(nullptr), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), isFull(false), totalMemoryUsage(0), totalBlocks(0)/*,vertexBufferObject(("chunk " + std::to_string(chunkX) + " " + std::to_string(chunkY) + " " + std::to_string(chunkZ)).c_str())*/ {
-}
+Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : blocks(nullptr), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), totalMemoryUsage(0), totalBlocks(0)/*,vertexBufferObject(("chunk " + std::to_string(chunkX) + " " + std::to_string(chunkY) + " " + std::to_string(chunkZ)).c_str())*/ {
 
-// Currently just sets up the VBO, VAO, and IBO
-void Chunk::SetupRenderComponents() {
-    vertexBufferObject.SetupBuffer();
-    vertexArrayObject.SetupArrayObject();
-    indexBufferObject.SetupBuffer();
 }
 
 void Chunk::AllocateChunk() {
@@ -24,50 +18,38 @@ void Chunk::AllocateChunk() {
         }
     }
     else {
-        //std::cerr << "[Chunk Setup / Warn] Trying to allocate chunk after it had already been allocated, aborting {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        std::cerr << "[Chunk Setup / Warn] Trying to allocate chunk after it had already been allocated, aborting" << std::endl;
     }
 
     isAllocated = true;
     generationStatus = 1;
 }
 
-void Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug) {
+void Chunk::GenerateBlocks(World world, Chunk& callerChunk, bool updateCallerChunk) {
     if (isGenerated) {
-        //std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks after they had already been generated, aborting {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks after they had already been generated, aborting" << std::endl;
         return;
     }
     if (!isAllocated) {
-        std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
         return;
     }
 
-    if (!debug) {
-        for (int x = 0; x < chunkSize; ++x) {
-            for (int y = 0; y < chunkSize; ++y) {
-                for (int z = 0; z < chunkSize; ++z) {
-                    blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize, false);
-                    if (blocks[x][y][z].GetType() > 0) {
-                        totalBlocks++;
-                    }
-                }
-            }
-        }
-    }
-
-    if (debug) {
-        for (int x = 0; x < chunkSize; ++x) {
-            for (int y = 0; y < chunkSize; ++y) {
-                for (int z = 0; z < chunkSize; ++z) {
-                    blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize, true);
-                    if (blocks[x][y][z].GetType() > 0) {
-                        totalBlocks++;
-                    }
+    for (int x = 0; x < chunkSize; ++x) {
+        for (int y = 0; y < chunkSize; ++y) {
+            for (int z = 0; z < chunkSize; ++z) {
+                blocks[x][y][z].GenerateBlock(x, y, z, chunkX, chunkY, chunkZ, chunkSize);
+                //std::cout << blocks[x][y][z].GetType() << std::endl;
+                if (blocks[x][y][z].GetType() > 0) {
+                    totalBlocks++;
                 }
             }
         }
     }
 
     if (updateCallerChunk) {
+        //std::cout << "[Debug] Chunk generating {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" <<  std::endl;
+        //std::cout << "[Debug] Generate  caller {" << callerChunk.chunkX << ", " << callerChunk.chunkY << ", " << callerChunk.chunkZ << "}" << std::endl;
         world.GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, *this, true, callerChunk);
     }
 
@@ -75,23 +57,22 @@ void Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
     generationStatus = 2;
 }
 
-void Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
-    if (!isMeshed || remesh) {
+void Chunk::GenerateMesh(ChunkHandler& chunkHandler) {
+    if (!isMeshed) {
         if (!isAllocated) {
-            std::cerr << "[Chunk Mesh Generation / Warn] Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+            std::cerr << "[Chunk Mesh Generation / Warn] Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
             return;
         }
 
         if (!isGenerated) {
-            std::cerr << "[Chunk Mesh Generation / Warn] Trying to generate mesh for ungenerated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+            std::cerr << "[Chunk Mesh Generation / Warn] Trying to generate mesh for ungenerated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks)" << std::endl;
             return;
         }
 
         if (IsEmpty()) {
-            std::cout << "[Chunk Mesh Generation / Info] Chunk is empty, skipping mesh generation {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+            std::cout << "[Chunk Mesh Generation / Info] Chunk is empty, skipping mesh generation" << std::endl;
             return;
         }
-
 
         vertices.clear();
         indices.clear();
@@ -106,6 +87,7 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
         for (int x = 0; x < chunkSize; ++x) {
             for (int y = 0; y < chunkSize; ++y) {
                 for (int z = 0; z < chunkSize; ++z) {
+                    //std::cout << blocks[x][y][z].GetType() << " e" << std::endl;
                     if (blocks[x][y][z].GetType() > 0) {
                         Block& block = blocks[x][y][z];
         
@@ -219,6 +201,7 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                             }
                         
                             if (shouldAddFace) {
+
                                 block.AddFace(vertices, indices, faceDirection, chunkX, chunkY, chunkZ, chunkSize);
                             }
                         }
@@ -228,16 +211,15 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
         }
     }
 
-    id = 1;
-
-    std::cout << id << " " << chunkX << " " << chunkY << " " << chunkZ << " " << totalBlocks << " " << vertices.size() << " " << indices.size() << std::endl;
-
     isMeshed = true;
     generationStatus = 3;
-    IsEmpty();
 }
 
 void Chunk::Render() {
+    if (isEmpty) {
+        return;
+    }
+    
     renderer.DrawElements(vertexArrayObject, vertexBufferObject, indexBufferObject, vertices, indices);
 }
 
@@ -251,10 +233,6 @@ int Chunk::GetTotalBlocks() const {
     return totalBlocks;
 }
 
-void Chunk::SetTotalBlocks(unsigned short newTotalBlocks) {
-    totalBlocks = newTotalBlocks;
-}
-
 std::vector<GLfloat> Chunk::GetVertices() const {
     return vertices;
 }
@@ -263,13 +241,12 @@ std::vector<GLuint> Chunk::GetIndices() const {
     return indices;
 }
 
-unsigned int Chunk::GetMemoryUsage() {
-    totalMemoryUsage = (sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size());
-    return totalMemoryUsage;
+unsigned int Chunk::GetMemoryUsage() const {
+    return 20 * totalBlocks;
 }
 
 bool Chunk::IsEmpty() {
-    if (totalBlocks != 0) {
+    if (totalBlocks > 0) {
         isEmpty = false;
         return false;
     }
@@ -279,45 +256,12 @@ bool Chunk::IsEmpty() {
     }
 }
 
-bool Chunk::IsFull() {
-    if (totalBlocks == chunkSize * chunkSize * chunkSize) {
-        isFull = true;
-        return true;
-    }
-    else {
-        isFull = false;
-        return false;
-    }
-}
-
 void Chunk::DisplayImGui() const {
-    ImGui::Text("Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %d, Indices: %d, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, vertices.size(), indices.size(), vertexBufferObject.vertexBufferObjectID, vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID, static_cast<int>(static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) / 1024.0));
+    ImGui::Text("Chunk Position: {%d, %d, %d}, GS: %d, Blocks: %d, VBO: %d", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, vertexBufferObject.vertexBufferObjectID);
 }
 
-void Chunk::Delete() {
+Chunk::~Chunk() {
     //vertexArrayObject.Delete();
     //vertexBufferObject.Delete();
     //indexBufferObject.Delete();
-
-    if (blocks) {
-        for (int x = 0; x < chunkSize; ++x) {
-            for (int y = 0; y < chunkSize; ++y) {
-                delete[] blocks[x][y];
-            }
-            delete[] blocks[x];
-        }
-        delete[] blocks;
-        blocks = nullptr;
-    }
-
-    isAllocated = false;
-    isGenerated = false;
-    isMeshed = false;
-    generationStatus = 0;
-    isEmpty = true;
-    isFull = false;
-    totalBlocks = 0;
-
-    vertices.clear();
-    indices.clear();
 }

@@ -36,7 +36,7 @@ void DebugRenderer::SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner
 	// Future setups go here
 }
 
-void DebugRenderer::UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition) const {
+void DebugRenderer::UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition) {
 	GLuint playerPhysicsBoundingBoxIndices[] = {
 			0, 1, 1, 2, 2, 3, 3, 0,
 			4, 5, 5, 6, 6, 7, 7, 4,
@@ -57,7 +57,7 @@ void DebugRenderer::UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorne
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(playerPhysicsBoundingBoxIndices), playerPhysicsBoundingBoxIndices, GL_STATIC_DRAW);
 }
 
-void DebugRenderer::RenderDebug(Shader& wireframeShaderProgram) const {
+void DebugRenderer::RenderDebug(Shader& wireframeShaderProgram) {
 	// PlayerPhysicsBoundingBox renderer
 	wireframeShaderProgram.Bind();
 	glBindVertexArray(playerPhysicsBoundingBoxVAO);

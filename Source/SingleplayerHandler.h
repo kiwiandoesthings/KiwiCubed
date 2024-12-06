@@ -7,10 +7,9 @@
 
 class SingleplayerHandler {
 	public:
-		World singleplayerWorld = World(5, *this);
+		World singleplayerWorld = World(5);
 		Window& window;
-
-		bool isLoadedIntoSingleplayerWorld = false;
+		bool isLoadedIntoSingleplayerWorld;
 
 		SingleplayerHandler(Window &newWindow);
 

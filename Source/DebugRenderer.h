@@ -16,8 +16,8 @@ class DebugRenderer {
 		~DebugRenderer();
 
 		void SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition);
-		void UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition) const;
-		void RenderDebug(Shader& wireframeShaderProgram) const;
+		void UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition);
+		void RenderDebug(Shader& wireframeShaderProgram);
 
 	private:
 		GLuint playerPhysicsBoundingBoxVAO;

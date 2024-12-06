@@ -18,8 +18,8 @@ struct EntityData {
 	glm::vec3 upDirection = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 velocity = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	glm::ivec3 globalChunkPosition = glm::vec3(0, 0, 0);
-	glm::ivec3 localChunkPosition = glm::vec3(0, 0, 0);
+	glm::vec3 globalChunkPosition = glm::vec3(0, 0, 0);
+	glm::vec3 localChunkPosition = glm::vec3(0, 0, 0);
 
 	float terminalVelocity = 0.4f;
 
