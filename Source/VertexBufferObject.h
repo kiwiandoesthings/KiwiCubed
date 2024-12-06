@@ -9,9 +9,11 @@ class VertexBufferObject
 {
 	public:
 		GLuint vertexBufferObjectID;
+
 		VertexBufferObject(/*const char* initializer*/);
 		
-		void Setup(GLsizeiptr size, GLfloat* vertices);
+		int SetupBuffer();
+		void SetBufferData(GLsizeiptr size, GLfloat* vertices);
 		void Bind() const;
 		void Unbind();
 		void Delete() const;

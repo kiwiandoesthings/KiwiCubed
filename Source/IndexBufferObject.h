@@ -8,9 +8,11 @@ class IndexBufferObject
 {
 	public:
 		GLuint indexBufferObjectID;
+
 		IndexBufferObject();
 
-		void Setup(GLsizeiptr size, GLuint* indicies);
+		int SetupBuffer();
+		void SetBufferData(GLsizeiptr size, GLuint* indicies);
 		void Bind() const;
 		void Unbind();
 		void Delete() const;

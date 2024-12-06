@@ -16,9 +16,9 @@ void Renderer::ClearScreen(float redValue, float blueValue, float greenValue) {
 void Renderer::DrawElements(VertexArrayObject vertexArrayObject, VertexBufferObject vertexBufferObject, IndexBufferObject indexBufferObject, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices) {
 	vertexArrayObject.Bind();
 	vertexBufferObject.Bind();
-	vertexBufferObject.Setup(vertices.size() * sizeof(GLfloat), vertices.data());
+	vertexBufferObject.SetBufferData(vertices.size() * sizeof(GLfloat), vertices.data());
 	indexBufferObject.Bind();
-	indexBufferObject.Setup(indices.size() * sizeof(GLuint), indices.data());
+	indexBufferObject.SetBufferData(indices.size() * sizeof(GLuint), indices.data());
 	vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 	vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textureCoordinate));
 	vertexArrayObject.LinkAttribute(vertexBufferObject, 2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textureIndex));
