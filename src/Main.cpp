@@ -15,7 +15,6 @@ extern "C"
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
