@@ -5,8 +5,8 @@ project('kiwicubed', 'cpp', default_options : ['cpp_std=c++20'])
 add_project_arguments('-DGLM_ENABLE_EXPERIMENTAL', language: 'cpp')
 add_project_arguments('-DSTB_IMAGE_IMPLEMENTATION', language: 'cpp')
 
-inc = include_directories('Source','Vendor')
-sources = files('Source/Block.cpp','Source/Camera.cpp','Source/Chunk.cpp','Source/ChunkHandler.cpp','Source/DebugRenderer.cpp','Source/Entity.cpp','Source/IndexBufferObject.cpp','Source/Input.cpp','Source/Main.cpp','Source/Physics.cpp','Source/Player.cpp','Source/Renderer.cpp','Source/Shader.cpp','Source/SingleplayerHandler.cpp','Source/Texture.cpp','Source/VertexArrayObject.cpp','Source/VertexBufferObject.cpp','Source/Window.cpp','Source/World.cpp')
+inc = include_directories('Source', 'Vendor')
+sources = files('Source/Block.cpp', 'Source/Camera.cpp', 'Source/Chunk.cpp', 'Source/ChunkHandler.cpp', 'Source/DebugRenderer.cpp', 'Source/Entity.cpp', 'Source/IndexBufferObject.cpp', 'Source/Input.cpp', 'Source/Main.cpp', 'Source/Physics.cpp', 'Source/Player.cpp', 'Source/Renderer.cpp', 'Source/Shader.cpp', 'Source/SingleplayerHandler.cpp', 'Source/Texture.cpp', 'Source/VertexArrayObject.cpp', 'Source/VertexBufferObject.cpp', 'Source/Window.cpp', 'Source/World.cpp')
 
 
 executable('kiwicubed', sources, include_directories: inc, dependencies: [
