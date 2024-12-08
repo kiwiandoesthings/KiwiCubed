@@ -371,16 +371,6 @@ FodyWeavers.xsd
 # PyCharm auto-generated files
 .idea/
 
-
-
-
-
 # Meson buildsystem
-
 /subprojects/*
-
 !/subprojects/*.wrap
-
-# We declared some dependencies manually - keep them
-!/subprojects/FastNoise
-!/subprojects/stb
