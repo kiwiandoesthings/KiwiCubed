@@ -1,9 +1,5 @@
 #include "SingleplayerHandler.h"
 
-
-SingleplayerHandler::SingleplayerHandler(Window &newWindow) : window(newWindow), isLoadedIntoSingleplayerWorld(false) {
-}
-
 void SingleplayerHandler::Setup() {
 	singleplayerWorld.Setup(window);
 }

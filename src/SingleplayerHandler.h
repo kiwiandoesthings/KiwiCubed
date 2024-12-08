@@ -1,18 +1,16 @@
 #pragma once
 
 #include <GLError.h>
-#include <glad.h>
+#include <glad/glad.h>
 
 #include <World.h>
 
 class SingleplayerHandler {
 	public:
-		World singleplayerWorld = World(5, *this);
+		World singleplayerWorld;
 		Window& window;
 
 		bool isLoadedIntoSingleplayerWorld = false;
-
-		SingleplayerHandler(Window &newWindow);
 
 		void Setup();
 
@@ -20,4 +18,6 @@ class SingleplayerHandler {
 		void EndSingleplayerWorld();
 
 		void Delete();
+
+	SingleplayerHandler(Window &newWindow) : singleplayerWorld(5, this), window(newWindow), isLoadedIntoSingleplayerWorld(false) {};
 };

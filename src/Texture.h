@@ -2,8 +2,6 @@
 
 #include <GLError.h>
 
-#include <stb_image.h>
-
 #include"Shader.h"
 
 class Texture {

@@ -24,7 +24,7 @@ Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
 Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk == chunks.end()) {
-        chunks.insert(std::make_pair(std::tuple(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
+        chunks.insert(std::make_pair(std::tuple<int, int, int>(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
         chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
         chunk->second.SetPosition(chunkX, chunkY, chunkZ);
         chunk->second.AllocateChunk();

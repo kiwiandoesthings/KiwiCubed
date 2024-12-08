@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GLError.h"
-#include <glad.h>
+#include <glad/glad.h>
 
 #include <atomic>
 #include <chrono>
@@ -27,7 +27,7 @@ class World {
 		Player player = Player(36, 100, 80, chunkHandler);
 
 		World() : shouldTick(false), tickIntervalMs(50), chunkHandler(*this), totalChunks(0), totalMemoryUsage(0), worldSize(5), singleplayerHandler(singleplayerHandler) {}
-		World(unsigned int worldSize, SingleplayerHandler& singleplayerHandler);
+		World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler);
 
 		void Setup(Window& window);
 		void SetupRenderComponents();
@@ -50,7 +50,7 @@ class World {
 		void Delete();
 
 	private:
-		SingleplayerHandler& singleplayerHandler;
+		SingleplayerHandler* singleplayerHandler;
 
 		std::atomic<bool> shouldTick;
 		std::thread TickThread;

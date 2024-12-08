@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GLError.h"
-#include <glad.h>
+#include <glad/glad.h>
 #include "GLFW/glfw3.h"
 
 #include "IndexBufferObject.h"

@@ -383,5 +383,4 @@ FodyWeavers.xsd
 
 # We declared some dependencies manually - keep them
 !/subprojects/FastNoise
-!/subprojects/GLAD
 !/subprojects/stb

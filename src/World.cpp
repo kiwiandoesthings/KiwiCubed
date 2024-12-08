@@ -6,7 +6,7 @@
 std::atomic<bool> keepRunning(true);
 
 
-World::World(unsigned int worldSize, SingleplayerHandler& singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), chunkHandler(*this), worldSize(worldSize), singleplayerHandler(singleplayerHandler) {
+World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), chunkHandler(*this), worldSize(worldSize), singleplayerHandler(singleplayerHandler) {
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
@@ -33,7 +33,7 @@ void World::SetupRenderComponents() {
 
     std::cout << "[World Creation / Info] Finished setting up chunk render components" << std::endl;
 
-    singleplayerHandler.isLoadedIntoSingleplayerWorld = true;
+    singleplayerHandler->isLoadedIntoSingleplayerWorld = true;
 }
 
 void World::Render(Shader shaderProgram) {
