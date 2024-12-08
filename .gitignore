@@ -374,3 +374,5 @@ FodyWeavers.xsd
 # Meson buildsystem
 /subprojects/*
 !/subprojects/*.wrap
+# this one's a straggler
+/subprojects/egl-registry.wrap
