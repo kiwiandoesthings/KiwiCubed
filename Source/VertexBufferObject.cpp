@@ -1,6 +1,6 @@
 #include <VertexBufferObject.h>
 
-VertexBufferObject::VertexBufferObject(/*const char* initializer = "(unknown)"*/) : vertexBufferObjectID(0){
+VertexBufferObject::VertexBufferObject() : vertexBufferObjectID(0){
 }
 
 int VertexBufferObject::SetupBuffer() {

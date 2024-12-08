@@ -14,6 +14,7 @@ void Renderer::ClearScreen(float redValue, float blueValue, float greenValue) {
 }
 
 void Renderer::DrawElements(VertexArrayObject vertexArrayObject, VertexBufferObject vertexBufferObject, IndexBufferObject indexBufferObject, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices) {
+
 	vertexArrayObject.Bind();
 	vertexBufferObject.Bind();
 	vertexBufferObject.SetBufferData(vertices.size() * sizeof(GLfloat), vertices.data());

@@ -6,7 +6,7 @@ ChunkHandler::ChunkHandler(World& world) : world(world) {
 }
 
 void ChunkHandler::GenerateWorld() {
-    //world.GenerateWorld();
+    world.GenerateWorld();
 }
 
 Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
@@ -15,7 +15,7 @@ Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
         return chunk->second;
     }
     else {
-        std::cout << "[ChunkHandler / Debug] Chunk not found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        //std::cout << "[ChunkHandler / Debug] Chunk not found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
         Chunk& chunk = AddChunk(chunkX, chunkY, chunkZ);
         return chunk;
     }
@@ -26,9 +26,10 @@ Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
     if (chunk == chunks.end()) {
         chunks.insert(std::make_pair(std::tuple(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
         chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
-        chunk->second.SetPosition(chunkX, chunkY, chunkZ);
-        chunk->second.AllocateChunk();
         chunk->second.SetupRenderComponents();
+        
+        std::cout << "[ChunkHandler / Debug] Chunk added at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        world.totalChunks++;
 
         return chunk->second;
     }
@@ -36,6 +37,10 @@ Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
         //std::cout << "[ChunkHandler / Debug] Chunk already found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
         return GetChunk(chunkX, chunkY, chunkZ);
     }
+}
+
+void ChunkHandler::DeleteChunk(int chunkX, int chunkY, int chunkZ) {
+    GetChunk(chunkX, chunkY, chunkZ).Delete();
 }
 
 void ChunkHandler::GenerateChunk(int chunkX, int chunkY, int chunkZ, bool debug) {
@@ -107,5 +112,6 @@ void ChunkHandler::Delete() {
         const auto& key = it->first;
         auto& chunk = it->second;
         chunk.Delete();
+        world.totalChunks--;
     }
 }

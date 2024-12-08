@@ -49,14 +49,13 @@ class Chunk {
         bool isAllocated = false;
         bool isGenerated = false;
         bool isMeshed = false;
-        unsigned int generationStatus = 0;
+        unsigned short generationStatus = 0;
         bool isEmpty;
         bool isFull;
         bool shouldGenerate = true;
         unsigned int totalMemoryUsage;
-        bool id = 0;
     
-        Chunk() : blocks(nullptr), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(true), isFull(false), totalMemoryUsage(0), totalBlocks(0)/*, vertexBufferObject(("chunk " + std::to_string(chunkX) + " " + std::to_string(chunkY) + " " + std::to_string(chunkZ)).c_str())*/ {}
+        Chunk() : blocks(nullptr), chunkX(chunkX), chunkY(chunkY), chunkZ(chunkZ), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(true), isFull(false), totalMemoryUsage(0), totalBlocks(0)/*, vertexBufferObject(("chunk " + std::to_string(chunkX) + " " + std::to_string(chunkY) + " " + std::to_string(chunkZ)).c_str())*/ {}
         Chunk(int chunkX, int chunkY, int chunkZ);
     
 
@@ -98,15 +97,16 @@ class Chunk {
 
 class ChunkHandler {
 public:
+    World& world;
     std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 
     ChunkHandler(World& world);
-    void Delete();
 
     void GenerateWorld();
 
     Chunk& GetChunk(int chunkX, int chunkY, int chunkZ);
     Chunk& AddChunk(int chunkX, int chunkY, int chunkZ);
+    void DeleteChunk(int chunkX, int chunkY, int chunkZ);
     void GenerateChunk(int chunkX, int chunkY, int chunkZ, bool debug);
     void MeshChunk(int chunkX, int chunkY, int chunkZ);
     void SmartGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ);
@@ -116,8 +116,8 @@ public:
     void AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, int type);
     void RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ);
 
-private:
-    World& world;
+    void Delete();
 
+private:
     Chunk defaultChunk = Chunk(0, 0, 0);
 };

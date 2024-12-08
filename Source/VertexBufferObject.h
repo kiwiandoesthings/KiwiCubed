@@ -10,7 +10,7 @@ class VertexBufferObject
 	public:
 		GLuint vertexBufferObjectID;
 
-		VertexBufferObject(/*const char* initializer*/);
+		VertexBufferObject();
 		
 		int SetupBuffer();
 		void SetBufferData(GLsizeiptr size, GLfloat* vertices);

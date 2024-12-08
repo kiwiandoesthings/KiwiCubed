@@ -67,17 +67,13 @@ GLuint faceIndices[] = {
 };
 
 
-Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(0) {
+Block::Block(int type) : type(0) {
 }
 
-void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, unsigned short newBlockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug) {
-	blockX = newBlockX;
-	blockY = newBlockY;
-	blockZ = newBlockZ;
-
+void Block::GenerateBlock(unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug) {
 	FastNoiseLite noise;
 	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-	noise.SetSeed(121);
+	noise.SetSeed(120);
 
 	/// Physics debug generation
 	//if ((chunkX % 2 == 0 && chunkY % 2 == 1 && chunkZ % 2 == 0)) {
@@ -112,7 +108,7 @@ void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, un
 	type = 0;
 }
 
-void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize) {
+void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned short blockX, unsigned short blockY, unsigned short blockZ, unsigned int chunkSize) {
 	GLuint vertexOffset = static_cast<GLuint>(faceDirection) * 20;
 	GLuint baseIndex = static_cast<GLuint>(vertices.size() / 6);
 	

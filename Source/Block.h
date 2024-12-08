@@ -29,21 +29,16 @@ enum FaceDirection {
 
 class Block {
     public:
-        Block() : blockX(0), blockY(0), blockZ(0), type(0) {}
+        Block() {}
         Block(int type);
 
         void GenerateBlock(unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
-        void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize);
+        void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned short blockX, unsigned short blockY, unsigned short blockZ, unsigned int chunkSize);
         
         unsigned int GetType() const;
         void SetType(unsigned int newType);
 
     private:
-        unsigned short blockX;
-        unsigned short blockY;
-        unsigned short blockZ;
-
-
         //unsigned short blockState;
         unsigned short type = 0;
 };

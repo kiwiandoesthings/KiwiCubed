@@ -25,6 +25,7 @@ struct ChunkData {
 class World {
 	public:
 		Player player = Player(36, 100, 80, chunkHandler);
+		unsigned int totalChunks;
 
 		World() : shouldTick(false), tickIntervalMs(50), chunkHandler(*this), totalChunks(0), totalMemoryUsage(0), worldSize(5), singleplayerHandler(singleplayerHandler) {}
 		World(unsigned int worldSize, SingleplayerHandler& singleplayerHandler);
@@ -64,7 +65,6 @@ class World {
 		bool isWorldGenerated = false;
 		unsigned int worldSize;
 		ChunkHandler chunkHandler;
-		unsigned int totalChunks;
 		float totalMemoryUsage;
 
 		Renderer renderer;

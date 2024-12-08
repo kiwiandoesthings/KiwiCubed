@@ -7,11 +7,11 @@ std::atomic<bool> keepRunning(true);
 
 
 World::World(unsigned int worldSize, SingleplayerHandler& singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), chunkHandler(*this), worldSize(worldSize), singleplayerHandler(singleplayerHandler) {
-    for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
-        for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
-            for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
-                totalChunks++;
+    for (unsigned int chunkX = 0; chunkX < worldSize - 1; ++chunkX) {
+        for (unsigned int chunkY = 0; chunkY < worldSize - 1; ++chunkY) {
+            for (unsigned int chunkZ = 0; chunkZ < worldSize - 1; ++chunkZ) {
                 chunkHandler.AddChunk(chunkX, chunkY, chunkZ);
+                std::cout << "FUUUUUCK " << chunkX << ", " << chunkY << ", " << chunkZ << std::endl;
             }
         }
     }
@@ -28,7 +28,7 @@ void World::SetupRenderComponents() {
     for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
         const auto& key = it->first;
         auto& chunk = it->second;
-        chunk.SetupRenderComponents();
+        //chunk.SetupRenderComponents();
     }
 
     std::cout << "[World Creation / Info] Finished setting up chunk render components" << std::endl;
@@ -42,9 +42,9 @@ void World::Render(Shader shaderProgram) {
     }
 
     shaderProgram.Bind();
-    for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
-        const auto& key = it->first;
-        auto& chunk = it->second;
+    for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
+        const auto& key = iterator->first;
+        auto& chunk = iterator->second;
         if (!chunk.isEmpty) {
             chunk.Render();
         }
@@ -58,9 +58,8 @@ void World::GenerateWorld() {
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
-                Chunk chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
+                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
                 GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
-                totalMemoryUsage += chunk.GetMemoryUsage();
             }
         }
     }
@@ -77,9 +76,7 @@ void World::GenerateWorld() {
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk) {
-    // Basic procedures for preparing a chunk, SetPosition should be done before ANYTHING ELSE, or functions relying on the chunks position will not work properly
-    chunk.SetPosition(chunkX, chunkY, chunkZ);
-
+    // Basic procedures for preparing a chunk
     if (!chunk.shouldGenerate) {
         return;
     }
@@ -208,6 +205,15 @@ void World::Tick() {
     }
 
     ++totalTicks;
+
+    float newTotalMemoryUsage = 0;
+    for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
+        const auto& key = iterator->first;
+        auto& chunk = iterator->second;
+        newTotalMemoryUsage += static_cast<float>(chunk.GetMemoryUsage());
+    }
+
+    totalMemoryUsage = newTotalMemoryUsage;
 }
 
 void World::RunTickThread() {

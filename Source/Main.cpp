@@ -208,11 +208,7 @@ int main() {
 				singleplayerHandler.singleplayerWorld.GetChunk(
 					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
 					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).GetTotalBlocks(),
-				singleplayerHandler.singleplayerWorld.GetChunk(
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).id);
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).GetTotalBlocks());
 			ImGui::Text("Total frames: %d", frames);													
 			ImGui::Text("FPS: %.2f", fps);
 		}
