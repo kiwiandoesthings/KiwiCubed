@@ -1,14 +1,15 @@
 #pragma once
 
 #include <glad/glad.h>
-
 #include <iostream>
+#include <debug-trap.h>
 
-#define ASSERT(x) if (!(x)) __debugbreak();
+
+#define ASSERT(x) if (!(x)) psnip_trap();
 #define GLCall(x) \
     GLClearError(); \
     x; \
-    if (!GLLogCall(#x, __FILE__, __LINE__)) __debugbreak()
+    if (!GLLogCall(#x, __FILE__, __LINE__)) psnip_trap()
 
 static void GLClearError() {
     while (glGetError() != GL_NO_ERROR);

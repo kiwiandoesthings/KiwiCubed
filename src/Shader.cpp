@@ -1,5 +1,5 @@
 #include "Shader.h"
-
+#include <debug-trap.h>
 
 Shader::Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath) {
     std::string vertexSource = ParseShader(vertexFilePath);
@@ -41,7 +41,7 @@ int Shader::CompileShader(unsigned int type, const std::string& source) {
     {
         int length;
         GLCall(glGetShaderiv(shaderProgramID, GL_INFO_LOG_LENGTH, &length));
-        char* message = (char*)_malloca(length * sizeof(char));
+        char* message = (char*)malloc(length * sizeof(char));
         GLCall(glGetShaderInfoLog(shaderProgramID, length, &length, message));
         std::cerr << "[Shader Compilation / Error] Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
         std::cerr << "[Shader Compilation / Error] Shader compilation error message: " << std::endl << message << std::endl;
@@ -57,7 +57,7 @@ int Shader::CreateShader(const std::string& vertexShader, const std::string& fra
     int vertexShaderResult = CompileShader(GL_VERTEX_SHADER, vertexShader);
     int fragmentShaderResult = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
     if (vertexShaderResult == -1 || fragmentShaderResult == -1) {
-        __debugbreak();
+        psnip_trap();
     }
 
     GLCall(glAttachShader(shaderProgram, vertexShaderResult));

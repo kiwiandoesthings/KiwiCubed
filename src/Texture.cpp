@@ -1,6 +1,6 @@
 #include <Texture.h>
 #include <stb_image.h>
-
+#include <debug-trap.h>
 
 Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum format, GLenum pixelType) : atlasSize(0)
 {
@@ -12,7 +12,7 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 
 	if (!bytes) {
 		std::cout << "[Texture Loading / Error] Failed to load image from file path: " << filepath << std::endl;
-		__debugbreak();
+		psnip_trap();
 	}
 
 
