@@ -104,6 +104,7 @@ int main() {
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+	io.IniFilename = NULL; // don't save the accursed imgui.ini
 	ImGui_ImplGlfw_InitForOpenGL(globalWindow.GetWindowInstance(), true);
 	ImGui_ImplOpenGL3_Init("#version 430");
 
