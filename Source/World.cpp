@@ -10,7 +10,6 @@ World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) :
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
-                totalChunks++;
                 chunkHandler.AddChunk(chunkX, chunkY, chunkZ);
             }
         }
@@ -26,7 +25,6 @@ void World::Setup(Window& window) {
 // Currently just calls SetupRenderComponents on all the chunks
 void World::SetupRenderComponents() {
     for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
-        const auto& key = it->first;
         auto& chunk = it->second;
         chunk.SetupRenderComponents();
     }
@@ -43,7 +41,6 @@ void World::Render(Shader shaderProgram) {
 
     shaderProgram.Bind();
     for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
-        const auto& key = it->first;
         auto& chunk = it->second;
         if (!chunk.isEmpty) {
             chunk.Render();
@@ -53,12 +50,14 @@ void World::Render(Shader shaderProgram) {
 
 void World::GenerateWorld() {
     std::cout << "[World Creation / Info] Started generating world" << std::endl;
+
+    chunkAddition = 0;
     
     auto start_time = std::chrono::high_resolution_clock::now();
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
-                Chunk chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
+                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
                 GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
                 totalMemoryUsage += chunk.GetMemoryUsage();
             }
@@ -74,6 +73,8 @@ void World::GenerateWorld() {
     std::cout << "[World Creation / Info] World creation with chunk count of " << worldSize * worldSize * worldSize << " took " << duration << " ms" << " or roughly " << chunkGenerationSpeed << " ms per chunk (slightly innacurate as empty chunks are skipped). With around " << static_cast<int>(1000) / chunkGenerationSpeed << " chunks generated, meshed and added per second" << std::endl;
     
     isWorldGenerated = true;
+
+    std::cout << "added" << chunkAddition << std::endl;
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk) {
@@ -153,7 +154,6 @@ void World::DisplayImGui(unsigned int option) {
     }
     else if (option == 1) {
         for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
-            const auto& key = it->first;
             auto& chunk = it->second;
             chunk.DisplayImGui();
         }

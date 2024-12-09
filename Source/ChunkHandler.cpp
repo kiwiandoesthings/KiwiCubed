@@ -6,7 +6,7 @@ ChunkHandler::ChunkHandler(World& world) : world(world) {
 }
 
 void ChunkHandler::GenerateWorld() {
-    //world.GenerateWorld();
+    world.GenerateWorld();
 }
 
 Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
@@ -15,7 +15,7 @@ Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
         return chunk->second;
     }
     else {
-        std::cout << "[ChunkHandler / Debug] Chunk not found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        //std::cout << "[ChunkHandler / Debug] Chunk not found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
         Chunk& chunk = AddChunk(chunkX, chunkY, chunkZ);
         return chunk;
     }
@@ -29,6 +29,19 @@ Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
         chunk->second.SetPosition(chunkX, chunkY, chunkZ);
         chunk->second.AllocateChunk();
         chunk->second.SetupRenderComponents();
+
+        if (chunkX == -1 && chunkZ == 6) {
+            std::cout << "FUCKKKKKKKKKKK " << chunkX << " " << chunkY << " " << chunkZ << std::endl;
+        } else if (chunkX == -1 && chunkZ == 6) {
+            std::cout << "FUCKKKKKKKKKKK " << chunkX << " " << chunkY << " " << chunkZ << std::endl;
+        } else if (chunkX == 6 && chunkZ == -1) {
+            std::cout << "FUCKKKKKKKKKKK " << chunkX << " " << chunkY << " " << chunkZ << std::endl;
+        } else if (chunkX == 6 && chunkZ == 6) {
+            std::cout << "FUCKKKKKKKKKKK " << chunkX << " " << chunkY << " " << chunkZ << std::endl;
+        }
+
+        world.totalChunks++;
+        world.chunkAddition++;
 
         return chunk->second;
     }
@@ -104,8 +117,10 @@ void ChunkHandler::RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, i
 
 void ChunkHandler::Delete() {
     for (auto it = chunks.begin(); it != chunks.end(); ++it) {
-        const auto& key = it->first;
         auto& chunk = it->second;
         chunk.Delete();
+        world.totalChunks--;
     }
+
+    world.totalMemoryUsage = 0;
 }

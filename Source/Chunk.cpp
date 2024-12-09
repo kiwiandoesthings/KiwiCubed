@@ -101,7 +101,7 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
         Chunk& positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ);     // Positive Y
         Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ);     // Negative Y
         Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1);     // Positive Z
-        Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1);     // Negative Z
+        Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1);     // Negative Z;
 
         for (int x = 0; x < chunkSize; ++x) {
             for (int y = 0; y < chunkSize; ++y) {
@@ -227,10 +227,6 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
             }
         }
     }
-
-    id = 1;
-
-    std::cout << id << " " << chunkX << " " << chunkY << " " << chunkZ << " " << totalBlocks << " " << vertices.size() << " " << indices.size() << std::endl;
 
     isMeshed = true;
     generationStatus = 3;

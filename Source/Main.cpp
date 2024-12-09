@@ -47,6 +47,11 @@ extern "C"
 #include "Texture.h"
 #include "Window.h"
 
+// chunk numbers
+// says generatede 360 chunks
+// 343 chunks is perfect cube
+// debug renderer for ALL chunks? super hard without one
+
 
 using json = nlohmann::json;
 

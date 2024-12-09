@@ -26,7 +26,12 @@ class World {
 	public:
 		Player player = Player(36, 100, 80, chunkHandler);
 
-		World() : shouldTick(false), tickIntervalMs(50), chunkHandler(*this), totalChunks(0), totalMemoryUsage(0), worldSize(5), singleplayerHandler(singleplayerHandler) {}
+		unsigned int totalChunks;
+		float totalMemoryUsage;
+
+		int chunkAddition = 0;
+
+		World() : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), shouldTick(false), tickIntervalMs(50), worldSize(5), chunkHandler(*this) {}
 		World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler);
 
 		void Setup(Window& window);
@@ -64,8 +69,6 @@ class World {
 		bool isWorldGenerated = false;
 		unsigned int worldSize;
 		ChunkHandler chunkHandler;
-		unsigned int totalChunks;
-		float totalMemoryUsage;
 
 		Renderer renderer;
 
