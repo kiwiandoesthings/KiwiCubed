@@ -75,7 +75,7 @@ int main() {
 	windowWidth = jsonData["init_settings"]["window_width"];
 	windowHeight = jsonData["init_settings"]["window_height"];
 	windowTitle = jsonData["init_settings"]["window_title"].get<std::string>();
-	windowType = jsonData["init_setttings"]["window_tyoe"].get<std::string>();
+	windowType = jsonData["init_settings"]["window_type"].get<std::string>();
 	projectVersion = jsonData["project_version"].get<std::string>();
 
 	// Initialize GLFW
@@ -89,7 +89,8 @@ int main() {
 	}
 
 	// Create a window
-	Window globalWindow = Window(windowWidth, windowHeight, windowTitle + projectVersion, windowType);
+	Window globalWindow;
+	globalWindow.CreateWindowInstance(windowWidth, windowHeight, windowTitle + projectVersion, windowType);
 	globalWindow.Setup();
 
 	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);

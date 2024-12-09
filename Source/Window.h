@@ -2,7 +2,6 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "GLError.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -15,9 +14,10 @@
 
 class Window {
 	public:
-		Window() : windowWidth(640), windowHeight(480), windowTitle(""), isFocused(false), window(window) {}
-		Window(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType);
-		Window(int windowWidth, int windowHeight, std::string windowTitle, std::string windowType);
+		Window();
+		
+		GLFWwindow* CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType);
+		GLFWwindow* CreateWindowInstance(int windowWidth, int windowHeight, std::string windowTitle, std::string windowType);
 
 		void Setup();
 

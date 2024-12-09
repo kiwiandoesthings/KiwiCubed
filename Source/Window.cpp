@@ -1,22 +1,39 @@
 #include "Window.h"
+#include "GLFW/glfw3.h"
 
 
-Window::Window(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType) : isFocused(false), window(glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr)) {
+Window::Window() {
+}
+
+GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
 
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+	if (strcmp(windowType, "fullscreen") == 0) {
+		window = glfwCreateWindow(mode->width, mode->height, windowTitle, monitor, nullptr);
+	}
+	else if (strcmp(windowType, "window_borderless") == 0) {
+		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+		window = glfwCreateWindow(mode->width, mode->height, windowTitle, nullptr, nullptr);
+	}
+	else if (strcmp(windowType, "window_maximized") == 0) {
+		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
+		glfwMaximizeWindow(window);
+	}
+	else if (strcmp(windowType, "window") == 0) {
+		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
+	}
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GL_CONTEXT_PROFILE_MASK, 24);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-
-	int newWindowWidth, newWindowHeight;
-	glfwGetFramebufferSize(window, &newWindowWidth, &newWindowHeight);
-	Window::windowWidth = newWindowWidth;
-	Window::windowHeight = newWindowHeight;
 
 	if (!window)
 	{
@@ -26,27 +43,51 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle, const
 	else {
 		std::cout << "[Initialization / Info] Successfully created GLFW window" << std::endl;
 	}
+
+	int newWindowWidth;
+	int newWindowHeight;
+
+	glfwGetWindowSize(window, &newWindowWidth, &newWindowHeight);
+
+	Window::windowWidth = newWindowWidth;
+	Window::windowHeight = newWindowHeight;
+
 	glfwMakeContextCurrent(window);
 
 	inputHandler.SetupCallbacks(window);
+
+	return window;
 }
 
-Window::Window(int windowWidth, int windowHeight, std::string windowTitle, std::string windowType) : isFocused(false), window(glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), nullptr, nullptr)) {
+GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, std::string windowTitle, std::string windowType) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle.c_str();
 
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+	if (windowType == "fullscreen") {
+		window = glfwCreateWindow(mode->width, mode->height, windowTitle.c_str(), monitor, nullptr);
+	}
+	else if (windowType == "window_borderless") {
+		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+		window = glfwCreateWindow(mode->width, mode->height, windowTitle.c_str(), nullptr, nullptr);
+	}
+	else if (windowType == "window_maximized") {
+		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), nullptr, nullptr);
+		glfwMaximizeWindow(window);
+	}
+	else if (windowType == "window") {
+		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), nullptr, nullptr);
+	}
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GL_CONTEXT_PROFILE_MASK, 24);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-
-	int newWindowWidth, newWindowHeight;
-	glfwGetFramebufferSize(window, &newWindowWidth, &newWindowHeight);
-	Window::windowWidth = newWindowWidth;
-	Window::windowHeight = newWindowHeight;
 
 	if (!window)
 	{
@@ -57,9 +98,19 @@ Window::Window(int windowWidth, int windowHeight, std::string windowTitle, std::
 		std::cout << "[Initialization / Info] Successfully created GLFW window" << std::endl;
 	}
 
+	int newWindowWidth;
+	int newWindowHeight;
+
+	glfwGetWindowSize(window, &newWindowWidth, &newWindowHeight);
+
+	Window::windowWidth = newWindowWidth;
+	Window::windowHeight = newWindowHeight;
+
 	glfwMakeContextCurrent(window);
 
 	inputHandler.SetupCallbacks(window);
+
+	return window;
 }
 
 void Window::Setup() {
