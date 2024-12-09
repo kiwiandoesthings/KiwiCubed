@@ -150,6 +150,7 @@ int main() {
 	// Create a debug shader
 	Shader terrainShaderProgram("Resources/Shaders/Terrain_Vertex.vert", "Resources/Shaders/Terrain_Fragment.frag");
 	Shader wireframeShaderProgram("Resources/Shaders/Wireframe_Vertex.vert", "Resources/Shaders/Wireframe_Fragment.frag");
+	Shader chunkDebugShaderProgram("Resources/Shaders/ChunkDebug_Vertex.vert", "Resources/Shaders/ChunkDebug_Fragment.frag");
 
 	// Create a debug texture
 	Texture terrainAtlas("Resources/Textures/Blocks/stone.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -248,6 +249,7 @@ int main() {
 			singleplayerHandler.singleplayerWorld.Update(&globalWindow);
 			singleplayerHandler.singleplayerWorld.player.UpdateShader(terrainShaderProgram, "windowViewMatrix");
 			singleplayerHandler.singleplayerWorld.player.UpdateShader(wireframeShaderProgram, "windowViewMatrix");
+			singleplayerHandler.singleplayerWorld.player.UpdateShader(chunkDebugShaderProgram, "windowViewMatrix");
 
 			singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
 
@@ -256,7 +258,7 @@ int main() {
 			glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
 
 			debugRenderer.UpdateBuffers(c1, c2, pos);
-			debugRenderer.RenderDebug(wireframeShaderProgram);
+			debugRenderer.RenderDebug(wireframeShaderProgram, chunkDebugShaderProgram);
 		}
 
 
