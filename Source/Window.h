@@ -16,8 +16,8 @@
 class Window {
 	public:
 		Window() : windowWidth(640), windowHeight(480), windowTitle(""), isFocused(false), window(window) {}
-		Window(int windowWidth, int windowHeight, const char* windowTitle);
-		Window(int windowWidth, int windowHeight, std::string windowTitle);
+		Window(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType);
+		Window(int windowWidth, int windowHeight, std::string windowTitle, std::string windowType);
 
 		void Setup();
 

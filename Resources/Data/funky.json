@@ -3,6 +3,9 @@
 	"init_settings": {
 		"window_width": 640,
 		"window_height": 480,
-		"window_title": "KiwiCubed Engine"
+		"window_title": "KiwiCubed Engine",
+
+		"_comment": "window_type can be: fullscreen, window_borderless, fullscreen_window, or window",
+		"window_type": "fullscreen_window"
 	}
 }

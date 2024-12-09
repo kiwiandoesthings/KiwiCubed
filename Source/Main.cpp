@@ -4,6 +4,8 @@
 
 
 bool bitness;
+
+// Make it so on laptops, it will request the dGPU if possible, without this, you have to force it to use the dGPU
 #ifdef __linux__
 // For NVIDIA GPUs
 std::setenv("__NV_PRIME_RENDER_OFFLOAD", "1", 1);
@@ -12,13 +14,13 @@ std::setenv("__GLX_VENDOR_LIBRARY_NAME", "nvidia", 1);
 // For AMD GPUs
 std::setenv("DRI_PRIME", "1", 1);
 #elif _WIN32
-// Make it so on laptops, it will request the dGPU if possible, without this, you have to force it to use the dGPU
 extern "C"
 {
-	__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
-	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+	__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001; // For NVIDIA GPUs
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;   // For AMD GPUs
 }
 #endif
+
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -52,10 +54,10 @@ using json = nlohmann::json;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 
-// TODO: Replace with JSON file loading or something
 int windowWidth;
 int windowHeight;
 std::string windowTitle;
+std::string windowType;
 std::string projectVersion;
 
 // This main function is getting out of hand
@@ -63,7 +65,7 @@ int main() {
 	std::ifstream file("Resources/Data/funky.json");
 
 	if (!file.is_open()) {
-		std::cerr << "Could not open the file!" << std::endl;
+		std::cerr << "[Initialization / Error] Could not open or find the JSON config file" << std::endl;
 		return 1;
 	}
 
@@ -73,6 +75,7 @@ int main() {
 	windowWidth = jsonData["init_settings"]["window_width"];
 	windowHeight = jsonData["init_settings"]["window_height"];
 	windowTitle = jsonData["init_settings"]["window_title"].get<std::string>();
+	windowType = jsonData["init_setttings"]["window_tyoe"].get<std::string>();
 	projectVersion = jsonData["project_version"].get<std::string>();
 
 	// Initialize GLFW
@@ -86,7 +89,7 @@ int main() {
 	}
 
 	// Create a window
-	Window globalWindow = Window(windowWidth, windowHeight, windowTitle + projectVersion);
+	Window globalWindow = Window(windowWidth, windowHeight, windowTitle + projectVersion, windowType);
 	globalWindow.Setup();
 
 	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);

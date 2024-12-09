@@ -5,3 +5,6 @@
 /subprojects/egl-registry.wrap
 
 .vscode/*
+
+# clangd vsc plugin cache
+.cache/*

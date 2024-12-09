@@ -1,7 +1,7 @@
 #include "Window.h"
 
 
-Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isFocused(false), window(glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr)) {
+Window::Window(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType) : isFocused(false), window(glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr)) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
@@ -31,7 +31,7 @@ Window::Window(int windowWidth, int windowHeight, const char* windowTitle) : isF
 	inputHandler.SetupCallbacks(window);
 }
 
-Window::Window(int windowWidth, int windowHeight, std::string windowTitle) : isFocused(false), window(glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), nullptr, nullptr)) {
+Window::Window(int windowWidth, int windowHeight, std::string windowTitle, std::string windowType) : isFocused(false), window(glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), nullptr, nullptr)) {
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle.c_str();
