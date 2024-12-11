@@ -26,12 +26,9 @@ extern "C"
 #include <GLFW/glfw3.h>
 
 #include <chrono>
-#include <future>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
-#include <thread>
 #include <time.h>
 
 #include <imgui.h>
@@ -67,7 +64,7 @@ std::string projectVersion;
 
 // This main function is getting out of hand
 int main() {
-	std::ifstream file("Resources/Data/funky.json");
+	std::ifstream file("Resources/Data/init_config.json");
 
 	if (!file.is_open()) {
 		std::cerr << "[Initialization / Error] Could not open or find the JSON config file" << std::endl;
@@ -168,7 +165,7 @@ int main() {
 	glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
 	glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
 
-	debugRenderer.SetupBuffers(c1, c2, pos);
+	debugRenderer.SetupBuffers(c1, c2, pos, std::vector<glm::vec3>{glm::vec3(0, 0, 0)});
 
 	int frames = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -191,18 +188,19 @@ int main() {
 			start_time = end_time;
 		}
 
+		EntityData playerData = singleplayerHandler.singleplayerWorld.player.GetEntityData();
 		ImGui::Begin("Debug");
 		if (ImGui::CollapsingHeader("Player Info")) {
 			ImGui::Text("Player name: %s", singleplayerHandler.singleplayerWorld.player.GetEntityData().name);
 			ImGui::Text("Player health: %d", static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityStats().health));
 			ImGui::Text("Player position: %f, %f, %f", 
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.x, 
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.y, 
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().position.z);
+				playerData.position.x, 
+				playerData.position.y, 
+				playerData.position.z);
 			ImGui::Text("Player orientation: %f, %f, %f", 
-				(singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.x),
-				(singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.y), 
-				(singleplayerHandler.singleplayerWorld.player.GetEntityData().orientation.z));
+				playerData.orientation.x,
+				playerData.orientation.y, 
+				playerData.orientation.z);
 			ImGui::Text("Player velocity: %f, %f, %f", 
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.x, 
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.y, 
@@ -246,10 +244,10 @@ int main() {
 		// Do rendering stuff
 		globalWindow.QueryInputs();
 		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
-			singleplayerHandler.singleplayerWorld.Update(&globalWindow);
-			singleplayerHandler.singleplayerWorld.player.UpdateShader(terrainShaderProgram, "windowViewMatrix");
-			singleplayerHandler.singleplayerWorld.player.UpdateShader(wireframeShaderProgram, "windowViewMatrix");
-			singleplayerHandler.singleplayerWorld.player.UpdateShader(chunkDebugShaderProgram, "windowViewMatrix");
+			singleplayerHandler.singleplayerWorld.Update();
+			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(terrainShaderProgram);
+			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(wireframeShaderProgram);
+			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(chunkDebugShaderProgram);
 
 			singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
 
@@ -258,6 +256,7 @@ int main() {
 			glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
 
 			debugRenderer.UpdateBuffers(c1, c2, pos);
+			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(wireframeShaderProgram, chunkDebugShaderProgram);
 		}
 

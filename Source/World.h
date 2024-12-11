@@ -41,7 +41,7 @@ class World {
 		void GenerateWorld();
 		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk);
 
-		void Update(Window* window);
+		void Update();
 
 		void DisplayImGui(unsigned int option);
 

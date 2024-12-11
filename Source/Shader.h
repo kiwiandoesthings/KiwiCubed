@@ -24,6 +24,7 @@ class Shader
 
 		unsigned int UniformTest(const char* uniform) const;
 		void SetUniform4fv(const char* uniform, glm::mat4 value) const;
+		void SetUniform3fv(const char* uniform, glm::vec3 value) const;
 		void SetUniform1ui(const char* uniform, unsigned int value) const;
 
 		void Bind() const;
@@ -32,6 +33,6 @@ class Shader
 
 	private:
 		std::string ParseShader(const std::string& filePath);
-		int CompileShader(unsigned int type, const std::string& source);
-		int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
+		int CompileShader(unsigned int type, const std::string& source, const std::string& filePath);
+		int CreateShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& vertexFilePath, const std::string& fragmentFilePath);
 };

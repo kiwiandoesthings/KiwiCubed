@@ -141,8 +141,8 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
     }
 }
 
-void World::Update(Window* window) {
-    player.Update(window);
+void World::Update() {
+    player.Update();
 }
 
 // Pass 0 for world ImGui, 1 for chunk ImGui...

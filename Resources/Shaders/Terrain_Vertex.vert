@@ -8,14 +8,15 @@ out vec2 textureCoordinateOut;
 out vec3 blockPositionOut;
 out float blockTypeOut;
 
-uniform mat4 windowViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
 
 
 void main()
 {
 	vec4 worldPosition = vec4(blockPosition, 1);
 
-	gl_Position = windowViewMatrix * worldPosition;
+	gl_Position = projectionMatrix * viewMatrix * worldPosition;
 	blockPositionOut = blockPosition;
 	textureCoordinateOut = textureCoordinate;
 	blockTypeOut = blockType;

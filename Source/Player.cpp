@@ -1,12 +1,7 @@
 #include "Player.h"
 
 
-static int positiveModulo(int a, int b) {
-	return (a % b + b) % b;
-}
-
-
-Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler) : width(640), height(480), yaw(0), pitch(0), roll(0), Entity(), chunkHandler(chunkHandler) {
+Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler) : Entity(), yaw(0), pitch(0), roll(0), width(640), height(480), chunkHandler(chunkHandler) {
 	entityData.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
@@ -32,8 +27,7 @@ void Player::Setup(Window& window) {
 	});
 }
 
-void Player::Update(Window* window) {
-	EntityData oldData = entityData;
+void Player::Update() {
 	if (!camera) {
 		std::cerr << "[Player Update / Warn] Trying to update player without a camera, aborting" << std::endl;
 		return;
@@ -56,12 +50,7 @@ void Player::Update(Window* window) {
 	//}
 }
 
-void Player::UpdateShader(Shader& shader, const char* uniform) {
-	UpdateCameraMatrix(shader, uniform);
-}
-
 void Player::QueryInputs() {
-	Window& window = camera->GetWindow();
 	if (inputHandler.GetKeyState(GLFW_KEY_W)) {
 		entityData.velocity += speed * entityData.orientation;
 	}
@@ -142,8 +131,8 @@ void Player::QueryMouseInputs() {
 	glfwGetCursorPos(window.GetWindowInstance(), &mouseX, &mouseY);
 
 	// Get the amount to rotate for the frame
-	float rotationX = sensitivity * static_cast<float>(mouseY - (window.GetHeight() / 2)) / window.GetHeight();
-	float rotationY = sensitivity * static_cast<float>(mouseX - (window.GetWidth() / 2)) / window.GetWidth();
+	float rotationX = sensitivity * static_cast<float>(mouseY - (static_cast<float>(window.GetHeight()) / 2)) / window.GetHeight();
+	float rotationY = sensitivity * static_cast<float>(mouseX - (static_cast<float>(window.GetWidth()) / 2)) / window.GetWidth();
 
 	yaw += rotationY;
 	pitch += rotationX;
@@ -162,7 +151,7 @@ void Player::QueryMouseInputs() {
 	entityData.orientation = glm::normalize(facing);
 
 	// We don't want anyone to be able to move the mouse off the screen, that would be very very very bad and horrible and would make the game absolutely unplayable
-	glfwSetCursorPos(window.GetWindowInstance(), (static_cast<float>(window.GetWidth() / 2)), (static_cast<float>(window.GetHeight() / 2)));
+	glfwSetCursorPos(window.GetWindowInstance(), (static_cast<float>(window.GetWidth()) / 2.0), (static_cast<float>(window.GetHeight()) / 2.0));
 }
 
 void Player::SetPosition(Window* window, int newPlayerX, int newPlayerY, int newPlayerZ) {
@@ -178,12 +167,16 @@ const std::tuple<int, int, int> Player::GetPosition() {
 	return std::make_tuple(static_cast<int>(entityData.position.x), static_cast<int>(entityData.position.y), static_cast<int>(entityData.position.z));
 }
 
-void Player::UpdateCameraMatrix(Shader& shader, const char* uniform) {
+void Player::UpdateShader(Shader& shader, const char* uniform) {
+
+}
+
+void Player::UpdateCameraMatrix(Shader& shader) {
 	if (!camera) {
 		std::cerr << "[Camera Matrix / Warn] Trying to update camera matrix without a camera, aborting" << std::endl;
 	}
 	camera->UpdateMatrix(80.0f, 0.1f, 1000.0f, entityData.position, entityData.orientation, entityData.upDirection);
-	camera->SetCameraMatrix(shader, uniform);
+	camera->SetCameraMatrix(shader);
 }
 
 void Player::Delete() {

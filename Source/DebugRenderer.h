@@ -1,11 +1,8 @@
 #pragma once
 
-#include "GLError.h"
 #include "glad/glad.h"
 
 #include <vector>
-
-#include "glm/vec3.hpp"
 
 #include "Shader.h"
 
@@ -15,8 +12,9 @@ class DebugRenderer {
 		DebugRenderer();
 		~DebugRenderer();
 
-		void SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition);
+		void SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition, const std::vector<glm::vec3>& chunkOrigins);
 		void UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition) const;
+		void UpdateUniforms() const;
 		void RenderDebug(Shader& wireframeShaderProgram, Shader& chunkDebugShaderProgram) const;
 
 	private:
@@ -24,13 +22,15 @@ class DebugRenderer {
 		GLuint playerPhysicsBoundingBoxVBO;
 		GLuint playerPhysicsBoundingBoxEBO;
 
-		GLuint playerPhysicsBoundingBoxIndices;
 		std::vector<glm::vec3> playerPhysicsBoundingBoxVertices;
+		GLuint playerPhysicsBoundingBoxIndices;
 
 		GLuint chunkDebugVAO;
 		GLuint chunkDebugVBO;
-		GLuint chunkDebugEBO;
+		GLuint chunkDebugIBO;
+		GLuint chunkDebugIndexBO;
 
-		GLuint chunkDebugIndices;
 		std::vector<glm::vec3> chunkDebugVertices;
+		GLuint chunkDebugIndices;
+		std::vector<glm::vec3> chunkOrigins;
 };
