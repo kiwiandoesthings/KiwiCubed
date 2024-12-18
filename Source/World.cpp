@@ -59,6 +59,10 @@ void World::GenerateWorld() {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
                 Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
                 GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
+                //chunkDebugVisualizationVertices.insert(chunkDebugVisualizationVertices.end(), chunk.GetDebugVisualizationVertices().begin(), chunk.GetDebugVisualizationVertices().end());
+                //chunkDebugVisualizationIndices.insert(chunkDebugVisualizationIndices.end(), chunk.GetDebugVisualizationIndices().begin(), chunk.GetDebugVisualizationIndices().end());
+                //chunkDebugVisualizationColors.emplace_back((chunk.generationStatus == 0) ? glm::ivec3(255, 0, 0) : (chunk.generationStatus == 1) ? glm::ivec3(0, 255, 0) : (chunk.generationStatus == 2) ? glm::ivec3(0, 0, 255) : glm::ivec3(0, 0, 0));
+                //chunkOrigins.emplace_back(glm::vec3(chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunkZ * chunkSize + static_cast<int>(chunkSize / 2)));
                 totalMemoryUsage += chunk.GetMemoryUsage();
             }
         }

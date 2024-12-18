@@ -131,8 +131,8 @@ void Player::QueryMouseInputs() {
 	glfwGetCursorPos(window.GetWindowInstance(), &mouseX, &mouseY);
 
 	// Get the amount to rotate for the frame
-	float rotationX = sensitivity * static_cast<float>(mouseY - (static_cast<float>(window.GetHeight()) / 2)) / window.GetHeight();
-	float rotationY = sensitivity * static_cast<float>(mouseX - (static_cast<float>(window.GetWidth()) / 2)) / window.GetWidth();
+	float rotationX = sensitivity * static_cast<float>(mouseY - (window.GetHeight() / 2)) / window.GetHeight();
+	float rotationY = sensitivity * static_cast<float>(mouseX - (window.GetWidth() / 2)) / window.GetWidth();
 
 	yaw += rotationY;
 	pitch += rotationX;

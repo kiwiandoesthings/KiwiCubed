@@ -137,7 +137,7 @@ int main() {
 
 	// Set things up before main game loop
 	GLCall(glViewport(0, 0, globalWindow.GetWidth(), globalWindow.GetHeight()));
-	GLCall(glEnable(GL_DEPTH_TEST));
+	 GLCall(glEnable(GL_DEPTH_TEST));
 
 	// Create a singleplayer world
 	SingleplayerHandler singleplayerHandler(globalWindow);
@@ -165,7 +165,7 @@ int main() {
 	glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
 	glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
 
-	debugRenderer.SetupBuffers(c1, c2, pos, std::vector<glm::vec3>{glm::vec3(0, 0, 0)});
+	debugRenderer.SetupBuffers(c1, c2, pos, singleplayerHandler.singleplayerWorld.chunkDebugVisualizationVertices, singleplayerHandler.singleplayerWorld.chunkDebugVisualizationIndices, singleplayerHandler.singleplayerWorld.chunkOrigins);
 
 	int frames = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -255,7 +255,7 @@ int main() {
 			glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
 			glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
 
-			debugRenderer.UpdateBuffers(c1, c2, pos);
+			debugRenderer.UpdateBuffers(c1, c2, pos, singleplayerHandler.singleplayerWorld.chunkDebugVisualizationVertices, singleplayerHandler.singleplayerWorld.chunkDebugVisualizationIndices, singleplayerHandler.singleplayerWorld.chunkOrigins);
 			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(wireframeShaderProgram, chunkDebugShaderProgram);
 		}

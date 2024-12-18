@@ -9,6 +9,8 @@
 #include <thread>
 #include <vector>
 
+#include <glm/gtx/extend.hpp>
+
 #include "ChunkHandler.h"
 #include "Player.h"
 #include "Shader.h"
@@ -28,6 +30,12 @@ class World {
 
 		unsigned int totalChunks;
 		float totalMemoryUsage;
+
+		std::vector<GLfloat> chunkDebugVisualizationVertices;
+		std::vector<GLuint> chunkDebugVisualizationIndices;
+		std::vector<glm::ivec3> chunkDebugVisualizationColors;
+
+		std::vector<glm::vec3> chunkOrigins;
 
 		int chunkAddition = 0;
 

@@ -71,8 +71,11 @@ class Chunk {
         int GetTotalBlocks() const;
         void SetTotalBlocks(unsigned short newTotalBlocks);
     
-        std::vector<GLfloat> GetVertices() const;
-        std::vector<GLuint> GetIndices() const;
+        std::vector<GLfloat>& GetVertices();
+        std::vector<GLuint>& GetIndices();
+
+        std::vector<GLfloat>& GetDebugVisualizationVertices();
+        std::vector<GLuint>& GetDebugVisualizationIndices();
 
         unsigned int GetMemoryUsage();
 
@@ -84,10 +87,15 @@ class Chunk {
         void Delete();
     
     private:
+        const int debugVertexScale = 5;
+
         Renderer renderer;
 
         std::vector<GLfloat> vertices;
         std::vector<GLuint> indices;
+
+        std::vector<GLfloat> debugVisualizationVertices;
+        std::vector<GLuint> debugVisualizationIndices;
     
         unsigned short totalBlocks;
     

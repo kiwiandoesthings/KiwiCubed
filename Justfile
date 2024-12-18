@@ -10,6 +10,6 @@ run: build
 
 build:
 	meson compile -C build
-
+	
 clean:
 	meson setup --reconfigure build

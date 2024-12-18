@@ -14,6 +14,18 @@ void Chunk::SetupRenderComponents() {
 
 void Chunk::AllocateChunk() {
     if (!isAllocated) {
+        debugVisualizationVertices = {
+    	    -1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,
+    	     1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,
+    	     1.0f * debugVertexScale,  1.0f * debugVertexScale,  0.0f * debugVertexScale,
+    	    -1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale
+	    };
+
+	    debugVisualizationIndices = {
+        	0, 1, 2,
+        	0, 2, 3
+	    };
+
         // Allocate memory for all the blocks in the chunk
         blocks = new Block * *[chunkSize];
         for (int i = 0; i < chunkSize; ++i) {
@@ -251,12 +263,20 @@ void Chunk::SetTotalBlocks(unsigned short newTotalBlocks) {
     totalBlocks = newTotalBlocks;
 }
 
-std::vector<GLfloat> Chunk::GetVertices() const {
+std::vector<GLfloat>& Chunk::GetVertices() {
     return vertices;
 }
 
-std::vector<GLuint> Chunk::GetIndices() const {
+std::vector<GLuint>& Chunk::GetIndices() {
     return indices;
+}
+
+std::vector<GLfloat>& Chunk::GetDebugVisualizationVertices() {
+    return debugVisualizationVertices;
+}
+
+std::vector<GLuint>& Chunk::GetDebugVisualizationIndices() {
+    return debugVisualizationIndices;
 }
 
 unsigned int Chunk::GetMemoryUsage() {
