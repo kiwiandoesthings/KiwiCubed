@@ -87,7 +87,7 @@ class Chunk {
         void Delete();
     
     private:
-        const int debugVertexScale = 5;
+        const int debugVertexScale = 1;
 
         Renderer renderer;
 

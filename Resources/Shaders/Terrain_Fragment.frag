@@ -12,14 +12,14 @@ uniform uint atlasSize;
 
 void main()
 {
-
 	//vec3 tint = vec3(mod(blockPositionOut.x, 32) * 2, mod(blockPositionOut.y, 32) * 2, mod(blockPositionOut.z, 32) * 2);
     //tint = ((tint + vec3(1.0)) / 255.0 * 10);
+    vec3 tint = vec3(1.0, 1.0, 1.0)
 
     float epsilon = 0.00001;
 
-    float textureIndexX = mod(blockTypeOut + epsilon, atlasSize);
-    float textureIndexY = floor((blockTypeOut + epsilon) / atlasSize);
+    float textureIndexX = mod(blockTypeOut - 1 + epsilon, atlasSize);
+    float textureIndexY = floor((blockTypeOut - 1 + epsilon) / atlasSize);
 
     vec2 offset = vec2(textureIndexX, textureIndexY);
     vec2 newTextureCoordinate = vec2(
@@ -28,5 +28,5 @@ void main()
     );
 
 	vec4 baseColor = texture(tex0, newTextureCoordinate);
-    FragColor = baseColor;
+    FragColor = baseColor * tint;
 }

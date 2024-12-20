@@ -33,10 +33,6 @@ Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
         world.totalChunks++;
         world.chunkAddition++;
 
-        world.chunkDebugVisualizationVertices.insert(world.chunkDebugVisualizationVertices.end(), chunk->second.GetDebugVisualizationVertices().begin(), chunk->second.GetDebugVisualizationVertices().end());
-        world.chunkDebugVisualizationIndices.insert(world.chunkDebugVisualizationIndices.end(), chunk->second.GetDebugVisualizationIndices().begin(), chunk->second.GetDebugVisualizationIndices().end());
-        world.chunkOrigins.emplace_back(glm::vec3(chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunkZ * chunkSize + static_cast<int>(chunkSize / 2)));
-
         return chunk->second;
     }
     else {
@@ -116,5 +112,6 @@ void ChunkHandler::Delete() {
         world.totalChunks--;
     }
 
+    chunks.clear();
     world.totalMemoryUsage = 0;
 }

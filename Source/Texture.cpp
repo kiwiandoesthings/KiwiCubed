@@ -20,16 +20,18 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 	GLCall(glActiveTexture(slot));
 	GLCall(glBindTexture(textureType, ID));
 
-	GLCall(glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR));
-	GLCall(glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	GLCall(glTexParameteri(textureType, GL_TEXTURE_BASE_LEVEL, 0));
+	GLCall(glTexParameteri(textureType, GL_TEXTURE_MAX_LEVEL, 4));
 
+	GLCall(glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
+	GLCall(glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
 	GLCall(glTexParameteri(textureType, GL_TEXTURE_WRAP_S, GL_REPEAT));
 	GLCall(glTexParameteri(textureType, GL_TEXTURE_WRAP_T, GL_REPEAT));
 
 	GLCall(glTexImage2D(textureType, 0, GL_RGBA, imageWidth, imageHeight, 0, format, pixelType, bytes));
 	GLCall(glGenerateMipmap(textureType));
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.5f);
+	GLCall(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.5f));
 
 	stbi_image_free(bytes);
 	GLCall(glBindTexture(textureType, 0));

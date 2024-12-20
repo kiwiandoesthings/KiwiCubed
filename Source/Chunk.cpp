@@ -15,10 +15,10 @@ void Chunk::SetupRenderComponents() {
 void Chunk::AllocateChunk() {
     if (!isAllocated) {
         debugVisualizationVertices = {
-    	    -1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,
-    	     1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,
-    	     1.0f * debugVertexScale,  1.0f * debugVertexScale,  0.0f * debugVertexScale,
-    	    -1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale
+    	     -1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  0.0f,  0.0f,
+    	      1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  1.0f,  0.0f, 
+    	     1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 1.0f, 1.0f,
+    	    -1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 0.0f, 1.0f
 	    };
 
 	    debugVisualizationIndices = {
@@ -336,4 +336,8 @@ void Chunk::Delete() {
 
     vertices.clear();
     indices.clear();
+
+    debugVisualizationVertices.clear();
+    debugVisualizationIndices.clear();
+
 }

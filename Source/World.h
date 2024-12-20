@@ -31,12 +31,6 @@ class World {
 		unsigned int totalChunks;
 		float totalMemoryUsage;
 
-		std::vector<GLfloat> chunkDebugVisualizationVertices;
-		std::vector<GLuint> chunkDebugVisualizationIndices;
-		std::vector<glm::ivec3> chunkDebugVisualizationColors;
-
-		std::vector<glm::vec3> chunkOrigins;
-
 		int chunkAddition = 0;
 
 		World() : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), shouldTick(false), tickIntervalMs(50), worldSize(5), chunkHandler(*this) {}
@@ -55,6 +49,11 @@ class World {
 
 		Chunk GetChunk(int chunkX, int chunkY, int chunkZ);
 		Entity GetEntity(std::string uuid);
+
+		std::vector<float>& GetChunkDebugVisualizationVertices();
+		std::vector<GLuint>& GetChunkDebugVisualizationIndices();
+
+		std::vector<glm::vec4>& GetChunkOrigins();
 
 		void Tick();
 		bool StartTickThread();
@@ -79,6 +78,12 @@ class World {
 		ChunkHandler chunkHandler;
 
 		Renderer renderer;
+
+		std::vector<GLfloat> chunkDebugVisualizationVertices;
+		std::vector<GLuint> chunkDebugVisualizationIndices;
+		std::vector<glm::ivec3> chunkDebugVisualizationColors;
+
+		std::vector<glm::vec4> chunkOrigins;
 
 		// Batch rendering later..?
 		//std::vector<GLfloat> vertices;

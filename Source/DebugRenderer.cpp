@@ -4,7 +4,7 @@ DebugRenderer::DebugRenderer() {
 }
 
 // I have so little fucking idea how to make this more modular. I feel it's going to be ultra hardcoded for a very long time.
-void DebugRenderer::SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition, const std::vector<GLfloat>& chunkDebugVertices, const std::vector<GLuint>& chunkDebugIndices, const std::vector<glm::vec3>& chunkOrigins) {
+void DebugRenderer::SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition, const std::vector<GLfloat>& chunkDebugVertices, const std::vector<GLuint>& chunkDebugIndices, const std::vector<glm::vec4>& chunkOrigins) {
 	// PlayerPhysicsBoundingBox setup
 
 	std::vector<glm::vec3> playerPhysicsBoundingBoxVertices = {
@@ -54,24 +54,27 @@ void DebugRenderer::SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, chunkDebugVBO));
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * chunkDebugVertices.size(), chunkDebugVertices.data(), GL_STATIC_DRAW));
 
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0));
 	GLCall(glEnableVertexAttribArray(0));
+
+	GLCall(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3)));
+	GLCall(glEnableVertexAttribArray(2));
 
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunkDebugIBO));
 	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * chunkDebugIndices.size(), chunkDebugIndices.data(), GL_STATIC_DRAW));
 
 	// Instance data
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, chunkDebugIndexBO));
-	GLCall(glBufferData(GL_ARRAY_BUFFER,  sizeof(glm::vec3) * chunkOrigins.size(), chunkOrigins.data(), GL_STATIC_DRAW));
+	GLCall(glBufferData(GL_ARRAY_BUFFER,  sizeof(glm::vec4) * chunkOrigins.size(), chunkOrigins.data(), GL_STATIC_DRAW));
 
-	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0));
+	GLCall(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0));
 	GLCall(glEnableVertexAttribArray(1));
 	GLCall(glVertexAttribDivisor(1, 1));
 
 	// Future setups go here
 }
 
-void DebugRenderer::UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition, const std::vector<GLfloat>& chunkDebugVertices, const std::vector<GLuint>& chunkDebugIndices, const std::vector<glm::vec3>& chunkOrigins) {
+void DebugRenderer::UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition, const std::vector<GLfloat>& chunkDebugVertices, const std::vector<GLuint>& chunkDebugIndices, const std::vector<glm::vec4>& chunkOrigins) {
 	// PlayerPhysicsBoundingBox buffers
 
 	GLuint playerPhysicsBoundingBoxIndices[] = {
@@ -107,10 +110,8 @@ void DebugRenderer::UpdateBuffers(const glm::vec3& playerPhysicsBoundingBoxCorne
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunkDebugIBO));
 	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * chunkDebugIndices.size(), chunkDebugIndices.data(), GL_STATIC_DRAW));
 
-
-	//std::cout << chunkDebugVertices.size() << " " << chunkDebugIndices.size() << std::endl;
-	//GLCall(glBindBuffer(GL_ARRAY_BUFFER, chunkDebugIndexBO));
-	//GLCall(glBufferData(GL_ARRAY_BUFFER,  sizeof(glm::vec3) * chunkOrigins.size(), chunkOrigins.data(), GL_STATIC_DRAW));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, chunkDebugIndexBO));
+	GLCall(glBufferData(GL_ARRAY_BUFFER,  sizeof(glm::vec4) * chunkOrigins.size(), chunkOrigins.data(), GL_STATIC_DRAW));
 
 
 	// Future updates go here

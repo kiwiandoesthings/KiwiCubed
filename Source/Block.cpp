@@ -114,7 +114,7 @@ void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, un
 
 void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize) {
 	GLuint vertexOffset = static_cast<GLuint>(faceDirection) * 20;
-	GLuint baseIndex = static_cast<GLuint>(vertices.size() / 36);
+	GLuint baseIndex = static_cast<GLuint>(vertices.size() / 6);
 	
 	for (size_t i = vertexOffset; i < static_cast<size_t>(vertexOffset) + 20; i += 5) {
 		vertices.emplace_back(faceVertices[i  + 0] + static_cast<GLfloat>(blockX + (chunkX * static_cast<int>(chunkSize))));

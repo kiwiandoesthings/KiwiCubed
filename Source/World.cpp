@@ -6,7 +6,7 @@
 std::atomic<bool> keepRunning(true);
 
 
-World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), chunkHandler(*this), worldSize(worldSize), singleplayerHandler(singleplayerHandler) {
+World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), worldSize(worldSize), chunkHandler(*this) {
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
@@ -59,10 +59,6 @@ void World::GenerateWorld() {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
                 Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ);
                 GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
-                //chunkDebugVisualizationVertices.insert(chunkDebugVisualizationVertices.end(), chunk.GetDebugVisualizationVertices().begin(), chunk.GetDebugVisualizationVertices().end());
-                //chunkDebugVisualizationIndices.insert(chunkDebugVisualizationIndices.end(), chunk.GetDebugVisualizationIndices().begin(), chunk.GetDebugVisualizationIndices().end());
-                //chunkDebugVisualizationColors.emplace_back((chunk.generationStatus == 0) ? glm::ivec3(255, 0, 0) : (chunk.generationStatus == 1) ? glm::ivec3(0, 255, 0) : (chunk.generationStatus == 2) ? glm::ivec3(0, 0, 255) : glm::ivec3(0, 0, 0));
-                //chunkOrigins.emplace_back(glm::vec3(chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunkZ * chunkSize + static_cast<int>(chunkSize / 2)));
                 totalMemoryUsage += chunk.GetMemoryUsage();
             }
         }
@@ -171,6 +167,33 @@ Chunk World::GetChunk(int chunkX, int chunkY, int chunkZ) {
 Entity World::GetEntity(std::string uuid) {
     // Later
     return Entity(0, 0, 0);
+}
+
+std::vector<float>& World::GetChunkDebugVisualizationVertices() {
+    chunkDebugVisualizationVertices.clear();
+    for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
+        auto& chunk = it->second;
+        chunkDebugVisualizationVertices.insert(chunkDebugVisualizationVertices.end(), chunk.GetDebugVisualizationVertices().begin(), chunk.GetDebugVisualizationVertices().end());
+    }
+    return chunkDebugVisualizationVertices;
+}
+
+std::vector<GLuint>& World::GetChunkDebugVisualizationIndices() {
+    chunkDebugVisualizationIndices.clear();
+    for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
+        auto& chunk = it->second;
+        chunkDebugVisualizationIndices.insert(chunkDebugVisualizationIndices.end(), chunk.GetDebugVisualizationIndices().begin(), chunk.GetDebugVisualizationIndices().end());
+    }
+    return chunkDebugVisualizationIndices;
+}
+
+std::vector<glm::vec4>& World::GetChunkOrigins() {
+    chunkOrigins.clear();
+    for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
+        auto& chunk = it->second;
+        chunkOrigins.emplace_back(glm::vec4(chunk.chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunk.chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunk.chunkZ * chunkSize + static_cast<int>(chunkSize / 2), chunk.generationStatus));
+    }
+    return chunkOrigins;
 }
 
 bool World::StartTickThread() {

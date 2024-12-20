@@ -150,8 +150,9 @@ int main() {
 	Shader chunkDebugShaderProgram("Resources/Shaders/ChunkDebug_Vertex.vert", "Resources/Shaders/ChunkDebug_Fragment.frag");
 
 	// Create a debug texture
-	Texture terrainAtlas("Resources/Textures/Blocks/stone.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	terrainAtlas.SetAtlasSize(terrainShaderProgram, 2);
+	Texture terrainAtlas("Resources/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	terrainAtlas.SetAtlasSize(terrainShaderProgram, 3);
+	terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, 3);
 
 	singleplayerHandler.singleplayerWorld.GenerateWorld();
 	singleplayerHandler.singleplayerWorld.SetupRenderComponents();
@@ -165,7 +166,7 @@ int main() {
 	glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
 	glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
 
-	debugRenderer.SetupBuffers(c1, c2, pos, singleplayerHandler.singleplayerWorld.chunkDebugVisualizationVertices, singleplayerHandler.singleplayerWorld.chunkDebugVisualizationIndices, singleplayerHandler.singleplayerWorld.chunkOrigins);
+	debugRenderer.SetupBuffers(c1, c2, pos, singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
 
 	int frames = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -183,7 +184,7 @@ int main() {
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
 		if (duration >= 1000.0) {
-			fps = (float)frames / (duration / 1000.0);
+			fps = static_cast<float>(frames) / (duration / 1000.0);
 			frames = 0;
 			start_time = end_time;
 		}
@@ -255,7 +256,7 @@ int main() {
 			glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
 			glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
 
-			debugRenderer.UpdateBuffers(c1, c2, pos, singleplayerHandler.singleplayerWorld.chunkDebugVisualizationVertices, singleplayerHandler.singleplayerWorld.chunkDebugVisualizationIndices, singleplayerHandler.singleplayerWorld.chunkOrigins);
+			debugRenderer.UpdateBuffers(c1, c2, pos, singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
 			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(wireframeShaderProgram, chunkDebugShaderProgram);
 		}
