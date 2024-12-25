@@ -6,7 +6,7 @@
 #include "VertexArrayObject.h"
 #include "VertexBufferObject.h"
 
-struct Vertex{
+struct Vertex {
 	GLfloat position[3];
 	GLfloat textureCoordinate[2];
 	GLuint textureIndex;
@@ -14,8 +14,6 @@ struct Vertex{
 
 
 class Renderer {
-	private:
-
 	public:
 		Renderer();
 

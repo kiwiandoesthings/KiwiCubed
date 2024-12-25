@@ -18,8 +18,7 @@ Shader::Shader(const std::string& vertexFilePath, const std::string& fragmentFil
 
 std::string Shader::ParseShader(const std::string& filePath) {
     std::ifstream file(filePath);
-    if (!file)
-    {
+    if (!file) {
         std::cerr << "[Shader Parsing / Error] Could not find shader at " << filePath << std::endl;
         return "";
     }
@@ -39,8 +38,7 @@ int Shader::CompileShader(unsigned int type, const std::string& source, const st
 
     int result;
     GLCall(glGetShaderiv(shaderProgramID, GL_COMPILE_STATUS, &result));
-    if (!result)
-    {
+    if (!result) {
         int length;
         GLCall(glGetShaderiv(shaderProgramID, GL_INFO_LOG_LENGTH, &length));
         char* message = (char*)malloc(length * sizeof(char));

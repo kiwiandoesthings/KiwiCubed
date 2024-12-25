@@ -17,7 +17,7 @@
 
 class Shader
 {
-	public: 
+	public:
 		GLuint shaderProgramID;
 
 		Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath);

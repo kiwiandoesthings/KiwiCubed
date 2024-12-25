@@ -108,7 +108,7 @@ class ChunkHandler {
 public:
     std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 
-    ChunkHandler(World& world);
+    ChunkHandler(World& world) : world(world) {};
     void Delete();
 
     void GenerateWorld();

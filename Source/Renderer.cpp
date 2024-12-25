@@ -1,10 +1,6 @@
 #include "Renderer.h"
 
 
-Renderer::Renderer() {
-
-}
-
 void Renderer::ClearScreen(float redValue, float blueValue, float greenValue) {
 	// Clear them buffers so they are nice and clean for next frame
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));

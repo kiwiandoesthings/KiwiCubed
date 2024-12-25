@@ -115,7 +115,7 @@ class InputHandler {
         }
     
         // Mouse button callback handler
-        static  void MouseButtonCallbackHandler(GLFWwindow* window, int button, int action, int mods) {
+        static void MouseButtonCallbackHandler(GLFWwindow* window, int button, int action, int mods) {
             if (action == GLFW_PRESS) {
                 mouseButtonStates[button] = true;
     

@@ -63,6 +63,7 @@ std::string windowType;
 std::string projectVersion;
 
 // This main function is getting out of hand
+// yes but hands are in pocket so is it still in the pocket or is it out of pocket? - Astra
 int main() {
 	std::ifstream file("Resources/Data/init_config.json");
 
@@ -137,7 +138,7 @@ int main() {
 
 	// Set things up before main game loop
 	GLCall(glViewport(0, 0, globalWindow.GetWidth(), globalWindow.GetHeight()));
-	 GLCall(glEnable(GL_DEPTH_TEST));
+	GLCall(glEnable(GL_DEPTH_TEST));
 
 	// Create a singleplayer world
 	SingleplayerHandler singleplayerHandler(globalWindow);
@@ -212,7 +213,7 @@ int main() {
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z));
 			ImGui::Text("Local chunk position: %d, %d, %d", 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.x), 
-				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.y), 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.y),
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.z));
 			ImGui::Text("Current chunk generation status and blocks %d, %d, %d",
 				singleplayerHandler.singleplayerWorld.GetChunk(
@@ -227,7 +228,7 @@ int main() {
 					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
 					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
 					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).id);
-			ImGui::Text("Total frames: %d", frames);													
+			ImGui::Text("Total frames: %d", frames);
 			ImGui::Text("FPS: %.2f", fps);
 		}
 

@@ -2,8 +2,7 @@
 #include <stb_image.h>
 #include <debug-trap.h>
 
-Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum format, GLenum pixelType) : atlasSize(0)
-{
+Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum format, GLenum pixelType) : atlasSize(0) {
 	type = textureType;
 
 	int imageWidth, imageHeight, colorChannels;
@@ -37,8 +36,7 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 	GLCall(glBindTexture(textureType, 0));
 }
 
-void Texture::TextureUnit(Shader& shader, const char* uniform, GLuint unit)
-{
+void Texture::TextureUnit(Shader& shader, const char* uniform, GLuint unit) {
 	GLuint textureUnit = glGetUniformLocation(shader.shaderProgramID, uniform);
 	shader.Bind();
 	GLCall(glUniform1i(textureUnit, unit));
@@ -50,17 +48,14 @@ void Texture::SetAtlasSize(Shader& shader, GLuint newAtlasSize) {
 	shader.SetUniform1ui("atlasSize", atlasSize);
 }
 
-void Texture::Bind() const
-{
+void Texture::Bind() const {
 	GLCall(glBindTexture(type, ID));
 }
 
-void Texture::Unbind() const
-{
+void Texture::Unbind() const {
 	GLCall(glBindTexture(type, 0));
 }
 
-void Texture::Delete() const
-{
+void Texture::Delete() const {
 	GLCall(glDeleteTextures(1, &ID));
 }

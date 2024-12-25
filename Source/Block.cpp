@@ -67,9 +67,6 @@ GLuint faceIndices[] = {
 };
 
 
-Block::Block(int type) : blockX(0), blockY(0), blockZ(0), type(0) {
-}
-
 void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, unsigned short newBlockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug) {
 	blockX = newBlockX;
 	blockY = newBlockY;
@@ -128,11 +125,4 @@ void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices
 	for (size_t i = 0; i < 6; ++i) {
 		indices.emplace_back(static_cast<GLuint>(baseIndex + faceIndices[i]));
 	}
-}
-unsigned int Block::GetType() const {
-	return type;
-}
-
-void Block::SetType(unsigned int newType) {
-	type = newType;
 }

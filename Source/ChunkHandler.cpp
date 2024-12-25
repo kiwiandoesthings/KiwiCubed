@@ -1,10 +1,6 @@
 #include "ChunkHandler.h"
 #include "World.h"
 
-
-ChunkHandler::ChunkHandler(World& world) : world(world) {
-}
-
 void ChunkHandler::GenerateWorld() {
     world.GenerateWorld();
 }
