@@ -6,6 +6,9 @@
 #include <iostream>
 #include <map>
 #include <unordered_map>
+#include <sstream>
+#include <istream>
+#include "log4kwc.hpp"
 
 class Window;
 
@@ -29,51 +32,56 @@ class InputHandler {
     
         // MonitoredKeys argument is technically optional, as it isn't used, but should be passed for console debugging
         void SetupKeyStates(GLFWwindow* window, std::vector<int> monitoredKeys) {
-            std::cout << "[InputHandler / Info] Key monitoring registered for keys: (";
+            OVERRIDE_LOG_NAME("InputHandler");
+            std::stringstream ss;
+            ss << " Key monitoring registered for keys: (";
             for (int i = 0; i < monitoredKeys.size(); ++i) {
                 const char* keyName = glfwGetKeyName(monitoredKeys[i], 0);
                 if (keyName == NULL) {
-                    std::cout << "keycode: " << monitoredKeys[i];
+                    ss << "keycode: " << monitoredKeys[i];
                     if (i + 1 != monitoredKeys.size()) {
-                        std::cout << ", ";
+                        ss << ", ";
                     }
                     continue;
                 }
-                std::cout << "\'" << keyName << "\'";
+                ss << "\'" << keyName << "\'";
                 if (i + 1 != monitoredKeys.size()) {
-                    std::cout << ", ";
+                    ss << ", ";
                 }
             }
     
             auto iterator = std::find(instances.begin(), instances.end(), this);
             int index = static_cast<int>(iterator - instances.begin());
-            std::cout << ") for input instance[" << index << "]" << std::endl;
-    
+            ss << ") for input instance[" << index << "]" << std::endl;
+            INFO(ss.str());
             instances.push_back(this);
         }
-    
-        void RegisterKeyCallback(std::vector<int> keys, KeyCallback callback) {
-            std::cout << "[InputHandler / Info] Key callbacks registered for keys: (";
-            for (int i = 0; i < keys.size(); ++i) {
-                keyCallbacks[keys[i]] = callback;
-                const char* keyName = glfwGetKeyName(keys[i], 0);
-                if (keyName == NULL) {
-                    std::cout << "keycode: " << keys[i];
-                    if (i + 1 != keys.size()) {
-                        std::cout << ", ";
-                    }
-                    continue;
-                }
-                std::cout << "\'" << keyName << "\'";
-                if (i + 1 != keys.size()) {
-                    std::cout << ", ";
-                }
+
+        void RegisterCallbackOnKeys(std::vector<int> keys, KeyCallback callback) {
+            for (int key : keys) {
+                RegisterKeyCallback(key, callback);
             }
-            auto iterator = std::find(instances.begin(), instances.end(), this);
-            int index = static_cast<int>(iterator - instances.begin());
-            std::cout << ") for input instance[" << index << "]" << std::endl;
         }
-    
+
+        void RegisterKeyCallback(int key, KeyCallback callback) {
+            OVERRIDE_LOG_NAME("InputHandler");
+
+            keyCallbacks[key] = callback;
+            const char* keyName = glfwGetKeyName(key, 0);
+
+            std::stringstream ss;
+
+            ss << "Key callbacks registered for keys: (";
+            if (keyName == NULL) {
+                ss << "keycode: " << key;
+            } else {
+                ss << "\'" << keyName << "\'";
+            }
+            int index = static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin());
+            ss << ") for input instance[" << index << "]";
+            INFO(ss.str());
+        }
+
         void RegisterMouseButtonCallback(int button, MouseButtonCallback callback) {
             mouseButtonCallbacks[button] = callback;
         }
@@ -82,7 +90,7 @@ class InputHandler {
         void RegisterScrollCallback(bool direction, ScrollCallback callback) {
             scrollCallbacks[direction] = callback;
         }
-    
+
         bool GetKeyState(int key) const {
             auto iterator = keyStates.find(key);
             return iterator != keyStates.end() && iterator->second;

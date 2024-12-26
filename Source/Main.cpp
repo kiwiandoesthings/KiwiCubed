@@ -43,6 +43,7 @@ extern "C"
 #include "SingleplayerHandler.h"
 #include "Texture.h"
 #include "Window.h"
+#include "log4kwc.hpp"
 
 // chunk numbers
 // says generatede 360 chunks
@@ -67,10 +68,9 @@ std::string projectVersion;
 int main() {
 	std::ifstream file("Resources/Data/init_config.json");
 
-	if (!file.is_open()) {
-		std::cerr << "[Initialization / Error] Could not open or find the JSON config file" << std::endl;
-		return 1;
-	}
+	OVERRIDE_LOG_NAME("Initialization");
+
+	LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Could not open or find the JSON config file", 1);
 
 	json jsonData;
 	file >> jsonData;
@@ -82,32 +82,18 @@ int main() {
 	projectVersion = jsonData["project_version"].get<std::string>();
 
 	// Initialize GLFW
-	if (!glfwInit())
-	{
-		std::cerr << "[Initialization / Error] Failed to initialize GLFW" << std::endl;
-		return -1;
-	}
-	else {
-		std::cout << "[Initialization / Info] Successfully initialized GLFW" << std::endl;
-	}
+	LOG_CHECK_RETURN(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW", -1);
 
 	// Create a window
 	Window globalWindow;
-	globalWindow.CreateWindowInstance(windowWidth, windowHeight, windowTitle + projectVersion, windowType);
+	globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
 	globalWindow.Setup();
 
 	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
 	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
 
 	// Initialize glad
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cerr << "[Initialization / Error] Failed to initialize GLAD" << std::endl << std::endl;
-		return -1;
-	}
-	else {
-		std::cout << "[Initialization / Info] Successfully initialized GLAD" << std::endl << std::endl;
-	}
+	LOG_CHECK_RETURN(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD", -1);
 
 	// Setup ImGui
 	IMGUI_CHECKVERSION();
@@ -127,14 +113,13 @@ int main() {
 		bitness = 0;
 	}
 	else {
-		std::cerr << "[Initialization / Error]: Could not find machine bitness" << std::endl;
+		ERR("Could not find machine bitness");
 		return -1;
 	}
-	std::cout << "[Initialization / Info] Machine bitness: " << (bitness == 1 ? "64" : "32") << std::endl;
-	std::cout << "[Initialization / Info] Using OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-	std::cout << "[Initialization / Info] Using graphics device: " << glGetString(GL_RENDERER) << std::endl;
-	std::cout << "[Initialization / Info] Using resolution: " << globalWindow.GetWidth() << " x " << globalWindow.GetHeight() << std::endl << std::endl;
-
+	INFO("Machine bitness: " + std::to_string(bitness == 1 ? 64 : 32));
+	INFO("Using OpenGL version: " + std::string((char*)glGetString(GL_VERSION)));
+	INFO("Using graphics device: " + std::string((char*)glGetString(GL_RENDERER)));
+	INFO("Using resolution: " + std::to_string(globalWindow.GetWidth()) + " x " + std::to_string(globalWindow.GetHeight()));
 
 	// Set things up before main game loop
 	GLCall(glViewport(0, 0, globalWindow.GetWidth(), globalWindow.GetHeight()));
@@ -191,25 +176,26 @@ int main() {
 		}
 
 		EntityData playerData = singleplayerHandler.singleplayerWorld.player.GetEntityData();
+
 		ImGui::Begin("Debug");
 		if (ImGui::CollapsingHeader("Player Info")) {
 			ImGui::Text("Player name: %s", singleplayerHandler.singleplayerWorld.player.GetEntityData().name);
 			ImGui::Text("Player health: %d", static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityStats().health));
-			ImGui::Text("Player position: %f, %f, %f", 
-				playerData.position.x, 
-				playerData.position.y, 
+			ImGui::Text("Player position: %f, %f, %f",
+				playerData.position.x,
+				playerData.position.y,
 				playerData.position.z);
 			ImGui::Text("Player orientation: %f, %f, %f", 
 				playerData.orientation.x,
 				playerData.orientation.y, 
 				playerData.orientation.z);
-			ImGui::Text("Player velocity: %f, %f, %f", 
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.x, 
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.y, 
+			ImGui::Text("Player velocity: %f, %f, %f",
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.x,
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.y,
 				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.z);
 			ImGui::Text("Global chunk position: %d, %d, %d", 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x), 
-				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y), 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y),
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z));
 			ImGui::Text("Local chunk position: %d, %d, %d", 
 				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.x), 
@@ -271,10 +257,12 @@ int main() {
 		++frames;
 	}
 
-	singleplayerHandler.EndSingleplayerWorld();
 
 	// Clean up once the program has exited
-	std::cout << "[Cleanup / Info] Cleaned up, exiting program" << std::endl;
+	OVERRIDE_LOG_NAME("Cleanup");
+	INFO("Cleaning up...");
+	singleplayerHandler.EndSingleplayerWorld();
+
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

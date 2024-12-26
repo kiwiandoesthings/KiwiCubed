@@ -19,10 +19,10 @@ void Player::Setup(Window& window) {
 	camera->Setup(window);
 	inputHandler.SetupKeyStates(window.GetWindowInstance(), std::vector<int>{GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_LEFT_CONTROL});
 
-	inputHandler.RegisterKeyCallback({ GLFW_KEY_E }, [&]() {
+	inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&]() {
 		chunkHandler.Delete();
 	});
-	inputHandler.RegisterKeyCallback({ GLFW_KEY_R }, [&]() {
+	inputHandler.RegisterKeyCallback(GLFW_KEY_R, [&]() {
 		chunkHandler.GenerateWorld();
 	});
 }

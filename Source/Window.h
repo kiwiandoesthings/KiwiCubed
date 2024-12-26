@@ -14,10 +14,9 @@
 
 class Window {
 	public:
-		Window();
+		Window() {};
 		
 		GLFWwindow* CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType);
-		GLFWwindow* CreateWindowInstance(int windowWidth, int windowHeight, std::string windowTitle, std::string windowType);
 
 		void Setup();
 

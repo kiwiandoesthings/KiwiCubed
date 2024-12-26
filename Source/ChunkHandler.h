@@ -42,30 +42,31 @@ struct TripleHash {
 
 class Chunk {
     public:
-        Block*** blocks;
-        int chunkX;
-        int chunkY;
-        int chunkZ;
+        Block*** blocks = nullptr;
+        int chunkX = 0;
+        int chunkY = 0;
+        int chunkZ = 0;
         bool isAllocated = false;
         bool isGenerated = false;
         bool isMeshed = false;
         unsigned int generationStatus = 0;
-        bool isEmpty;
+        bool isEmpty = true;
         bool isFull;
         bool shouldGenerate = true;
         unsigned int totalMemoryUsage;
         bool id = 0;
-    
-        Chunk() : blocks(nullptr), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(true), isFull(false), totalMemoryUsage(0), totalBlocks(0)/*, vertexBufferObject(("chunk " + std::to_string(chunkX) + " " + std::to_string(chunkY) + " " + std::to_string(chunkZ)).c_str())*/ {}
-        Chunk(int chunkX, int chunkY, int chunkZ);
-    
+
+        Chunk() {}
+        Chunk(int chunkX, int chunkY, int chunkZ) : isEmpty(false), chunkX(chunkX), chunkY(chunkY), chunkZ(chunkZ) {}
+
+
 
         void SetupRenderComponents();
         void AllocateChunk();
         void GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug);
         void GenerateMesh(ChunkHandler& chunkHandler, const bool remesh);
         void Render();
-    
+
         void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
     
         int GetTotalBlocks() const;

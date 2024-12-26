@@ -29,9 +29,9 @@ void World::SetupRenderComponents() {
         chunk.SetupRenderComponents();
     }
 
-    std::cout << "[World Creation / Info] Finished setting up chunk render components" << std::endl;
-
     singleplayerHandler->isLoadedIntoSingleplayerWorld = true;
+
+    INFO("Finished setting up chunk render components");
 }
 
 void World::Render(Shader shaderProgram) {
@@ -49,7 +49,7 @@ void World::Render(Shader shaderProgram) {
 }
 
 void World::GenerateWorld() {
-    std::cout << "[World Creation / Info] Started generating world" << std::endl;
+    INFO("Generating world");
 
     chunkAddition = 0;
     
@@ -66,15 +66,19 @@ void World::GenerateWorld() {
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0f;
-    
-    float chunkGenerationSpeed = static_cast<float>(duration / (worldSize * worldSize * worldSize));
-    
-    std::cout << std::endl << "[World Creation / Info] Finished generating world" << std::endl;
-    std::cout << "[World Creation / Info] World creation with chunk count of " << worldSize * worldSize * worldSize << " took " << duration << " ms" << " or roughly " << chunkGenerationSpeed << " ms per chunk (slightly innacurate as empty chunks are skipped). With around " << static_cast<int>(1000) / chunkGenerationSpeed << " chunks generated, meshed and added per second" << std::endl;
-    
+
+    int chunkCount = worldSize * worldSize * worldSize;
+    float chunkGenerationSpeed = static_cast<float>(duration / chunkCount);
+    float chunkgenspeed_seconds = chunkGenerationSpeed / 1000.0f;
+
+
+    INFO("Finished generating world");
+    INFO("World creation with chunk count of " + std::to_string(chunkCount) + " took " + std::to_string(duration) + " ms" + " or roughly " + std::to_string(chunkGenerationSpeed) + " ms per chunk (slightly innacurate as empty chunks are skipped)");
+    INFO("Around " + std::to_string(chunkgenspeed_seconds) + " chunks generated, meshed and added per second");
+
     isWorldGenerated = true;
 
-    std::cout << "added" << chunkAddition << std::endl;
+    DEBUG("added " + chunkAddition);
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk) {

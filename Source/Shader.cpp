@@ -2,26 +2,27 @@
 #include <debug-trap.h>
 #include <string>
 #include <winnt.h>
+#include "log4kwc.hpp"
 
 Shader::Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath) {
     std::string vertexSource = ParseShader(vertexFilePath);
     std::string fragmentSource = ParseShader(fragmentFilePath);
 
+    OVERRIDE_LOG_NAME("Shader Setup");
+
     if (!fragmentSource.empty() || !vertexSource.empty()) {
         shaderProgramID = CreateShader(vertexSource, fragmentSource, vertexFilePath, fragmentFilePath);
-        std::cout << "[Shader Setup / Info] Successfully created shader program with ID of " << shaderProgramID << std::endl;
+        INFO("Successfully created shader program with ID of " + std::to_string(shaderProgramID));
     }
     else {
-        std::cerr << "[Shader Setup / Error] Shader file(s) not found, aborting shader creation" << std::endl;
+        ERR("Shader file(s) not found, aborting shader creation");
     }
 }
 
 std::string Shader::ParseShader(const std::string& filePath) {
+    OVERRIDE_LOG_NAME("Shader File Parsing");
     std::ifstream file(filePath);
-    if (!file) {
-        std::cerr << "[Shader Parsing / Error] Could not find shader at " << filePath << std::endl;
-        return "";
-    }
+    LOG_CHECK_RETURN(file.is_open(), "Successfully opened shader file at " + filePath, "Could not open shader file at " + filePath, "");
     std::string str;
     std::string content;
     while (std::getline(file, str)) {

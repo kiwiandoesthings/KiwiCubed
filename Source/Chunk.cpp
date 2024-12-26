@@ -1,9 +1,6 @@
 #include "ChunkHandler.h"
 #include "World.h"
-
-
-Chunk::Chunk(int chunkX, int chunkY, int chunkZ) : blocks(nullptr), chunkX(0), chunkY(0), chunkZ(0), isAllocated(false), isGenerated(false), isMeshed(false), isEmpty(false), isFull(false), totalMemoryUsage(0), totalBlocks(0)/*,vertexBufferObject(("chunk " + std::to_string(chunkX) + " " + std::to_string(chunkY) + " " + std::to_string(chunkZ)).c_str())*/ {
-}
+#include "log4kwc.hpp"
 
 // Currently just sets up the VBO, VAO, and IBO
 void Chunk::SetupRenderComponents() {
@@ -16,7 +13,7 @@ void Chunk::AllocateChunk() {
     if (!isAllocated) {
         debugVisualizationVertices = {
     	     -1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  0.0f,  0.0f,
-    	      1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  1.0f,  0.0f, 
+    	      1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  1.0f,  0.0f,
     	     1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 1.0f, 1.0f,
     	    -1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 0.0f, 1.0f
 	    };
@@ -88,22 +85,25 @@ void Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
 }
 
 void Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
+    OVERRIDE_LOG_NAME("Chunk Mesh Generation");
     if (!isMeshed || remesh) {
-        if (!isAllocated) {
-            std::cerr << "[Chunk Mesh Generation / Warn] Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        if (!isAllocated | !isGenerated | IsEmpty()) {
+            std::string chunkposstr = "{" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}";
+
+            if (!isAllocated) {
+                ERR("Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) " + chunkposstr);
+            }
+
+            if (!isGenerated) {
+                WARN("Trying to generate mesh for ungenerated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) " + chunkposstr);
+            }
+
+            if (IsEmpty()) {
+                INFO("Chunk is empty, skipping mesh generation " + chunkposstr);
+            }
+
             return;
         }
-
-        if (!isGenerated) {
-            std::cerr << "[Chunk Mesh Generation / Warn] Trying to generate mesh for ungenerated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
-            return;
-        }
-
-        if (IsEmpty()) {
-            std::cout << "[Chunk Mesh Generation / Info] Chunk is empty, skipping mesh generation {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
-            return;
-        }
-
 
         vertices.clear();
         indices.clear();

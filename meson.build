@@ -4,8 +4,15 @@ project('kiwicubed', 'cpp', default_options: ['cpp_std=c++20'])
 add_project_arguments('-DGLM_ENABLE_EXPERIMENTAL', language: 'cpp')
 add_project_arguments('-DSTB_IMAGE_IMPLEMENTATION', language: 'cpp')
 
+
+if meson.get_compiler('cpp').get_id() == 'msvc'
+    add_project_link_arguments('/ignore:4099', language: 'cpp') # 4099 is for PDB not found, which is fine and just logspam because we don't have PDBs anyways
+endif
+
+
 inc = include_directories('Source', 'Source/GPUObjects', 'Vendor')
 sources = files(
+  'Source/log4kwc.cpp',
   'Source/Block.cpp',
   'Source/Camera.cpp',
   'Source/Chunk.cpp',
