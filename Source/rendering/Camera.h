@@ -22,8 +22,8 @@ class Camera
 		glm::mat4 projectionMatrix = glm::mat4(1.0f);
 
 		Camera() : window(window), windowInstance(nullptr) {}
-		Camera(Window& newWindow);
-		~Camera();
+		Camera(Window& newWindow):  window(newWindow), windowInstance(nullptr) {};
+		~Camera() {};
 
 		void Setup(Window& window);
 

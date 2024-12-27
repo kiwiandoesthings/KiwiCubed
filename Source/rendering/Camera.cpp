@@ -1,10 +1,6 @@
 #include "Camera.h"
 #include "glm/ext.hpp"
 
-
-Camera::Camera(Window& newWindow) : window(newWindow), windowInstance(nullptr) {
-}
-
 void Camera::Setup(Window& window) {
 	Camera::window = window;
 	windowInstance = window.GetWindowInstance();
@@ -26,8 +22,4 @@ void Camera::UpdateMatrix(float FOV, float nearPlane, float farPlane, glm::vec3 
 
 Window& Camera::GetWindow() {
 	return window;
-}
-
-Camera::~Camera() {
-
 }

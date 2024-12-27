@@ -1,6 +1,6 @@
 #include "ChunkHandler.h"
 #include "World.h"
-#include "log4kwc.hpp"
+#include <log4kwc.hpp>
 
 // Currently just sets up the VBO, VAO, and IBO
 void Chunk::SetupRenderComponents() {

@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <istream>
-#include "log4kwc.hpp"
+#include <log4kwc.hpp>
 
 class Window;
 

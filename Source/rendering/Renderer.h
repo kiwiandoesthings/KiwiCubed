@@ -20,5 +20,5 @@ class Renderer {
 		void ClearScreen(float redValue, float blueValue, float greenValue);
 		void DrawElements(VertexArrayObject vertexArrayObject, VertexBufferObject vertexBufferObject, IndexBufferObject indexBufferObject, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices);
 
-		void Delete();
+		void Delete() {};
 };

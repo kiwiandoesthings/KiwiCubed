@@ -43,7 +43,7 @@ extern "C"
 #include "SingleplayerHandler.h"
 #include "Texture.h"
 #include "Window.h"
-#include "log4kwc.hpp"
+#include <log4kwc.hpp>
 
 // chunk numbers
 // says generatede 360 chunks

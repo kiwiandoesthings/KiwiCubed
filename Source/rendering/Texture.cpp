@@ -1,8 +1,10 @@
 #include <Texture.h>
 #include <stb_image.h>
 #include <debug-trap.h>
+#include <log4kwc.hpp>
 
 Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum format, GLenum pixelType) : atlasSize(0) {
+	OVERRIDE_LOG_NAME("Texture Loading");
 	type = textureType;
 
 	int imageWidth, imageHeight, colorChannels;
@@ -10,7 +12,7 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 	unsigned char* bytes = stbi_load(filepath, &imageWidth, &imageHeight, &colorChannels, 0);
 
 	if (!bytes) {
-		std::cout << "[Texture Loading / Error] Failed to load image from file path: " << filepath << std::endl;
+		ERR("Failed to load image from file path: " + std::string(filepath));
 		psnip_trap();
 	}
 

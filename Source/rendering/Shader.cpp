@@ -2,7 +2,7 @@
 #include <debug-trap.h>
 #include <string>
 #include <winnt.h>
-#include "log4kwc.hpp"
+#include <log4kwc.hpp>
 
 Shader::Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath) {
     std::string vertexSource = ParseShader(vertexFilePath);

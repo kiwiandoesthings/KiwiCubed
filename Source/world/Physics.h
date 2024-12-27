@@ -8,9 +8,7 @@
 
 #include "ChunkHandler.h"
 
-
 class Entity;
-
 
 struct PhysicsBoundingBox {
 	glm::vec3 corner1;
