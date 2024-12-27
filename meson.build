@@ -10,7 +10,7 @@ if meson.get_compiler('cpp').get_id() == 'msvc'
 endif
 
 
-inc = include_directories('Source', 'Source/GPUObjects', 'Vendor')
+inc = include_directories('Source', 'Source/GPUObjects')
 sources = files(
   'Source/log4kwc.cpp',
   'Source/Block.cpp',
@@ -39,6 +39,7 @@ executable(
   sources,
   include_directories: inc,
   dependencies: [
+    dependency('kwport', fallback: ['kwport', 'kwport_dep']),
     dependency('json', fallback: ['json', 'nlohmann_json_dep']),
     dependency('glfw', fallback: ['glfw', 'glfw_dep'], static: true),
     dependency('imgui', fallback: ['imgui', 'imgui_dep'], static: true),

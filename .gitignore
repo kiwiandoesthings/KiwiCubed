@@ -3,6 +3,8 @@
 !/subprojects/*.wrap
 # this one's a straggler from glad
 /subprojects/egl-registry.wrap
+# and this one is for our portable .h dependencies
+!/subprojects/kwport
 
 .vscode/*
 
