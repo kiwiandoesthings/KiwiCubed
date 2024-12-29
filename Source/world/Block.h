@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 #include <FastNoise.h>
 #include <glm/vec3.hpp>
@@ -15,7 +16,36 @@
 #include <glm/gtx/vector_angle.hpp>
 
 #include "Renderer.h"
+#include <Texture.h>
 
+
+struct BlockID {
+    const char* modID;
+    const char* blockName;
+
+    bool isAir() {
+        return strcmp(blockName, "air") == 0;
+    }
+
+    bool operator==(const BlockID& other) const {
+        return strcmp(modID, other.modID) == 0 && strcmp(blockName, other.blockName) == 0;
+    }
+
+    std::string canonicalName() {
+        return std::string(modID) + ":" + blockName;
+    }
+};
+
+template <>
+struct std::hash<BlockID>{
+    std::size_t operator()(const BlockID& k) const {
+        using std::size_t;
+
+        return std::hash<std::string>()(std::string(k.modID) + ":" + k.blockName);
+    }
+};
+
+typedef unsigned int TextureID;
 
 enum FaceDirection {
     FRONT,
@@ -26,28 +56,73 @@ enum FaceDirection {
     BOTTOM
 };
 
+struct BlockPos {
+    unsigned short x;
+    unsigned short y;
+    unsigned short z;
+};
 
-class Block {
+struct BlockType {
+    BlockID blockID;
+    std::vector<TextureID> textures;
+
+    bool isAir() {
+        return textures[0] == 0;
+    }
+};
+
+class BlockManager {
     public:
-        Block() : blockX(0), blockY(0), blockZ(0), type(0) {}
-        Block(int type) : blockX(0), blockY(0), blockZ(0), type(type) {}
-
-        void GenerateBlock(unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
-        void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize);
-        
-        unsigned int GetType() const {
-            return type;
+        BlockManager(): blockTypes({}) {
+            registerBlockType({
+                .blockID = {"kiwicubed", "air"},
+                .textures = {0}
+            });
+            registerBlockType({
+                .blockID = {"kiwicubed", "stone"},
+                .textures = {1, 2, 3, 4}
+            });
         }
-        void SetType(unsigned int newType) {
-            type = newType;
+
+        void registerBlockType(BlockType blockType) {
+            blockTypes[blockType.blockID] = blockType;
+        }
+
+        BlockType* GetBlockType(BlockID blockID) {
+            return &blockTypes[blockID];
+        }
+
+        BlockType* GetBlockType(const char* modID, const char* blockName) {
+            return &blockTypes[{modID, blockName}];
         }
 
     private:
-        unsigned short blockX;
-        unsigned short blockY;
-        unsigned short blockZ;
+        std::unordered_map<BlockID, BlockType> blockTypes;
+};
 
+inline BlockManager gBlockManager = BlockManager();
+
+
+class Block {
+    public:
+        Block() : pos({0,0,0}), type(gBlockManager.GetBlockType("kiwicubed", "air")) {}
+        Block(BlockType* type) : pos({0,0,0}), type(type) {}
+
+        void GenerateBlock(BlockPos newpos, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
+        void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize);
+
+        void SetType(BlockType* newBlockType) {
+            type = newBlockType;
+        }
+
+        BlockType* GetType() {
+            return type;
+        }
+
+    private:
+        BlockPos pos;
 
         //unsigned short blockState;
-        unsigned short type = 0;
+        unsigned short variant;
+        BlockType* type;
 };

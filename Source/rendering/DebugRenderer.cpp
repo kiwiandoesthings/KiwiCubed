@@ -1,8 +1,5 @@
 #include "DebugRenderer.h"
 
-DebugRenderer::DebugRenderer() {
-}
-
 // I have so little fucking idea how to make this more modular. I feel it's going to be ultra hardcoded for a very long time.
 void DebugRenderer::SetupBuffers(const glm::vec3& playerPhysicsBoundingBoxCorner1, const glm::vec3& playerPhysicsBoundingBoxCorner2, const glm::vec3& playerPosition, const std::vector<GLfloat>& chunkDebugVertices, const std::vector<GLuint>& chunkDebugIndices, const std::vector<glm::vec4>& chunkOrigins) {
 	// PlayerPhysicsBoundingBox setup
@@ -136,7 +133,4 @@ void DebugRenderer::RenderDebug(Shader& wireframeShaderProgram, Shader& chunkDeb
 
 
 	// Future renderers go here
-}
-
-DebugRenderer::~DebugRenderer() {
 }

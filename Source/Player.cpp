@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "log4kwc.hpp"
 
 
 Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler) : Entity(), yaw(0), pitch(0), roll(0), width(640), height(480), chunkHandler(chunkHandler) {
@@ -29,7 +30,7 @@ void Player::Setup(Window& window) {
 
 void Player::Update() {
 	if (!camera) {
-		std::cerr << "[Player Update / Warn] Trying to update player without a camera, aborting" << std::endl;
+		WARN("Trying to update player without a camera, aborting");
 		return;
 	}
 
@@ -85,23 +86,14 @@ void Player::MouseButtonCallback() {
 		chunkHandler.RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 		if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
 			chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
-			if (blockPosition.x == 0) {
+			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1) {
 				chunkHandler.RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
 			}
-			if (blockPosition.x == chunkSize - 1) {
-				chunkHandler.RemeshChunk(chunkPosition.x + 1, chunkPosition.y, chunkPosition.z, false);
-			}
-			if (blockPosition.y == 0) {
+			if (blockPosition.y == 0 || blockPosition.y == chunkSize - 1) {
 				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y - 1, chunkPosition.z, false);
 			}
-			if (blockPosition.y == chunkSize - 1) {
-				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y + 1, chunkPosition.z, false);
-			}
-			if (blockPosition.z == 0) {
+			if (blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
 				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z - 1, false);
-			}
-			if (blockPosition.z == chunkSize - 1) {
-				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z + 1, false);
 			}
 		}
 		else {

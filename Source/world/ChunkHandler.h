@@ -122,7 +122,7 @@ public:
     void ForceGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ);
     void RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNeighbors);
 
-    void AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, int type);
+    void AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, BlockID type);
     void RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ);
 
 private:

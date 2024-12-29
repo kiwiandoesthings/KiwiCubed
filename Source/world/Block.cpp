@@ -67,59 +67,41 @@ GLuint faceIndices[] = {
 };
 
 
-void Block::GenerateBlock(unsigned short newBlockX, unsigned short newBlockY, unsigned short newBlockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug) {
-	blockX = newBlockX;
-	blockY = newBlockY;
-	blockZ = newBlockZ;
+void Block::GenerateBlock(BlockPos newpos, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug) {
+	pos = newpos;
 
 	FastNoiseLite noise;
 	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 	noise.SetSeed(120);
 
-	/// Physics debug generation
-	//if ((chunkX % 2 == 0 && chunkY % 2 == 1 && chunkZ % 2 == 0)) {
-	//	int random = (rand() % 4) + 1;
-	//	type = random;
-	//	return;
-	//}
-	//if ((blockX >= 16 && blockX <= 31 && blockY >= 16 && blockY <= 31 && blockZ >= 16 && blockZ <= 31)) {
-	//	int random = (rand() % 4) + 1;
-	//	type = random;
-	//	return;
-	//}
-	//if (blockX == 16 && blockY == 16 && blockZ == 16) {
-	//	type = 1;
-	//	return;
-	//}
-
 	int newChunkSize = static_cast<int>(chunkSize);
 
-	float density = noise.GetNoise(static_cast<float>(static_cast<int>(blockX) + (chunkX * static_cast<int>(newChunkSize))), static_cast<float>(static_cast<int>(blockY) + (chunkY * static_cast<int>(newChunkSize))), static_cast<float>(static_cast<int>(blockZ) + (chunkZ * static_cast<int>(newChunkSize))));
+	float density = noise.GetNoise(
+		static_cast<float>(static_cast<int>(pos.x) + (chunkX * newChunkSize)),
+		static_cast<float>(static_cast<int>(pos.y) + (chunkY * newChunkSize)),
+		static_cast<float>(static_cast<int>(pos.z) + (chunkZ * newChunkSize))
+	);
 
-	if (debug) {
-		//std::cout << static_cast<float>(blockX) + (chunkX * newChunkSize) << " " << static_cast<float>(blockY) + (chunkY * newChunkSize) << " " << static_cast<float>(blockZ) + (chunkZ * newChunkSize) << std::endl;
-	}
-	
 	if (density > 0) {
-		int random = (rand() % 4) + 1;
-		type = random;
-		return;
+		type = gBlockManager.GetBlockType("kiwicubed", "stone");
+		variant = rand() % 4;
+	} else {
+		type = gBlockManager.GetBlockType("kiwicubed", "air");
+		variant = 0;
 	}
-	
-	type = 0;
 }
 
 void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize) {
 	GLuint vertexOffset = static_cast<GLuint>(faceDirection) * 20;
 	GLuint baseIndex = static_cast<GLuint>(vertices.size() / 6);
-	
+
 	for (size_t i = vertexOffset; i < static_cast<size_t>(vertexOffset) + 20; i += 5) {
-		vertices.emplace_back(faceVertices[i  + 0] + static_cast<GLfloat>(blockX + (chunkX * static_cast<int>(chunkSize))));
-		vertices.emplace_back(faceVertices[i  + 1] + static_cast<GLfloat>(blockY + (chunkY * static_cast<int>(chunkSize))));
-		vertices.emplace_back(faceVertices[i  + 2] + static_cast<GLfloat>(blockZ + (chunkZ * static_cast<int>(chunkSize))));
-		vertices.emplace_back(faceVertices[i  + 3]);
-		vertices.emplace_back(faceVertices[i  + 4]);
-		vertices.emplace_back(static_cast<GLfloat>(type));
+		vertices.emplace_back(faceVertices[i + 0] + static_cast<GLfloat>(pos.x + (chunkX * static_cast<int>(chunkSize))));
+		vertices.emplace_back(faceVertices[i + 1] + static_cast<GLfloat>(pos.y + (chunkY * static_cast<int>(chunkSize))));
+		vertices.emplace_back(faceVertices[i + 2] + static_cast<GLfloat>(pos.z + (chunkZ * static_cast<int>(chunkSize))));
+		vertices.emplace_back(faceVertices[i + 3]);
+		vertices.emplace_back(faceVertices[i + 4]);
+		vertices.emplace_back(static_cast<GLfloat>(type->textures[variant]));
 	}
 	
 	for (size_t i = 0; i < 6; ++i) {

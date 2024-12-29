@@ -263,7 +263,7 @@ bool RaycastWorld(const glm::vec3& origin, const glm::vec3& direction, int maxDi
 		Chunk chunk = chunkHandler.GetChunk(currentChunk.x, currentChunk.y, currentChunk.z);
 		if (chunk.isGenerated) {
 			Block& block = chunk.blocks[localBlockPos.x][localBlockPos.y][localBlockPos.z];
-			if (block.GetType() > 0) {
+			if (!block.GetType()->isAir()) {
 				blockHitPosition = glm::ivec3(positiveModulo(currentBlock.x, chunkSize), positiveModulo(currentBlock.y, chunkSize), positiveModulo(currentBlock.z, chunkSize));
 				chunkHitPosition = currentChunk;
 				isHit = true;
