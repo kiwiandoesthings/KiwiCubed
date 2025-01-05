@@ -1,5 +1,0 @@
-[wrap-file]
-directory = log4kwc
-
-[provide]
-log4kwc = log4kwc_dep

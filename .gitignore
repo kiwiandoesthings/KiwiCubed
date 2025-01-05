@@ -5,7 +5,7 @@
 /subprojects/egl-registry.wrap
 # custom subprojects
 !/subprojects/kwport
-!/subprojects/log4kwc
+!/subprojects/klogger
 
 .vscode/*
 

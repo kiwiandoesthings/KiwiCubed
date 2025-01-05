@@ -3,6 +3,7 @@
 #include <GLError.h>
 #include <glad/glad.h>
 
+#include <bitset>
 #include <iostream>
 #include <vector>
 #include <unordered_map>
@@ -19,29 +20,29 @@
 #include <Texture.h>
 
 
-struct BlockID {
+struct BlockStringID {
     const char* modID;
     const char* blockName;
 
-    bool isAir() {
+    bool IsAir() {
         return strcmp(blockName, "air") == 0;
     }
 
-    bool operator==(const BlockID& other) const {
+    bool operator==(const BlockStringID& other) const {
         return strcmp(modID, other.modID) == 0 && strcmp(blockName, other.blockName) == 0;
     }
 
-    std::string canonicalName() {
+    std::string CanonicalName() {
         return std::string(modID) + ":" + blockName;
     }
 };
 
 template <>
-struct std::hash<BlockID>{
-    std::size_t operator()(const BlockID& k) const {
+struct std::hash<BlockStringID>{
+    std::size_t operator()(const BlockStringID& blockStringID) const {
         using std::size_t;
 
-        return std::hash<std::string>()(std::string(k.modID) + ":" + k.blockName);
+        return std::hash<std::string>()(std::string(blockStringID.modID) + ":" + blockStringID.blockName);
     }
 };
 
@@ -56,73 +57,94 @@ enum FaceDirection {
     BOTTOM
 };
 
-struct BlockPos {
-    unsigned short x;
-    unsigned short y;
-    unsigned short z;
+struct BlockPosition {
+    std::bitset<5> x;
+    std::bitset<5> y;
+    std::bitset<5> z;
+
+    int xInt () const {
+        return static_cast<int>(x.to_ulong());
+    }
+
+    int yInt () const {
+        return static_cast<int>(x.to_ulong());
+    }
+
+    int zInt () const {
+        return static_cast<int>(x.to_ulong());
+    }
 };
 
 struct BlockType {
-    BlockID blockID;
+    BlockStringID blockStringID;
     std::vector<TextureID> textures;
+    // Textures given by the block manager currently don't mean anything. They are not connected to the actual textures rendered on screen.
+    // For that a texture-mesher type thing would be needed like in Minecraft to take all of the seperate block textures, and combine them into one atlas.
 
-    bool isAir() {
-        return textures[0] == 0;
+    // TODO: When needed, some way to access different blocks properties such as friction, blast resistance, etc.
+    // How should this block data be stored? Reading from a generated or pre-made file probably isn't efficient.
+    // Could try and register block properties using RegisterBlockType, and have some data fixer-upper fill in empty values.
+    // This would have to be stored in some custom data structure with another map and everything though so maybe that isn't the best idea.
+    // Also, custom block properties need to be accounted for. If a mod wants to add some custom data to its blocks to be read, how should that be done?
+
+    bool IsAir() {
+        return blockStringID.IsAir();
     }
 };
+
 
 class BlockManager {
     public:
         BlockManager(): blockTypes({}) {
-            registerBlockType({
-                .blockID = {"kiwicubed", "air"},
+            RegisterBlockType({
+                .blockStringID = {"kiwicubed", "air"},
                 .textures = {0}
             });
-            registerBlockType({
-                .blockID = {"kiwicubed", "stone"},
-                .textures = {1, 2, 3, 4}
+            RegisterBlockType({
+                .blockStringID = {"kiwicubed", "stone"},
+                .textures = {0, 1, 2, 3}
             });
         }
 
-        void registerBlockType(BlockType blockType) {
-            blockTypes[blockType.blockID] = blockType;
-        }
+        void RegisterBlockType(BlockType blockType);
 
-        BlockType* GetBlockType(BlockID blockID) {
-            return &blockTypes[blockID];
-        }
+        BlockType* GetBlockType(BlockStringID blockStringID);
+        BlockType* GetBlockType(const char* modID, const char* blockName);
+        BlockType* GetBlockType(unsigned short blockID);
 
-        BlockType* GetBlockType(const char* modID, const char* blockName) {
-            return &blockTypes[{modID, blockName}];
-        }
+        unsigned short* GetBlockID(BlockStringID blockStringID);
+        unsigned short* GetBlockID(const char* modID, const char* blockName);
 
     private:
-        std::unordered_map<BlockID, BlockType> blockTypes;
+        std::unordered_map<unsigned short, BlockType> blockTypes;
+
+        std::unordered_map<unsigned short, BlockStringID> blockIDsToStrings;
+        std::unordered_map<BlockStringID, unsigned short> blockStringsToIDs;
+
+        unsigned short latestBlockID = 0;
 };
 
-inline BlockManager gBlockManager = BlockManager();
+
+inline BlockManager blockManager = BlockManager();
 
 
 class Block {
     public:
-        Block() : pos({0,0,0}), type(gBlockManager.GetBlockType("kiwicubed", "air")) {}
-        Block(BlockType* type) : pos({0,0,0}), type(type) {}
+        Block() : blockPosition(0, 0, 0), blockID(0) {}
+        Block(unsigned short blockID) : blockPosition(0, 0, 0), blockID(blockID) {}
 
-        void GenerateBlock(BlockPos newpos, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
+        void GenerateBlock(BlockPosition newBlockPosition, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
         void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize);
 
-        void SetType(BlockType* newBlockType) {
-            type = newBlockType;
-        }
+        unsigned int GetBlockID() const;
+        void SetBlockID(unsigned short newBlockID);
 
-        BlockType* GetType() {
-            return type;
-        }
+        bool IsAir();
 
     private:
-        BlockPos pos;
+        BlockPosition blockPosition;
 
-        //unsigned short blockState;
+        unsigned short blockID;
         unsigned short variant;
-        BlockType* type;
+        //unsigned short blockState;
 };

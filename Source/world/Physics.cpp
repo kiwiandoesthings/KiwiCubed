@@ -248,6 +248,7 @@ void ApplyPhysics(Entity& entity, ChunkHandler& chunkHandler) {
 	entity.SetEntityData(newEntityData);
 }
 
+// Literally what the fuck even is this functionn I hate raycasting so much
 bool RaycastWorld(const glm::vec3& origin, const glm::vec3& direction, int maxDistance, ChunkHandler& chunkHandler, glm::ivec3& blockHitPosition, glm::ivec3& chunkHitPosition, bool& isHit) {
 	glm::ivec3 currentBlock = glm::floor(origin );
 	glm::ivec3 currentChunk = glm::ivec3(glm::floor(float(currentBlock.x) / float(chunkSize)), glm::floor(float(currentBlock.y) / float(chunkSize)),glm::floor(float(currentBlock.z) / float(chunkSize)));
@@ -263,7 +264,7 @@ bool RaycastWorld(const glm::vec3& origin, const glm::vec3& direction, int maxDi
 		Chunk chunk = chunkHandler.GetChunk(currentChunk.x, currentChunk.y, currentChunk.z);
 		if (chunk.isGenerated) {
 			Block& block = chunk.blocks[localBlockPos.x][localBlockPos.y][localBlockPos.z];
-			if (!block.GetType()->isAir()) {
+			if (!block.IsAir()) {
 				blockHitPosition = glm::ivec3(positiveModulo(currentBlock.x, chunkSize), positiveModulo(currentBlock.y, chunkSize), positiveModulo(currentBlock.z, chunkSize));
 				chunkHitPosition = currentChunk;
 				isHit = true;

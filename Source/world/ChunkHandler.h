@@ -2,6 +2,7 @@
 
 #include "GLError.h"
 #include <glad/glad.h>
+#include <klogger.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -25,6 +26,7 @@
 
 
 const int chunkSize = 32;
+
 
 class Chunk;
 class ChunkHandler;
@@ -57,7 +59,7 @@ class Chunk {
         bool id = 0;
 
         Chunk() {}
-        Chunk(int chunkX, int chunkY, int chunkZ) : isEmpty(false), chunkX(chunkX), chunkY(chunkY), chunkZ(chunkZ) {}
+        Chunk(int chunkX, int chunkY, int chunkZ) : chunkX(chunkX), chunkY(chunkY), chunkZ(chunkZ), isEmpty(false) {}
 
 
 
@@ -105,6 +107,7 @@ class Chunk {
         IndexBufferObject indexBufferObject;
 };
 
+
 class ChunkHandler {
 public:
     std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
@@ -122,7 +125,7 @@ public:
     void ForceGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ);
     void RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNeighbors);
 
-    void AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, BlockID type);
+    void AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID);
     void RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ);
 
 private:

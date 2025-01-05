@@ -76,6 +76,7 @@ class World {
 		bool isWorldGenerated = false;
 		unsigned int worldSize;
 		ChunkHandler chunkHandler;
+		BlockManager blockManager;
 
 		Renderer renderer;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLError.h>
+#include <klogger.hpp>
 
 #include"Shader.h"
 

@@ -1,14 +1,14 @@
 #pragma once
 
-#ifndef LOG4KWC_HPP
-#define LOG4KWC_HPP
+#ifndef KLOGGER_HPP
+#define KLOGGER_HPP
 
 #include <string>
 #include <iostream>
 #include <source_location>
 #include <map>
 
-enum class LogLevel {
+enum class LogLevel { 
 	debug,
 	info,
 	warn,
@@ -18,11 +18,11 @@ enum class LogLevel {
 };
 
 
-std::string logLevelToString(LogLevel level);
+std::string LogLevelToString(LogLevel level);
 
-void overrideFunctionLogName(const std::string& functionName, const std::string& replacement);
+void OverrideFunctionLogName(const std::string& functionName, const std::string& replacement);
 
-void Log(LogLevel level, const std::string& message, const std::source_location &srclc);
+void Log(LogLevel level, const std::string& message, const std::source_location &sourceLocation);
 
 
 #define DEBUG(message) Log(LogLevel::debug, message, std::source_location::current())
@@ -35,7 +35,7 @@ void Log(LogLevel level, const std::string& message, const std::source_location 
 #define LOG_CHECK_RETURN(cond, succmsg, errmsg, retcode) if (cond) { INFO(succmsg); } else { ERR(errmsg); return retcode; }
 #define LOG_CHECK_RETURN_VOID(cond, succmsg, errmsg) if (cond) { INFO(succmsg); } else { ERR(errmsg); return; }
 
-#define OVERRIDE_LOG_NAME(replacement) overrideFunctionLogName(std::source_location::current().function_name(), replacement)
+#define OVERRIDE_LOG_NAME(replacement) OverrideFunctionLogName(std::source_location::current().function_name(), replacement)
 
 
 #endif

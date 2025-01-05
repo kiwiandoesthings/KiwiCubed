@@ -1,4 +1,4 @@
-#include <log4kwc.hpp>
+#include <klogger.hpp>
 
 
 
@@ -20,9 +20,9 @@ LogLevel logLevel = LogLevel::debug;
 
 std::map<std::string, std::string> functionHeaderReplacements;
 
-std::string header_structure = "[{level} | {function} @ {file}:{line}]";
+std::string headerStructure = "[{level} | {function}]";
 
-std::string logLevelToString(LogLevel level) {
+std::string LogLevelToString(LogLevel level) {
 	switch (level) {
 		case LogLevel::debug: return "DEBUG";
 		case LogLevel::info: return "INFO";
@@ -34,17 +34,17 @@ std::string logLevelToString(LogLevel level) {
 	}
 }
 
-void overrideFunctionLogName(const std::string& functionName, const std::string& replacement) {
+void OverrideFunctionLogName(const std::string& functionName, const std::string& replacement) {
 	functionHeaderReplacements[functionName] = replacement;
 }
 
 void Log(LogLevel level, const std::string& message, const std::source_location &srclc) {
 	if (level >= logLevel) {
 
-		std::string header = header_structure;
+		std::string header = headerStructure;
 		#define REPLACE(f, r) header.replace(header.find(f), sizeof(f) - 1, r)
 
-		std::string loglvlstr = logLevelToString(level);
+		std::string loglvlstr = LogLevelToString(level);
 		REPLACE("{level}", COLORED_STR(loglvlstr, loglvlstr));
 
 		std::string fname;
@@ -54,9 +54,15 @@ void Log(LogLevel level, const std::string& message, const std::source_location 
 		} else {
 			fname = COLORED_STR("FUNCTION", srclc.function_name());
 		}
+		
 		REPLACE("{function}", fname);
-		REPLACE("{file}", COLORED_STR("SRCLOC", srclc.file_name()));
-		REPLACE("{line}", COLORED_STR("SRCLOC", std::to_string(srclc.line())));
+
+		std::string stupidStringThatIHate = "void __cdecl ";
+		size_t stupid = header.find(stupidStringThatIHate);
+    
+    	if (stupid != std::string::npos) {
+        	header.erase(stupid, stupidStringThatIHate.length());
+    	}
 
 		#undef REPLACE
 		

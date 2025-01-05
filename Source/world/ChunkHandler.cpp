@@ -84,23 +84,23 @@ void ChunkHandler::RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNe
     }
 }
 
-void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, BlockID type) {
+void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID) {
     Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ);
     Block& block = chunk.blocks[blockX][blockY][blockZ];
-    if (block.GetType()->isAir() ^ type.isAir()) {
+    if (block.IsAir() ^ (newBlockID == 0)) {
         int curblocks = chunk.GetTotalBlocks();
-        if (type.isAir()) {
+        if (newBlockID == 0) {
             chunk.SetTotalBlocks(curblocks - 1);
         }
         else {
             chunk.SetTotalBlocks(curblocks + 1);
         }
     }
-    block.SetType(gBlockManager.GetBlockType(type));
+    block.SetBlockID(newBlockID);
 }
 
 void ChunkHandler::RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ) {
-    AddBlock(chunkX, chunkY, chunkZ, blockX, blockY, blockZ, {"kiwicubed", "air"});
+    AddBlock(chunkX, chunkY, chunkZ, blockX, blockY, blockZ, 0);
 }
 
 

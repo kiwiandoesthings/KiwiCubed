@@ -1,0 +1,5 @@
+this is actually so in progress but im trying to start making resources more modular
+
+kiwicubed itself is a mod that is always loaded with the game
+
+making this system is going to be pain.

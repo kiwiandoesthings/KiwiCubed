@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+#include <klogger.hpp>
 
 #include <functional>
 #include <iostream>
@@ -8,9 +9,10 @@
 #include <unordered_map>
 #include <sstream>
 #include <istream>
-#include <log4kwc.hpp>
+
 
 class Window;
+
 
 class InputHandler {
     public:
@@ -33,27 +35,27 @@ class InputHandler {
         // MonitoredKeys argument is technically optional, as it isn't used, but should be passed for console debugging
         void SetupKeyStates(GLFWwindow* window, std::vector<int> monitoredKeys) {
             OVERRIDE_LOG_NAME("InputHandler");
-            std::stringstream ss;
-            ss << " Key monitoring registered for keys: (";
+            std::stringstream outputString;
+            outputString << " Key monitoring registered for keys: (";
             for (int i = 0; i < monitoredKeys.size(); ++i) {
                 const char* keyName = glfwGetKeyName(monitoredKeys[i], 0);
                 if (keyName == NULL) {
-                    ss << "keycode: " << monitoredKeys[i];
+                    outputString << "keycode: " << monitoredKeys[i];
                     if (i + 1 != monitoredKeys.size()) {
-                        ss << ", ";
+                        outputString << ", ";
                     }
                     continue;
                 }
-                ss << "\'" << keyName << "\'";
+                outputString << "\'" << keyName << "\'";
                 if (i + 1 != monitoredKeys.size()) {
-                    ss << ", ";
+                    outputString << ", ";
                 }
             }
     
             auto iterator = std::find(instances.begin(), instances.end(), this);
             int index = static_cast<int>(iterator - instances.begin());
-            ss << ") for input instance[" << index << "]" << std::endl;
-            INFO(ss.str());
+            outputString << ") for input instance[" << index << "]" << std::endl;
+            INFO(outputString.str());
             instances.push_back(this);
         }
 

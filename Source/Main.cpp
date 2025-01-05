@@ -24,6 +24,7 @@ extern "C"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <klogger.hpp>
 
 #include <chrono>
 #include <fstream>
@@ -43,12 +44,6 @@ extern "C"
 #include "SingleplayerHandler.h"
 #include "Texture.h"
 #include "Window.h"
-#include <log4kwc.hpp>
-
-// chunk numbers
-// says generatede 360 chunks
-// 343 chunks is perfect cube
-// debug renderer for ALL chunks? super hard without one
 
 
 using json = nlohmann::json;
@@ -66,7 +61,7 @@ std::string projectVersion;
 // This main function is getting out of hand
 // yes but hands are in pocket so is it still in the pocket or is it out of pocket? - Astra
 int main() {
-	std::ifstream file("Resources/Data/init_config.json");
+	std::ifstream file("init_config.json");
 
 	OVERRIDE_LOG_NAME("Initialization");
 

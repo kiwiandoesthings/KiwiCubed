@@ -1,7 +1,6 @@
 #include <Texture.h>
 #include <stb_image.h>
 #include <debug-trap.h>
-#include <log4kwc.hpp>
 
 Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum format, GLenum pixelType) : atlasSize(0) {
 	OVERRIDE_LOG_NAME("Texture Loading");
@@ -15,7 +14,6 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 		ERR("Failed to load image from file path: " + std::string(filepath));
 		psnip_trap();
 	}
-
 
 	GLCall(glGenTextures(1, &ID));
 	GLCall(glActiveTexture(slot));
