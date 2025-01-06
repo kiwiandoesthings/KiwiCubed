@@ -103,7 +103,7 @@ void Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
         for (int x = 0; x < chunkSize; ++x) {
             for (int y = 0; y < chunkSize; ++y) {
                 for (int z = 0; z < chunkSize; ++z) {
-                    if (blocks[x][y][z].IsAir()) {
+                    if (!blocks[x][y][z].IsAir()) {
                         Block& block = blocks[x][y][z];
         
                         for (int direction = 0; direction < 6; ++direction) {

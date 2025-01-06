@@ -101,7 +101,7 @@ void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices
 		vertices.emplace_back(faceVertices[i + 2] + static_cast<GLfloat>(blockPosition.zInt() + (chunkZ * static_cast<int>(chunkSize))));
 		vertices.emplace_back(faceVertices[i + 3]);
 		vertices.emplace_back(faceVertices[i + 4]);
-		vertices.emplace_back(static_cast<GLfloat>(blockManager.GetBlockType(blockID)->textures[variant]));
+		vertices.emplace_back(static_cast<GLfloat>(blockManager.GetBlockType(blockID)->textures[0]));
 	}
 	
 	for (size_t i = 0; i < 6; ++i) {
@@ -117,5 +117,5 @@ void Block::SetBlockID(unsigned short newBlockID) {
 }
 
 bool Block::IsAir() {
-	return blockID == 0;
+	return blockID == 1;
 }

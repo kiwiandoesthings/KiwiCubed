@@ -7,6 +7,7 @@ std::atomic<bool> keepRunning(true);
 
 
 World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), worldSize(worldSize), chunkHandler(*this) {
+    
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
@@ -24,6 +25,7 @@ void World::Setup(Window& window) {
 
 // Currently just calls SetupRenderComponents on all the chunks
 void World::SetupRenderComponents() {
+    OVERRIDE_LOG_NAME("World Setup");
     for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
         auto& chunk = it->second;
         chunk.SetupRenderComponents();
@@ -49,6 +51,7 @@ void World::Render(Shader shaderProgram) {
 }
 
 void World::GenerateWorld() {
+    OVERRIDE_LOG_NAME("World Generation");
     INFO("Generating world");
 
     chunkAddition = 0;
@@ -78,7 +81,7 @@ void World::GenerateWorld() {
 
     isWorldGenerated = true;
 
-    DEBUG("added " + chunkAddition);
+    DEBUG("added " + std::to_string(chunkAddition));
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk) {
@@ -201,24 +204,26 @@ std::vector<glm::vec4>& World::GetChunkOrigins() {
 }
 
 bool World::StartTickThread() {
+    OVERRIDE_LOG_NAME("World Tick Thread");
     if (shouldTick) {
-        std::cout << "[World Tick Thread / Info] Tried to start tick thread while it was running, aborting" << std::endl;
+        WARN("Tried to start tick thread while it was running, aborting");
         return false;
     }
 
-    std::cout << "[World Tick Thread / Info] Starting tick thread" << std::endl;
+    INFO("Starting tick thread");
     shouldTick = true;
     TickThread = std::thread(&World::RunTickThread, this);
     return true;
 }
 
 bool World::StopTickThread() {
+    OVERRIDE_LOG_NAME("World Tick Thread");
     if (!shouldTick) {
-        std::cout << "[World Tick Thread / Info] Tried to stop tick thread while it was stopped, aborting" << std::endl;
+        WARN("Tried to stop tick thread while it was stopped, aborting");
         return false;
     }
 
-    std::cout << "[World Tick Thread / Info] Stopping tick thread" << std::endl;
+    INFO("Stopping tick thread");
     shouldTick = false;
     if (TickThread.joinable()) {
         TickThread.join();

@@ -10,6 +10,7 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 }
 
 void SingleplayerHandler::EndSingleplayerWorld() {
+	OVERRIDE_LOG_NAME("Exiting World");
 	isLoadedIntoSingleplayerWorld = false;
 	singleplayerWorld.StopTickThread();
 	INFO("Exiting singleplayer world");

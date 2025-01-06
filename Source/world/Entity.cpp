@@ -24,7 +24,6 @@ void Entity::SetEntityData(EntityData newEntityData) {
 
 void Entity::DamageEntity(float damage) {
 	entityStats.health -= damage * (1 - static_cast<float>(entityStats.armor / 100));
-	std::cout << damage * (1 - static_cast<float>(entityStats.armor / 100)) << std::endl;
 }
 
 void Entity::Update() {

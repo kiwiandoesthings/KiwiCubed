@@ -2,6 +2,7 @@
 
 #include "GLError.h"
 #include <glad/glad.h>
+#include "klogger.hpp"
 
 #include <atomic>
 #include <chrono>

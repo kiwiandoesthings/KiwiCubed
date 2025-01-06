@@ -126,12 +126,12 @@ int main() {
 	singleplayerHandler.StartSingleplayerWorld();
 
 	// Create a debug shader
-	Shader terrainShaderProgram("Resources/Shaders/Terrain_Vertex.vert", "Resources/Shaders/Terrain_Fragment.frag");
-	Shader wireframeShaderProgram("Resources/Shaders/Wireframe_Vertex.vert", "Resources/Shaders/Wireframe_Fragment.frag");
-	Shader chunkDebugShaderProgram("Resources/Shaders/ChunkDebug_Vertex.vert", "Resources/Shaders/ChunkDebug_Fragment.frag");
+	Shader terrainShaderProgram("Mods/kiwicubed/Shaders/Terrain_Vertex.vert", "Mods/kiwicubed/Shaders/Terrain_Fragment.frag");
+	Shader wireframeShaderProgram("Mods/kiwicubed/Shaders/Wireframe_Vertex.vert", "Mods/kiwicubed/Shaders/Wireframe_Fragment.frag");
+	Shader chunkDebugShaderProgram("Mods/kiwicubed/Shaders/ChunkDebug_Vertex.vert", "Mods/kiwicubed/Shaders/ChunkDebug_Fragment.frag");
 
 	// Create a debug texture
-	Texture terrainAtlas("Resources/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture terrainAtlas("Mods/kiwicubed/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	terrainAtlas.SetAtlasSize(terrainShaderProgram, 3);
 	terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, 3);
 
