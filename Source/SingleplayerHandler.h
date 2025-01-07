@@ -1,23 +1,22 @@
 #pragma once
 
 #include <GLError.h>
+#include <World.h>
 #include <glad/glad.h>
 
-#include <World.h>
-
 class SingleplayerHandler {
-	public:
-		World singleplayerWorld;
-		Window& window;
+  public:
+    World singleplayerWorld;
+    Window &window;
 
-		bool isLoadedIntoSingleplayerWorld = false;
+    bool isLoadedIntoSingleplayerWorld = false;
 
-		void Setup();
+    void Setup();
 
-		void StartSingleplayerWorld();
-		void EndSingleplayerWorld();
+    void StartSingleplayerWorld();
+    void EndSingleplayerWorld();
 
-		void Delete();
+    void Delete();
 
-	SingleplayerHandler(Window &newWindow) : singleplayerWorld(5, this), window(newWindow), isLoadedIntoSingleplayerWorld(false) {};
+    SingleplayerHandler(Window &newWindow) : singleplayerWorld(5, this), window(newWindow), isLoadedIntoSingleplayerWorld(false) {};
 };

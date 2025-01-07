@@ -1,41 +1,25 @@
 #pragma once
 
+#include <debug-trap.h>
 #include <glad/glad.h>
-#include "klogger.hpp"
 
 #include <iostream>
 
-#include <debug-trap.h>
+#include "klogger.hpp"
 
+#define ASSERT(x)                                                                                                                          \
+    if (!(x))                                                                                                                              \
+        psnip_trap();
 
-#define ASSERT(x) if (!(x)) psnip_trap();
-#define GLCall(x) \
-    GLClearError(); \
-    x; \
-    if (!GLLogCall(#x, __FILE__, __LINE__)) psnip_trap()
+std::string GLStringifyError(GLenum errcode);
 
-static void GLClearError() {
-    while (glGetError() != GL_NO_ERROR);
-}
+static GLenum GLCALL_errorCode = GL_NO_ERROR;
 
-static bool GLLogCall(const char* function, const char* file, int line) {
-    OVERRIDE_LOG_NAME("[OpenGL Function Call]");
-    bool hasError = false;
-    GLenum errorCode;
-    while ((errorCode = glGetError()) != GL_NO_ERROR) {
-        std::string error;
-        switch (errorCode)
-        {
-            case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
-            case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
-            case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
-            case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
-            case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
-            case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
-        }
-        ERR("[[OpenGL Function Call]] / Error: " + error + " / " + std::to_string(errorCode) + " at line " + std::to_string(line) + " in function " + function + " in file " + file);
-        hasError = true;
+#define GLCall(x)                                                                                                                          \
+    while (glGetError() != GL_NO_ERROR) {                                                                                                  \
+    };                                                                                                                                     \
+    x;                                                                                                                                     \
+    while ((GLCALL_errorCode = glGetError()) != GL_NO_ERROR) {                                                                             \
+        ERR("GL " #x " code " + GLStringifyError(GLCALL_errorCode));                                                                       \
+        psnip_trap();                                                                                                                      \
     }
-    return !hasError;
-}

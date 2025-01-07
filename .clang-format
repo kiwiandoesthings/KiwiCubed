@@ -1,0 +1,4 @@
+ColumnLimit:      140
+BreakBeforeBraces: Attach
+AlignAfterOpenBracket: BlockIndent
+IndentWidth: 4

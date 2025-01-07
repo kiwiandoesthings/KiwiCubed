@@ -1,23 +1,21 @@
 #include "ChunkHandler.h"
+
 #include "World.h"
 
-void ChunkHandler::GenerateWorld() {
-    world.GenerateWorld();
-}
+void ChunkHandler::GenerateWorld() { world.GenerateWorld(); }
 
-Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
+Chunk &ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk != chunks.end()) {
         return chunk->second;
-    }
-    else {
-        //std::cout << "[ChunkHandler / Debug] Chunk not found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
-        Chunk& chunk = AddChunk(chunkX, chunkY, chunkZ);
+    } else {
+        // std::cout << "[ChunkHandler / Debug] Chunk not found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        Chunk &chunk = AddChunk(chunkX, chunkY, chunkZ);
         return chunk;
     }
 }
 
-Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
+Chunk &ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk == chunks.end()) {
         chunks.insert(std::make_pair(std::tuple<int, int, int>(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
@@ -30,9 +28,8 @@ Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
         world.chunkAddition++;
 
         return chunk->second;
-    }
-    else {
-        //std::cout << "[ChunkHandler / Debug] Chunk already found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+    } else {
+        // std::cout << "[ChunkHandler / Debug] Chunk already found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
         return GetChunk(chunkX, chunkY, chunkZ);
     }
 }
@@ -42,9 +39,7 @@ void ChunkHandler::GenerateChunk(int chunkX, int chunkY, int chunkZ, bool debug)
     GetChunk(chunkX, chunkY, chunkZ).GenerateBlocks(world, defaultChunk, false, debug);
 }
 
-void ChunkHandler::MeshChunk(int chunkX, int chunkY, int chunkZ) {
-    GetChunk(chunkX, chunkY, chunkZ).GenerateMesh(*this, false);
-}
+void ChunkHandler::MeshChunk(int chunkX, int chunkY, int chunkZ) { GetChunk(chunkX, chunkY, chunkZ).GenerateMesh(*this, false); }
 
 // Specifically uses the world's GenerateChunk() function that makes sure chunks mesh correctly
 void ChunkHandler::SmartGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ) {
@@ -85,14 +80,13 @@ void ChunkHandler::RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNe
 }
 
 void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID) {
-    Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ);
-    Block& block = chunk.blocks[blockX][blockY][blockZ];
+    Chunk &chunk = GetChunk(chunkX, chunkY, chunkZ);
+    Block &block = chunk.blocks[blockX][blockY][blockZ];
     if (block.IsAir() ^ (newBlockID == 0)) {
         int curblocks = chunk.GetTotalBlocks();
         if (newBlockID == 0) {
             chunk.SetTotalBlocks(curblocks - 1);
-        }
-        else {
+        } else {
             chunk.SetTotalBlocks(curblocks + 1);
         }
     }
@@ -103,10 +97,9 @@ void ChunkHandler::RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, i
     AddBlock(chunkX, chunkY, chunkZ, blockX, blockY, blockZ, 0);
 }
 
-
 void ChunkHandler::Delete() {
     for (auto it = chunks.begin(); it != chunks.end(); ++it) {
-        auto& chunk = it->second;
+        auto &chunk = it->second;
         chunk.Delete();
         world.totalChunks--;
     }
