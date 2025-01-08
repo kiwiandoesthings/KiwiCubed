@@ -36,6 +36,8 @@ struct TripleHash {
 };
 
 class Chunk {
+    friend class ChunkHandler;
+
   public:
     Block ***blocks = nullptr;
     int chunkX = 0;
@@ -64,6 +66,7 @@ class Chunk {
 
     int GetTotalBlocks() const;
     void SetTotalBlocks(unsigned short newTotalBlocks);
+    bool BlockIsAir(int blockX, int blockY, int blockZ) { return airBlocks[blockX + blockY * chunkSize + blockZ * chunkSize * chunkSize]; }
 
     std::vector<GLfloat> &GetVertices();
     std::vector<GLuint> &GetIndices();
@@ -92,11 +95,21 @@ class Chunk {
     std::vector<GLuint> debugVisualizationIndices;
 
     unsigned short totalBlocks;
+    std::bitset<chunkSize * chunkSize * chunkSize> airBlocks;
 
     VertexArrayObject vertexArrayObject;
     VertexBufferObject vertexBufferObject;
     IndexBufferObject indexBufferObject;
 };
+
+#define CHUNK_COORD_PROT(chunk, block)                                                                                                     \
+    if (block < 0) {                                                                                                                       \
+        chunk--;                                                                                                                           \
+        block += chunkSize;                                                                                                                \
+    } else if (block >= chunkSize - 1) {                                                                                                   \
+        chunk++;                                                                                                                           \
+        block -= chunkSize;                                                                                                                \
+    }
 
 class ChunkHandler {
   public:
@@ -117,6 +130,8 @@ class ChunkHandler {
 
     void AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID);
     void RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ);
+
+    int BlockIsAir(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ);
 
   private:
     World &world;

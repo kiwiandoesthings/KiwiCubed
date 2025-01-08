@@ -21,5 +21,4 @@ static GLenum GLCALL_errorCode = GL_NO_ERROR;
     x;                                                                                                                                     \
     while ((GLCALL_errorCode = glGetError()) != GL_NO_ERROR) {                                                                             \
         ERR("GL " #x " code " + GLStringifyError(GLCALL_errorCode));                                                                       \
-        psnip_trap();                                                                                                                      \
     }

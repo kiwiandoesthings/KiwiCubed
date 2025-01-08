@@ -9,6 +9,7 @@ World::World(unsigned int worldSize, SingleplayerHandler *singleplayerHandler)
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
+
                 chunkHandler.AddChunk(chunkX, chunkY, chunkZ);
             }
         }
@@ -76,8 +77,6 @@ void World::GenerateWorld() {
     INFO("Around " + std::to_string(chunkgenspeed_seconds) + " chunks generated, meshed and added per second");
 
     isWorldGenerated = true;
-
-    DEBUG("added " + chunkAddition);
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk &chunk, bool updateCallerChunk, Chunk &callerChunk) {

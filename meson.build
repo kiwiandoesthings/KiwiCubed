@@ -12,8 +12,29 @@ comp_id = meson.get_compiler('cpp').get_id()
 
 if comp_id == 'msvc'
   add_project_link_arguments('/ignore:4099', language: 'cpp') # 4099 is for PDB not found, which is fine and just logspam because we don't have PDBs anyways
-elif build_machine.system() == 'windows'
-    add_project_link_arguments('-static -static-libgcc -static-libstdc++', language: 'cpp') # we're cross compiling and wine no likey 
+endif
+
+if build_machine.system() != 'windows' and meson.is_cross_build()
+  add_project_link_arguments(['-static', '-static-libgcc', '-static-libstdc++'], language: 'cpp') # we're cross compiling and wine no likey
+endif
+
+dependencies = [
+  dependency('kwport'),
+  dependency('klogger', static: true),
+  dependency('json'),
+  dependency('glm', static: true),
+  dependency('glad-gl', static: true),
+  subproject('sdl2').get_variable('sdl2_dep'),
+  dependency('imgui', static: true),
+]
+
+if host_machine.system() == 'windows'
+  dependencies += dependency(
+    'sdl2main',
+    fallback: ['sdl2', 'sdl2main_dep'],
+    static: true,
+    required: true,
+  )
 endif
 
 executable(
@@ -43,13 +64,5 @@ executable(
     'Source/World/World.cpp',
   ),
   include_directories: include_directories('Source', 'Source/World', 'Source/Rendering'),
-  dependencies: [
-    dependency('kwport'),
-    dependency('klogger', static: true),
-    dependency('json'),
-    dependency('glfw3', static: true),
-    dependency('imgui', static: true),
-    dependency('glm', static: true),
-    dependency('glad-gl', static: true),
-  ],
+  dependencies: dependencies,
 )

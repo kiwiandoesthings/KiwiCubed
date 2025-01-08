@@ -18,8 +18,8 @@ class Camera {
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     glm::mat4 projectionMatrix = glm::mat4(1.0f);
 
-    Camera(Window &newWindow) : window(newWindow), windowInstance(nullptr) {};
-    ~Camera() {};
+    Camera(Window &newWindow) : window(newWindow), windowInstance(nullptr){};
+    ~Camera(){};
 
     void Setup(Window &window);
 
@@ -30,5 +30,5 @@ class Camera {
 
   private:
     Window &window;
-    GLFWwindow *windowInstance;
+    SDL_Window *windowInstance;
 };

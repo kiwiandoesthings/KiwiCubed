@@ -17,6 +17,7 @@ Chunk &ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
 
 Chunk &ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
+
     if (chunk == chunks.end()) {
         chunks.insert(std::make_pair(std::tuple<int, int, int>(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
         chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
@@ -86,8 +87,10 @@ void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int 
         int curblocks = chunk.GetTotalBlocks();
         if (newBlockID == 0) {
             chunk.SetTotalBlocks(curblocks - 1);
+            chunk.airBlocks.set(blockX + blockY * chunkSize + blockZ * chunkSize * chunkSize);
         } else {
             chunk.SetTotalBlocks(curblocks + 1);
+            chunk.airBlocks.reset(blockX + blockY * chunkSize + blockZ * chunkSize * chunkSize);
         }
     }
     block.SetBlockID(newBlockID);
@@ -106,4 +109,25 @@ void ChunkHandler::Delete() {
 
     chunks.clear();
     world.totalMemoryUsage = 0;
+}
+
+int ChunkHandler::BlockIsAir(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ) {
+    // -1: Chunk does not exist / is not generated
+    // 0: Block is not air
+    // 1: Block is air
+    CHUNK_COORD_PROT(chunkX, blockX);
+    CHUNK_COORD_PROT(chunkY, blockY);
+    CHUNK_COORD_PROT(chunkZ, blockZ);
+
+    if (chunks.find(std::make_tuple(chunkX, chunkY, chunkZ)) == chunks.end()) {
+        return -1;
+    }
+
+    Chunk &chunk = GetChunk(chunkX, chunkY, chunkZ);
+
+    if (!chunk.isGenerated) {
+        return -1;
+    }
+
+    return chunk.BlockIsAir(blockX, blockY, blockZ);
 }

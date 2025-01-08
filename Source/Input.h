@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+#include <SDL.h>
 
 #include <algorithm>
 #include <functional>
@@ -21,7 +21,8 @@ class InputHandler {
 
     InputHandler() : window(window) {}
 
-    void SetupCallbacks(GLFWwindow *window) {
+    void SetupCallbacks(SDL_Window *window) {
+
         InputHandler::window = window;
 
         glfwSetKeyCallback(window, KeyCallbackHandler);
@@ -33,7 +34,7 @@ class InputHandler {
 
     // MonitoredKeys argument is technically optional, as it isn't used, but
     // should be passed for console debugging
-    void SetupKeyStates(GLFWwindow *window, std::vector<int> monitoredKeys) {
+    void SetupKeyStates(SDL_Window *window, std::vector<int> monitoredKeys) {
         OVERRIDE_LOG_NAME("InputHandler");
         std::stringstream outputString;
         outputString << " Key monitoring registered for keys: (";
@@ -103,10 +104,10 @@ class InputHandler {
     static std::unordered_map<int, ScrollCallback> scrollCallbacks;
     static std::vector<InputHandler *> instances;
     std::map<int, bool> keys;
-    GLFWwindow *window;
+    SDL_Window *window;
 
     // Key callback handler
-    static void KeyCallbackHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    static void KeyCallbackHandler(SDL_Window *window, int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS) {
             keyStates[key] = true;
 
@@ -120,7 +121,7 @@ class InputHandler {
     }
 
     // Mouse button callback handler
-    static void MouseButtonCallbackHandler(GLFWwindow *window, int button, int action, int mods) {
+    static void MouseButtonCallbackHandler(SDL_Window *window, int button, int action, int mods) {
         if (action == GLFW_PRESS) {
             mouseButtonStates[button] = true;
 
@@ -133,7 +134,7 @@ class InputHandler {
         }
     }
 
-    static void ScrollCallbackHandler(GLFWwindow *, double xoffset, double yoffset) {
+    static void ScrollCallbackHandler(SDL_Window *, double xoffset, double yoffset) {
         scrollStates[true] = yoffset > 0;
         scrollStates[false] = xoffset > 0;
 

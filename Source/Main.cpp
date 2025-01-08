@@ -16,6 +16,7 @@ bool bitness;
 #include <nlohmann/json.hpp>
 #include <string>
 
+#include "DataPanel.h"
 #include "DebugRenderer.h"
 #include "IncludeGL.h"
 #include "Input.h"
@@ -42,6 +43,27 @@ __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001; // For NVI
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;   // For AMD GPUs
 }
 #endif
+
+// Signal handler (Signals don't work on windows iirc so block it from there for the time being)
+#if defined(__linux__) || defined(__APPLE__)
+#include <execinfo.h>
+#include <signal.h>
+#include <unistd.h>
+
+void handler(int sig) {
+    void *array[10];
+    size_t size;
+
+    // get void*'s for all entries on the stack
+    size = backtrace(array, 10);
+
+    // print out all the frames to stderr
+    fprintf(stderr, "Error: signal %d:\n", sig);
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
+    exit(1);
+}
+#endif
+
 using json = nlohmann::json;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -56,6 +78,12 @@ std::string projectVersion;
 // yes but hands are in pocket so is it still in the pocket or is it out of
 // pocket? - Astra
 int main() {
+// Install signal handler if on linux or mac
+#if defined(__linux__) || defined(__APPLE__)
+    signal(SIGSEGV, handler);
+    signal(SIGABRT, handler);
+    signal(SIGKILL, handler);
+#endif
     std::ifstream file("init_config.json");
 
     OVERRIDE_LOG_NAME("Initialization");
@@ -79,23 +107,10 @@ int main() {
     globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
     globalWindow.Setup();
 
-    glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
     glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
 
     // Initialize glad
     LOG_CHECK_RETURN(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD", -1);
-
-    // Setup ImGui
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-    io.IniFilename = NULL; // don't save the accursed imgui.ini
-    ImGui_ImplGlfw_InitForOpenGL(globalWindow.GetWindowInstance(), true);
-    ImGui_ImplOpenGL3_Init("#version 430");
-
     if (sizeof(void *) == 8) {
         bitness = 1;
     } else if (sizeof(void *) == 4) {
@@ -119,6 +134,8 @@ int main() {
     SingleplayerHandler singleplayerHandler(globalWindow);
     singleplayerHandler.Setup();
     singleplayerHandler.StartSingleplayerWorld();
+
+    DataPanel datapanel(&singleplayerHandler, &globalWindow, globalWindow.glsl_version);
 
     INFO("Initializing shaders...");
 
@@ -155,13 +172,24 @@ int main() {
     auto start_time = std::chrono::high_resolution_clock::now();
     double fps = 0.0;
 
-    // Main game loop
-    while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
-        glfwPollEvents();
+    SDL_Window *sdlwin = globalWindow.GetWindowInstance();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+    // Main game loop
+    bool exit_loop = false;
+    while (!exit_loop) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT)
+                exit_loop = true;
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                event.window.windowID == SDL_GetWindowID(sdlwin))
+                exit_loop = true;
+        }
+        if (SDL_GetWindowFlags(sdlwin) & SDL_WINDOW_MINIMIZED) {
+            SDL_Delay(10);
+            continue;
+        }
 
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
@@ -173,65 +201,7 @@ int main() {
         }
 
         EntityData playerData = singleplayerHandler.singleplayerWorld.player.GetEntityData();
-
-        ImGui::Begin("Debug");
-        if (ImGui::CollapsingHeader("Player Info")) {
-            ImGui::Text("Player name: %s", singleplayerHandler.singleplayerWorld.player.GetEntityData().name);
-            ImGui::Text("Player health: %d", static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityStats().health));
-            ImGui::Text("Player position: %f, %f, %f", playerData.position.x, playerData.position.y, playerData.position.z);
-            ImGui::Text("Player orientation: %f, %f, %f", playerData.orientation.x, playerData.orientation.y, playerData.orientation.z);
-            ImGui::Text(
-                "Player velocity: %f, %f, %f", singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.x,
-                singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.y,
-                singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.z
-            );
-            ImGui::Text(
-                "Global chunk position: %d, %d, %d",
-                static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x),
-                static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y),
-                static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z)
-            );
-            ImGui::Text(
-                "Local chunk position: %d, %d, %d",
-                static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.x),
-                static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.y),
-                static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.z)
-            );
-            ImGui::Text(
-                "Current chunk generation status and blocks %d, %d, %d",
-                singleplayerHandler.singleplayerWorld
-                    .GetChunk(
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z
-                    )
-                    .generationStatus,
-                singleplayerHandler.singleplayerWorld
-                    .GetChunk(
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z
-                    )
-                    .GetTotalBlocks(),
-                singleplayerHandler.singleplayerWorld
-                    .GetChunk(
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
-                        singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z
-                    )
-                    .id
-            );
-            ImGui::Text("Total frames: %d", frames);
-            ImGui::Text("FPS: %.2f", fps);
-        }
-
-        if (ImGui::CollapsingHeader("World")) {
-            singleplayerHandler.singleplayerWorld.DisplayImGui(0);
-        }
-
-        if (ImGui::CollapsingHeader("Chunk Info")) {
-            singleplayerHandler.singleplayerWorld.DisplayImGui(1);
-        }
+        datapanel.Draw(frames, fps, playerData);
 
         // Make background ~pink~
         renderer.ClearScreen(0.98f, 0.88f, 1.0f);
@@ -259,11 +229,9 @@ int main() {
             debugRenderer.RenderDebug(wireframeShaderProgram, chunkDebugShaderProgram);
         }
 
-        ImGui::End();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        datapanel.SwapFrames();
+        SDL_GL_SwapWindow(sdlwin);
 
-        glfwSwapBuffers(globalWindow.GetWindowInstance());
         ++frames;
     }
 
@@ -272,12 +240,9 @@ int main() {
     INFO("Cleaning up...");
     singleplayerHandler.EndSingleplayerWorld();
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    datapanel.Destroy();
 
-    glfwDestroyWindow(globalWindow.GetWindowInstance());
-    glfwTerminate();
+    globalWindow.Delete();
 
     return 0;
 }

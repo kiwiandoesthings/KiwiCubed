@@ -18,5 +18,5 @@ class SingleplayerHandler {
 
     void Delete();
 
-    SingleplayerHandler(Window &newWindow) : singleplayerWorld(5, this), window(newWindow), isLoadedIntoSingleplayerWorld(false) {};
+    SingleplayerHandler(Window &newWindow) : singleplayerWorld(5, this), window(newWindow) {};
 };

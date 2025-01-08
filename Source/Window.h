@@ -9,11 +9,24 @@
 #include "IncludeGL.h"
 #include "Input.h"
 
+#include "klogger.hpp"
+#include <SDL.h>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl2.h>
+
+#define GL_SILENCE_DEPRECATION
+#if defined(IMGUI_IMPL_OPENGL_ES2)
+#include <SDL_opengles2.h>
+#else
+#include <SDL_opengl.h>
+#endif
+
 class Window {
   public:
-    Window() {};
+    Window(){};
 
-    GLFWwindow *CreateWindowInstance(int windowWidth, int windowHeight, const char *windowTitle, const char *windowType);
+    SDL_Window *CreateWindowInstance(int windowWidth, int windowHeight, const char *windowTitle, const char *windowType);
 
     void Setup();
 
@@ -27,16 +40,18 @@ class Window {
     void SetTitle(const char *newTitle);
     void SetTitle(std::string newTitle);
 
-    GLFWwindow *GetWindowInstance();
+    SDL_Window *GetWindowInstance();
 
     void Delete();
 
     int windowWidth, windowHeight;
     const char *windowTitle;
+    const char *glsl_version;
+    SDL_GLContext gl_context;
 
     bool isFocused;
 
   private:
-    GLFWwindow *window;
+    SDL_Window *window;
     InputHandler inputHandler = InputHandler();
 };

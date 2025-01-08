@@ -30,9 +30,9 @@ class World {
 
     int chunkAddition = 0;
 
-    World()
-        : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), shouldTick(false), tickIntervalMs(50),
-          worldSize(5), chunkHandler(*this) {}
+    // World()
+    //     : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), shouldTick(false), tickIntervalMs(50),
+    //       worldSize(5), chunkHandler(*this) {}
     World(unsigned int worldSize, SingleplayerHandler *singleplayerHandler);
 
     void Setup(Window &window);
