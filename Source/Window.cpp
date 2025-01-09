@@ -2,8 +2,6 @@
 
 #include <cstring>
 
-#include "GLFW/glfw3.h"
-
 SDL_Window *Window::CreateWindowInstance(int windowWidth, int windowHeight, const char *windowTitle, const char *windowType) {
     OVERRIDE_LOG_NAME("Initialization");
     Window::windowWidth = windowWidth;
@@ -57,14 +55,12 @@ SDL_Window *Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
     SDL_GL_MakeCurrent(window, gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
 
-    inputHandler.SetupCallbacks(window);
-
     return window;
 }
 
 void Window::Setup() {
-    inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&]() { isFocused = false; });
-    inputHandler.RegisterKeyCallback(GLFW_KEY_SPACE, [&]() {
+    inputHandler.RegisterKeyCallback(SDL_SCANCODE_ESCAPE, [&]() { isFocused = false; });
+    inputHandler.RegisterKeyCallback(SDL_SCANCODE_SPACE, [&]() {
         isFocused = true;
         SDL_WarpMouseInWindow(window, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
     });

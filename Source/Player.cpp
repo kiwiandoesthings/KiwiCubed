@@ -13,19 +13,15 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler &chunkHandler
 
     entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
 
-    inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this));
+    inputHandler.RegisterMouseButtonCallback(SDL_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this));
 }
 
 void Player::Setup(Window &window) {
     camera = std::make_shared<Camera>(window);
     camera->Setup(window);
 
-    inputHandler.SetupKeyStates(
-        window.GetWindowInstance(),
-        std::vector<int>{GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_LEFT_CONTROL}
-    );
-    inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&]() { chunkHandler.Delete(); });
-    inputHandler.RegisterKeyCallback(GLFW_KEY_R, [&]() { chunkHandler.GenerateWorld(); });
+    inputHandler.RegisterKeyCallback(SDL_SCANCODE_E, [&]() { chunkHandler.Delete(); });
+    inputHandler.RegisterKeyCallback(SDL_SCANCODE_R, [&]() { chunkHandler.GenerateWorld(); });
 }
 
 void Player::Update() {
@@ -52,25 +48,25 @@ void Player::Update() {
 }
 
 void Player::QueryInputs() {
-    if (inputHandler.GetKeyState(GLFW_KEY_W)) {
+    if (inputHandler.GetKeyState(SDL_SCANCODE_W)) {
         entityData.velocity += speed * entityData.orientation;
     }
-    if (inputHandler.GetKeyState(GLFW_KEY_A)) {
+    if (inputHandler.GetKeyState(SDL_SCANCODE_A)) {
         entityData.velocity += speed * -glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
     }
-    if (inputHandler.GetKeyState(GLFW_KEY_S)) {
+    if (inputHandler.GetKeyState(SDL_SCANCODE_S)) {
         entityData.velocity += speed * -entityData.orientation;
     }
-    if (inputHandler.GetKeyState(GLFW_KEY_D)) {
+    if (inputHandler.GetKeyState(SDL_SCANCODE_D)) {
         entityData.velocity += speed * glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
     }
-    if (inputHandler.GetKeyState(GLFW_KEY_SPACE)) {
+    if (inputHandler.GetKeyState(SDL_SCANCODE_SPACE)) {
         entityData.velocity += speed * entityData.upDirection;
     }
-    if (inputHandler.GetKeyState(GLFW_KEY_LEFT_SHIFT)) {
+    if (inputHandler.GetKeyState(SDL_SCANCODE_LSHIFT)) {
         entityData.velocity += speed * -entityData.upDirection;
     }
-    if (inputHandler.GetKeyState(GLFW_KEY_LEFT_CONTROL)) {
+    if (inputHandler.GetKeyState(SDL_SCANCODE_LCTRL)) {
         speed = .8f;
     } else {
         speed = 0.01f;
@@ -109,15 +105,13 @@ void Player::QueryMouseInputs() {
 
     inputHandler.RegisterScrollCallback(true, [this](double offset) { entityStats.health += static_cast<float>(offset); });
 
-    if (inputHandler.GetKeyState(GLFW_KEY_MINUS)) {
+    if (inputHandler.GetKeyState(SDL_SCANCODE_MINUS)) {
         entityStats.health -= 0.1f;
     }
 
     // Does some absolute magic to rotate the camera correctly
-    double mouseX;
-    double mouseY;
-
-    glfwGetCursorPos(window.GetWindowInstance(), &mouseX, &mouseY);
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
 
     // Get the amount to rotate for the frame
     float rotationX = sensitivity * static_cast<float>(mouseY - (window.GetHeight() / 2)) / window.GetHeight();
@@ -141,7 +135,7 @@ void Player::QueryMouseInputs() {
 
     // We don't want anyone to be able to move the mouse off the screen, that would be very very very bad and horrible and would make the
     // game absolutely unplayable
-    glfwSetCursorPos(
+    SDL_WarpMouseInWindow(
         window.GetWindowInstance(), (static_cast<float>(window.GetWidth()) / 2.0), (static_cast<float>(window.GetHeight()) / 2.0)
     );
 }

@@ -28,15 +28,6 @@ dependencies = [
   dependency('imgui', static: true),
 ]
 
-if host_machine.system() == 'windows'
-  dependencies += dependency(
-    'sdl2main',
-    fallback: ['sdl2', 'sdl2main_dep'],
-    static: true,
-    required: true,
-  )
-endif
-
 executable(
   'kiwicubed',
   files(

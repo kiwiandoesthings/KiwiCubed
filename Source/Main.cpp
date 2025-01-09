@@ -3,10 +3,11 @@
 // R.I.P.
 
 bool bitness;
+#define SDL_MAIN_HANDLED
 
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl2.h>
 #include <time.h>
 
 #include <chrono>
@@ -84,6 +85,9 @@ int main() {
     signal(SIGABRT, handler);
     signal(SIGKILL, handler);
 #endif
+
+    SDL_SetMainReady();
+
     std::ifstream file("init_config.json");
 
     OVERRIDE_LOG_NAME("Initialization");
@@ -99,18 +103,20 @@ int main() {
     windowType = jsonData["init_settings"]["window_type"].get<std::string>();
     projectVersion = jsonData["project_version"].get<std::string>();
 
-    // Initialize GLFW
-    LOG_CHECK_RETURN(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW", -1);
+    // Initialize SDL2
+    LOG_CHECK_RETURN((SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) == 0), "Successfully initialized SDL2", "Failed to initialize SDL2", -1);
 
     // Create a window
     Window globalWindow;
     globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
     globalWindow.Setup();
 
-    glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
+    // glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
 
     // Initialize glad
-    LOG_CHECK_RETURN(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD", -1);
+    LOG_CHECK_RETURN(
+        gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD", -1
+    );
     if (sizeof(void *) == 8) {
         bitness = 1;
     } else if (sizeof(void *) == 4) {
@@ -247,13 +253,13 @@ int main() {
     return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    if (width == 0 || height == 0) {
-        return;
-    }
-    glViewport(0, 0, width, height);
-    Window *globalWindow = static_cast<Window *>(glfwGetWindowUserPointer(window));
-    if (globalWindow) {
-        globalWindow->UpdateWindowSize(width, height);
-    }
-}
+// void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+//     if (width == 0 || height == 0) {
+//         return;
+//     }
+//     glViewport(0, 0, width, height);
+//     Window *globalWindow = static_cast<Window *>(glfwGetWindowUserPointer(window));
+//     if (globalWindow) {
+//         globalWindow->UpdateWindowSize(width, height);
+//     }
+// }
