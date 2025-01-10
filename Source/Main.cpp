@@ -186,6 +186,9 @@ int main() {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
+            if (datapanel.took_input()) {
+                continue;
+            }
             if (event.type == SDL_QUIT)
                 exit_loop = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&

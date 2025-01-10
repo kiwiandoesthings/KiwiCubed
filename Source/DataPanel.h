@@ -16,11 +16,6 @@ class DataPanel {
         Setup(glsl_version);
     }
 
-    void addPointers(SingleplayerHandler *sph, Window *globalWindow) {
-        this->sph = sph;
-        this->globalWindow = globalWindow;
-    }
-
     void Setup(const char *glsl_version) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -31,6 +26,11 @@ class DataPanel {
         io.IniFilename = NULL; // don't save the accursed imgui.ini
         ImGui_ImplSDL2_InitForOpenGL(globalWindow->GetWindowInstance(), globalWindow->gl_context);
         ImGui_ImplOpenGL3_Init(glsl_version);
+    }
+
+    bool took_input() {
+        ImGuiIO io = ImGui::GetIO();
+        return (io.WantCaptureMouse || io.WantCaptureKeyboard);
     }
 
     void Draw(int frames, double fps, EntityData playerData) {
