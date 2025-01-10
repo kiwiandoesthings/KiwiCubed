@@ -111,7 +111,8 @@ int main() {
 
     // Create a window
     Window globalWindow;
-    globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
+    SDL_Window *sdlwin =
+        globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
     globalWindow.Setup();
 
     // glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
@@ -181,12 +182,11 @@ int main() {
     auto start_time = std::chrono::high_resolution_clock::now();
     double fps = 0.0;
 
-    SDL_Window *sdlwin = globalWindow.GetWindowInstance();
-
     // Main game loop
     bool exit_loop = false;
     while (!exit_loop) {
         NEW_FRAME();
+
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
@@ -197,6 +197,11 @@ int main() {
                 event.window.windowID == SDL_GetWindowID(sdlwin))
                 exit_loop = true;
 
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                globalWindow.UpdateWindowSize(event.window.data1, event.window.data2);
+                GLCall(glViewport(0, 0, event.window.data1, event.window.data2));
+            }
+
             // Quit events are exempt from input blocking - the rest aren't tho
             if (!datapanel.took_input()) {
                 globalWindow.inputHandler.handle_single_input(&event);
@@ -206,6 +211,8 @@ int main() {
             SDL_Delay(10);
             continue;
         }
+
+        SDL_SetRelativeMouseMode(globalWindow.isFocused ? SDL_TRUE : SDL_FALSE);
 
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
@@ -223,7 +230,7 @@ int main() {
         renderer.ClearScreen(0.98f, 0.88f, 1.0f);
 
         // Do rendering stuff
-        globalWindow.QueryInputs();
+
         if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
             singleplayerHandler.singleplayerWorld.Update();
             singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(terrainShaderProgram);
@@ -232,12 +239,11 @@ int main() {
 
             singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
 
-            glm::vec3 c1 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner1;
-            glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
-            glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
+            EntityData ed = singleplayerHandler.singleplayerWorld.player.GetEntityData();
 
             debugRenderer.UpdateBuffers(
-                c1, c2, pos, singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(),
+                ed.physicsBoundingBox.corner1, ed.physicsBoundingBox.corner2, ed.position,
+                singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(),
                 singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(),
                 singleplayerHandler.singleplayerWorld.GetChunkOrigins()
             );

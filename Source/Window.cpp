@@ -66,15 +66,6 @@ void Window::Setup() {
     });
 }
 
-void Window::QueryInputs() {
-    if (!isFocused) {
-        SDL_SetRelativeMouseMode(SDL_FALSE);
-        return;
-    } else {
-        SDL_SetRelativeMouseMode(SDL_TRUE);
-    }
-}
-
 void Window::UpdateWindowSize(int newWindowWidth, int newWindowHeight) {
     windowWidth = newWindowWidth;
     windowHeight = newWindowHeight;

@@ -13,7 +13,6 @@
 #include <SDL.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
-#include <imgui_impl_sdl2.h>
 
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -31,8 +30,6 @@ class Window {
     SDL_Window *CreateWindowInstance(int windowWidth, int windowHeight, const char *windowTitle, const char *windowType);
 
     void Setup();
-
-    void QueryInputs();
 
     void UpdateWindowSize(int newWindowWidth, int newWindowHeight);
 

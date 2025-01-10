@@ -46,7 +46,6 @@ executable(
     # Rendering
     'Source/Rendering/Camera.cpp',
     'Source/Rendering/DebugRenderer.cpp',
-    'Source/Rendering/GLError.cpp',
     'Source/Rendering/Renderer.cpp',
     'Source/Rendering/Shader.cpp',
     'Source/Rendering/Texture.cpp',
