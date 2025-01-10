@@ -11,7 +11,6 @@ out float blockTypeOut;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 
-
 void main()
 {
 	vec4 worldPosition = vec4(blockPosition, 1);
