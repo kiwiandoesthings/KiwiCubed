@@ -5,6 +5,7 @@
 bool bitness;
 #define SDL_MAIN_HANDLED
 
+#include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl2.h>
@@ -19,7 +20,6 @@ bool bitness;
 
 #include "DataPanel.h"
 #include "DebugRenderer.h"
-#include "IncludeGL.h"
 #include "Input.h"
 #include "Renderer.h"
 #include "Shader.h"
@@ -86,11 +86,14 @@ int main() {
     signal(SIGKILL, handler);
 #endif
 
+#ifdef PROFBUILD
+    CRITICAL("Tracy is enabled! This build is for profiling purposes only.");
+#endif
     SDL_SetMainReady();
 
     std::ifstream file("init_config.json");
 
-    OVERRIDE_LOG_NAME("Initialization");
+    OVERRIDE_LOG_NAME("Main");
 
     LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Could not open or find the JSON config file", 1);
 
@@ -183,18 +186,21 @@ int main() {
     // Main game loop
     bool exit_loop = false;
     while (!exit_loop) {
+        NEW_FRAME();
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            if (datapanel.took_input()) {
-                continue;
-            }
             if (event.type == SDL_QUIT)
                 exit_loop = true;
+
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
                 event.window.windowID == SDL_GetWindowID(sdlwin))
                 exit_loop = true;
-            globalWindow.inputHandler.handle_single_input(&event);
+
+            // Quit events are exempt from input blocking - the rest aren't tho
+            if (!datapanel.took_input()) {
+                globalWindow.inputHandler.handle_single_input(&event);
+            }
         }
         if (SDL_GetWindowFlags(sdlwin) & SDL_WINDOW_MINIMIZED) {
             SDL_Delay(10);
@@ -246,13 +252,16 @@ int main() {
     }
 
     // Clean up once the program has exited
-    OVERRIDE_LOG_NAME("Cleanup");
-    INFO("Cleaning up...");
-    singleplayerHandler.EndSingleplayerWorld();
+    {
+        OVERRIDE_LOG_NAME("Cleanup");
 
-    datapanel.Destroy();
+        INFO("Cleaning up...");
+        singleplayerHandler.EndSingleplayerWorld();
 
-    globalWindow.Delete();
+        datapanel.Destroy();
+
+        globalWindow.Delete();
+    }
 
     return 0;
 }

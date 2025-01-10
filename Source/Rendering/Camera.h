@@ -8,18 +8,18 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
-#include "IncludeGL.h"
 #include "Input.h"
 #include "Shader.h"
 #include "Window.h"
+#include <glad/glad.h>
 
 class Camera {
   public:
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     glm::mat4 projectionMatrix = glm::mat4(1.0f);
 
-    Camera(Window &newWindow) : window(newWindow), windowInstance(nullptr){};
-    ~Camera(){};
+    Camera(Window &newWindow) : window(newWindow), windowInstance(nullptr) {};
+    ~Camera() {};
 
     void Setup(Window &window);
 

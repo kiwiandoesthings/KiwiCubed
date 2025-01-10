@@ -19,8 +19,8 @@ class IndexBufferObject {
     };
     void SetBufferData(GLsizeiptr size, GLuint *indicies) { GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indicies, GL_STATIC_DRAW)); }
     void Bind() const { GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObjectID)); };
-    void Unbind() { GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)) };
-    void Delete() const { GLCall(glDeleteBuffers(1, &indexBufferObjectID)) };
+    void Unbind() { GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)); };
+    void Delete() const { GLCall(glDeleteBuffers(1, &indexBufferObjectID)); };
 };
 
 class VertexBufferObject {

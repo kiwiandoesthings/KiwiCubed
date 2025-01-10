@@ -12,7 +12,21 @@ build:
 	meson compile -C build
 	
 clean:
-	meson setup --reconfigure build
+	meson setup --reconfigure build --optimization=3
+
+clean_debug:
+	meson setup --reconfigure build_debug --buildtype=debugoptimized -Dtracy_enable=true
+
+build_debug:
+	meson compile -C build_debug
+
+[unix]
+debug: build_debug
+	build_debug/kiwicubed
+
+[windows]
+debug: build_debug
+	build_debug\kiwicubed.exe
 
 fmt:
 	fd -e h -e cpp -E subprojects -x clang-format -i

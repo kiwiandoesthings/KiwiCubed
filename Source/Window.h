@@ -6,8 +6,8 @@
 #include <iostream>
 #include <thread>
 
-#include "IncludeGL.h"
 #include "Input.h"
+#include <glad/glad.h>
 
 #include "klogger.hpp"
 #include <SDL.h>
@@ -26,7 +26,7 @@ class Window {
   public:
     InputHandler inputHandler = InputHandler();
 
-    Window(){};
+    Window() {};
 
     SDL_Window *CreateWindowInstance(int windowWidth, int windowHeight, const char *windowTitle, const char *windowType);
 

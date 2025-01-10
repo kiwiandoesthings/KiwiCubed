@@ -1,16 +1,16 @@
 #pragma once
 
-#ifndef KLOGGER_HPP
-#define KLOGGER_HPP
-
-#include <format>
 #include <iostream>
 #include <map>
 #include <source_location>
 #include <string>
 #include <vector>
 
-enum class LogLevel { debug, info, warn, error, critical, off };
+#ifdef PROFBUILD
+#include <tracy/Tracy.hpp>
+#endif
+
+enum class LogLevel { info, debug, warn, error, critical, off };
 
 std::string LogLevelToString(LogLevel level);
 
@@ -45,22 +45,14 @@ void Log(LogLevel level, const std::string &message, const std::source_location 
         return;                                                                                                                            \
     }
 
-#define OVERRIDE_LOG_NAME(replacement) OverrideFunctionLogName(std::source_location::current().function_name(), replacement)
-
-template <typename T> struct std::formatter<std::vector<T>> {
-    constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
-
-    auto format(const std::vector<T> &vec, format_context &ctx) {
-        std::string result = "[";
-        for (auto it = vec.begin(); it != vec.end(); ++it) {
-            if (it != vec.begin()) {
-                result += ", ";
-            }
-            result += std::format("{}", *it);
-        }
-        result += "]";
-        return format_to(ctx.out(), "{}", result);
-    }
-};
-
+#ifdef PROFBUILD
+#define PROFILE_SCOPE(name) ZoneScopedN(name)
+#define NEW_FRAME() FrameMark
+#else
+#define PROFILE_SCOPE(name)
+#define NEW_FRAME()
 #endif
+
+#define OVERRIDE_LOG_NAME(replacement)                                                                                                     \
+    PROFILE_SCOPE(#replacement);                                                                                                           \
+    OverrideFunctionLogName(std::source_location::current().function_name(), replacement)

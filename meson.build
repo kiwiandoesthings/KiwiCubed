@@ -24,9 +24,17 @@ dependencies = [
   dependency('json'),
   dependency('glm', static: true),
   dependency('glad-gl', static: true),
-  subproject('sdl2').get_variable('sdl2_dep'),
+  subproject('sdl2').get_variable('sdl2_dep'), # Force subproject-based SDL2
   dependency('imgui', static: true),
 ]
+
+if get_option('tracy_enable')
+  dependencies += [dependency('tracy', static: true)]
+  add_project_arguments('-DPROFBUILD', language: 'cpp')
+  if get_option('buildtype') != 'debugoptimized'
+  warning('Profiling builds should set --buildtype=debugoptimized')
+  endif
+endif
 
 executable(
   'kiwicubed',
