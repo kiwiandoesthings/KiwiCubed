@@ -34,8 +34,8 @@ class DataPanel {
     }
 
     void Draw(int frames, double fps, EntityData playerData) {
+        ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         ImGui::Begin("Debug");
@@ -93,10 +93,10 @@ class DataPanel {
         if (ImGui::CollapsingHeader("Chunk Info")) {
             sph->singleplayerWorld.DisplayImGui(1);
         }
+        ImGui::End();
     }
 
     void SwapFrames() {
-        ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
