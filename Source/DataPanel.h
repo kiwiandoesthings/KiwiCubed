@@ -17,6 +17,7 @@ class DataPanel {
     }
 
     void Setup(const char *glsl_version) {
+        OVERRIDE_LOG_NAME("DataPanel setup");
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
@@ -34,6 +35,7 @@ class DataPanel {
     }
 
     void Draw(int frames, double fps, EntityData playerData) {
+        OVERRIDE_LOG_NAME("DataPanel draw");
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
