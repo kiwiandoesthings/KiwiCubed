@@ -104,7 +104,7 @@ int main() {
     projectVersion = jsonData["project_version"].get<std::string>();
 
     // Initialize SDL2
-    LOG_CHECK_RETURN((SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) == 0), "Successfully initialized SDL2", "Failed to initialize SDL2", -1);
+    LOG_CHECK_RETURN((SDL_Init(SDL_INIT_EVERYTHING) == 0), "Successfully initialized SDL2", "Failed to initialize SDL2", -1);
 
     // Create a window
     Window globalWindow;
@@ -191,6 +191,7 @@ int main() {
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
                 event.window.windowID == SDL_GetWindowID(sdlwin))
                 exit_loop = true;
+            globalWindow.inputHandler.handle_single_input(&event);
         }
         if (SDL_GetWindowFlags(sdlwin) & SDL_WINDOW_MINIMIZED) {
             SDL_Delay(10);

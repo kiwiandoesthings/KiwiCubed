@@ -54,7 +54,7 @@ class Chunk {
     bool id = 0;
 
     Chunk() {}
-    Chunk(int chunkX, int chunkY, int chunkZ) : chunkX(chunkX), chunkY(chunkY), chunkZ(chunkZ), isEmpty(false) {}
+    Chunk(int chunkX, int chunkY, int chunkZ) : chunkX(chunkX), chunkY(chunkY), chunkZ(chunkZ), isEmpty(false) { airBlocks.reset(); }
 
     void SetupRenderComponents();
     void AllocateChunk();
@@ -95,7 +95,7 @@ class Chunk {
     std::vector<GLuint> debugVisualizationIndices;
 
     unsigned short totalBlocks;
-    std::bitset<chunkSize * chunkSize * chunkSize> airBlocks;
+    std::bitset<chunkSize * chunkSize * chunkSize + chunkSize * chunkSize + chunkSize> airBlocks;
 
     VertexArrayObject vertexArrayObject;
     VertexBufferObject vertexBufferObject;
@@ -106,7 +106,7 @@ class Chunk {
     if (block < 0) {                                                                                                                       \
         chunk--;                                                                                                                           \
         block += chunkSize;                                                                                                                \
-    } else if (block >= chunkSize - 1) {                                                                                                   \
+    } else if (block >= chunkSize) {                                                                                                       \
         chunk++;                                                                                                                           \
         block -= chunkSize;                                                                                                                \
     }
@@ -115,7 +115,7 @@ class ChunkHandler {
   public:
     std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 
-    ChunkHandler(World &world) : world(world) {};
+    ChunkHandler(World &world) : world(world){};
     void Delete();
 
     void GenerateWorld();

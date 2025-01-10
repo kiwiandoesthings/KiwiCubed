@@ -115,9 +115,11 @@ int ChunkHandler::BlockIsAir(int chunkX, int chunkY, int chunkZ, int blockX, int
     // -1: Chunk does not exist / is not generated
     // 0: Block is not air
     // 1: Block is air
+    // INFO(std::format("PRENORM: {} {} {} | {} {} {}", chunkX, chunkY, chunkZ, blockX, blockY, blockZ));
     CHUNK_COORD_PROT(chunkX, blockX);
     CHUNK_COORD_PROT(chunkY, blockY);
     CHUNK_COORD_PROT(chunkZ, blockZ);
+    // INFO(std::format("POSTNORM: {} {} {} | {} {} {}", chunkX, chunkY, chunkZ, blockX, blockY, blockZ));
 
     if (chunks.find(std::make_tuple(chunkX, chunkY, chunkZ)) == chunks.end()) {
         return -1;

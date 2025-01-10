@@ -24,6 +24,8 @@
 
 class Window {
   public:
+    InputHandler inputHandler = InputHandler();
+
     Window(){};
 
     SDL_Window *CreateWindowInstance(int windowWidth, int windowHeight, const char *windowTitle, const char *windowType);
@@ -53,5 +55,4 @@ class Window {
 
   private:
     SDL_Window *window;
-    InputHandler inputHandler = InputHandler();
 };
