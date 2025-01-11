@@ -1,10 +1,9 @@
 #pragma once
 
-#include <glad/glad.h>
-
-#include <iostream>
-
 #include "klogger.hpp"
+#include <format>
+#include <glad/glad.h>
+#include <iostream>
 
 #define GLCall(x)                                                                                                                          \
     do {                                                                                                                                   \

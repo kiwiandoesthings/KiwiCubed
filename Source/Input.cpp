@@ -1,6 +1,7 @@
 #include "Input.h"
 
 std::unordered_map<SDL_Scancode, bool> InputHandler::keyStates;
+InputHandler::MouseMotionCallback InputHandler::mouseMotionCallback;
 std::unordered_map<int, bool> InputHandler::mouseButtonStates;
 std::unordered_map<bool, bool> InputHandler::scrollStates;
 std::unordered_map<int, std::function<void()>> InputHandler::keyCallbacks;

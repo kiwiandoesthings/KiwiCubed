@@ -59,10 +59,15 @@ SDL_Window *Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 }
 
 void Window::Setup() {
-    inputHandler.RegisterKeyCallback(SDL_SCANCODE_ESCAPE, [&]() { isFocused = false; });
+    inputHandler.setIsFocusedPointer(&(this->isFocused));
+
+    inputHandler.RegisterKeyCallback(SDL_SCANCODE_ESCAPE, [&]() {
+        isFocused = false;
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+    });
     inputHandler.RegisterKeyCallback(SDL_SCANCODE_SPACE, [&]() {
         isFocused = true;
-        SDL_WarpMouseInWindow(window, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
     });
 }
 

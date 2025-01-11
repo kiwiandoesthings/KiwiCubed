@@ -4,6 +4,7 @@
 
 Player::Player(int playerX, int playerY, int playerZ, ChunkHandler &chunkHandler)
     : Entity(), yaw(0), pitch(0), roll(0), width(640), height(480), chunkHandler(chunkHandler) {
+    using namespace std::placeholders;
     entityData.position = glm::vec3(playerX, playerY, playerZ);
 
     entityStats.health = 20.0f;
@@ -14,6 +15,10 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler &chunkHandler
     entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
 
     inputHandler.RegisterMouseButtonCallback(SDL_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this));
+
+    inputHandler.RegisterScrollCallback(true, [this](double offset) { entityStats.health += static_cast<float>(offset); });
+
+    inputHandler.RegisterMouseMotionCallback(std::bind(&Player::MouseMotionCallback, this, _1, _2));
 }
 
 void Player::Setup(Window &window) {
@@ -32,7 +37,6 @@ void Player::Update() {
 
     if (camera->GetWindow().isFocused) {
         QueryInputs();
-        QueryMouseInputs();
         ApplyPhysics(*this, chunkHandler);
     }
 
@@ -97,34 +101,15 @@ void Player::MouseButtonCallback() {
     }
 }
 
-void Player::QueryMouseInputs() {
-    Window &window = camera->GetWindow();
-    if (!window.isFocused) {
-        return;
-    }
+void Player::MouseMotionCallback(int relX, int relY) {
+    float rotationX = sensitivity * static_cast<float>(relY) / static_cast<float>(450);
+    float rotationY = sensitivity * static_cast<float>(relX) / static_cast<float>(450);
 
-    inputHandler.RegisterScrollCallback(true, [this](double offset) { entityStats.health += static_cast<float>(offset); });
-
-    if (inputHandler.GetKeyState(SDL_SCANCODE_MINUS)) {
-        entityStats.health -= 0.1f;
-    }
-
-    // Does some absolute magic to rotate the camera correctly
-    int mouseX, mouseY;
-    SDL_GetMouseState(&mouseX, &mouseY);
-
-    // Get the amount to rotate for the frame
-    float rotationX = sensitivity * static_cast<float>(mouseY - (window.GetHeight() / 2)) / window.GetHeight();
-    float rotationY = sensitivity * static_cast<float>(mouseX - (window.GetWidth() / 2)) / window.GetWidth();
+    std::cout << std::format("rotX: {} rotY: {}", rotationX, rotationY) << std::endl;
 
     yaw += rotationY;
-    pitch += rotationX;
-
     // Clamp pitch to prevent the camera from flipping out
-    if (pitch > 89.9f)
-        pitch = 89.9f;
-    if (pitch < -89.9f)
-        pitch = -89.9f;
+    pitch = std::clamp(pitch + rotationX, -89.9f, 89.9f);
 
     // wha..? (learnopengl.com)
     glm::vec3 facing = glm::vec3(0, 0, 0);
@@ -132,12 +117,6 @@ void Player::QueryMouseInputs() {
     facing.y = sin(glm::radians(-pitch));
     facing.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     entityData.orientation = glm::normalize(facing);
-
-    // We don't want anyone to be able to move the mouse off the screen, that would be very very very bad and horrible and would make the
-    // game absolutely unplayable
-    SDL_WarpMouseInWindow(
-        window.GetWindowInstance(), (static_cast<float>(window.GetWidth()) / 2.0), (static_cast<float>(window.GetHeight()) / 2.0)
-    );
 }
 
 void Player::SetPosition(Window *window, int newPlayerX, int newPlayerY, int newPlayerZ) {

@@ -4,6 +4,7 @@
 #include <SDL.h>
 
 #include <algorithm>
+#include <format>
 #include <functional>
 #include <iostream>
 #include <istream>
@@ -19,7 +20,10 @@ class InputHandler {
     using KeyCallback = std::function<void()>;
     using MouseButtonCallback = std::function<void()>;
     using ScrollCallback = std::function<void(double offset)>;
+    using MouseMotionCallback = std::function<void(int relX, int relY)>;
 
+    bool *isFocused;
+    void setIsFocusedPointer(bool *point) { isFocused = point; }
     InputHandler() { instances.push_back(this); }
 
     void handle_single_input(const SDL_Event *e) {
@@ -45,6 +49,14 @@ class InputHandler {
         case SDL_MOUSEWHEEL:
             scrollStates[true] = e->wheel.y > 0;
             scrollStates[false] = e->wheel.x > 0;
+            if (scrollStates[true])
+                scrollCallbacks[true](e->wheel.y);
+            if (scrollStates[false])
+                scrollCallbacks[false](e->wheel.x);
+            break;
+        case SDL_MOUSEMOTION:
+            if (isFocused)
+                mouseMotionCallback(e->motion.xrel, e->motion.yrel);
             break;
         }
     }
@@ -71,6 +83,10 @@ class InputHandler {
     // Use true for y-scroll and false for x-scroll
     void RegisterScrollCallback(bool direction, ScrollCallback callback) { scrollCallbacks[direction] = callback; }
 
+    void RegisterMouseMotionCallback(MouseMotionCallback mouseMotionCallbackToRegister) {
+        mouseMotionCallback = mouseMotionCallbackToRegister;
+    }
+
     bool GetKeyState(SDL_Scancode key) const {
         if (keyStates.find(key) != keyStates.end()) {
             return keyStates[key];
@@ -81,6 +97,7 @@ class InputHandler {
 
   private:
     static std::unordered_map<SDL_Scancode, bool> keyStates;
+    static MouseMotionCallback mouseMotionCallback;
     static std::unordered_map<int, bool> mouseButtonStates;
     static std::unordered_map<bool, bool> scrollStates;
     static std::unordered_map<int, KeyCallback> keyCallbacks;

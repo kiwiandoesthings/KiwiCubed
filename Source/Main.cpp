@@ -212,8 +212,6 @@ int main() {
             continue;
         }
 
-        SDL_SetRelativeMouseMode(globalWindow.isFocused ? SDL_TRUE : SDL_FALSE);
-
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
@@ -230,7 +228,6 @@ int main() {
         renderer.ClearScreen(0.98f, 0.88f, 1.0f);
 
         // Do rendering stuff
-
         if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
             singleplayerHandler.singleplayerWorld.Update();
             singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(terrainShaderProgram);

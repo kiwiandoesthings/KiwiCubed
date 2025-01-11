@@ -4,6 +4,7 @@
 
 #include "Camera.h"
 #include "Entity.h"
+#include <algorithm>
 
 class Player : public Entity {
   public:
@@ -17,7 +18,6 @@ class Player : public Entity {
     float speed = 0.004f;
     float sensitivity = 100.0f;
 
-    Player() : Entity(), yaw(0), pitch(0), roll(0), width(640), height(480), chunkHandler(chunkHandler) {}
     Player(int playerX, int playerY, int playerZ, ChunkHandler &chunkHandler);
 
     void Setup(Window &window);
@@ -25,7 +25,7 @@ class Player : public Entity {
     void Update();
     void QueryInputs();
     void MouseButtonCallback();
-    void QueryMouseInputs();
+    void MouseMotionCallback(int relX, int relY);
 
     void SetPosition(Window *window, int playerX, int playerY, int playerZ);
     const std::tuple<int, int, int> GetPosition();
@@ -40,4 +40,5 @@ class Player : public Entity {
     InputHandler inputHandler = InputHandler();
     ChunkHandler &chunkHandler;
     std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
+    std::tuple<int, int> lastMousePos = std::make_tuple(-1, -1);
 };
