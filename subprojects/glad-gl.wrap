@@ -1,7 +1,7 @@
 [wrap-git]
-directory = glad-gl-3.3-compatibility
 url = https://github.com/meson-library/glad-gl.git
 revision = v3.3-compatibility
+patch_directory = glad-gl-3.3-compatibility
 
 [provide]
 glad-gl = glad_gl_dep

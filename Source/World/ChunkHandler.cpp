@@ -1,54 +1,73 @@
 #include "ChunkHandler.h"
-
 #include "World.h"
 
-void ChunkHandler::GenerateWorld() { world.GenerateWorld(); }
+void ChunkHandler::GenerateWorld() {
+    world.GenerateWorld();
+}
 
-Chunk &ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ) {
+Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotFound) {
+    OVERRIDE_LOG_NAME("ChunkHandler");
+    std::lock_guard<std::mutex> lock(ChunkMutex);
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk != chunks.end()) {
         return chunk->second;
-    } else {
-        // std::cout << "[ChunkHandler / Debug] Chunk not found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
-        Chunk &chunk = AddChunk(chunkX, chunkY, chunkZ);
-        return chunk;
+    }
+    else {
+        //WARN("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        if (addIfNotFound) {
+            Chunk& chunk = AddChunk(chunkX, chunkY, chunkZ);
+            return chunk;
+        } else {
+            return defaultChunk;
+        }
     }
 }
 
-Chunk &ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
+bool ChunkHandler::GetChunkExists(int chunkX, int chunkY, int chunkZ) {
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
+    if (chunk != chunks.end()) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 
+Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
+    OVERRIDE_LOG_NAME("ChunkHandler");
+    auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk == chunks.end()) {
         chunks.insert(std::make_pair(std::tuple<int, int, int>(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
         chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
         chunk->second.SetPosition(chunkX, chunkY, chunkZ);
         chunk->second.AllocateChunk();
-        chunk->second.SetupRenderComponents();
+        chunk->second.id = world.totalChunks;
 
         world.totalChunks++;
-        world.chunkAddition++;
 
         return chunk->second;
-    } else {
-        // std::cout << "[ChunkHandler / Debug] Chunk already found at {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
-        return GetChunk(chunkX, chunkY, chunkZ);
+    }
+    else {
+        //INFO("Chunk already found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        return GetChunk(chunkX, chunkY, chunkZ, false);
     }
 }
 
-void ChunkHandler::GenerateChunk(int chunkX, int chunkY, int chunkZ, bool debug) {
-    Chunk defaultChunk = Chunk(0, 0, 0);
-    GetChunk(chunkX, chunkY, chunkZ).GenerateBlocks(world, defaultChunk, false, debug);
+void ChunkHandler::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk callerChunk, bool updateCallerChunk, bool debug) {
+    GetChunk(chunkX, chunkY, chunkZ, false).GenerateBlocks(world, callerChunk, updateCallerChunk, debug);
 }
 
-void ChunkHandler::MeshChunk(int chunkX, int chunkY, int chunkZ) { GetChunk(chunkX, chunkY, chunkZ).GenerateMesh(*this, false); }
+bool ChunkHandler::MeshChunk(int chunkX, int chunkY, int chunkZ) {
+    return GetChunk(chunkX, chunkY, chunkZ, false).GenerateMesh(*this, false);
+}
 
 // Specifically uses the world's GenerateChunk() function that makes sure chunks mesh correctly
 void ChunkHandler::SmartGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ) {
-    Chunk chunk = GetChunk(chunkX, chunkY, chunkZ);
+    Chunk chunk = GetChunk(chunkX, chunkY, chunkZ, false);
     world.GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
 }
 
-// Meshes a chunk fully no matter what, even if it needs to alloate / generate surrounding chunks too
+// Meshes a chunk fully no matter what, even if it needs to allocate / generate surrounding chunks too
 void ChunkHandler::ForceGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ) {
     AddChunk(chunkX, chunkY, chunkZ);
     AddChunk(chunkX - 1, chunkY, chunkZ);
@@ -57,40 +76,44 @@ void ChunkHandler::ForceGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ)
     AddChunk(chunkX + 1, chunkY, chunkZ);
     AddChunk(chunkX, chunkY + 1, chunkZ);
     AddChunk(chunkX, chunkY, chunkZ + 1);
-    GenerateChunk(chunkX, chunkY, chunkZ, true);
-    GenerateChunk(chunkX - 1, chunkY, chunkZ, true);
-    GenerateChunk(chunkX, chunkY - 1, chunkZ, true);
-    GenerateChunk(chunkX, chunkY, chunkZ - 1, true);
-    GenerateChunk(chunkX + 1, chunkY, chunkZ, true);
-    GenerateChunk(chunkX, chunkY + 1, chunkZ, true);
-    GenerateChunk(chunkX, chunkY, chunkZ + 1, true);
+    GenerateChunk(chunkX, chunkY, chunkZ, defaultChunk, false, true);
+    GenerateChunk(chunkX - 1, chunkY, chunkZ, defaultChunk, false, true);
+    GenerateChunk(chunkX, chunkY - 1, chunkZ, defaultChunk, false, true);
+    GenerateChunk(chunkX, chunkY, chunkZ - 1, defaultChunk, false, true);
+    GenerateChunk(chunkX + 1, chunkY, chunkZ, defaultChunk, false, true);
+    GenerateChunk(chunkX, chunkY + 1, chunkZ, defaultChunk, false, true);
+    GenerateChunk(chunkX, chunkY, chunkZ + 1, defaultChunk, false, true);
     MeshChunk(chunkX, chunkY, chunkZ);
 }
 
 void ChunkHandler::RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNeighbors) {
-    GetChunk(chunkX, chunkY, chunkZ).GenerateMesh(*this, true);
+    Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ, false);
+    if (chunk.generationStatus < 2) {
+        return;
+    }
+
+    chunk.GenerateMesh(*this, true);
 
     if (updateNeighbors) {
-        GetChunk(chunkX + 1, chunkY, chunkZ).GenerateMesh(*this, true);
-        GetChunk(chunkX - 1, chunkY, chunkZ).GenerateMesh(*this, true);
-        GetChunk(chunkX, chunkY + 1, chunkZ).GenerateMesh(*this, true);
-        GetChunk(chunkX, chunkY - 1, chunkZ).GenerateMesh(*this, true);
-        GetChunk(chunkX, chunkY, chunkZ + 1).GenerateMesh(*this, true);
-        GetChunk(chunkX, chunkY, chunkZ - 1).GenerateMesh(*this, true);
+        GetChunk(chunkX + 1, chunkY, chunkZ, false).GenerateMesh(*this, true);
+        GetChunk(chunkX - 1, chunkY, chunkZ, false).GenerateMesh(*this, true);
+        GetChunk(chunkX, chunkY + 1, chunkZ, false).GenerateMesh(*this, true);
+        GetChunk(chunkX, chunkY - 1, chunkZ, false).GenerateMesh(*this, true);
+        GetChunk(chunkX, chunkY, chunkZ + 1, false).GenerateMesh(*this, true);
+        GetChunk(chunkX, chunkY, chunkZ - 1, false).GenerateMesh(*this, true);
     }
 }
 
 void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID) {
-    Chunk &chunk = GetChunk(chunkX, chunkY, chunkZ);
-    Block &block = chunk.blocks[blockX][blockY][blockZ];
+    Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ, false);
+    Block& block = chunk.blocks[blockX][blockY][blockZ];
     if (block.IsAir() ^ (newBlockID == 0)) {
-        int curblocks = chunk.GetTotalBlocks();
+        int currentBlocks = chunk.GetTotalBlocks();
         if (newBlockID == 0) {
-            chunk.SetTotalBlocks(curblocks - 1);
-            chunk.airBlocks.set(blockX + blockY * chunkSize + blockZ * chunkSize * chunkSize);
-        } else {
-            chunk.SetTotalBlocks(curblocks + 1);
-            chunk.airBlocks.reset(blockX + blockY * chunkSize + blockZ * chunkSize * chunkSize);
+            chunk.SetTotalBlocks(currentBlocks - 1);
+        }
+        else {
+            chunk.SetTotalBlocks(currentBlocks + 1);
         }
     }
     block.SetBlockID(newBlockID);
@@ -102,34 +125,11 @@ void ChunkHandler::RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, i
 
 void ChunkHandler::Delete() {
     for (auto it = chunks.begin(); it != chunks.end(); ++it) {
-        auto &chunk = it->second;
+        auto& chunk = it->second;
         chunk.Delete();
         world.totalChunks--;
     }
 
     chunks.clear();
     world.totalMemoryUsage = 0;
-}
-
-int ChunkHandler::BlockIsAir(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ) {
-    // -1: Chunk does not exist / is not generated
-    // 0: Block is not air
-    // 1: Block is air
-    // INFO(std::format("PRENORM: {} {} {} | {} {} {}", chunkX, chunkY, chunkZ, blockX, blockY, blockZ));
-    CHUNK_COORD_PROT(chunkX, blockX);
-    CHUNK_COORD_PROT(chunkY, blockY);
-    CHUNK_COORD_PROT(chunkZ, blockZ);
-    // INFO(std::format("POSTNORM: {} {} {} | {} {} {}", chunkX, chunkY, chunkZ, blockX, blockY, blockZ));
-
-    if (chunks.find(std::make_tuple(chunkX, chunkY, chunkZ)) == chunks.end()) {
-        return -1;
-    }
-
-    Chunk &chunk = GetChunk(chunkX, chunkY, chunkZ);
-
-    if (!chunk.isGenerated) {
-        return -1;
-    }
-
-    return chunk.BlockIsAir(blockX, blockY, blockZ);
 }

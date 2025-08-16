@@ -3,22 +3,26 @@
 // R.I.P.
 
 bool bitness;
-#define SDL_MAIN_HANDLED
+
 
 #include <glad/glad.h>
-#include <imgui.h>
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_sdl2.h>
-#include <time.h>
+#include <GLFW/glfw3.h>
+#include <klogger.hpp>
 
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <klogger.hpp>
-#include <nlohmann/json.hpp>
 #include <string>
+#include <time.h>
 
-#include "DataPanel.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <nlohmann/json.hpp>
+
+#include "Entity.h"
+#include "Events.h"
 #include "DebugRenderer.h"
 #include "Input.h"
 #include "Renderer.h"
@@ -27,47 +31,12 @@ bool bitness;
 #include "Texture.h"
 #include "Window.h"
 
-// Make it so on laptops, it will request the dGPU if possible, without this,
-// you have to force it to use the dGPU
-#ifdef __linux__
-// TEMP FIX BECAUSE LINUX SETENV NO EXISTING
-
-// For NVIDIA GPUs
-// setenv("__NV_PRIME_RENDER_OFFLOAD", "1", 1);
-// setenv("__GLX_VENDOR_LIBRARY_NAME", "nvidia", 1);
-
-// For AMD GPUs
-// setenv("DRI_PRIME", "1", 1);
-#elif _WIN32
-extern "C" {
-__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001; // For NVIDIA GPUs
-__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;   // For AMD GPUs
-}
-#endif
-
-// Signal handler (Signals don't work on windows iirc so block it from there for the time being)
-#if defined(__linux__) || defined(__APPLE__)
-#include <execinfo.h>
-#include <signal.h>
-#include <unistd.h>
-
-void handler(int sig) {
-    void *array[10];
-    size_t size;
-
-    // get void*'s for all entries on the stack
-    size = backtrace(array, 10);
-
-    // print out all the frames to stderr
-    fprintf(stderr, "Error: signal %d:\n", sig);
-    backtrace_symbols_fd(array, size, STDERR_FILENO);
-    exit(1);
-}
-#endif
 
 using json = nlohmann::json;
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
 
 int windowWidth;
 int windowHeight;
@@ -76,206 +45,253 @@ std::string windowType;
 std::string projectVersion;
 
 // This main function is getting out of hand
-// yes but hands are in pocket so is it still in the pocket or is it out of
-// pocket? - Astra
+// yes but hands are in pocket so is it still in the pocket or is it out of pocket? - Astra
 int main() {
-// Install signal handler if on linux or mac
-#if defined(__linux__) || defined(__APPLE__)
-    signal(SIGSEGV, handler);
-    signal(SIGABRT, handler);
-    signal(SIGKILL, handler);
-#endif
+	// Make it so on laptops, it will request the dGPU if possible, without this, you have to force it to use the dGPU
+	#ifdef __linux__
+	// For NVIDIA GPUs
+	setenv("__NV_PRIME_RENDER_OFFLOAD", "1", 1);
+	setenv("__GLX_VENDOR_LIBRARY_NAME", "nvidia", 1);
 
-#ifdef PROFBUILD
-    CRITICAL("Tracy is enabled! This build is for profiling purposes only.");
-#endif
-    SDL_SetMainReady();
+	// For AMD GPUs
+	setenv("DRI_PRIME", "1", 1);
+	#elif _WIN32
+	extern "C"
+	{
+		__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001; // For NVIDIA GPUs
+		__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;   // For AMD GPUs
+	}
+	#endif
 
-    std::ifstream file("init_config.json");
+	std::ifstream file("init_config.json");
 
-    OVERRIDE_LOG_NAME("Main");
+	OVERRIDE_LOG_NAME("Initialization");
 
-    LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Could not open or find the JSON config file", 1);
+	LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Could not open or find the JSON config file", 1);
 
-    json jsonData;
-    file >> jsonData;
+	json jsonData;
+	file >> jsonData;
 
-    windowWidth = jsonData["init_settings"]["window_width"];
-    windowHeight = jsonData["init_settings"]["window_height"];
-    windowTitle = jsonData["init_settings"]["window_title"].get<std::string>();
-    windowType = jsonData["init_settings"]["window_type"].get<std::string>();
-    projectVersion = jsonData["project_version"].get<std::string>();
+	windowWidth = jsonData["init_settings"]["window_width"];
+	windowHeight = jsonData["init_settings"]["window_height"];
+	windowTitle = jsonData["init_settings"]["window_title"].get<std::string>();
+	windowType = jsonData["init_settings"]["window_type"].get<std::string>();
+	projectVersion = jsonData["project_version"].get<std::string>();
 
-    // Initialize SDL2
-    LOG_CHECK_RETURN((SDL_Init(SDL_INIT_EVERYTHING) == 0), "Successfully initialized SDL2", "Failed to initialize SDL2", -1);
+	// Initialize GLFW
+	LOG_CHECK_RETURN(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW", -1);
 
-    // Create a window
-    Window globalWindow;
-    SDL_Window *sdlwin =
-        globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
-    globalWindow.Setup();
+	// Create a window
+	Window globalWindow;
+	globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
+	globalWindow.Setup();
 
-    // glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
+	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
+	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
 
-    // Initialize glad
-    LOG_CHECK_RETURN(
-        gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD", -1
-    );
-    if (sizeof(void *) == 8) {
-        bitness = 1;
-    } else if (sizeof(void *) == 4) {
-        bitness = 0;
-    } else {
-        ERR("Could not find machine bitness");
-        return -1;
-    }
-    INFO("Machine bitness: " + std::to_string(bitness == 1 ? 64 : 32));
-    INFO("Using OpenGL version: " + std::string((char *)glGetString(GL_VERSION)));
-    INFO("Using graphics device: " + std::string((char *)glGetString(GL_RENDERER)));
-    INFO("Using resolution: " + std::to_string(globalWindow.GetWidth()) + " x " + std::to_string(globalWindow.GetHeight()));
+	// Initialize glad
+	LOG_CHECK_RETURN(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD", -1);
 
-    // Set things up before main game loop
-    GLCall(glViewport(0, 0, globalWindow.GetWidth(), globalWindow.GetHeight()));
-    GLCall(glEnable(GL_DEPTH_TEST));
+	// Setup ImGui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+	io.IniFilename = NULL; // don't save the accursed imgui.ini
+	ImGui_ImplGlfw_InitForOpenGL(globalWindow.GetWindowInstance(), true);
+	ImGui_ImplOpenGL3_Init("#version 430");
 
-    INFO("Starting main game loop...");
+	if (sizeof(void*) == 8) {
+		bitness = 1;
+	}
+	else if (sizeof(void*) == 4) {
+		bitness = 0;
+	}
+	else {
+		ERR("Could not find machine bitness");
+		return -1;
+	}
+	INFO("Machine bitness: " + std::to_string(bitness == 1 ? 64 : 32));
+	INFO("Using OpenGL version: " + std::string((char*)glGetString(GL_VERSION)));
+	INFO("Using graphics device: " + std::string((char*)glGetString(GL_RENDERER)));
+	INFO("Using resolution: " + std::to_string(globalWindow.GetWidth()) + " x " + std::to_string(globalWindow.GetHeight()));
 
-    // Create a singleplayer world
-    SingleplayerHandler singleplayerHandler(globalWindow);
-    singleplayerHandler.Setup();
-    singleplayerHandler.StartSingleplayerWorld();
+	// Set things up before main game loop
+	GLCall(glViewport(0, 0, globalWindow.GetWidth(), globalWindow.GetHeight()));
+	GLCall(glEnable(GL_DEPTH_TEST));
 
-    DataPanel datapanel(&singleplayerHandler, &globalWindow, globalWindow.glsl_version);
+	// MAIN PROGRAM SETUP FINISHED - Most of the rest of this is able to be moved into other places to make this more modular
 
-    INFO("Initializing shaders...");
+	// Create a singleplayer world
+	SingleplayerHandler singleplayerHandler(globalWindow);
+	singleplayerHandler.Setup();
+	
+	// Create a debug shader
+	Shader terrainShaderProgram("Mods/kiwicubed/Shaders/Terrain_Vertex.vert", "Mods/kiwicubed/Shaders/Terrain_Fragment.frag");
+	Shader wireframeShaderProgram("Mods/kiwicubed/Shaders/Wireframe_Vertex.vert", "Mods/kiwicubed/Shaders/Wireframe_Fragment.frag");
+	Shader chunkDebugShaderProgram("Mods/kiwicubed/Shaders/ChunkDebug_Vertex.vert", "Mods/kiwicubed/Shaders/ChunkDebug_Fragment.frag");
+	
+	// Create a debug texture
+	Texture terrainAtlas("Mods/kiwicubed/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	terrainAtlas.SetAtlasSize(terrainShaderProgram, 3);
+	terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, 3);
 
-    // Create a debug shader
-    Shader terrainShaderProgram("Mods/kiwicubed/Shaders/Terrain_Vertex.vert", "Mods/kiwicubed/Shaders/Terrain_Fragment.frag");
-    Shader wireframeShaderProgram("Mods/kiwicubed/Shaders/Wireframe_Vertex.vert", "Mods/kiwicubed/Shaders/Wireframe_Fragment.frag");
-    Shader chunkDebugShaderProgram("Mods/kiwicubed/Shaders/ChunkDebug_Vertex.vert", "Mods/kiwicubed/Shaders/ChunkDebug_Fragment.frag");
+	for (const auto& entry : std::filesystem::directory_iterator("Mods")) {
+        if (entry.is_directory()) {
+            std::string modFolder = entry.path().string();
+            std::string modJsonPath = modFolder + "/mod.json";
+            
+            if (std::filesystem::exists(modJsonPath) && std::filesystem::is_regular_file(modJsonPath)) {
+                std::ifstream file(modFolder + "/mod.json");
 
-    INFO("Initializing textures...");
+				json jsonData;
+				file >> jsonData;
 
-    // Create a debug texture
-    Texture terrainAtlas("Mods/kiwicubed/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    terrainAtlas.SetAtlasSize(terrainShaderProgram, 3);
-    terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, 3);
+				std::string name = jsonData["mod_title"];
+				std::string version = jsonData["mod_version"];
+				std::string authors = jsonData["mod_authors"];
 
-    singleplayerHandler.singleplayerWorld.GenerateWorld();
-    singleplayerHandler.singleplayerWorld.SetupRenderComponents();
-
-    terrainAtlas.Bind();
-
-    Renderer renderer = Renderer();
-    DebugRenderer debugRenderer = DebugRenderer();
-
-    glm::vec3 c1 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner1;
-    glm::vec3 c2 = singleplayerHandler.singleplayerWorld.player.GetEntityData().physicsBoundingBox.corner2;
-    glm::vec3 pos = singleplayerHandler.singleplayerWorld.player.GetEntityData().position;
-
-    debugRenderer.SetupBuffers(
-        c1, c2, pos, singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(),
-        singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins()
-    );
-
-    int frames = 0;
-    auto start_time = std::chrono::high_resolution_clock::now();
-    double fps = 0.0;
-
-    // Main game loop
-    bool exit_loop = false;
-    while (!exit_loop) {
-        NEW_FRAME();
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT)
-                exit_loop = true;
-
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                event.window.windowID == SDL_GetWindowID(sdlwin))
-                exit_loop = true;
-
-            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                globalWindow.UpdateWindowSize(event.window.data1, event.window.data2);
-                GLCall(glViewport(0, 0, event.window.data1, event.window.data2));
-            }
-
-            // Quit events are exempt from input blocking - the rest aren't tho
-            if (!datapanel.took_input()) {
-                globalWindow.inputHandler.handle_single_input(&event);
+				INFO("Found mod \"" + name + "\" by \"" + authors + "\" with version \"" + version + "\"");
             }
         }
-        if (SDL_GetWindowFlags(sdlwin) & SDL_WINDOW_MINIMIZED) {
-            SDL_Delay(10);
-            continue;
-        }
-
-        auto end_time = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-
-        if (duration >= 1000.0) {
-            fps = static_cast<float>(frames) / (duration / 1000.0);
-            frames = 0;
-            start_time = end_time;
-        }
-
-        EntityData playerData = singleplayerHandler.singleplayerWorld.player.GetEntityData();
-        datapanel.Draw(frames, fps, playerData);
-
-        // Make background ~pink~
-        renderer.ClearScreen(0.98f, 0.88f, 1.0f);
-
-        // Do rendering stuff
-        if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
-            singleplayerHandler.singleplayerWorld.Update();
-            singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(terrainShaderProgram);
-            singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(wireframeShaderProgram);
-            singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(chunkDebugShaderProgram);
-
-            singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
-
-            EntityData ed = singleplayerHandler.singleplayerWorld.player.GetEntityData();
-
-            debugRenderer.UpdateBuffers(
-                ed.physicsBoundingBox.corner1, ed.physicsBoundingBox.corner2, ed.position,
-                singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(),
-                singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(),
-                singleplayerHandler.singleplayerWorld.GetChunkOrigins()
-            );
-            debugRenderer.UpdateUniforms();
-            debugRenderer.RenderDebug(wireframeShaderProgram, chunkDebugShaderProgram);
-        }
-
-        datapanel.SwapFrames();
-        SDL_GL_SwapWindow(sdlwin);
-
-        ++frames;
     }
+	
+	singleplayerHandler.singleplayerWorld.GenerateWorld();
+	singleplayerHandler.StartSingleplayerWorld();
 
-    // Clean up once the program has exited
-    {
-        OVERRIDE_LOG_NAME("Cleanup");
+	terrainAtlas.Bind();
 
-        INFO("Cleaning up...");
-        singleplayerHandler.EndSingleplayerWorld();
+	Renderer renderer = Renderer();
+	DebugRenderer debugRenderer = DebugRenderer();
 
-        datapanel.Destroy();
+	debugRenderer.SetupBuffers(singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
 
-        globalWindow.Delete();
-    }
+	int frames = 0;
+	auto start_time = std::chrono::high_resolution_clock::now();
+	double fps = 0.0;
 
-    return 0;
+	// Main game loop
+	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
+		glfwPollEvents();
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		auto end_time = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+		if (duration >= 1000.0) {
+			fps = static_cast<float>(frames) / (duration / 1000.0);
+			frames = 0;
+			start_time = end_time;
+		}
+
+		EntityData playerData = singleplayerHandler.singleplayerWorld.player.GetEntityData();
+
+		ImGui::Begin("Debug");
+		if (ImGui::CollapsingHeader("Player Info")) {
+			ImGui::Text("Player name: %s", singleplayerHandler.singleplayerWorld.player.GetEntityData().name);
+			ImGui::Text("Player health: %d", static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityStats().health));
+			ImGui::Text("Player position: %f, %f, %f",
+				playerData.position.x,
+				playerData.position.y,
+				playerData.position.z);
+			ImGui::Text("Player orientation: %f, %f, %f", 
+				playerData.orientation.x,
+				playerData.orientation.y, 
+				playerData.orientation.z);
+			ImGui::Text("Player velocity: %f, %f, %f",
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.x,
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.y,
+				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.z);
+			ImGui::Text("Global chunk position: %d, %d, %d", 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x), 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y),
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z));
+			ImGui::Text("Local chunk position: %d, %d, %d", 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.x), 
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.y),
+				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.z));
+			ImGui::Text("Current chunk generation status and blocks %d, %d, %d",
+				singleplayerHandler.singleplayerWorld.GetChunk(
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).generationStatus,
+				singleplayerHandler.singleplayerWorld.GetChunk(
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).GetTotalBlocks(),
+				singleplayerHandler.singleplayerWorld.GetChunk(
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
+					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).id);
+			ImGui::Text("Total frames: %d", frames);
+			ImGui::Text("FPS: %.2f", fps);
+		}
+
+		if (ImGui::CollapsingHeader("World")) {
+			singleplayerHandler.singleplayerWorld.DisplayImGui(0);
+		}
+
+		if (ImGui::CollapsingHeader("Chunk Info")) {
+			singleplayerHandler.singleplayerWorld.DisplayImGui(1);
+		}
+
+		// Make background ~pink~
+		renderer.ClearScreen(0.98f, 0.88f, 1.0f);
+
+		// Do rendering stuff
+		globalWindow.QueryInputs();
+		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
+			singleplayerHandler.singleplayerWorld.player.Update();
+			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(terrainShaderProgram);
+			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(wireframeShaderProgram);
+			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(chunkDebugShaderProgram);
+
+			singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
+
+			debugRenderer.UpdateBuffers(singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
+			debugRenderer.UpdateUniforms();
+			debugRenderer.RenderDebug(chunkDebugShaderProgram);
+		}
+
+
+		ImGui::End();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		glfwSwapBuffers(globalWindow.GetWindowInstance());
+		++frames;
+	}
+
+
+	// Clean up once the program has exited
+	OVERRIDE_LOG_NAME("Cleanup");
+	INFO("Cleaning up...");
+	singleplayerHandler.EndSingleplayerWorld();
+
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
+	glfwDestroyWindow(globalWindow.GetWindowInstance());
+	glfwTerminate();
+
+	INFO("Finished cleaning up");
+	return 0;
 }
 
-// void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-//     if (width == 0 || height == 0) {
-//         return;
-//     }
-//     glViewport(0, 0, width, height);
-//     Window *globalWindow = static_cast<Window *>(glfwGetWindowUserPointer(window));
-//     if (globalWindow) {
-//         globalWindow->UpdateWindowSize(width, height);
-//     }
-// }
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	if (width == 0 || height == 0) {
+		return;
+	}
+	glViewport(0, 0, width, height);
+	Window* globalWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	if (globalWindow) {
+		globalWindow->UpdateWindowSize(width, height);
+	}
+}

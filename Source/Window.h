@@ -2,54 +2,45 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <chrono>
+#include <cstring>
 #include <iostream>
 #include <thread>
 
 #include "Input.h"
-#include <glad/glad.h>
 
-#include "klogger.hpp"
-#include <SDL.h>
-#include <imgui.h>
-#include <imgui_impl_opengl3.h>
-
-#define GL_SILENCE_DEPRECATION
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <SDL_opengles2.h>
-#else
-#include <SDL_opengl.h>
-#endif
 
 class Window {
-  public:
-    InputHandler inputHandler = InputHandler();
+	public:
+		Window() {};
+		
+		GLFWwindow* CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType);
 
-    Window() {};
+		void Setup();
 
-    SDL_Window *CreateWindowInstance(int windowWidth, int windowHeight, const char *windowTitle, const char *windowType);
+		void QueryInputs();
 
-    void Setup();
+		void UpdateWindowSize(int newWindowWidth, int newWindowHeight);
 
-    void UpdateWindowSize(int newWindowWidth, int newWindowHeight);
+		int GetWidth() const;
+		int GetHeight() const;
+		const char* GetTitle() const;
+		void SetTitle(const char* newTitle);
+		void SetTitle(std::string newTitle);
 
-    int GetWidth() const;
-    int GetHeight() const;
-    const char *GetTitle() const;
-    void SetTitle(const char *newTitle);
-    void SetTitle(std::string newTitle);
+		GLFWwindow* GetWindowInstance();
 
-    SDL_Window *GetWindowInstance();
+		void Delete();
 
-    void Delete();
+		int windowWidth, windowHeight;
+		const char* windowTitle;
 
-    int windowWidth, windowHeight;
-    const char *windowTitle;
-    const char *glsl_version;
-    SDL_GLContext gl_context;
+		bool isFocused;
 
-    bool isFocused;
-
-  private:
-    SDL_Window *window;
+	private:
+		GLFWwindow* window;
+		InputHandler inputHandler = InputHandler();
 };

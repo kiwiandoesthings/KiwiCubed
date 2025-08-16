@@ -1,6 +1,7 @@
 # Meson build dir is already ignored by a gitignore inside it
 /subprojects/*
 !/subprojects/*.wrap
+!/subprojects/packagefiles
 # this one's a straggler from glad
 /subprojects/egl-registry.wrap
 # custom subprojects

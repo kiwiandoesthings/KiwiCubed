@@ -1,152 +1,253 @@
 #include "ChunkHandler.h"
 #include "World.h"
+#include <klogger.hpp>
 
 // Currently just sets up the VBO, VAO, and IBO
 void Chunk::SetupRenderComponents() {
+    OVERRIDE_LOG_NAME("Chunk Render Components Setup");
+    if (renderComponentsSetup) {
+        ERR("Tried to setup render components when they were already setup, aborting");
+    }
     vertexBufferObject.SetupBuffer();
     vertexArrayObject.SetupArrayObject();
     indexBufferObject.SetupBuffer();
-    // INFO(
-    //     "VBO VAO IBO: " + std::to_string(indexBufferObject.indexBufferObjectID) + ' ' +
-    //     std::to_string(vertexArrayObject.vertexArrayObjectID) + ' ' + std::to_string(vertexBufferObject.vertexBufferObjectID)
-    // );
+    renderComponentsSetup = true;
 }
+
 
 void Chunk::AllocateChunk() {
     if (!isAllocated) {
-        debugVisualizationVertices = {-1.0f * debugVertexScale, -1.0f * debugVertexScale, 0.0f * debugVertexScale, 0.0f, 0.0f,
-                                      1.0f * debugVertexScale,  -1.0f * debugVertexScale, 0.0f * debugVertexScale, 1.0f, 0.0f,
-                                      1.0f * debugVertexScale,  1.0f * debugVertexScale,  0.0f * debugVertexScale, 1.0f, 1.0f,
-                                      -1.0f * debugVertexScale, 1.0f * debugVertexScale,  0.0f * debugVertexScale, 0.0f, 1.0f};
+        debugVisualizationVertices = {
+    	     -1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  0.0f,  0.0f,
+    	      1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  1.0f,  0.0f,
+    	     1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 1.0f, 1.0f,
+    	    -1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 0.0f, 1.0f
+	    };
 
-        debugVisualizationIndices = {0, 1, 2, 0, 2, 3};
+	    debugVisualizationIndices = {
+        	0, 1, 2,
+        	0, 2, 3
+	    };
 
         // Allocate memory for all the blocks in the chunk
-        blocks = new Block **[chunkSize];
+        blocks = new Block * *[chunkSize];
         for (int i = 0; i < chunkSize; ++i) {
-            blocks[i] = new Block *[chunkSize];
+            blocks[i] = new Block * [chunkSize];
             for (int j = 0; j < chunkSize; ++j) {
                 blocks[i][j] = new Block[chunkSize];
             }
         }
-    } else {
-        // std::cerr << "[Chunk Setup / Warn] Trying to allocate chunk after it had
-        // already been allocated, aborting {" << chunkX << ", " << chunkY << ", "
-        // << chunkZ << "}" << std::endl;
+    }
+    else {
+        //std::cerr << "[Chunk Setup / Warn] Trying to allocate chunk after it had already been allocated, aborting {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
     }
 
     isAllocated = true;
     generationStatus = 1;
 }
 
-void Chunk::GenerateBlocks(World &world, Chunk &callerChunk, bool updateCallerChunk, bool debug) {
+void Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug) {
     if (isGenerated) {
-        // std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks
-        // after they had already been generated, aborting {" << chunkX << ", " <<
-        // chunkY << ", " << chunkZ << "}" << std::endl;
+        //std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks after they had already been generated, aborting {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
         return;
     }
     if (!isAllocated) {
-        WARN(
-            "Trying to generate blocks for unallocated chunk, aborting. (This "
-            "should never happen, report a bug if you encounter this, thanks) {" +
-            std::format("{} {} {}", chunkX, chunkY, chunkZ) + '}'
-        );
+        WARN("Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
         return;
     }
 
-    for (int x = 0; x < chunkSize; ++x) {
-        for (int y = 0; y < chunkSize; ++y) {
-            for (int z = 0; z < chunkSize; ++z) {
-                blocks[x][y][z].GenerateBlock(
-                    {static_cast<unsigned short>(x), static_cast<unsigned short>(y), static_cast<unsigned short>(z)}, chunkX, chunkY,
-                    chunkZ, chunkSize, debug
-                );
-                if (!blocks[x][y][z].IsAir()) {
+    for (int blockX = 0; blockX < chunkSize; ++blockX) {
+        for (int blockY = 0; blockY < chunkSize; ++blockY) {
+            for (int blockZ = 0; blockZ < chunkSize; ++blockZ) {
+                blocks[blockX][blockY][blockZ].GenerateBlock(blockX, blockY, blockZ, chunkX, chunkY, chunkZ, chunkSize, debug);
+                if (blocks[blockX][blockY][blockZ].GetBlockID() != 0) {
                     totalBlocks++;
-                } else {
-                    airBlocks.set(x + y * chunkSize + z * chunkSize * chunkSize);
                 }
             }
         }
     }
 
+
     if (updateCallerChunk) {
         world.GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, *this, true, callerChunk);
     }
 
+    IsEmpty();
+    IsFull();
     isGenerated = true;
     generationStatus = 2;
 }
 
-void Chunk::GenerateMesh(ChunkHandler &chunkHandler, const bool remesh) {
+// Returns whether or not the mesh was generated
+bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
     OVERRIDE_LOG_NAME("Chunk Mesh Generation");
+    if (!(!isMeshed || remesh)) {
+        WARN("Trying to generate mesh for already meshed chunk, aborting");
+        return false;
+    }
 
-    std::string chunkPositionString = "{" + std::format("{} {} {}", chunkX, chunkY, chunkZ) + "}";
-    if (!isMeshed || remesh) {
-        if (!isAllocated | !isGenerated | IsEmpty()) {
+    if (!isAllocated) {
+        ERR("Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        return false;
+    }
+    
+    if (!isGenerated) {
+        WARN("Trying to generate mesh for ungenerated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        return false;
+    }
 
-            if (!isAllocated) {
-                ERR("Trying to generate mesh for unallocated chunk, aborting. (This "
-                    "should never happen, report a bug if you encounter this, "
-                    "thanks) " +
-                    chunkPositionString);
-            }
+    if (IsEmpty() || IsFull()) {
+        INFO("Chunk is empty or full, skipping mesh generation {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        return false;
+    }
 
-            if (!isGenerated) {
-                WARN(
-                    "Trying to generate mesh for ungenerated chunk, aborting. (This "
-                    "should never happen, report a bug if you encounter this, "
-                    "thanks) " +
-                    chunkPositionString
-                );
-            }
+    vertices.clear();
+    indices.clear();
+    
+    Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ, true);     // Positive X
+    Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ, true);     // Negative X
+    Chunk& positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ, true);     // Positive Y
+    Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ, true);     // Negative Y
+    Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1, true);     // Positive Z
+    Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1, true);     // Negative Z
 
-            if (IsEmpty()) {
-                INFO("Chunk is empty, skipping mesh generation " + chunkPositionString);
-            }
-
-            return;
-        }
-
-        vertices.clear();
-        indices.clear();
-
-        DEBUG("Meshing chunk " + chunkPositionString);
-
-        for (int x = 0; x < chunkSize; ++x) {
-            for (int y = 0; y < chunkSize; ++y) {
-                for (int z = 0; z < chunkSize; ++z) {
-                    if (!blocks[x][y][z].IsAir()) {
-                        Block &block = blocks[x][y][z];
-
-                        std::array<int, 6> faces = {chunkHandler.BlockIsAir(chunkX, chunkY, chunkZ, x + 1, y, z),
-                                                    chunkHandler.BlockIsAir(chunkX, chunkY, chunkZ, x - 1, y, z),
-                                                    chunkHandler.BlockIsAir(chunkX, chunkY, chunkZ, x, y + 1, z),
-                                                    chunkHandler.BlockIsAir(chunkX, chunkY, chunkZ, x, y - 1, z),
-                                                    chunkHandler.BlockIsAir(chunkX, chunkY, chunkZ, x, y, z + 1),
-                                                    chunkHandler.BlockIsAir(chunkX, chunkY, chunkZ, x, y, z - 1)};
-
-                        for (int direction = 0; direction < 6; ++direction) {
-                            // DEBUG("Direction " + std::to_string(direction));
-
-                            // -1 too for if the bordering chunk is not generated / doesn't exist
-                            if (faces[direction] == 1 || faces[direction] == -1) {
-                                block.AddFace(vertices, indices, static_cast<FaceDirection>(direction), chunkX, chunkY, chunkZ, chunkSize);
-                            }
+    for (int x = 0; x < chunkSize; ++x) {
+        for (int y = 0; y < chunkSize; ++y) {
+            for (int z = 0; z < chunkSize; ++z) {
+                if (blocks[x][y][z].GetBlockID() != 0) {
+                    Block& block = blocks[x][y][z];
+                    
+                    for (int direction = 0; direction < 6; ++direction) {
+                        FaceDirection faceDirection = static_cast<FaceDirection>(direction);
+                        bool shouldAddFace = false;
+                        switch (faceDirection) {
+                            case RIGHT:
+                                if (x < chunkSize - 1) {
+                                    if (blocks[x + 1][y][z].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                if (!positiveXChunk.isGenerated) {
+                                    break;
+                                }
+                                if (x == chunkSize - 1) {
+                                    if (positiveXChunk.blocks[0][y][z].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                break;
+                            case LEFT:
+                                if (x > 0) {
+                                    if (blocks[x - 1][y][z].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else if (x == 0 && negativeXChunk.isGenerated) {
+                                    if (negativeXChunk.blocks[chunkSize - 1][y][z].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    shouldAddFace = false;
+                                }
+                                break;
+                            case TOP:
+                                if (y < chunkSize - 1) {
+                                    if (blocks[x][y + 1][z].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else if (y == chunkSize - 1 && positiveYChunk.isGenerated) {
+                                    if (positiveYChunk.blocks[x][0][z].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    shouldAddFace = false;
+                                }
+                                break;
+                            case BOTTOM:
+                                if (y > 0) {
+                                    if (blocks[x][y - 1][z].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else if (y == 0 && negativeYChunk.isGenerated) {
+                                    if (negativeYChunk.blocks[x][chunkSize - 1][z].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    shouldAddFace = false;
+                                }
+                                break;
+                            case BACK:
+                                if (z < chunkSize - 1) {
+                                    if (blocks[x][y][z + 1].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else if (z == chunkSize - 1 && positiveZChunk.isGenerated) {
+                                    if (positiveZChunk.blocks[x][y][0].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    shouldAddFace = false;
+                                }
+                                break;
+                            case FRONT:
+                                if (z > 0) {
+                                    if (blocks[x][y][z - 1].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else if (z == 0 && negativeZChunk.isGenerated) {
+                                    if (negativeZChunk.blocks[x][y][chunkSize - 1].GetBlockID() == 0) {
+                                        shouldAddFace = true;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    shouldAddFace = false;
+                                }
+                                break;
+                        }
+                    
+                        if (shouldAddFace) {
+                            block.AddFace(vertices, indices, faceDirection, chunkX, chunkY, chunkZ, chunkSize);
                         }
                     }
                 }
             }
         }
     }
-    // DEBUG("Finished meshing");
 
     isMeshed = true;
     generationStatus = 3;
+
+    return true;
 }
 
-void Chunk::Render() { renderer.DrawElements(vertexArrayObject, vertexBufferObject, indexBufferObject, vertices, indices); }
+void Chunk::Render() {
+    if (shouldRender) {
+        if (!renderComponentsSetup) {
+            SetupRenderComponents();
+        }
+        renderer.DrawElements(vertexArrayObject, vertexBufferObject, indexBufferObject, vertices, indices);
+    }
+}
 
 void Chunk::SetPosition(int newChunkX, int newChunkY, int newChunkZ) {
     chunkX = newChunkX;
@@ -154,20 +255,47 @@ void Chunk::SetPosition(int newChunkX, int newChunkY, int newChunkZ) {
     chunkZ = newChunkZ;
 }
 
-int Chunk::GetTotalBlocks() const { return totalBlocks; }
+int Chunk::GetTotalBlocks() const {
+    return totalBlocks;
+}
 
-void Chunk::SetTotalBlocks(unsigned short newTotalBlocks) { totalBlocks = newTotalBlocks; }
+void Chunk::SetTotalBlocks(unsigned short newTotalBlocks) {
+    totalBlocks = newTotalBlocks;
+}
 
-std::vector<GLfloat> &Chunk::GetVertices() { return vertices; }
+bool Chunk::GetMeshable(ChunkHandler& chunkHandler) const {
+    if (!isAllocated || !isGenerated || isEmpty || isFull) {
+        return false;
+    } else {
+        Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ, false);
+        Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ, false);
+        Chunk& positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ, false);
+        Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ, false);
+        Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1, false);
+        Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1, false);
 
-std::vector<GLuint> &Chunk::GetIndices() { return indices; }
+        return positiveXChunk.isGenerated && negativeXChunk.isGenerated && positiveYChunk.isGenerated && negativeYChunk.isGenerated && positiveZChunk.isGenerated && negativeZChunk.isGenerated;
+    }
+}
 
-std::vector<GLfloat> &Chunk::GetDebugVisualizationVertices() { return debugVisualizationVertices; }
+std::vector<GLfloat>& Chunk::GetVertices() {
+    return vertices;
+}
 
-std::vector<GLuint> &Chunk::GetDebugVisualizationIndices() { return debugVisualizationIndices; }
+std::vector<GLuint>& Chunk::GetIndices() {
+    return indices;
+}
+
+std::vector<GLfloat>& Chunk::GetDebugVisualizationVertices() {
+    return debugVisualizationVertices;
+}
+
+std::vector<GLuint>& Chunk::GetDebugVisualizationIndices() {
+    return debugVisualizationIndices;
+}
 
 unsigned int Chunk::GetMemoryUsage() {
-    totalMemoryUsage = (sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size());
+    totalMemoryUsage = (sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size()) + sizeof(Chunk);
     return totalMemoryUsage;
 }
 
@@ -175,7 +303,8 @@ bool Chunk::IsEmpty() {
     if (totalBlocks != 0) {
         isEmpty = false;
         return false;
-    } else {
+    }
+    else {
         isEmpty = true;
         return true;
     }
@@ -185,29 +314,21 @@ bool Chunk::IsFull() {
     if (totalBlocks == chunkSize * chunkSize * chunkSize) {
         isFull = true;
         return true;
-    } else {
+    }
+    else {
         isFull = false;
         return false;
     }
 }
 
-void Chunk::DisplayImGui() const {
-    ImGui::Text(
-        "Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %lu, "
-        "Indices: %lu, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB",
-        chunkX, chunkY, chunkZ, generationStatus, totalBlocks, vertices.size(), indices.size(), vertexBufferObject.vertexBufferObjectID,
-        vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID,
-        static_cast<int>(
-            static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) /
-            1024.0
-        )
-    );
+void Chunk::DisplayImGui() {
+    ImGui::Text("Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %d, Indices: %d, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, static_cast<int>(vertices.size()), static_cast<int>(indices.size()), vertexBufferObject.vertexBufferObjectID, vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID, static_cast<int>(static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) / 1024.0));
 }
 
 void Chunk::Delete() {
-    // vertexArrayObject.Delete();
-    // vertexBufferObject.Delete();
-    // indexBufferObject.Delete();
+    vertexArrayObject.Delete();
+    vertexBufferObject.Delete();
+    indexBufferObject.Delete();
 
     if (blocks) {
         for (int x = 0; x < chunkSize; ++x) {
@@ -227,11 +348,11 @@ void Chunk::Delete() {
     isEmpty = true;
     isFull = false;
     totalBlocks = 0;
-    airBlocks.reset();
 
     vertices.clear();
     indices.clear();
 
     debugVisualizationVertices.clear();
     debugVisualizationIndices.clear();
+
 }

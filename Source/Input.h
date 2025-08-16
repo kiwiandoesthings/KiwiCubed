@@ -1,107 +1,156 @@
 #pragma once
 
-#include "SDL_keyboard.h"
-#include <SDL.h>
+#include <GLFW/glfw3.h>
+#include <klogger.hpp>
 
 #include <algorithm>
-#include <format>
 #include <functional>
 #include <iostream>
 #include <istream>
-#include <klogger.hpp>
 #include <map>
-#include <sstream>
 #include <unordered_map>
+#include <sstream>
+#include <vector>
+
 
 class Window;
 
+
 class InputHandler {
-  public:
-    using KeyCallback = std::function<void()>;
-    using MouseButtonCallback = std::function<void()>;
-    using ScrollCallback = std::function<void(double offset)>;
-    using MouseMotionCallback = std::function<void(int relX, int relY)>;
-
-    bool *isFocused;
-    void setIsFocusedPointer(bool *point) { isFocused = point; }
-    InputHandler() { instances.push_back(this); }
-
-    void handle_single_input(const SDL_Event *e) {
-        switch (e->type) {
-        case SDL_KEYDOWN:
-            keyStates[e->key.keysym.scancode] = true;
-            if (keyCallbacks.find(e->key.keysym.scancode) != keyCallbacks.end()) {
-                keyCallbacks[e->key.keysym.scancode]();
+    public:
+        using KeyCallback = std::function<void(int key)>;
+        using MouseButtonCallback = std::function<void(int button)>;
+        using ScrollCallback = std::function<void(double offset)>;
+    
+        InputHandler() : window(window) {}
+    
+        void SetupCallbacks(GLFWwindow* window) {
+            InputHandler::window = window;
+    
+            glfwSetKeyCallback(window, KeyCallbackHandler);
+            glfwSetMouseButtonCallback(window, MouseButtonCallbackHandler);
+            glfwSetScrollCallback(window, ScrollCallbackHandler);
+    
+            instances.push_back(this);
+        }
+    
+        // MonitoredKeys argument is technically optional, as it isn't used, but should be passed for console debugging
+        void SetupKeyStates(GLFWwindow* window, std::vector<int> monitoredKeys) {
+            OVERRIDE_LOG_NAME("InputHandler");
+            std::stringstream outputString;
+            outputString << " Key monitoring registered for keys: (";
+            for (int i = 0; i < monitoredKeys.size(); ++i) {
+                const char* keyName = glfwGetKeyName(monitoredKeys[i], 0);
+                if (keyName == NULL) {
+                    outputString << "keycode: " << monitoredKeys[i];
+                    if (i + 1 != monitoredKeys.size()) {
+                        outputString << ", ";
+                    }
+                    continue;
+                }
+                outputString << "\'" << keyName << "\'";
+                if (i + 1 != monitoredKeys.size()) {
+                    outputString << ", ";
+                }
             }
-            break;
-        case SDL_KEYUP:
-            keyStates[e->key.keysym.scancode] = false;
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            if (mouseButtonCallbacks.find(e->button.button) != mouseButtonCallbacks.end()) {
-                mouseButtonCallbacks[e->button.button]();
+    
+            auto iterator = std::find(instances.begin(), instances.end(), this);
+            int index = static_cast<int>(iterator - instances.begin());
+            outputString << ") for input instance[" << index << "]";
+            INFO(outputString.str());
+            instances.push_back(this);
+        }
+
+        void RegisterCallbackOnKeys(std::vector<int> keys, KeyCallback callback) {
+            for (int key : keys) {
+                RegisterKeyCallback(key, callback);
             }
-            mouseButtonStates[e->button.button] = true;
-            break;
-        case SDL_MOUSEBUTTONUP:
-            mouseButtonStates[e->button.button] = false;
-            break;
-        case SDL_MOUSEWHEEL:
-            scrollStates[true] = e->wheel.y > 0;
-            scrollStates[false] = e->wheel.x > 0;
-            if (scrollStates[true])
-                scrollCallbacks[true](e->wheel.y);
-            if (scrollStates[false])
-                scrollCallbacks[false](e->wheel.x);
-            break;
-        case SDL_MOUSEMOTION:
-            if (isFocused)
-                mouseMotionCallback(e->motion.xrel, e->motion.yrel);
-            break;
         }
-    }
 
-    void RegisterCallbackOnKeys(std::vector<SDL_Scancode> keys, KeyCallback callback) {
-        for (SDL_Scancode key : keys) {
-            RegisterKeyCallback(key, callback);
+        void RegisterKeyCallback(int key, KeyCallback callback) {
+            OVERRIDE_LOG_NAME("InputHandler");
+
+            keyCallbacks[key] = callback;
+            const char* keyName = glfwGetKeyName(key, 0);
+
+            std::stringstream ss;
+
+            ss << "Key callbacks registered for keys: (";
+            if (keyName == NULL) {
+                ss << "keycode: " << key;
+            } else {
+                ss << "\'" << keyName << "\'";
+            }
+            int index = static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin());
+            ss << ") for input instance[" << index << "]";
+            INFO(ss.str());
         }
-    }
 
-    void RegisterKeyCallback(SDL_Scancode key, KeyCallback callback) {
-        OVERRIDE_LOG_NAME("InputHandler");
-
-        keyCallbacks[key] = callback;
-
-        INFO(std::format(
-            "Key callback registered for {} for instance[{}]", SDL_GetScancodeName(key),
-            static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin())
-        ));
-    }
-
-    void RegisterMouseButtonCallback(int button, MouseButtonCallback callback) { mouseButtonCallbacks[button] = callback; }
-
-    // Use true for y-scroll and false for x-scroll
-    void RegisterScrollCallback(bool direction, ScrollCallback callback) { scrollCallbacks[direction] = callback; }
-
-    void RegisterMouseMotionCallback(MouseMotionCallback mouseMotionCallbackToRegister) {
-        mouseMotionCallback = mouseMotionCallbackToRegister;
-    }
-
-    bool GetKeyState(SDL_Scancode key) const {
-        if (keyStates.find(key) != keyStates.end()) {
-            return keyStates[key];
-        } else {
-            return false;
+        void RegisterMouseButtonCallback(int button, MouseButtonCallback callback) {
+            mouseButtonCallbacks[button] = callback;
         }
-    }
+    
+        // Use true for y-scroll and false for x-scroll
+        void RegisterScrollCallback(bool direction, ScrollCallback callback) {
+            scrollCallbacks[direction] = callback;
+        }
 
-  private:
-    static std::unordered_map<SDL_Scancode, bool> keyStates;
-    static MouseMotionCallback mouseMotionCallback;
-    static std::unordered_map<int, bool> mouseButtonStates;
-    static std::unordered_map<bool, bool> scrollStates;
-    static std::unordered_map<int, KeyCallback> keyCallbacks;
-    static std::unordered_map<int, MouseButtonCallback> mouseButtonCallbacks;
-    static std::unordered_map<int, ScrollCallback> scrollCallbacks;
-    static std::vector<InputHandler *> instances;
+        bool GetKeyState(int key) const {
+            auto iterator = keyStates.find(key);
+            return iterator != keyStates.end() && iterator->second;
+        }
+    
+    private:
+        static std::unordered_map<int, bool> keyStates;
+        static std::unordered_map<int, bool> mouseButtonStates;
+        static std::unordered_map<bool, bool> scrollStates;
+        static std::unordered_map<int, KeyCallback> keyCallbacks;
+        static std::unordered_map<int, MouseButtonCallback> mouseButtonCallbacks;
+        static std::unordered_map<int, ScrollCallback> scrollCallbacks;
+        static std::vector<InputHandler*> instances;
+        std::map<int, bool> keys;
+        GLFWwindow* window;
+    
+        // Key callback handler
+        static void KeyCallbackHandler(GLFWwindow* window, int key, int scancode, int action, int mods) {
+            if (action == GLFW_PRESS) {
+                keyStates[key] = true;
+    
+                // If a callback is registered for this key, invoke it
+                if (keyCallbacks.find(key) != keyCallbacks.end()) {
+                    keyCallbacks[key](key);
+                }
+            }
+            else if (action == GLFW_RELEASE) {
+                keyStates[key] = false;
+            }
+        }
+    
+        // Mouse button callback handler
+        static void MouseButtonCallbackHandler(GLFWwindow* window, int button, int action, int mods) {
+            if (action == GLFW_PRESS) {
+                mouseButtonStates[button] = true;
+    
+                // If a callback is registered for this button, invoke it
+                if (mouseButtonCallbacks.find(button) != mouseButtonCallbacks.end()) {
+                    mouseButtonCallbacks[button](button);
+                }
+            }
+            else if (action == GLFW_RELEASE) {
+                mouseButtonStates[button] = false;
+            }
+        }
+    
+        static void ScrollCallbackHandler(GLFWwindow*, double xoffset, double yoffset) {
+            scrollStates[true] = yoffset > 0;
+            scrollStates[false] = xoffset > 0;
+    
+            if (scrollCallbacks.find(true) != scrollCallbacks.end()) {
+                scrollCallbacks[true](yoffset);
+            }
+    
+            if (scrollCallbacks.find(false) != scrollCallbacks.end()) {
+                scrollCallbacks[false](xoffset);
+            }
+        }
 };

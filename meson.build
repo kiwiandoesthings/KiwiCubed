@@ -1,56 +1,21 @@
-project(
-  'kiwicubed',
-  'cpp',
-  default_options: ['cpp_std=c++20', 'default_library=static'],
-)
+project('kiwicubed', 'cpp', default_options: ['cpp_std=c++20'])
 
 # Stops KiwiCubed\subprojects\glm-1.0.1\glm\gtx\../gtx/transform.hpp(23): fatal error C1189
 add_project_arguments('-DGLM_ENABLE_EXPERIMENTAL', language: 'cpp')
 add_project_arguments('-DSTB_IMAGE_IMPLEMENTATION', language: 'cpp')
+add_project_arguments('-g', language: 'cpp')
 
-comp_id = meson.get_compiler('cpp').get_id()
-
-if comp_id == 'msvc'
-  add_project_link_arguments('/ignore:4099', language: 'cpp') # 4099 is for PDB not found, which is fine and just logspam because we don't have PDBs anyways
-endif
-
-if build_machine.system() != 'windows' and meson.is_cross_build()
-  add_project_link_arguments(['-static', '-static-libgcc', '-static-libstdc++'], language: 'cpp') # we're cross compiling and wine no likey
-endif
-
-dependencies = [
-  dependency('kwport'),
-  dependency('klogger', static: true),
-  dependency('json'),
-  dependency('glm', static: true),
-  dependency('glad-gl', static: true),
-  subproject('sdl2').get_variable('sdl2_dep'), # Force subproject-based SDL2
-  dependency('imgui', static: true),
-]
-
-if get_option('tracy_enable')
-  dependencies += [dependency('tracy', static: true)]
-  add_project_arguments('-DPROFBUILD', language: 'cpp')
-  if get_option('buildtype') != 'debugoptimized'
-  warning('Profiling builds should set --buildtype=debugoptimized')
-  endif
+if meson.get_compiler('cpp').get_id() == 'msvc'
+    add_project_link_arguments('/ignore:4099', language: 'cpp')
 endif
 
 executable(
   'kiwicubed',
   files(
-    'Source/Input.cpp',
-    'Source/Main.cpp',
-    'Source/Player.cpp',
-
-    # Rendering
-    'Source/Rendering/Camera.cpp',
-    'Source/Rendering/DebugRenderer.cpp',
-    'Source/Rendering/Renderer.cpp',
-    'Source/Rendering/Shader.cpp',
-    'Source/Rendering/Texture.cpp',
-    'Source/SingleplayerHandler.cpp',
-    'Source/Window.cpp',
+    # GPU objects
+    'Source/GPUObjects/IndexBufferObject.cpp',
+    'Source/GPUObjects/VertexArrayObject.cpp',
+    'Source/GPUObjects/VertexBufferObject.cpp',
 
     # World types
     'Source/World/Block.cpp',
@@ -59,8 +24,32 @@ executable(
     'Source/World/ChunkHandler.cpp',
     'Source/World/Entity.cpp',
     'Source/World/Physics.cpp',
+    'Source/World/Player.cpp',
+    'Source/World/SingleplayerHandler.cpp',
     'Source/World/World.cpp',
+
+    # Rendering
+    'Source/Rendering/Camera.cpp',
+    'Source/Rendering/DebugRenderer.cpp',
+    'Source/Rendering/Renderer.cpp',
+    'Source/Rendering/Texture.cpp',
+    'Source/Rendering/Shader.cpp',
+
+    # Other
+    'Source/Events.cpp',
+    'Source/Input.cpp',
+    'Source/Main.cpp',
+    'Source/ThreadPool.cpp',
+    'Source/Window.cpp'
   ),
-  include_directories: include_directories('Source', 'Source/World', 'Source/Rendering'),
-  dependencies: dependencies,
+  include_directories: include_directories('Source', 'Source/GPUObjects', 'Source/World', 'Source/Rendering'),
+  dependencies: [
+    dependency('kwport'),
+    dependency('klogger', static: true),
+    dependency('json'),
+    dependency('glfw3', static: true),
+    dependency('imgui', static: true),
+    dependency('glm', static: true),
+    dependency('glad-gl', static: true),
+  ],
 )

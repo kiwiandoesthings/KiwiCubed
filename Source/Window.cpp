@@ -1,101 +1,114 @@
 #include "Window.h"
+#include "GLFW/glfw3.h"
 
-#include <cstring>
 
-SDL_Window *Window::CreateWindowInstance(int windowWidth, int windowHeight, const char *windowTitle, const char *windowType) {
-    OVERRIDE_LOG_NAME("Initialization");
-    Window::windowWidth = windowWidth;
-    Window::windowHeight = windowHeight;
-    Window::windowTitle = windowTitle;
 
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-    // GL ES 2.0 + GLSL 100
-    glsl_version = (char *)"#version 100";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#elif defined(__APPLE__)
-    // GL 3.2 Core + GLSL 150
-    glsl_version = (char *)"#version 150";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
-                        SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-#else
-    // GL 3.0 + GLSL 130
-    glsl_version = (char *)"#version 130";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#endif
+GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType) {
+	OVERRIDE_LOG_NAME("Initialization");
+	Window::windowWidth = windowWidth;
+	Window::windowHeight = windowHeight;
+	Window::windowTitle = windowTitle;
 
-#ifdef SDL_HINT_IME_SHOW_UI
-    SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-#endif
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-    // window types: fullscreen, window_borderless, window_maximized, window
-    SDL_WindowFlags flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+	if (strcmp(windowType, "fullscreen") == 0) {
+		window = glfwCreateWindow(mode->width, mode->height, windowTitle, monitor, nullptr);
+	}
+	else if (strcmp(windowType, "window_borderless") == 0) {
+		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+		window = glfwCreateWindow(mode->width, mode->height, windowTitle, nullptr, nullptr);
+	}
+	else if (strcmp(windowType, "window_maximized") == 0) {
+		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
+		glfwMaximizeWindow(window);
+	}
+	else if (strcmp(windowType, "window") == 0) {
+		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
+	}
 
-    window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, flags);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GL_CONTEXT_PROFILE_MASK, 24);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-    if (window == nullptr) {
-        printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
-        exit(0);
-    }
+	if (!window) {
+		ERR("Failed to create GLFW window");
+		glfwTerminate();
+	} else {
+		INFO("Successfully created GLFW window");
+	}
 
-    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-    if (gl_context == nullptr) {
-        printf("Error: SDL_GL_CreateContext(): %s\n", SDL_GetError());
-        exit(0);
-    }
+	int newWindowWidth;
+	int newWindowHeight;
 
-    SDL_GL_MakeCurrent(window, gl_context);
-    SDL_GL_SetSwapInterval(1); // Enable vsync
+	glfwGetWindowSize(window, &newWindowWidth, &newWindowHeight);
 
-    return window;
+	Window::windowWidth = newWindowWidth;
+	Window::windowHeight = newWindowHeight;
+
+	glfwMakeContextCurrent(window);
+
+	inputHandler.SetupCallbacks(window);
+
+	return window;
 }
 
 void Window::Setup() {
-    inputHandler.setIsFocusedPointer(&(this->isFocused));
+	inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int button) {
+		isFocused = false;
+	});
+	inputHandler.RegisterKeyCallback(GLFW_KEY_SPACE, [&](int button) {
+		isFocused = true;
+		glfwSetCursorPos(window, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
+	});
+}
 
-    inputHandler.RegisterKeyCallback(SDL_SCANCODE_ESCAPE, [&]() {
-        isFocused = false;
-        SDL_SetRelativeMouseMode(SDL_FALSE);
-    });
-    inputHandler.RegisterKeyCallback(SDL_SCANCODE_SPACE, [&]() {
-        isFocused = true;
-        SDL_SetRelativeMouseMode(SDL_TRUE);
-    });
+void Window::QueryInputs() {
+	if (!isFocused) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		return;
+	}
+	if (isFocused) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_CURSOR_HIDDEN);
+	}
 }
 
 void Window::UpdateWindowSize(int newWindowWidth, int newWindowHeight) {
-    windowWidth = newWindowWidth;
-    windowHeight = newWindowHeight;
+	windowWidth = newWindowWidth;
+	windowHeight = newWindowHeight;
 }
 
-int Window::GetWidth() const { return windowWidth; }
+int Window::GetWidth() const {
+	return windowWidth;
+}
 
-int Window::GetHeight() const { return windowHeight; }
+int Window::GetHeight() const {
+	return windowHeight;
+}
 
-const char *Window::GetTitle() const { return windowTitle; }
+const char* Window::GetTitle() const {
+	return windowTitle;
+}
 
-void Window::SetTitle(const char *newTitle) {
-    SDL_SetWindowTitle(window, newTitle);
-    windowTitle = newTitle;
+void Window::SetTitle(const char* newTitle) {
+	glfwSetWindowTitle(window, newTitle);
+	windowTitle = newTitle;
 }
 
 void Window::SetTitle(std::string newTitle) {
-    SDL_SetWindowTitle(window, newTitle.c_str());
-    windowTitle = newTitle.c_str();
+	glfwSetWindowTitle(window, newTitle.c_str());
+	windowTitle = newTitle.c_str();
 }
 
-SDL_Window *Window::GetWindowInstance() { return window; }
+GLFWwindow* Window::GetWindowInstance() {
+	return window;
+}
 
 void Window::Delete() {
-    SDL_GL_DeleteContext(gl_context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+	glfwDestroyWindow(window);
+	glfwTerminate();
 }

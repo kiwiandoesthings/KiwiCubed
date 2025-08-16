@@ -6,11 +6,4 @@ klogger_lib = static_library(
 	include_directories: include_directories('.'),
 )
 
-dependencies = []
-
-if get_option('tracy_enable')
-  dependencies += [dependency('tracy', static: true)]
-  add_project_arguments('-DPROFBUILD', language: 'cpp')
-endif
-
-klogger_dep = declare_dependency(link_with: klogger_lib, include_directories: include_directories('.'), dependencies: dependencies)
+klogger_dep = declare_dependency(link_with: klogger_lib, include_directories: include_directories('.'))
