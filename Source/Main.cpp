@@ -2,6 +2,14 @@
 // ~2008-2/8/2024
 // R.I.P.
 
+#ifdef _WIN32
+	extern "C"
+	{
+		__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001; // For NVIDIA GPUs
+		__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;   // For AMD GPUs
+	}
+#endif
+
 bool bitness;
 
 
@@ -55,12 +63,6 @@ int main() {
 
 	// For AMD GPUs
 	setenv("DRI_PRIME", "1", 1);
-	#elif _WIN32
-	extern "C"
-	{
-		__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001; // For NVIDIA GPUs
-		__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;   // For AMD GPUs
-	}
 	#endif
 
 	std::ifstream file("init_config.json");
