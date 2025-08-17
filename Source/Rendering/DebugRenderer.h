@@ -1,7 +1,9 @@
 #pragma once
 
-#include "glad.h"
+#include "glad/glad.h"
+
 #include <vector>
+
 #include "Shader.h"
 
 

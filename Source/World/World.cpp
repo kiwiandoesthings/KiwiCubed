@@ -15,7 +15,7 @@ World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) :
             }
         }
     }
-
+    
     isWorldAllocated = true;
 }
 
@@ -40,7 +40,7 @@ void World::Render(Shader shaderProgram) {
 void World::GenerateWorld() {
     OVERRIDE_LOG_NAME("World Generation");
     INFO("Generating world");
-
+    
     auto start_time = std::chrono::high_resolution_clock::now();
     for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
@@ -104,23 +104,23 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
         if (!positiveXChunk.isGenerated) {
             GenerateChunk(chunkX + 1, chunkY, chunkZ, positiveXChunk, true, chunk);
         }
-
+    
         if (!negativeXChunk.isGenerated) {
             GenerateChunk(chunkX - 1, chunkY, chunkZ, negativeXChunk, true, chunk);
         }
-
+    
         if (!positiveYChunk.isGenerated) {
             GenerateChunk(chunkX, chunkY + 1, chunkZ, positiveYChunk, true, chunk);
         }
-
+    
         if (!negativeYChunk.isGenerated) {
             GenerateChunk(chunkX, chunkY - 1, chunkZ, negativeYChunk, true, chunk);
         }
-
+    
         if (!positiveZChunk.isGenerated) {
             GenerateChunk(chunkX, chunkY, chunkZ + 1, positiveZChunk, true, chunk);
         }
-
+    
         if (!negativeZChunk.isGenerated) {
             GenerateChunk(chunkX, chunkY, chunkZ - 1, negativeZChunk, true, chunk);
         }
@@ -262,7 +262,6 @@ bool World::StartTickThread() {
     INFO("Starting tick thread");
     shouldTick = true;
     tickThread = std::thread(&World::RunTickThread, this);
-    INFO("Tick thread started!");
     return true;
 }
 
@@ -280,7 +279,6 @@ bool World::StopTickThread() {
     } else {
         WARN("Tick thread was not joinable (could not be stopped)");
     }
-    INFO("Tick thread stopped!");
     return true;
 }
 
@@ -312,7 +310,6 @@ void World::RunTickThread() {
     while (shouldTick) {
         auto nextTickTime = std::chrono::steady_clock::now();
         Tick();
-        INFO("Ticked!");
         nextTickTime += std::chrono::milliseconds(tickIntervalMs);
         std::this_thread::sleep_until(nextTickTime);
     }

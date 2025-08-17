@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glad.h"
+#include <glad/glad.h>
 
 #include "Camera.h"
 #include "Entity.h"

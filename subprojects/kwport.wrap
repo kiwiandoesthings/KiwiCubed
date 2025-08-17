@@ -1,0 +1,5 @@
+[wrap-file]
+directory = kwport
+
+[provide]
+kwport = kwport_dep

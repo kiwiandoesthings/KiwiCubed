@@ -1,15 +1,18 @@
+set windows-shell := ['cmd', '/c']
 
-run: build_debug
-	BuildDebug/kiwicubed
+[unix]
+run: build
+	Build/kiwicubed
 
-run_release: build_release
-	BuildRelease/kiwicubed
+[windows]
+run: build
+	Build\kiwicubed.exe
+
+build:
+	meson compile -C Build
 
 setup:
-	cmake -S . -B BuildDebug -DCMAKE_BUILD_TYPE=Debug
-	cmake -S . -B BuildRelease -DCMAKE_BUILD_TYPE=Release
-
-build_debug:
-	cmake --build BuildDebug
-build_release:
-	cmake --build BuildRelease
+	meson setup Build
+	
+clean:
+	meson setup --reconfigure Build

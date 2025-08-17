@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GLError.h"
-#include "glad.h"
+#include <glad/glad.h>
 #include <klogger.hpp>
 
 #include <algorithm>
