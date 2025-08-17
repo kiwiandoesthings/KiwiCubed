@@ -13,7 +13,7 @@
 bool bitness;
 
 
-#include <glad/glad.h>
+#include "glad.h"
 #include <GLFW/glfw3.h>
 #include <klogger.hpp>
 

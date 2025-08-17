@@ -6,12 +6,13 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 
 class Event {
     public:
         std::string eventName;
-        
+
         Event(std::string eventName) : eventName(eventName) {}
         ~Event();
 

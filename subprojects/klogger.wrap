@@ -1,5 +1,0 @@
-[wrap-file]
-directory = klogger
-
-[provide]
-klogger = klogger_dep

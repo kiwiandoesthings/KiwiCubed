@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GLError.h"
-#include <glad/glad.h>
+#include "glad.h"
 
 #include <atomic>
 #include <chrono>
