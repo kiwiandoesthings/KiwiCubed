@@ -1,5 +1,14 @@
 #include "Input.h"
 
+
+InputHandler::InputHandler() = default;
+InputHandler::~InputHandler() = default;
+
+InputHandler& InputHandler::GetInstance() {
+    static InputHandler instance;
+    return instance;
+}
+
 std::unordered_map<int, bool> InputHandler::keyStates;
 std::unordered_map<int, bool> InputHandler::mouseButtonStates;
 std::unordered_map<bool, bool> InputHandler::scrollStates;

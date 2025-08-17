@@ -26,7 +26,8 @@ class Shader
 		unsigned int UniformTest(const char* uniform) const;
 		void SetUniform1ui(const char* uniform, unsigned int value) const;
 		void SetUniform3fv(const char* uniform, glm::vec3 value) const;
-		void SetUniform4fv(const char* uniform, glm::mat4 value) const;
+		void SetUniform4fv(const char* uniform, glm::vec4 value) const;
+		void SetUniformMatrix4fv(const char* uniform, glm::mat4 value) const;
 
 		void Bind() const;
 		void Unbind() const;

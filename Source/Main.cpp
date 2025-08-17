@@ -37,6 +37,7 @@ bool bitness;
 #include "Shader.h"
 #include "SingleplayerHandler.h"
 #include "Texture.h"
+#include "UI.h"
 #include "Window.h"
 
 
@@ -134,6 +135,7 @@ int main() {
 	Shader terrainShaderProgram("Mods/kiwicubed/Shaders/Terrain_Vertex.vert", "Mods/kiwicubed/Shaders/Terrain_Fragment.frag");
 	Shader wireframeShaderProgram("Mods/kiwicubed/Shaders/Wireframe_Vertex.vert", "Mods/kiwicubed/Shaders/Wireframe_Fragment.frag");
 	Shader chunkDebugShaderProgram("Mods/kiwicubed/Shaders/ChunkDebug_Vertex.vert", "Mods/kiwicubed/Shaders/ChunkDebug_Fragment.frag");
+	Shader uiShaderProgram("Mods/kiwicubed/Shaders/UI_Vertex.vert", "Mods/kiwicubed/Shaders/UI_Fragment.frag");
 	
 	// Create a debug texture
 	Texture terrainAtlas("Mods/kiwicubed/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -169,6 +171,9 @@ int main() {
 	DebugRenderer debugRenderer = DebugRenderer();
 
 	debugRenderer.SetupBuffers(singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
+
+	UI::GetInstance().Setup(&uiShaderProgram, &globalWindow);
+	UIElement button = UIElement(glm::vec2(25, 425), glm::vec2(300, 300));
 
 	int frames = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -260,6 +265,7 @@ int main() {
 			debugRenderer.RenderDebug(chunkDebugShaderProgram);
 		}
 
+		button.Render();
 
 		ImGui::End();
 		ImGui::Render();

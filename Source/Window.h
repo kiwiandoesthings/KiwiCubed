@@ -11,6 +11,7 @@
 #include <thread>
 
 #include "Input.h"
+#include "UI.h"
 
 
 class Window {
@@ -42,5 +43,4 @@ class Window {
 
 	private:
 		GLFWwindow* window;
-		InputHandler inputHandler = InputHandler();
 };

@@ -113,7 +113,18 @@ void Shader::SetUniform3fv(const char* uniform, glm::vec3 value) const {
     GLCall(glUniform3fv(uniformLocation, 1, glm::value_ptr(value)));
 }
 
-void Shader::SetUniform4fv(const char* uniform, glm::mat4 value) const {
+void Shader::SetUniform4fv(const char* uniform, glm::vec4 value) const {
+    Bind();
+    unsigned int uniformLocation = UniformTest(uniform);
+
+    if (uniformLocation == -1) {
+        return;
+    }
+
+    GLCall(glUniform4fv(uniformLocation, 1, glm::value_ptr(value)));
+}
+
+void Shader::SetUniformMatrix4fv(const char* uniform, glm::mat4 value) const {
     Bind();
     unsigned int uniformLocation = UniformTest(uniform);
 

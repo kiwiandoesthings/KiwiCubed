@@ -51,16 +51,16 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 
 	glfwMakeContextCurrent(window);
 
-	inputHandler.SetupCallbacks(window);
+	InputHandler::GetInstance().SetupCallbacks(window);
 
 	return window;
 }
 
 void Window::Setup() {
-	inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int button) {
+	InputHandler::GetInstance().RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int button) {
 		isFocused = false;
 	});
-	inputHandler.RegisterKeyCallback(GLFW_KEY_SPACE, [&](int button) {
+	InputHandler::GetInstance().RegisterKeyCallback(GLFW_KEY_SPACE, [&](int button) {
 		isFocused = true;
 		glfwSetCursorPos(window, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
 	});

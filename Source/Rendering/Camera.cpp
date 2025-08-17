@@ -8,8 +8,8 @@ void Camera::Setup(Window& window) {
 
 void Camera::SetCameraMatrix(Shader& shader) const {
 	shader.Bind();
-	shader.SetUniform4fv("projectionMatrix", projectionMatrix);
-	shader.SetUniform4fv("viewMatrix", viewMatrix);
+	shader.SetUniformMatrix4fv("projectionMatrix", projectionMatrix);
+	shader.SetUniformMatrix4fv("viewMatrix", viewMatrix);
 }
 
 void Camera::UpdateMatrix(float FOV, float nearPlane, float farPlane, glm::vec3 position, glm::vec3 orientation, glm::vec3 upDirection) {

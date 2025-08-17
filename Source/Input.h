@@ -12,17 +12,19 @@
 #include <sstream>
 #include <vector>
 
+#include <glm/vec2.hpp>
+
 
 class Window;
 
 
 class InputHandler {
     public:
+        static InputHandler& GetInstance();
+
         using KeyCallback = std::function<void(int key)>;
         using MouseButtonCallback = std::function<void(int button)>;
         using ScrollCallback = std::function<void(double offset)>;
-    
-        InputHandler() : window(window) {}
     
         void SetupCallbacks(GLFWwindow* window) {
             InputHandler::window = window;
@@ -99,8 +101,21 @@ class InputHandler {
             auto iterator = keyStates.find(key);
             return iterator != keyStates.end() && iterator->second;
         }
+
+        glm::vec2 GetMousePosition() const {
+            double mouseX;
+            double mouseY;
+            glfwGetCursorPos(window, &mouseX, &mouseY);
+            return glm::vec2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+        }
     
     private:
+        InputHandler();
+        ~InputHandler();
+
+        InputHandler(const InputHandler&) = delete;
+        InputHandler& operator=(const InputHandler&) = delete;
+
         static std::unordered_map<int, bool> keyStates;
         static std::unordered_map<int, bool> mouseButtonStates;
         static std::unordered_map<bool, bool> scrollStates;

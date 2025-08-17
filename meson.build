@@ -39,7 +39,9 @@ executable(
     'Source/Events.cpp',
     'Source/Input.cpp',
     'Source/Main.cpp',
+    'Source/ModHandler.cpp',
     'Source/ThreadPool.cpp',
+    'Source/UI.cpp',
     'Source/Window.cpp'
   ),
   include_directories: include_directories('Source', 'Source/GPUObjects', 'Source/World', 'Source/Rendering'),

@@ -42,7 +42,6 @@ class Entity {
 		EntityStats entityStats;
 		EntityData entityData;
 
-
 	public:
 		Entity() : entityStats(EntityStats()), entityData(EntityData()) {}
 		Entity(float entityX, float entityY, float entityZ);

@@ -38,7 +38,6 @@ class Player : public Entity {
 	
 	private:
 		std::shared_ptr<Camera> camera;
-		InputHandler inputHandler = InputHandler();
 		ChunkHandler& chunkHandler;
 		std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 
