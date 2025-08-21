@@ -3,7 +3,7 @@
 out vec4 FragColor;
 
 in vec3 blockPositionOut;
-in vec2 textureCoordinateOut;
+in vec2 textureCoordinatesOut;
 in float blockTypeOut;
 
 uniform sampler2D tex0;
@@ -21,7 +21,7 @@ void main() {
     float textureIndexY = floor((blockTypeOut - 1.0 + epsilon) / float(atlasSize));
 
     FragColor = texture(tex0, vec2(
-        (textureCoordinateOut.x / float(atlasSize)) + (textureIndexX / float(atlasSize)),
-        (textureCoordinateOut.y / float(atlasSize)) + (textureIndexY / float(atlasSize))
+        (textureCoordinatesOut.x / float(atlasSize)) + (textureIndexX / float(atlasSize)),
+        (textureCoordinatesOut.y / float(atlasSize)) + (textureIndexY / float(atlasSize))
     )) * vec4(tint, 1.0);
 }

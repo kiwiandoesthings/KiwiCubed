@@ -112,9 +112,9 @@ void Block::AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices
 	GLuint baseIndex = static_cast<GLuint>(vertices.size() / 6);
 
 	for (size_t i = vertexOffset; i < static_cast<size_t>(vertexOffset) + 20; i += 5) {
-		vertices.emplace_back(faceVertices[i + 0] + static_cast<GLfloat>(blockX + (chunkX * static_cast<int>(chunkSize))));
-		vertices.emplace_back(faceVertices[i + 1] + static_cast<GLfloat>(blockY + (chunkY * static_cast<int>(chunkSize))));
-		vertices.emplace_back(faceVertices[i + 2] + static_cast<GLfloat>(blockZ + (chunkZ * static_cast<int>(chunkSize))));
+		vertices.emplace_back((faceVertices[i + 0] * 1) + static_cast<GLfloat>(blockX + (chunkX * static_cast<int>(chunkSize))));
+		vertices.emplace_back((faceVertices[i + 1] * 1) + static_cast<GLfloat>(blockY + (chunkY * static_cast<int>(chunkSize))));
+		vertices.emplace_back((faceVertices[i + 2] * 1) + static_cast<GLfloat>(blockZ + (chunkZ * static_cast<int>(chunkSize))));
 		vertices.emplace_back(faceVertices[i + 3]);
 		vertices.emplace_back(faceVertices[i + 4]);
 		vertices.emplace_back(static_cast<GLfloat>(blockID + variant));

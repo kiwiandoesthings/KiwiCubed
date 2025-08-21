@@ -9,7 +9,7 @@ UI& UI::GetInstance() {
     return instance;
 }
 
-void UI::Setup(Shader* shaderProgram, Window* window) {
+void UI::Setup(Shader* shaderProgram, Texture* atlas, Window* window) {
     OVERRIDE_LOG_NAME("UI Render Components Setup");
     if (!renderComponentsSetup) {
         vertexBufferObject.SetupBuffer();
@@ -22,29 +22,46 @@ void UI::Setup(Shader* shaderProgram, Window* window) {
         return;
     }
 
-    GLfloat vertices[] = {
-        //Positions             //Texture Coordinates
-        0.0f, 0.0f, 1.0f, 0.0f,
-	    1.0f, 0.0f, 0.0f, 0.0f,
-	    1.0f, 1.0f, 0.0f, 1.0f,
-	    0.0f, 1.0f,  1.0f, 1.0f,
-    };
-
-    GLuint indices[] = {
-        0, 1, 2,
-	    2, 3, 0,
-    };
-
-    vertexArrayObject.Bind();
-    vertexBufferObject.Bind();
-    vertexBufferObject.SetBufferData(sizeof(vertices), vertices);
-    vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
-    vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, false, sizeof(float) * 4, (void*)(sizeof(float) * 2));
-    indexBufferObject.Bind();
-    indexBufferObject.SetBufferData(sizeof(indices), indices);
+    //vertexArrayObject.Bind();
+    //vertexBufferObject.Bind();
+    //vertexBufferObject.SetBufferData(sizeof(vertices), vertices);
+    //vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
+    //vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, false, sizeof(float) * 4, (void*)(sizeof(float) * 2));
+    //indexBufferObject.Bind();
+    //indexBufferObject.SetBufferData(sizeof(indices), indices);
 
     uiShaderProgram = shaderProgram;
+    uiAtlas = atlas;
     UI::window = window;
+}
+
+void UI::Render() {
+    uiAtlas->SetActive();
+    uiAtlas->Bind();
+    currentScreen->Render();
+}
+
+void UI::AddScreen(UIScreen* screen) {
+    uiScreens.emplace_back(screen);
+}
+
+void UI::SetCurrentScreen(UIScreen* screen) {
+    currentScreen = screen;
+}
+
+UIScreen::UIScreen(std::string screenName) : screenName(screenName) {
+    OVERRIDE_LOG_NAME("UI Initialization");
+    INFO("Created screen \"" + screenName + "\"");
+}
+
+void UIScreen::Render() {
+    for (int i = 0; i < uiElements.size(); i++) {
+        uiElements[i]->Render();
+    }
+}
+
+void UIScreen::AddUIElement(UIElement* element) {
+    uiElements.emplace_back(element);
 }
 
 glm::vec2 UIElement::PixelsToNDC(glm::vec2 pixelPosition) {
@@ -52,7 +69,29 @@ glm::vec2 UIElement::PixelsToNDC(glm::vec2 pixelPosition) {
 }
 
 void UIElement::Render() {
+    GLfloat vertices[] = {
+        // Positions      // Texture Coordinates
+        0.0f, 0.0f, 0.0f, 0.0f,
+	    1.0f, 0.0f, 1.0f, 0.0f,
+	    1.0f, 1.0f, 1.0f, 1.0f,
+	    0.0f, 1.0f, 0.0f, 1.0f
+    };
+
+    GLuint indices[] = {
+        0, 1, 2,
+	    2, 3, 0,
+    };
+
     UI& ui = UI::GetInstance();
+
+    ui.vertexArrayObject.Bind();
+    ui.vertexBufferObject.Bind();
+    ui.vertexBufferObject.SetBufferData(sizeof(vertices), vertices);
+    ui.vertexArrayObject.LinkAttribute(ui.vertexBufferObject, 0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
+    ui.vertexArrayObject.LinkAttribute(ui.vertexBufferObject, 1, 2, GL_FLOAT, false, sizeof(float) * 4, (void*)(sizeof(float) * 2));
+    ui.indexBufferObject.Bind();
+    ui.indexBufferObject.SetBufferData(sizeof(indices), indices);
+
     ui.uiShaderProgram->Bind();
     ui.vertexArrayObject.Bind();
     ui.vertexBufferObject.Bind();
@@ -65,7 +104,7 @@ void UIElement::Render() {
     modelMatrix = glm::scale(modelMatrix, glm::vec3(ndcSize.x, ndcSize.y, 1.0f));
     ui.uiShaderProgram->SetUniformMatrix4fv("modelMatrix", modelMatrix);
 
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(6), GL_UNSIGNED_INT, 0);
+    GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sizeof(indices)), GL_UNSIGNED_INT, 0));
 }
 
 bool UIElement::GetHovered() {

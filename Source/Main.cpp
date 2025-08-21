@@ -138,9 +138,14 @@ int main() {
 	Shader uiShaderProgram("Mods/kiwicubed/Shaders/UI_Vertex.vert", "Mods/kiwicubed/Shaders/UI_Fragment.frag");
 	
 	// Create a debug texture
-	Texture terrainAtlas("Mods/kiwicubed/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture terrainAtlas("Mods/kiwicubed/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
 	terrainAtlas.SetAtlasSize(terrainShaderProgram, 3);
 	terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, 3);
+	terrainAtlas.TextureUnit(terrainShaderProgram, "tex0", terrainAtlas.ID);
+	terrainAtlas.TextureUnit(chunkDebugShaderProgram, "tex0", terrainAtlas.ID);
+	Texture uiAtlas("Mods/kiwicubed/Textures/ui_atlas.png", GL_TEXTURE_2D, GL_TEXTURE2, GL_RGBA, GL_UNSIGNED_BYTE);
+	uiAtlas.SetAtlasSize(uiShaderProgram, 1);
+	uiAtlas.TextureUnit(uiShaderProgram, "tex0", uiAtlas.ID);
 
 	for (const auto& entry : std::filesystem::directory_iterator("Mods")) {
         if (entry.is_directory()) {
@@ -172,8 +177,12 @@ int main() {
 
 	debugRenderer.SetupBuffers(singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
 
-	UI::GetInstance().Setup(&uiShaderProgram, &globalWindow);
-	UIElement button = UIElement(glm::vec2(25, 425), glm::vec2(300, 300));
+	UI::GetInstance().Setup(&uiShaderProgram, &uiAtlas, &globalWindow);
+	UIScreen hud = UIScreen("screen");
+	//hud.AddUIElement(new UIElement(glm::vec2(100, 100), glm::vec2(200, 200)));
+	//hud.AddUIElement(new UIElement(glm::vec2(700, 700), glm::vec2(600, 35)));
+	UI::GetInstance().AddScreen(&hud);
+	UI::GetInstance().SetCurrentScreen(&hud);
 
 	int frames = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -258,6 +267,8 @@ int main() {
 			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(wireframeShaderProgram);
 			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(chunkDebugShaderProgram);
 
+			terrainAtlas.SetActive();
+			terrainAtlas.Bind();
 			singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
 
 			debugRenderer.UpdateBuffers(singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
@@ -265,7 +276,7 @@ int main() {
 			debugRenderer.RenderDebug(chunkDebugShaderProgram);
 		}
 
-		button.Render();
+		UI::GetInstance().Render();
 
 		ImGui::End();
 		ImGui::Render();

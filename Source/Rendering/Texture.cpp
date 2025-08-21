@@ -5,6 +5,7 @@
 Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum format, GLenum pixelType) : atlasSize(0) {
 	OVERRIDE_LOG_NAME("Texture Loading");
 	type = textureType;
+	Texture::slot = slot;
 
 	int imageWidth, imageHeight, colorChannels;
 	stbi_set_flip_vertically_on_load(true);
@@ -34,6 +35,8 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 
 	stbi_image_free(bytes);
 	GLCall(glBindTexture(textureType, 0));
+
+	INFO("Successfully created texture with ID of " + std::to_string(ID));
 }
 
 void Texture::TextureUnit(Shader& shader, const char* uniform, GLuint unit) {
@@ -54,6 +57,10 @@ void Texture::Bind() const {
 
 void Texture::Unbind() const {
 	GLCall(glBindTexture(type, 0));
+}
+
+void Texture::SetActive() const {
+	GLCall(glActiveTexture(slot));
 }
 
 void Texture::Delete() const {

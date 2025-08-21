@@ -24,5 +24,7 @@ void main()
     
     vec4 baseColor = texture(tex0, newTextureCoordinate);
 
-    FragColor = baseColor;
+    //FragColor = baseColor;
+
+    FragColor = vec4(255, 25, 55, 0);
 }

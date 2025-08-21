@@ -12,6 +12,7 @@ class Texture {
 		GLuint ID;
 		GLenum type;
 		GLuint atlasSize;
+		GLenum slot;
 	
 		Texture() : ID(0), type(0), atlasSize(0) {}
 		Texture(const char* filepath, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
@@ -20,6 +21,7 @@ class Texture {
 		void SetAtlasSize(Shader& shader, GLuint newAtlasSize);
 		void Bind() const;
 		void Unbind() const;
+		void SetActive() const;
 	
 		void Delete() const;
 };
