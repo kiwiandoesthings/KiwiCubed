@@ -2,6 +2,13 @@
 #include "GLFW/glfw3.h"
 
 
+Window::Window() = default;
+Window::~Window() = default;
+
+Window& Window::GetInstance() {
+    static Window instance;
+    return instance;
+}
 
 GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType) {
 	OVERRIDE_LOG_NAME("Initialization");
@@ -51,16 +58,15 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 
 	glfwMakeContextCurrent(window);
 
-	InputHandler::GetInstance().SetupCallbacks(window);
-
 	return window;
 }
 
 void Window::Setup() {
-	InputHandler::GetInstance().RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int button) {
+	inputHandler.SetupCallbacks(window);
+	inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int button) {
 		isFocused = false;
 	});
-	InputHandler::GetInstance().RegisterKeyCallback(GLFW_KEY_SPACE, [&](int button) {
+	inputHandler.RegisterKeyCallback(GLFW_KEY_SPACE, [&](int button) {
 		isFocused = true;
 		glfwSetCursorPos(window, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
 	});

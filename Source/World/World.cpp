@@ -19,8 +19,8 @@ World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) :
     isWorldAllocated = true;
 }
 
-void World::Setup(Window& window) {
-    player.Setup(window);
+void World::Setup() {
+    player.Setup();
 }
 
 void World::Render(Shader shaderProgram) {

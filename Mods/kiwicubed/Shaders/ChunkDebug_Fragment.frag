@@ -2,29 +2,26 @@
 
 out vec4 FragColor;
 
-in vec2 textureCoordinateOut;
+in vec2 textureCoordinatesOut;
 flat in int generationStatusOut;
 
 uniform sampler2D tex0;
-uniform uint atlasSize;
+uniform vec2 atlasSize;
+
+float epsilon = 0.00001;
 
 
 void main()
 {
-    float epsilon = 0.00001;
+    float textureIndexX = mod(generationStatusOut + 4 - 1 + epsilon, atlasSize.x);
+    float textureIndexY = floor((generationStatusOut + 4 - 1 + epsilon) / atlasSize.y);
 
-    float textureIndexX = mod(generationStatusOut + 4 - 1 + epsilon, atlasSize);
-    float textureIndexY = floor((generationStatusOut + 4 - 1 + epsilon) / atlasSize);
-
-    vec2 offset = vec2(textureIndexX, textureIndexY);
-    vec2 newTextureCoordinate = vec2(
-        (textureCoordinateOut.x / atlasSize) + (offset.x / atlasSize), 
-        (textureCoordinateOut.y / atlasSize) + (offset.y / atlasSize)
+    vec2 newTextureCoordinates = vec2(
+        (textureCoordinatesOut.x / float(atlasSize.x)) + (textureIndexX / float(atlasSize.x)),
+        (textureCoordinatesOut.y / float(atlasSize.y)) + (textureIndexY / float(atlasSize.y))
     );
     
-    vec4 baseColor = texture(tex0, newTextureCoordinate);
+    vec4 baseColor = texture(tex0, newTextureCoordinates);
 
-    //FragColor = baseColor;
-
-    FragColor = vec4(255, 25, 55, 0);
+    FragColor = baseColor;
 }

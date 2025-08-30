@@ -1,11 +1,6 @@
 #include "Camera.h"
 #include "glm/ext.hpp"
 
-void Camera::Setup(Window& window) {
-	Camera::window = window;
-	windowInstance = window.GetWindowInstance();
-}
-
 void Camera::SetCameraMatrix(Shader& shader) const {
 	shader.Bind();
 	shader.SetUniformMatrix4fv("projectionMatrix", projectionMatrix);

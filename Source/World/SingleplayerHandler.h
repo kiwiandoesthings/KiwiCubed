@@ -8,7 +8,6 @@
 class SingleplayerHandler {
 	public:
 		World singleplayerWorld;
-		Window& window;
 
 		bool isLoadedIntoSingleplayerWorld = false;
 
@@ -19,5 +18,5 @@ class SingleplayerHandler {
 
 		void Delete();
 
-	SingleplayerHandler(Window &newWindow) : singleplayerWorld(5, this), window(newWindow), isLoadedIntoSingleplayerWorld(false) {};
+	SingleplayerHandler() : singleplayerWorld(5, this), isLoadedIntoSingleplayerWorld(false) {};
 };

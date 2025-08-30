@@ -22,7 +22,7 @@ class Player : public Entity {
 		Player() : Entity(), yaw(0), pitch(0), roll(0), width(640), height(480), chunkHandler(chunkHandler) {}
 		Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler);
 	
-		void Setup(Window& window);
+		void Setup();
 	
 		void Update();
 		void QueryInputs();
@@ -38,6 +38,7 @@ class Player : public Entity {
 	
 	private:
 		std::shared_ptr<Camera> camera;
+		InputHandler inputHandler = InputHandler();
 		ChunkHandler& chunkHandler;
 		std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 

@@ -1,19 +1,12 @@
 #include "Input.h"
 
 
-InputHandler::InputHandler() = default;
-InputHandler::~InputHandler() = default;
-
-InputHandler& InputHandler::GetInstance() {
-    static InputHandler instance;
-    return instance;
-}
-
 std::unordered_map<int, bool> InputHandler::keyStates;
 std::unordered_map<int, bool> InputHandler::mouseButtonStates;
 std::unordered_map<bool, bool> InputHandler::scrollStates;
-std::unordered_map<int, std::function<void(int)>> InputHandler::keyCallbacks;
-std::unordered_map<int, std::function<void(int)>> InputHandler::mouseButtonCallbacks;
-std::unordered_map<int, std::function<void(double)>> InputHandler::scrollCallbacks;
+
+std::unordered_map<int, std::vector<InputHandler::KeyCallback>> InputHandler::keyCallbacks;
+std::unordered_map<int, std::vector<InputHandler::MouseButtonCallback>> InputHandler::mouseButtonCallbacks;
+std::unordered_map<bool, std::vector<InputHandler::ScrollCallback>> InputHandler::scrollCallbacks;
+
 std::vector<InputHandler*> InputHandler::instances;
-std::map<int, bool> keys;

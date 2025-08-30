@@ -1,7 +1,9 @@
 #pragma once
 
+#include <klogger.hpp>
 #include <GLError.h>
 #include <glad/glad.h>
+#include <debug-trap.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -25,6 +27,8 @@ class Shader
 
 		unsigned int UniformTest(const char* uniform) const;
 		void SetUniform1ui(const char* uniform, unsigned int value) const;
+		void SetUniform1fv(const char* uniform, glm::vec1 value) const;
+		void SetUniform2fv(const char* uniform, glm::vec2 value) const;
 		void SetUniform3fv(const char* uniform, glm::vec3 value) const;
 		void SetUniform4fv(const char* uniform, glm::vec4 value) const;
 		void SetUniformMatrix4fv(const char* uniform, glm::mat4 value) const;

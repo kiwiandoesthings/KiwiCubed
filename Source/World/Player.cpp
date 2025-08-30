@@ -13,20 +13,22 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler
 	
 	entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
 
-	InputHandler::GetInstance().RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1));
-	InputHandler::GetInstance().RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1));
+	inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
+	inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1));
+	inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1));
 }
 
-void Player::Setup(Window& window) {
-	camera = std::make_shared<Camera>(window);
-	camera->Setup(window);
-	InputHandler::GetInstance().SetupKeyStates(window.GetWindowInstance(), std::vector<int>{GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_LEFT_CONTROL});
+void Player::Setup() {
+	camera = std::make_shared<Camera>();
 
-	InputHandler::GetInstance().RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
+	inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
 		chunkHandler.Delete();
 	});
-	InputHandler::GetInstance().RegisterKeyCallback(GLFW_KEY_R, [&](int key) {
+	inputHandler.RegisterKeyCallback(GLFW_KEY_R, [&](int key) {
 		chunkHandler.GenerateWorld();
+	});
+	inputHandler.RegisterScrollCallback(true, [this](double offset) {
+		entityStats.health += static_cast<float>(offset);
 	});
 }
 
@@ -50,7 +52,6 @@ void Player::Update() {
 }
 
 void Player::QueryInputs() {
-	InputHandler& inputHandler = InputHandler::GetInstance();
 	if (inputHandler.GetKeyState(GLFW_KEY_W)) {
 		entityData.velocity += speed * entityData.orientation;
 	}
@@ -117,11 +118,7 @@ void Player::QueryMouseInputs() {
 		return;
 	}
 
-	InputHandler::GetInstance().RegisterScrollCallback(true, [this](double offset) {
-		entityStats.health += static_cast<float>(offset);
-	});
-
-	if (InputHandler::GetInstance().GetKeyState(GLFW_KEY_MINUS)) {
+	if (inputHandler.GetKeyState(GLFW_KEY_MINUS)) {
 		entityStats.health -= 0.1f;
 	}
 

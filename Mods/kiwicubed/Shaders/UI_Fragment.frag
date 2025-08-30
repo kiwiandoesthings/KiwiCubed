@@ -5,9 +5,13 @@ out vec4 FragColor;
 in vec2 textureCoordinatesOut;
 
 uniform sampler2D tex0;
-uniform uint atlasSize;
-//uniform float borderSize;
-//uniform vec2 textureSize;
+uniform vec2 atlasSize;
+uniform vec2 textureSize;
+uniform vec2 borderSize;
+uniform vec2 elementDimensions;
+uniform uint textureIndex;
+
+const float epsilon = 0.00001;
 
 float map(float value, float originalMin, float originalMax, float newMin, float newMax) {
     return (value - originalMin) / (originalMax - originalMin) * (newMax - newMin) + newMin;
@@ -21,25 +25,25 @@ float processAxis(float coord, float textureBorder, float windowBorder) {
     return map(coord, 1 - windowBorder, 1, 1 - textureBorder, 1);
 }
 
+
 void main()
 {
-    float textureIndexX = 0;
-    float textureIndexY = 0;
+    float textureIndexX = mod(textureIndex + 3u + epsilon, atlasSize.x);
+    float textureIndexY = floor((textureIndex + 3u + epsilon) / atlasSize.y);
+    textureIndexY = 0;
 
-    //FragColor = texture(tex0, vec2(
-    //    (textureCoordinatesOut.x / float(atlasSize)) + (textureIndexX / float(atlasSize)),
-    //    (textureCoordinatesOut.y / float(atlasSize)) + (textureIndexY / float(atlasSize))
-    //));
-
-    float borderSize = 1;
-    vec2 textureSize = vec2(64, 64);
-
-    vec2 borders = vec2(borderSize) / textureSize.xx;
-
-    vec2 newUV = vec2(
-        processAxis(textureCoordinatesOut.x, 1, borders.x),
-        processAxis(textureCoordinatesOut.y, 1, borders.y)
+    vec2 newTextureCoordinates = vec2(
+        (textureCoordinatesOut.x / float(atlasSize.x)) + (textureIndexX / float(atlasSize.x)),
+        (textureCoordinatesOut.y / float(atlasSize.y)) + (textureIndexY / float(atlasSize.y))
     );
+
+    vec2 borders = borderSize / textureSize;
+    vec2 dimensions = borderSize / elementDimensions * borderSize;
+
+    //newTextureCoordinates = vec2(
+    //    processAxis(newTextureCoordinates.x, borders.x, dimensions.x),
+    //    processAxis(newTextureCoordinates.y, borders.y, dimensions.y)
+    //);
     
-    FragColor = texture(tex0, newUV);
+    FragColor = texture(tex0, newTextureCoordinates);
 }

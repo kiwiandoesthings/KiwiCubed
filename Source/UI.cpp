@@ -9,7 +9,7 @@ UI& UI::GetInstance() {
     return instance;
 }
 
-void UI::Setup(Shader* shaderProgram, Texture* atlas, Window* window) {
+void UI::Setup(Shader* shaderProgram, Texture* atlas) {
     OVERRIDE_LOG_NAME("UI Render Components Setup");
     if (!renderComponentsSetup) {
         vertexBufferObject.SetupBuffer();
@@ -22,17 +22,17 @@ void UI::Setup(Shader* shaderProgram, Texture* atlas, Window* window) {
         return;
     }
 
-    //vertexArrayObject.Bind();
-    //vertexBufferObject.Bind();
-    //vertexBufferObject.SetBufferData(sizeof(vertices), vertices);
-    //vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
-    //vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, false, sizeof(float) * 4, (void*)(sizeof(float) * 2));
-    //indexBufferObject.Bind();
-    //indexBufferObject.SetBufferData(sizeof(indices), indices);
-
     uiShaderProgram = shaderProgram;
     uiAtlas = atlas;
-    UI::window = window;
+
+    inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
+    inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, [&](int button){
+        for (int iterator = 0; iterator < currentScreen->uiElements.size(); ++iterator) {
+            if (currentScreen->uiElements[iterator]->OnClick()) {
+                return;
+            }
+        }
+    });
 }
 
 void UI::Render() {
@@ -47,6 +47,27 @@ void UI::AddScreen(UIScreen* screen) {
 
 void UI::SetCurrentScreen(UIScreen* screen) {
     currentScreen = screen;
+}
+
+UIScreen* UI::GetScreen(std::string& screenName) {
+    for (int iterator = 0; iterator < uiScreens.size(); ++iterator) {
+        if (uiScreens[iterator]->screenName == screenName) {
+            return uiScreens[iterator];
+        }
+    }
+    return nullptr;
+}
+
+UIScreen* UI::GetCurrentScreen() {
+    return currentScreen;
+}
+
+std::string UI::GetCurrentScreenName() {
+    return currentScreen->screenName;
+}
+
+InputHandler& UI::GetInputHandler() {
+    return inputHandler;
 }
 
 UIScreen::UIScreen(std::string screenName) : screenName(screenName) {
@@ -65,7 +86,7 @@ void UIScreen::AddUIElement(UIElement* element) {
 }
 
 glm::vec2 UIElement::PixelsToNDC(glm::vec2 pixelPosition) {
-    return glm::vec2((pixelPosition.x / UI::GetInstance().window->GetWidth()) * 2 - 1, (pixelPosition.y / UI::GetInstance().window->GetHeight()) * 2 - 1);
+    return glm::vec2((pixelPosition.x / Window::GetInstance().GetWidth()) * 2 - 1, (pixelPosition.y / Window::GetInstance().GetHeight()) * 2 - 1);
 }
 
 void UIElement::Render() {
@@ -97,18 +118,42 @@ void UIElement::Render() {
     ui.vertexBufferObject.Bind();
     ui.indexBufferObject.Bind();
 
+    if (GetHovered()) {
+        if (UI::GetInstance().GetInputHandler().GetMouseButtonState(GLFW_MOUSE_BUTTON_LEFT)) {
+            textureIndex = 2;
+        } else {
+            textureIndex = 1;
+        }
+    } else {
+        textureIndex = 0;
+    }
+
     glm::mat4 modelMatrix = glm::mat4(1.0f);
     glm::vec2 ndcPosition = PixelsToNDC(position);
     glm::vec2 ndcSize = PixelsToNDC(size) + glm::vec2(1, 1);
     modelMatrix = glm::translate(modelMatrix, glm::vec3(ndcPosition.x, ndcPosition.y, 0.0f));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(ndcSize.x, ndcSize.y, 1.0f));
     ui.uiShaderProgram->SetUniformMatrix4fv("modelMatrix", modelMatrix);
+    ui.uiShaderProgram->SetUniform1ui("textureIndex", textureIndex);
 
     GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sizeof(indices)), GL_UNSIGNED_INT, 0));
 }
 
+bool UIElement::OnClick() {
+    if (!GetHovered() || screenRedirect == "") {
+        return false;
+    }
+
+    UI& ui = UI::GetInstance();
+    ui.SetCurrentScreen(ui.GetScreen(screenRedirect));
+    return true;
+}
+
 bool UIElement::GetHovered() {
-    glm::vec2 mousePosition = InputHandler::GetInstance().GetMousePosition();
+    glm::vec2 mousePosition = UI::GetInstance().GetInputHandler().GetMousePosition();
+    int windowHeight = Window::GetInstance().windowHeight;
+    mousePosition.y = windowHeight - mousePosition.y;
 
     return (mousePosition.x >= position.x && mousePosition.y >= position.y && mousePosition.x <= position.x + size.x && mousePosition.y <= position.y + size.y);
+    return false;
 }

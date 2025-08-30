@@ -2,9 +2,9 @@
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec4 chunkData;
-layout (location = 2) in vec2 textureCoordinate;
+layout (location = 2) in vec2 textureCoordinates;
 
-out vec2 textureCoordinateOut;
+out vec2 textureCoordinatesOut;
 flat out int generationStatusOut;
 
 uniform mat4 projectionMatrix;
@@ -19,6 +19,6 @@ void main() {
     
     gl_Position = projectionMatrix * viewMatrix * vec4(worldPosition, 1.0);
 
-    textureCoordinateOut = textureCoordinate;
+    textureCoordinatesOut = textureCoordinates;
     generationStatusOut = int(chunkData.w);
 }

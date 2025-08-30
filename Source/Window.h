@@ -16,8 +16,8 @@
 
 class Window {
 	public:
-		Window() {};
-		
+		static Window& GetInstance();
+
 		GLFWwindow* CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType);
 
 		void Setup();
@@ -42,5 +42,12 @@ class Window {
 		bool isFocused;
 
 	private:
+		Window();
+        ~Window();
+
+        Window(const Window&) = delete;
+        Window& operator=(const Window&) = delete;
+
 		GLFWwindow* window;
+		InputHandler inputHandler = InputHandler();
 };

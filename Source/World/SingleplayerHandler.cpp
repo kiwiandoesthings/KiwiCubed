@@ -2,7 +2,7 @@
 
 
 void SingleplayerHandler::Setup() {
-	singleplayerWorld.Setup(window);
+	singleplayerWorld.Setup();
 
 	EventManager& eventManager = EventManager::GetInstance();
 	eventManager.RegisterEvent("EntityMovedChunk");

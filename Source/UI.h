@@ -1,6 +1,6 @@
 #pragma once
 
-#include "klogger.hpp"
+#include <klogger.hpp>
 
 #include <glm/vec2.hpp>
 
@@ -21,11 +21,17 @@ class UI {
     public:
         static UI& GetInstance();
 
-        void Setup(Shader* shaderProgram, Texture* atlas, Window* window);
+        void Setup(Shader* shaderProgram, Texture* atlas);
         void Render();
 
         void AddScreen(UIScreen* screen);
         void SetCurrentScreen(UIScreen* screen);
+
+        UIScreen* GetScreen(std::string& screenName);
+        UIScreen* GetCurrentScreen();
+        std::string GetCurrentScreenName();
+
+        InputHandler& GetInputHandler();
 
         Shader* uiShaderProgram;
         Texture* uiAtlas;
@@ -46,12 +52,16 @@ class UI {
 
         std::vector<UIScreen*> uiScreens;
         UIScreen* currentScreen;
+        bool screenVisible = true;
+
+        InputHandler inputHandler = InputHandler();
 };
 
 
 class UIScreen {
     public:
         const std::string screenName;
+        std::vector<UIElement*> uiElements;
 
         UIScreen(std::string screenName);
 
@@ -60,22 +70,27 @@ class UIScreen {
         void AddUIElement(UIElement* uiElement);
 
     private:
-        std::vector<UIElement*> uiElements;
 };
 
 
 class UIElement {
     public:
-        UIElement(glm::vec2 position, glm::vec2 size) : position(position), size(size) {}
+        UIElement(glm::vec2 position, glm::vec2 size, std::string screenRedirect) : position(position), size(size), screenRedirect(screenRedirect) {}
         
         glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
         float PositionToNDC(float number);
 
         void Render();
 
+        bool OnClick();
+        void OnHover();
+
     protected:
         glm::vec2 position = glm::vec2(0, 0);
         glm::vec2 size = glm::vec2(0, 0);
+        std::string screenRedirect = "";
+
+        unsigned int textureIndex;
 
         bool GetHovered();
 };

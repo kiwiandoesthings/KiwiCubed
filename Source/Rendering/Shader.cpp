@@ -1,7 +1,5 @@
 #include "Shader.h"
-#include <debug-trap.h>
-#include <string>
-#include <klogger.hpp>
+
 
 Shader::Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath) {
     std::string vertexSource = ParseShader(vertexFilePath);
@@ -100,6 +98,29 @@ void Shader::SetUniform1ui(const char* uniform, unsigned int value) const {
     }
 
     GLCall(glUniform1ui(uniformLocation, value));
+}
+
+void Shader::SetUniform1fv(const char* uniform, glm::vec1 value) const {
+    Bind();
+    unsigned int uniformLocation = UniformTest(uniform);
+
+    if (uniformLocation == -1) {
+        return;
+    }
+
+    float valuePtr = value.x;
+    GLCall(glUniform1fv(uniformLocation, 1, &valuePtr));
+}
+
+void Shader::SetUniform2fv(const char* uniform, glm::vec2 value) const {
+    Bind();
+    unsigned int uniformLocation = UniformTest(uniform);
+
+    if (uniformLocation == -1) {
+        return;
+    }
+
+    GLCall(glUniform2fv(uniformLocation, 1, glm::value_ptr((value))));
 }
 
 void Shader::SetUniform3fv(const char* uniform, glm::vec3 value) const {
