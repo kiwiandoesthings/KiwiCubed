@@ -43,7 +43,7 @@ public:
     }
 
     void RegisterKeyCallback(int key, KeyCallback callback) {
-        OVERRIDE_LOG_NAME("InputHandler");
+        OVERRIDE_LOG_NAME("Input Handler");
         keyCallbacks[key].push_back(callback);
 
         const char* keyName = glfwGetKeyName(key, 0);
@@ -57,7 +57,7 @@ public:
     }
 
     void RegisterMouseButtonCallback(int button, MouseButtonCallback callback) {
-        OVERRIDE_LOG_NAME("InputHandler");
+        OVERRIDE_LOG_NAME("Input Handler");
         mouseButtonCallbacks[button].push_back(callback);
 
         std::stringstream outputString;
@@ -68,7 +68,7 @@ public:
     }
 
     void RegisterScrollCallback(bool direction, ScrollCallback callback) {
-        OVERRIDE_LOG_NAME("InputHandler");
+        OVERRIDE_LOG_NAME("Input Handler");
         scrollCallbacks[direction].push_back(callback);
 
         std::stringstream outputString;
@@ -112,6 +112,9 @@ private:
             keyStates[key] = true;
         } else if (action == GLFW_RELEASE) {
             keyStates[key] = false;
+            return;
+        } else if (action == GLFW_REPEAT) {
+            return;
         }
 
         auto iterator = keyCallbacks.find(key);

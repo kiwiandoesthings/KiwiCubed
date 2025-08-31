@@ -22,10 +22,10 @@ void Player::Setup() {
 	camera = std::make_shared<Camera>();
 
 	inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
-		chunkHandler.Delete();
+		EventManager::GetInstance().TriggerEvent("event/unload_world");
 	});
 	inputHandler.RegisterKeyCallback(GLFW_KEY_R, [&](int key) {
-		chunkHandler.GenerateWorld();
+		EventManager::GetInstance().TriggerEvent("event/generate_world");
 	});
 	inputHandler.RegisterScrollCallback(true, [this](double offset) {
 		entityStats.health += static_cast<float>(offset);
@@ -46,7 +46,7 @@ void Player::Update() {
 		ApplyPhysics(*this, chunkHandler, entityData.applyGravity, entityData.applyCollision);
 
 		if (oldEntityData.globalChunkPosition != entityData.globalChunkPosition) {
-			EventManager::GetInstance().TriggerEvent("EntityMovedChunk", make_pair("globalChunkPosition", std::any(entityData.globalChunkPosition)));
+			EventManager::GetInstance().TriggerEvent("event/entity_moved_chunk");
 		}
 	}
 }

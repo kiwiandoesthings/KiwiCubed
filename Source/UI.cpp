@@ -1,4 +1,5 @@
 #include "UI.h"
+#include "Events.h"
 
 
 UI::UI() : uiShaderProgram(nullptr) {}
@@ -140,12 +141,11 @@ void UIElement::Render() {
 }
 
 bool UIElement::OnClick() {
-    if (!GetHovered() || screenRedirect == "") {
+    if (!GetHovered() || eventToTrigger == "") {
         return false;
     }
 
-    UI& ui = UI::GetInstance();
-    ui.SetCurrentScreen(ui.GetScreen(screenRedirect));
+    EventManager::GetInstance().TriggerEvent(eventToTrigger);
     return true;
 }
 

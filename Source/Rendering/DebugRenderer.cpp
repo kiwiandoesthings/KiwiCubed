@@ -70,7 +70,7 @@ void DebugRenderer::RenderDebug(Shader& chunkDebugShaderProgram) const {
 	// Chunk debug renderer
 	chunkDebugShaderProgram.Bind();
 	GLCall(glBindVertexArray(chunkDebugVAO));
-	//GLCall(glDrawElementsInstanced(GL_TRIANGLES, chunkDebugIndices.size(), GL_UNSIGNED_INT, 0, chunkOrigins.size()););
+	GLCall(glDrawElementsInstanced(GL_TRIANGLES, chunkDebugIndices.size(), GL_UNSIGNED_INT, 0, chunkOrigins.size()););
 	GLCall(glBindVertexArray(0));
 
 

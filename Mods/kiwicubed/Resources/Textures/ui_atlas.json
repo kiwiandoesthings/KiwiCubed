@@ -1,0 +1,29 @@
+{
+	"name": "ui_atlas",
+	"textures": [
+		{
+			"id": "button",
+			"variant": 0,
+			"xPosition": 0,
+			"yPosition": 0,
+			"xSize": 3,
+			"ySize": 1
+		},
+		{
+			"id": "button",
+			"variant": 1,
+			"xPosition": 3,
+			"yPosition": 0,
+			"xSize": 3,
+			"ySize": 1
+		},
+		{
+			"id": "button",
+			"variant": 2,
+			"xPosition": 6,
+			"yPosition": 0,
+			"xSize": 3,
+			"ySize": 1
+		}
+	]
+}

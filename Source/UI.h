@@ -4,6 +4,7 @@
 
 #include <glm/vec2.hpp>
 
+#include "Events.h"
 #include "IndexBufferObject.h"
 #include "Input.h"
 #include "Renderer.h"
@@ -75,7 +76,7 @@ class UIScreen {
 
 class UIElement {
     public:
-        UIElement(glm::vec2 position, glm::vec2 size, std::string screenRedirect) : position(position), size(size), screenRedirect(screenRedirect) {}
+        UIElement(glm::vec2 position, glm::vec2 size, std::string eventToTrigger) : position(position), size(size), eventToTrigger(eventToTrigger) {}
         
         glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
         float PositionToNDC(float number);
@@ -88,7 +89,7 @@ class UIElement {
     protected:
         glm::vec2 position = glm::vec2(0, 0);
         glm::vec2 size = glm::vec2(0, 0);
-        std::string screenRedirect = "";
+        std::string eventToTrigger = "";
 
         unsigned int textureIndex;
 

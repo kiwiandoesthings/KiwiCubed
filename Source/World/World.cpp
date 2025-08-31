@@ -256,6 +256,10 @@ void World::DisplayImGui(unsigned int option) {
     }
 }
 
+ChunkHandler& World::GetChunkHandler() {
+    return chunkHandler;
+}
+
 Chunk World::GetChunk(int chunkX, int chunkY, int chunkZ) {
     return chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
 }
@@ -263,6 +267,10 @@ Chunk World::GetChunk(int chunkX, int chunkY, int chunkZ) {
 Entity World::GetEntity(std::string uuid) {
     // Later
     return Entity(0, 0, 0);
+}
+
+Player& World::GetPlayer() {
+    return player;
 }
 
 std::vector<float>& World::GetChunkDebugVisualizationVertices() {

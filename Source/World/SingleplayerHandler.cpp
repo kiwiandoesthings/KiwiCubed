@@ -8,10 +8,19 @@ void SingleplayerHandler::StartSingleplayerWorld(DebugRenderer& debugRenderer) {
 	debugRenderer.SetupBuffers(singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerWorld->GetChunkOrigins());
 
 	EventManager& eventManager = EventManager::GetInstance();
-	eventManager.RegisterEvent("EntityMovedChunk");
-	eventManager.AddEventToDo("EntityMovedChunk", [&](Event& event) {
+	eventManager.RegisterEvent("event/entity_moved_chunk");
+	eventManager.AddEventToDo("event/entity_moved_chunk", [&](Event& event) {
 		singleplayerWorld->GenerateChunksAroundPosition(event);
 	});
+	eventManager.RegisterEvent("event/generate_world");
+	eventManager.AddEventToDo("event/generate_world", [&](Event& event) {
+		singleplayerWorld->GenerateWorld();
+	});
+	eventManager.RegisterEvent("event/unload_world");
+	eventManager.AddEventToDo("event/unload_world", [&](Event& event) {
+		singleplayerWorld->GetChunkHandler().Delete();
+	});
+	
 	singleplayerWorld->StartTickThread();
 }
 

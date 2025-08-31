@@ -28,15 +28,13 @@ struct ChunkData {
 
 class World {
 	public:
-		Player player = Player(0, 0, 0, chunkHandler);
-
 		unsigned int totalChunks;
 		float totalMemoryUsage;
 
 		unsigned int generationQueuedChunks = 0;
 		unsigned int meshingQueuedChunks = 0;
 
-		World() : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), shouldTick(false), tickIntervalMs(50), worldSize(5), chunkHandler(*this) {}
+		World() : worldSize(5), chunkHandler(*this), player(0, 0, 0, chunkHandler), singleplayerHandler(singleplayerHandler), totalChunks(0), totalMemoryUsage(0), shouldTick(false), tickIntervalMs(50) {}
 		World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler);
 
 		void Setup();
@@ -52,8 +50,12 @@ class World {
 
 		void DisplayImGui(unsigned int option);
 
+		ChunkHandler& GetChunkHandler();
 		Chunk GetChunk(int chunkX, int chunkY, int chunkZ);
 		Entity GetEntity(std::string uuid);
+
+		//temporary - merge into GetEntity
+		Player& GetPlayer();
 
 		std::vector<float>& GetChunkDebugVisualizationVertices();
 		std::vector<GLuint>& GetChunkDebugVisualizationIndices();
@@ -66,10 +68,7 @@ class World {
 
 		void Delete();
 
-	private:
-		SingleplayerHandler* singleplayerHandler;
-		Chunk defaultChunk = Chunk(0, 0, 0);
-		
+	private:		
 		std::atomic<bool> shouldTick;
 		std::thread tickThread;
 		std::mutex tickThreadMutex;
@@ -88,8 +87,10 @@ class World {
 
 		bool isWorldAllocated = false;
 		bool isWorldGenerated = false;
-		unsigned int worldSize;
+		unsigned int worldSize = 1;
 		ChunkHandler chunkHandler;
+		Player player = Player(0, 0, 0, chunkHandler);
+		SingleplayerHandler* singleplayerHandler;
 
 		Renderer renderer;
 
@@ -108,6 +109,8 @@ class World {
 		//IndexBufferObject indexBufferObject;
 		//VertexArrayObject vertexArrayObject;
 		//VertexBufferObject vertexBufferObject = VertexBufferObject(/*"world*/);
+
+		Chunk defaultChunk = Chunk(0, 0, 0);
 
 		void RunTickThread();
 };

@@ -183,27 +183,29 @@ int main() {
         }
     }
 
+	
+
 	// Setup debug renderer
 	Renderer renderer = Renderer();
 	DebugRenderer debugRenderer = DebugRenderer();
 
 	UI::GetInstance().Setup(&uiShaderProgram, &uiAtlas);
 	UIScreen mainMenuUI = UIScreen("ui/main_menu");
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2(100, 100), glm::vec2(64, 16), "ui/settings"));
+	mainMenuUI.AddUIElement(new UIElement(glm::vec2(100, 100), glm::vec2(64, 16), ""));
 	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 700), glm::vec2(128, 32), ""));
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 100), glm::vec2(512, 128), ""));
+	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 100), glm::vec2(512, 128), "event/generate_world"));
 	UI::GetInstance().AddScreen(&mainMenuUI);
 	UI::GetInstance().SetCurrentScreen(&mainMenuUI);
 
 	UIScreen settingsUI = UIScreen("ui/settings");
-	settingsUI.AddUIElement(new UIElement(glm::vec2(400, 400), glm::vec2(256, 64), "ui/main_menu"));
+	settingsUI.AddUIElement(new UIElement(glm::vec2(400, 400), glm::vec2(256, 64), ""));
 	UI::GetInstance().AddScreen(&settingsUI);
 
 	// Create a singleplayer world
 	SingleplayerHandler singleplayerHandler = SingleplayerHandler();
 	//singleplayerHandler.singleplayerWorld->GenerateWorld();
-	singleplayerHandler.StartSingleplayerWorld(debugRenderer);
-
+	singleplayerHandler.StartSingleplayerWorld(debugRenderer);	
+	
 	// FPS code
 	int frames = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -249,10 +251,10 @@ int main() {
 		// Do rendering stuff
 		globalWindow.QueryInputs();
 		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
-			singleplayerHandler.singleplayerWorld->player.Update();
-			singleplayerHandler.singleplayerWorld->player.UpdateCameraMatrix(terrainShaderProgram);
-			singleplayerHandler.singleplayerWorld->player.UpdateCameraMatrix(wireframeShaderProgram);
-			singleplayerHandler.singleplayerWorld->player.UpdateCameraMatrix(chunkDebugShaderProgram);
+			singleplayerHandler.singleplayerWorld->GetPlayer().Update();
+			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(terrainShaderProgram);
+			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(wireframeShaderProgram);
+			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(chunkDebugShaderProgram);
 			
 			terrainAtlas.SetActive();
 			terrainAtlas.Bind();

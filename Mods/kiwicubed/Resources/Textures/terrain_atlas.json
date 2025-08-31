@@ -1,0 +1,61 @@
+{
+	"name": "terrain_atlas",
+	"textures": [
+		{
+			"id": "stone",
+			"variant": 0,
+			"xPosition": 0,
+			"yPosition": 0,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "stone",
+			"variant": 1,
+			"xPosition": 1,
+			"yPosition": 0,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "stone",
+			"variant": 2,
+			"xPosition": 2,
+			"yPosition": 0,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "stone",
+			"variant": 3,
+			"xPosition": 0,
+			"yPosition": 1,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "chunk_debug_indicator",
+			"variant": 0,
+			"xPosition": 1,
+			"yPosition": 1,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "chunk_debug_indicator",
+			"variant": 0,
+			"xPosition": 2,
+			"yPosition": 1,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "chunk_debug_indicator",
+			"variant": 0,
+			"xPosition": 0,
+			"yPosition": 2,
+			"xSize": 1,
+			"ySize": 1
+		}
+	]
+}
