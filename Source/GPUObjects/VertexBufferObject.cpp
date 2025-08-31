@@ -1,3 +1,4 @@
+#include "glad/glad.h"
 #include <VertexBufferObject.h>
 
 VertexBufferObject::VertexBufferObject(/*const char* initializer = "(unknown)"*/) : vertexBufferObjectID(0){
@@ -13,6 +14,10 @@ int VertexBufferObject::SetupBuffer() {
 
 void VertexBufferObject::SetBufferData(GLsizeiptr size, GLfloat* vertices) {
 	GLCall(glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW));
+}
+
+void VertexBufferObject::SetBufferSubData(GLsizei offset, GLsizeiptr size, GLfloat* vertices) {
+	GLCall(glBufferSubData(GL_ARRAY_BUFFER, offset, size, vertices));
 }
 
 void VertexBufferObject::Bind() const {

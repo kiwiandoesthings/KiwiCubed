@@ -188,6 +188,46 @@ void World::Update() {
 // Pass 0 for world ImGui, 1 for chunk ImGui...
 void World::DisplayImGui(unsigned int option) {
     if (option == 0) {
+        EntityData playerData = player.GetEntityData();
+
+		ImGui::Text("Player name: %s", player.GetEntityData().name);
+		ImGui::Text("Player health: %d", static_cast<int>(player.GetEntityStats().health));
+		ImGui::Text("Player position: %f, %f, %f",
+			playerData.position.x,
+			playerData.position.y,
+			playerData.position.z);
+		ImGui::Text("Player orientation: %f, %f, %f", 
+			playerData.orientation.x,
+			playerData.orientation.y, 
+			playerData.orientation.z);
+		ImGui::Text("Player velocity: %f, %f, %f",
+			player.GetEntityData().velocity.x,
+			player.GetEntityData().velocity.y,
+			player.GetEntityData().velocity.z);
+		ImGui::Text("Global chunk position: %d, %d, %d", 
+			static_cast<int>(player.GetEntityData().globalChunkPosition.x), 
+			static_cast<int>(player.GetEntityData().globalChunkPosition.y),
+			static_cast<int>(player.GetEntityData().globalChunkPosition.z));
+		ImGui::Text("Local chunk position: %d, %d, %d", 
+			static_cast<int>(player.GetEntityData().localChunkPosition.x), 
+			static_cast<int>(player.GetEntityData().localChunkPosition.y),
+			static_cast<int>(player.GetEntityData().localChunkPosition.z));
+		ImGui::Text("Current chunk generation status and blocks %d, %d, %d",
+			GetChunk(
+				player.GetEntityData().globalChunkPosition.x,
+				player.GetEntityData().globalChunkPosition.y,
+				player.GetEntityData().globalChunkPosition.z).generationStatus,
+			GetChunk(
+				player.GetEntityData().globalChunkPosition.x,
+				player.GetEntityData().globalChunkPosition.y,
+				player.GetEntityData().globalChunkPosition.z).GetTotalBlocks(),
+			GetChunk(
+				player.GetEntityData().globalChunkPosition.x,
+				player.GetEntityData().globalChunkPosition.y,
+				player.GetEntityData().globalChunkPosition.z).id);
+    }
+
+    if (option == 1) {
         ImGui::Text("TPS: %d", ticksPerSecond);
         ImGui::Text("Total chunks: %d", totalChunks);
         ImGui::Text("Memory usage: %.2f MB", totalMemoryUsage / (1024.0 * 1024.0));
@@ -208,7 +248,7 @@ void World::DisplayImGui(unsigned int option) {
             }
         }
     }
-    else if (option == 1) {
+    else if (option == 2) {
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
             auto& chunk = iterator->second;
             chunk.DisplayImGui();

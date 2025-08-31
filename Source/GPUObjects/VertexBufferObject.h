@@ -14,6 +14,7 @@ class VertexBufferObject
 		
 		int SetupBuffer();
 		void SetBufferData(GLsizeiptr size, GLfloat* vertices);
+		void SetBufferSubData(GLsizei offset, GLsizeiptr size, GLfloat* vertices);
 		void Bind() const;
 		void Unbind();
 		void Delete() const;

@@ -16,8 +16,8 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 		psnip_trap();
 	}
 
-	GLCall(glGenTextures(1, &ID));
 	GLCall(glActiveTexture(slot));
+	GLCall(glGenTextures(1, &ID));
 	GLCall(glBindTexture(textureType, ID));
 
 	GLCall(glTexParameteri(textureType, GL_TEXTURE_BASE_LEVEL, 0));
@@ -44,13 +44,13 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 	stbi_image_free(bytes);
 	GLCall(glBindTexture(textureType, 0));
 
-	INFO("Successfully created texture with ID of " + std::to_string(ID));
+	INFO("Successfully created texture with ID of " + std::to_string(ID) + " of type {" + usage + "}");
 }
 
-void Texture::TextureUnit(Shader& shader, const char* uniform, GLuint unit) {
+void Texture::TextureUnit(Shader& shader, const char* uniform) {
 	GLuint textureUnit = glGetUniformLocation(shader.shaderProgramID, uniform);
 	shader.Bind();
-	GLCall(glUniform1i(textureUnit, unit));
+	GLCall(glUniform1i(textureUnit, slot - GL_TEXTURE0));
 }
 
 void Texture::SetAtlasSize(Shader& shader, glm::vec2 newAtlasSize) {

@@ -24,6 +24,8 @@ bool bitness;
 #include <string>
 #include <time.h>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -36,6 +38,7 @@ bool bitness;
 #include "Renderer.h"
 #include "Shader.h"
 #include "SingleplayerHandler.h"
+#include "TextRenderer.h"
 #include "Texture.h"
 #include "UI.h"
 #include "Window.h"
@@ -70,7 +73,7 @@ int main() {
 
 	OVERRIDE_LOG_NAME("Initialization");
 
-	LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Could not open or find the JSON config file", 1);
+	LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file", 1);
 
 	json jsonData;
 	file >> jsonData;
@@ -94,6 +97,19 @@ int main() {
 	// Initialize glad
 	LOG_CHECK_RETURN(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD", -1);
 
+	// Initialize FreeType
+	FT_Library ft;
+    LOG_CHECK_RETURN(!FT_Init_FreeType(&ft), "Successfully initialized FreeType", "Failed to initialize FreeType", 1);
+
+    FT_Face face;
+    LOG_CHECK_RETURN(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf", 1);
+
+    FT_Set_Pixel_Sizes(face, 0, 64);
+
+	Shader textShader("Mods/kiwicubed/Resources/Shaders/Text_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Text_Fragment.frag");
+
+	TextRenderer textRenderer(ft, face, textShader);
+
 	// Setup ImGui
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -105,14 +121,16 @@ int main() {
 	ImGui_ImplGlfw_InitForOpenGL(globalWindow.GetWindowInstance(), true);
 	ImGui_ImplOpenGL3_Init("#version 430");
 
+	// Setup window *after* ImGui is initialized
 	globalWindow.Setup();
 
+	// System info
 	if (sizeof(void*) == 8) {
 		bitness = 1;
 	} else if (sizeof(void*) == 4) {
 		bitness = 0;
 	} else {
-		ERR("Could not find machine bitness");
+		ERR("Failed to find machine bitness");
 		return -1;
 	}
 	INFO("Machine bitness: " + std::to_string(bitness == 1 ? 64 : 32));
@@ -123,29 +141,28 @@ int main() {
 	// Set things up before main game loop
 	GLCall(glViewport(0, 0, globalWindow.GetWidth(), globalWindow.GetHeight()));
 	GLCall(glEnable(GL_DEPTH_TEST));
+	GLCall(glEnable(GL_BLEND));
+	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 	// MAIN PROGRAM SETUP FINISHED - Most of the rest of this is able to be moved into other places to make this more modular
+	
+	// Create shader programs (needs to be modularized)
+	Shader terrainShaderProgram("Mods/kiwicubed/Resources/Shaders/Terrain_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Terrain_Fragment.frag");
+	Shader wireframeShaderProgram("Mods/kiwicubed/Resources/Shaders/Wireframe_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Wireframe_Fragment.frag");
+	Shader chunkDebugShaderProgram("Mods/kiwicubed/Resources/Shaders/ChunkDebug_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/ChunkDebug_Fragment.frag");
+	Shader uiShaderProgram("Mods/kiwicubed/Resources/Shaders/UI_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/UI_Fragment.frag");
 
-	// Create a singleplayer world
-	SingleplayerHandler singleplayerHandler = SingleplayerHandler();
-	singleplayerHandler.Setup();
-	
-	// Create a debug shader
-	Shader terrainShaderProgram("Mods/kiwicubed/Shaders/Terrain_Vertex.vert", "Mods/kiwicubed/Shaders/Terrain_Fragment.frag");
-	Shader wireframeShaderProgram("Mods/kiwicubed/Shaders/Wireframe_Vertex.vert", "Mods/kiwicubed/Shaders/Wireframe_Fragment.frag");
-	Shader chunkDebugShaderProgram("Mods/kiwicubed/Shaders/ChunkDebug_Vertex.vert", "Mods/kiwicubed/Shaders/ChunkDebug_Fragment.frag");
-	Shader uiShaderProgram("Mods/kiwicubed/Shaders/UI_Vertex.vert", "Mods/kiwicubed/Shaders/UI_Fragment.frag");
-	
-	// Create a debug texture
-	Texture terrainAtlas("Mods/kiwicubed/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE, "texture/terrain");
+	// Create texture atlases (needs to be modularized)
+	Texture terrainAtlas("Mods/kiwicubed/Resources/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, "texture/terrain");
 	terrainAtlas.SetAtlasSize(terrainShaderProgram, glm::vec2(3, 3));
 	terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, glm::vec2(3, 3));
-	terrainAtlas.TextureUnit(terrainShaderProgram, "tex0", terrainAtlas.ID);
-	terrainAtlas.TextureUnit(chunkDebugShaderProgram, "tex0", terrainAtlas.ID);
-	Texture uiAtlas("Mods/kiwicubed/Textures/ui_atlas.png", GL_TEXTURE_2D, GL_TEXTURE2, GL_RGBA, GL_UNSIGNED_BYTE, "texture/gui");
+	terrainAtlas.TextureUnit(terrainShaderProgram, "tex0");
+	terrainAtlas.TextureUnit(chunkDebugShaderProgram, "tex0");
+	Texture uiAtlas("Mods/kiwicubed/Resources/Textures/ui_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, "texture/gui");
 	uiAtlas.SetAtlasSize(uiShaderProgram, glm::vec2(3, 1));
-	uiAtlas.TextureUnit(uiShaderProgram, "tex0", uiAtlas.ID);
+	uiAtlas.TextureUnit(uiShaderProgram, "tex0");
 
+	// Get mods + mod info (needs to be modularized + actually do things)
 	for (const auto& entry : std::filesystem::directory_iterator("Mods")) {
         if (entry.is_directory()) {
             std::string modFolder = entry.path().string();
@@ -165,16 +182,10 @@ int main() {
             }
         }
     }
-	
-	singleplayerHandler.singleplayerWorld.GenerateWorld();
-	singleplayerHandler.StartSingleplayerWorld();
 
-	terrainAtlas.Bind();
-
+	// Setup debug renderer
 	Renderer renderer = Renderer();
 	DebugRenderer debugRenderer = DebugRenderer();
-
-	debugRenderer.SetupBuffers(singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
 
 	UI::GetInstance().Setup(&uiShaderProgram, &uiAtlas);
 	UIScreen mainMenuUI = UIScreen("ui/main_menu");
@@ -188,6 +199,12 @@ int main() {
 	settingsUI.AddUIElement(new UIElement(glm::vec2(400, 400), glm::vec2(256, 64), "ui/main_menu"));
 	UI::GetInstance().AddScreen(&settingsUI);
 
+	// Create a singleplayer world
+	SingleplayerHandler singleplayerHandler = SingleplayerHandler();
+	//singleplayerHandler.singleplayerWorld->GenerateWorld();
+	singleplayerHandler.StartSingleplayerWorld(debugRenderer);
+
+	// FPS code
 	int frames = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
 	double fps = 0.0;
@@ -209,55 +226,22 @@ int main() {
 			start_time = end_time;
 		}
 
-		EntityData playerData = singleplayerHandler.singleplayerWorld.player.GetEntityData();
-
 		ImGui::Begin("Debug");
-		if (ImGui::CollapsingHeader("Player Info")) {
-			ImGui::Text("Player name: %s", singleplayerHandler.singleplayerWorld.player.GetEntityData().name);
-			ImGui::Text("Player health: %d", static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityStats().health));
-			ImGui::Text("Player position: %f, %f, %f",
-				playerData.position.x,
-				playerData.position.y,
-				playerData.position.z);
-			ImGui::Text("Player orientation: %f, %f, %f", 
-				playerData.orientation.x,
-				playerData.orientation.y, 
-				playerData.orientation.z);
-			ImGui::Text("Player velocity: %f, %f, %f",
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.x,
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.y,
-				singleplayerHandler.singleplayerWorld.player.GetEntityData().velocity.z);
-			ImGui::Text("Global chunk position: %d, %d, %d", 
-				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x), 
-				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y),
-				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z));
-			ImGui::Text("Local chunk position: %d, %d, %d", 
-				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.x), 
-				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.y),
-				static_cast<int>(singleplayerHandler.singleplayerWorld.player.GetEntityData().localChunkPosition.z));
-			ImGui::Text("Current chunk generation status and blocks %d, %d, %d",
-				singleplayerHandler.singleplayerWorld.GetChunk(
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).generationStatus,
-				singleplayerHandler.singleplayerWorld.GetChunk(
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).GetTotalBlocks(),
-				singleplayerHandler.singleplayerWorld.GetChunk(
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.x,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.y,
-					singleplayerHandler.singleplayerWorld.player.GetEntityData().globalChunkPosition.z).id);
-			ImGui::Text("Total frames: %d", frames);
-			ImGui::Text("FPS: %.2f", fps);
-		}
+		ImGui::Text("Total frames: %d", frames);
+		ImGui::Text("FPS: %.2f", fps);
 
-		if (ImGui::CollapsingHeader("World")) {
-			singleplayerHandler.singleplayerWorld.DisplayImGui(0);
-		}
+		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
+			if (ImGui::CollapsingHeader("Player")) {
+				singleplayerHandler.singleplayerWorld->DisplayImGui(0);
+			}
 
-		if (ImGui::CollapsingHeader("Chunk Info")) {
-			singleplayerHandler.singleplayerWorld.DisplayImGui(1);
+			if (ImGui::CollapsingHeader("World")) {
+				singleplayerHandler.singleplayerWorld->DisplayImGui(1);
+			}
+
+			if (ImGui::CollapsingHeader("Chunk Info")) {
+				singleplayerHandler.singleplayerWorld->DisplayImGui(2);
+			}
 		}
 
 		// Make background ~pink~
@@ -265,21 +249,23 @@ int main() {
 		// Do rendering stuff
 		globalWindow.QueryInputs();
 		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
-			singleplayerHandler.singleplayerWorld.player.Update();
-			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(terrainShaderProgram);
-			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(wireframeShaderProgram);
-			singleplayerHandler.singleplayerWorld.player.UpdateCameraMatrix(chunkDebugShaderProgram);
+			singleplayerHandler.singleplayerWorld->player.Update();
+			singleplayerHandler.singleplayerWorld->player.UpdateCameraMatrix(terrainShaderProgram);
+			singleplayerHandler.singleplayerWorld->player.UpdateCameraMatrix(wireframeShaderProgram);
+			singleplayerHandler.singleplayerWorld->player.UpdateCameraMatrix(chunkDebugShaderProgram);
 			
 			terrainAtlas.SetActive();
 			terrainAtlas.Bind();
-			singleplayerHandler.singleplayerWorld.Render(terrainShaderProgram);
+			singleplayerHandler.singleplayerWorld->Render(terrainShaderProgram);
 			
-			debugRenderer.UpdateBuffers(singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld.GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld.GetChunkOrigins());
+			debugRenderer.UpdateBuffers(singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld->GetChunkOrigins());
 			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(chunkDebugShaderProgram);
 		}
 		
 		UI::GetInstance().Render();
+
+		textRenderer.RenderText("! i literally am the kiwi and have ui'd this fucking \n game", 300, 600, 1, glm::vec3(frames * 4, 255 - (frames * 4), (frames * 4) / 2));
 
 		ImGui::End();
 		ImGui::Render();
@@ -293,8 +279,9 @@ int main() {
 	// Clean up once the program has exited
 	OVERRIDE_LOG_NAME("Cleanup");
 	INFO("Cleaning up...");
-	singleplayerHandler.EndSingleplayerWorld();
-
+	if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
+		singleplayerHandler.EndSingleplayerWorld();
+	}
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

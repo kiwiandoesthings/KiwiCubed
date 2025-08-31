@@ -2,15 +2,9 @@
 #include "Entity.h"
 
 
-void* operator new(size_t size) {
-	//std::cout << "allocated " << size << " bytes" << std::endl;
-	return malloc(size);
-}
-
-
 static void ApplyGravity(EntityData& newEntityData) {
 	if (abs(newEntityData.velocity.y) < newEntityData.terminalVelocity) {
-		newEntityData.velocity.y -= 0.00918f;
+		newEntityData.velocity.y -= 0.0918f;
 	}
 	else {
 		if (newEntityData.velocity.y > 0) {

@@ -3,7 +3,11 @@ project('kiwicubed', 'cpp', default_options: ['cpp_std=c++20'])
 # Stops KiwiCubed\subprojects\glm-1.0.1\glm\gtx\../gtx/transform.hpp(23): fatal error C1189
 add_project_arguments('-DGLM_ENABLE_EXPERIMENTAL', language: 'cpp')
 add_project_arguments('-DSTB_IMAGE_IMPLEMENTATION', language: 'cpp')
-add_project_arguments('-g', language: 'cpp')
+add_project_arguments('-GL_WITH_GLAD', language: 'c')
+
+if host_machine.system() == 'linux'
+  add_project_arguments('-g', language: 'cpp')
+endif
 
 if meson.get_compiler('cpp').get_id() == 'msvc'
     add_project_link_arguments('/ignore:4099', language: 'cpp')
@@ -32,6 +36,7 @@ executable(
     'Source/Rendering/Camera.cpp',
     'Source/Rendering/DebugRenderer.cpp',
     'Source/Rendering/Renderer.cpp',
+    'Source/Rendering/TextRenderer.cpp',
     'Source/Rendering/Texture.cpp',
     'Source/Rendering/Shader.cpp',
 
@@ -48,10 +53,12 @@ executable(
   dependencies: [
     dependency('kwport'),
     dependency('klogger', static: true),
-    dependency('json'),
+    dependency('json', static: true),
     dependency('glfw3', static: true),
     dependency('imgui', static: true),
     dependency('glm', static: true),
     dependency('glad-gl', static: true),
+    dependency('freetype2', static: true),
+    dependency('freetype-gl')
   ],
 )
