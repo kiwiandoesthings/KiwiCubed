@@ -2,11 +2,9 @@
 
 layout (location = 0) in vec3 blockPosition;
 layout (location = 1) in vec2 textureCoordinates;
-layout (location = 2) in float blockType;
 
 out vec2 textureCoordinatesOut;
 out vec3 blockPositionOut;
-out float blockTypeOut;
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
@@ -19,5 +17,4 @@ void main()
 	gl_Position = projectionMatrix * viewMatrix * worldPosition;
 	blockPositionOut = blockPosition;
 	textureCoordinatesOut = textureCoordinates;
-	blockTypeOut = blockType;
 }

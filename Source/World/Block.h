@@ -18,35 +18,7 @@
 
 #include "Renderer.h"
 #include "Texture.h"
-
-
-struct BlockStringID {
-    const char* modID;
-    const char* blockName;
-
-    bool IsAir() {
-        return strcmp(blockName, "air") == 0;
-    }
-
-    bool operator==(const BlockStringID& other) const {
-        return strcmp(modID, other.modID) == 0 && strcmp(blockName, other.blockName) == 0;
-    }
-
-    std::string CanonicalName() {
-        return std::string(modID) + ":" + blockName;
-    }
-};
-
-template <>
-struct std::hash<BlockStringID>{
-    std::size_t operator()(const BlockStringID& blockStringID) const {
-        using std::size_t;
-
-        return std::hash<std::string>()(std::string(blockStringID.modID) + ":" + blockStringID.blockName);
-    }
-};
-
-typedef unsigned int TextureID;
+#include "TextureManager.h"
 
 enum FaceDirection {
     FRONT,
@@ -58,8 +30,10 @@ enum FaceDirection {
 };
 
 struct BlockType {
-    BlockStringID blockStringID;
-    std::vector<TextureID> textures;
+    // placeholder examples
+    int hardness = 1;
+    int flamability = 0;
+
     // Textures given by the block manager currently don't mean anything. They are not connected to the actual textures rendered on screen.
     // For that a texture-mesher type thing would be needed like in Minecraft to take all of the seperate block textures, and combine them into one atlas.
 
@@ -68,42 +42,27 @@ struct BlockType {
     // Could try and register block properties using RegisterBlockType, and have some data fixer-upper fill in empty values.
     // This would have to be stored in some custom data structure with another map and everything though so maybe that isn't the best idea.
     // Also, custom block properties need to be accounted for. If a mod wants to add some custom data to its blocks to be read, how should that be done?
+};
 
-    bool IsAir() {
-        return blockStringID.IsAir();
+template <>
+struct std::hash<BlockType>{
+    std::size_t operator()(const BlockType& blockType) const {
+        return std::hash<int>()(blockType.hardness) + std::hash<int>()(blockType.flamability);
     }
 };
 
 
 class BlockManager {
     public:
-        BlockManager(): blockTypes({}) {
-            RegisterBlockType({
-                .blockStringID = {"kiwicubed", "air"},
-                .textures = {0}
-            });
-            RegisterBlockType({
-                .blockStringID = {"kiwicubed", "stone"},
-                .textures = {0, 1, 2, 3}
-            });
-        }
+        BlockManager(): blockTypes({}) {}
 
-        void RegisterBlockType(BlockType blockType);
+        void RegisterBlockType(unsigned int numericalID, BlockType blockType);
 
-        BlockType GetBlockType(BlockStringID blockStringID);
-        BlockType GetBlockType(const char* modID, const char* blockName);
-        BlockType GetBlockType(unsigned short blockID);
-
-        unsigned short GetBlockID(BlockStringID blockStringID);
-        unsigned short GetBlockID(const char* modID, const char* blockName);
+        BlockType* GetBlockType(TextureStringID blockStringID);
+        BlockType* GetBlockType(unsigned short blockID);
 
     private:
         std::unordered_map<unsigned short, BlockType> blockTypes;
-
-        std::unordered_map<unsigned short, BlockStringID> blockIDsToStrings;
-        std::unordered_map<BlockStringID, unsigned short> blockStringsToIDs;
-
-        int latestBlockID = -1;
 };
 
 

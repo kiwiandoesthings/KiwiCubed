@@ -32,8 +32,11 @@ void Log(LogLevel level, const std::string& message, const std::source_location 
 #define CRITICAL(message) Log(LogLevel::critical, message, std::source_location::current())
 
 #define LOG_CHECK(cond, succmsg, errmsg) if (cond) { INFO(succmsg); } else { ERR(errmsg); }
+#define LOG_CHECK_BAD(cond, errmsg) if (cond) {} else { ERR(errmsg); }
 #define LOG_CHECK_RETURN(cond, succmsg, errmsg, retcode) if (cond) { INFO(succmsg); } else { ERR(errmsg); return retcode; }
+#define LOG_CHECK_RETURN_BAD(cond, errmsg, retcode) if (cond) {} else { ERR(errmsg); return retcode; }
 #define LOG_CHECK_RETURN_VOID(cond, succmsg, errmsg) if (cond) { INFO(succmsg); } else { ERR(errmsg); return; }
+#define LOG_CHECK_RETURN_VOID_BAD(cond, succmsg, errmsg) if (cond) {} else { ERR(errmsg); return; }
 
 #define OVERRIDE_LOG_NAME(replacement) OverrideFunctionLogName(std::source_location::current().function_name(), replacement)
 

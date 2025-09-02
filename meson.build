@@ -45,6 +45,7 @@ executable(
     'Source/Input.cpp',
     'Source/Main.cpp',
     'Source/ModHandler.cpp',
+    'Source/TextureManager.cpp',
     'Source/ThreadPool.cpp',
     'Source/UI.cpp',
     'Source/Window.cpp'
@@ -58,7 +59,6 @@ executable(
     dependency('imgui', static: true),
     dependency('glm', static: true),
     dependency('glad-gl', static: true),
-    dependency('freetype2', static: true),
-    dependency('freetype-gl')
+    dependency('freetype2', static: true)
   ],
 )

@@ -1,5 +1,6 @@
 #include "UI.h"
 #include "Events.h"
+#include "TextRenderer.h"
 
 
 UI::UI() : uiShaderProgram(nullptr) {}
@@ -10,7 +11,7 @@ UI& UI::GetInstance() {
     return instance;
 }
 
-void UI::Setup(Shader* shaderProgram, Texture* atlas) {
+void UI::Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer) {
     OVERRIDE_LOG_NAME("UI Render Components Setup");
     if (!renderComponentsSetup) {
         vertexBufferObject.SetupBuffer();
@@ -25,6 +26,7 @@ void UI::Setup(Shader* shaderProgram, Texture* atlas) {
 
     uiShaderProgram = shaderProgram;
     uiAtlas = atlas;
+    uiTextRenderer = textRenderer;
 
     inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
     inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, [&](int button){
@@ -77,8 +79,19 @@ UIScreen::UIScreen(std::string screenName) : screenName(screenName) {
 }
 
 void UIScreen::Render() {
-    for (int i = 0; i < uiElements.size(); i++) {
-        uiElements[i]->Render();
+    UI& ui = UI::GetInstance();
+    for (int iterator = 0; iterator < uiElements.size(); ++iterator) {
+        uiElements[iterator]->Render();
+    }
+    for (int iterator = 0; iterator < uiElements.size(); ++iterator) {
+        UIElement* element = uiElements[iterator];
+        std::string* elementLabel = element->GetElementLabel();
+        if (*elementLabel != "") {
+            glm::vec2* position = element->GetPosition();
+            glm::vec2* size = element->GetSize();
+            //ui.uiTextRenderer->RenderText(*elementLabel, (position->y + size->y) / 2, (position->x + size->x) / 2, 1, glm::vec3(255, 255, 255));
+            ui.uiTextRenderer->RenderText(*elementLabel, position->x, position->y, 1, glm::vec3(255, 255, 255));
+        }
     }
 }
 
@@ -156,4 +169,20 @@ bool UIElement::GetHovered() {
 
     return (mousePosition.x >= position.x && mousePosition.y >= position.y && mousePosition.x <= position.x + size.x && mousePosition.y <= position.y + size.y);
     return false;
+}
+
+std::string* UIElement::GetEventTrigger() {
+    return &eventToTrigger;
+}
+
+std::string* UIElement::GetElementLabel() {
+    return &elementLabel;
+}
+
+glm::vec2* UIElement::GetPosition() {
+    return &position;
+}
+
+glm::vec2* UIElement::GetSize() {
+    return &size;
 }

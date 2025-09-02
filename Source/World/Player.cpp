@@ -22,10 +22,23 @@ void Player::Setup() {
 	camera = std::make_shared<Camera>();
 
 	inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
+		DEBUG("clicked key e");
 		EventManager::GetInstance().TriggerEvent("event/unload_world");
 	});
 	inputHandler.RegisterKeyCallback(GLFW_KEY_R, [&](int key) {
+		DEBUG("clicked key r");
 		EventManager::GetInstance().TriggerEvent("event/generate_world");
+	});
+	inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
+		if (playerData.gameMode == SURVIVAL) {
+			playerData.gameMode = CREATIVE;
+			entityData.applyGravity = false;
+			entityData.applyCollision = false;
+		} else {
+			playerData.gameMode = SURVIVAL;
+			entityData.applyGravity = true;
+			entityData.applyCollision = true;
+		}
 	});
 	inputHandler.RegisterScrollCallback(true, [this](double offset) {
 		entityStats.health += static_cast<float>(offset);
@@ -46,36 +59,68 @@ void Player::Update() {
 		ApplyPhysics(*this, chunkHandler, entityData.applyGravity, entityData.applyCollision);
 
 		if (oldEntityData.globalChunkPosition != entityData.globalChunkPosition) {
-			EventManager::GetInstance().TriggerEvent("event/entity_moved_chunk");
+			EventManager::GetInstance().TriggerEvent("event/entity_moved_chunk", std::make_pair("globalChunkPosition", entityData.globalChunkPosition));
 		}
 	}
 }
 
 void Player::QueryInputs() {
-	if (inputHandler.GetKeyState(GLFW_KEY_W)) {
-		entityData.velocity += speed * entityData.orientation;
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_A)) {
-		entityData.velocity += speed * -glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_S)) {
-		entityData.velocity += speed * -entityData.orientation;
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_D)) {
-		entityData.velocity += speed * glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_SPACE)) {
-		entityData.velocity += speed * entityData.upDirection;
-	}
-	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_SHIFT)) {
-		entityData.velocity += speed * -entityData.upDirection;
-	}
+	glm::vec3 movementVector = glm::vec3(0);
+
 	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_CONTROL)) {
-		speed = .8f;
+		speed = .5f;
+	} else {
+		speed = 0.1f;
 	}
-	else {
-		speed = 0.01f;
+
+	if (playerData.gameMode == CREATIVE) {
+		glm::vec3 forward = entityData.orientation;
+		glm::vec3 right = glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
+		glm::vec3 up = entityData.upDirection;
+
+		if (inputHandler.GetKeyState(GLFW_KEY_W)) {
+			movementVector += forward;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_A)) {
+			movementVector += -right;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_S)) {
+			movementVector += -forward;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_D)) {
+			movementVector += right;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_SPACE)) {
+			movementVector += up;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_LEFT_SHIFT)) {
+			movementVector += -up;
+		}
+	} else {
+		glm::vec3 forward = entityData.orientation;
+		forward.y = 0;
+		forward = glm::normalize(forward);
+		glm::vec3 right = glm::normalize(glm::cross(forward, entityData.upDirection));
+
+		if (inputHandler.GetKeyState(GLFW_KEY_W)) {
+			movementVector += forward;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_A)) {
+			movementVector += -right;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_S)) {
+			movementVector += -forward;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_D)) {
+			movementVector += right;
+		}
 	}
+
+	if (glm::length(movementVector) > 0.0f) {
+		movementVector = glm::normalize(movementVector) * speed;
+	}
+
+	entityData.velocity = movementVector;
 }
 
 void Player::MouseButtonCallback(int button) {

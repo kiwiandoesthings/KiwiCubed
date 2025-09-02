@@ -9,6 +9,5 @@ uniform mat4 modelMatrix;
 void main()
 {
     gl_Position = modelMatrix * vec4(vertex.x, vertex.y, 0, 1);
-    //gl_Position = vertex;
     textureCoordinatesOut = vertex.zw;
 }

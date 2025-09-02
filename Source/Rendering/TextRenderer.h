@@ -1,8 +1,11 @@
+#pragma once
+
 #include <glad/glad.h>
 
 #include <map>
 
 #include <ft2build.h>
+#include "freetype/freetype.h"
 #include FT_FREETYPE_H
 #include <glm/glm.hpp>
 

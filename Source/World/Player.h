@@ -6,6 +6,14 @@
 #include "Entity.h"
 #include "Events.h"
 
+enum GameMode {
+	SURVIVAL,
+	CREATIVE
+};
+
+struct PlayerData {
+	GameMode gameMode = CREATIVE;
+};
 
 class Player : public Entity {
 	public:
@@ -37,6 +45,7 @@ class Player : public Entity {
 		void Delete();
 	
 	private:
+		PlayerData playerData = PlayerData();
 		std::shared_ptr<Camera> camera;
 		InputHandler inputHandler = InputHandler();
 		ChunkHandler& chunkHandler;

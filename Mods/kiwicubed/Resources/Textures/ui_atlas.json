@@ -2,7 +2,7 @@
 	"name": "ui_atlas",
 	"textures": [
 		{
-			"id": "button",
+			"id": "kiwicubed:button",
 			"variant": 0,
 			"xPosition": 0,
 			"yPosition": 0,
@@ -10,7 +10,7 @@
 			"ySize": 1
 		},
 		{
-			"id": "button",
+			"id": "kiwicubed:button",
 			"variant": 1,
 			"xPosition": 3,
 			"yPosition": 0,
@@ -18,7 +18,7 @@
 			"ySize": 1
 		},
 		{
-			"id": "button",
+			"id": "kiwicubed:button",
 			"variant": 2,
 			"xPosition": 6,
 			"yPosition": 0,

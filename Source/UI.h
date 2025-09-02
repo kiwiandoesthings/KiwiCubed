@@ -9,11 +9,14 @@
 #include "Input.h"
 #include "Renderer.h"
 #include "Shader.h"
+//#include "TextRenderer.h"
 #include "Texture.h"
 #include "VertexArrayObject.h"
 #include "VertexBufferObject.h"
 #include "Window.h"
 
+
+class TextRenderer;
 class UIScreen;
 class UIElement;
 
@@ -22,7 +25,7 @@ class UI {
     public:
         static UI& GetInstance();
 
-        void Setup(Shader* shaderProgram, Texture* atlas);
+        void Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer);
         void Render();
 
         void AddScreen(UIScreen* screen);
@@ -36,6 +39,7 @@ class UI {
 
         Shader* uiShaderProgram;
         Texture* uiAtlas;
+        TextRenderer* uiTextRenderer;
         Window* window;
 
         VertexBufferObject vertexBufferObject;
@@ -76,7 +80,7 @@ class UIScreen {
 
 class UIElement {
     public:
-        UIElement(glm::vec2 position, glm::vec2 size, std::string eventToTrigger) : position(position), size(size), eventToTrigger(eventToTrigger) {}
+        UIElement(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, std::string elementLabel) : position(position), size(size), eventToTrigger(eventToTrigger), elementLabel(elementLabel) {}
         
         glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
         float PositionToNDC(float number);
@@ -86,10 +90,17 @@ class UIElement {
         bool OnClick();
         void OnHover();
 
+        glm::vec2* GetPosition();
+        glm::vec2* GetSize();
+
+        std::string* GetEventTrigger();
+        std::string* GetElementLabel();
+
     protected:
         glm::vec2 position = glm::vec2(0, 0);
         glm::vec2 size = glm::vec2(0, 0);
         std::string eventToTrigger = "";
+        std::string elementLabel = "";
 
         unsigned int textureIndex;
 

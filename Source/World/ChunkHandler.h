@@ -100,7 +100,7 @@ class Chunk {
 
         void SetupRenderComponents();
         void AllocateChunk();
-        void GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug);
+        bool GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug);
         bool GenerateMesh(ChunkHandler& chunkHandler, const bool remesh);
         void Render();
 

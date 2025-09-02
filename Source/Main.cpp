@@ -35,6 +35,7 @@ bool bitness;
 #include "Events.h"
 #include "DebugRenderer.h"
 #include "Input.h"
+#include "ModHandler.h"
 #include "Renderer.h"
 #include "Shader.h"
 #include "SingleplayerHandler.h"
@@ -73,7 +74,7 @@ int main() {
 
 	OVERRIDE_LOG_NAME("Initialization");
 
-	LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file", 1);
+	LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file, exiting", -1);
 
 	json jsonData;
 	file >> jsonData;
@@ -85,7 +86,7 @@ int main() {
 	projectVersion = jsonData["project_version"].get<std::string>();
 
 	// Initialize GLFW
-	LOG_CHECK_RETURN(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW", -1);
+	LOG_CHECK_RETURN(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW, exiting", -1);
 
 	// Create a window
 	Window& globalWindow = Window::GetInstance();
@@ -95,14 +96,14 @@ int main() {
 	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
 
 	// Initialize glad
-	LOG_CHECK_RETURN(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD", -1);
+	LOG_CHECK_RETURN(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD, exiting", -1);
 
 	// Initialize FreeType
 	FT_Library ft;
-    LOG_CHECK_RETURN(!FT_Init_FreeType(&ft), "Successfully initialized FreeType", "Failed to initialize FreeType", 1);
+    LOG_CHECK_RETURN(!FT_Init_FreeType(&ft), "Successfully initialized FreeType", "Failed to initialize FreeType, exiting", -1);
 
     FT_Face face;
-    LOG_CHECK_RETURN(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf", 1);
+    LOG_CHECK_RETURN(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf, exiting", -1);
 
     FT_Set_Pixel_Sizes(face, 0, 64);
 
@@ -162,43 +163,23 @@ int main() {
 	uiAtlas.SetAtlasSize(uiShaderProgram, glm::vec2(3, 1));
 	uiAtlas.TextureUnit(uiShaderProgram, "tex0");
 
-	// Get mods + mod info (needs to be modularized + actually do things)
-	for (const auto& entry : std::filesystem::directory_iterator("Mods")) {
-        if (entry.is_directory()) {
-            std::string modFolder = entry.path().string();
-            std::string modJsonPath = modFolder + "/mod.json";
-            
-            if (std::filesystem::exists(modJsonPath) && std::filesystem::is_regular_file(modJsonPath)) {
-                std::ifstream file(modFolder + "/mod.json");
-
-				json jsonData;
-				file >> jsonData;
-
-				std::string name = jsonData["mod_title"];
-				std::string version = jsonData["mod_version"];
-				std::string authors = jsonData["mod_authors"];
-
-				INFO("Found mod \"" + name + "\" by \"" + authors + "\" with version \"" + version + "\"");
-            }
-        }
-    }
-
-	
+	ModHandler modHandler = ModHandler();
+	LOG_CHECK_RETURN_BAD(modHandler.SetupTextureAtlasData(), "Failed to setup texture atlas data, exiting", -1);
 
 	// Setup debug renderer
 	Renderer renderer = Renderer();
 	DebugRenderer debugRenderer = DebugRenderer();
 
-	UI::GetInstance().Setup(&uiShaderProgram, &uiAtlas);
+	UI::GetInstance().Setup(&uiShaderProgram, &uiAtlas, &textRenderer);
 	UIScreen mainMenuUI = UIScreen("ui/main_menu");
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2(100, 100), glm::vec2(64, 16), ""));
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 700), glm::vec2(128, 32), ""));
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 100), glm::vec2(512, 128), "event/generate_world"));
+	mainMenuUI.AddUIElement(new UIElement(glm::vec2(100, 100), glm::vec2(64, 16), "", "do nothing lol"));
+	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 700), glm::vec2(128, 32), "", "still nothing"));
+	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 100), glm::vec2(512, 128), "event/generate_world", "Create World"));
 	UI::GetInstance().AddScreen(&mainMenuUI);
 	UI::GetInstance().SetCurrentScreen(&mainMenuUI);
 
 	UIScreen settingsUI = UIScreen("ui/settings");
-	settingsUI.AddUIElement(new UIElement(glm::vec2(400, 400), glm::vec2(256, 64), ""));
+	settingsUI.AddUIElement(new UIElement(glm::vec2(400, 400), glm::vec2(256, 64), "", "go to settings? nah"));
 	UI::GetInstance().AddScreen(&settingsUI);
 
 	// Create a singleplayer world
@@ -267,7 +248,7 @@ int main() {
 		
 		UI::GetInstance().Render();
 
-		textRenderer.RenderText("! i literally am the kiwi and have ui'd this fucking \n game", 300, 600, 1, glm::vec3(frames * 4, 255 - (frames * 4), (frames * 4) / 2));
+		//textRenderer.RenderText("! i literally am the kiwi and have ui'd this fucking \n game", 300, 600, 1, glm::vec3(frames * 4, 255 - (frames * 4), (frames * 4) / 2));
 
 		ImGui::End();
 		ImGui::Render();

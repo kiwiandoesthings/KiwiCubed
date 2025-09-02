@@ -6,7 +6,7 @@
 void Chunk::SetupRenderComponents() {
     OVERRIDE_LOG_NAME("Chunk Render Components Setup");
     if (renderComponentsSetup) {
-        ERR("Tried to setup render components when they were already setup, aborting");
+        WARN("Tried to setup render components when they were already setup, aborting");
     }
     vertexBufferObject.SetupBuffer();
     vertexArrayObject.SetupArrayObject();
@@ -46,14 +46,14 @@ void Chunk::AllocateChunk() {
     generationStatus = 1;
 }
 
-void Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug) {
+bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug) {
     if (isGenerated) {
         //std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks after they had already been generated, aborting {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
-        return;
+        return false;
     }
     if (!isAllocated) {
         WARN("Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
-        return;
+        return false;
     }
 
     for (int blockX = 0; blockX < chunkSize; ++blockX) {
@@ -76,6 +76,7 @@ void Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
     IsFull();
     isGenerated = true;
     generationStatus = 2;
+    return true;
 }
 
 // Returns whether or not the mesh was generated

@@ -28,8 +28,8 @@ struct EntityData {
 
 	const char* name = "";
 
-	bool applyGravity = false;
-	bool applyCollision = false;
+	bool applyGravity = true;
+	bool applyCollision = true;
 };
 
 struct ProtectedEntityData {

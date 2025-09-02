@@ -1,5 +1,5 @@
 #include "TextRenderer.h"
-#include "freetype/freetype.h"
+
 
 TextRenderer::TextRenderer(FT_Library& freeType, FT_Face& fontFace, Shader& textShader) : freeType(freeType), fontFace(fontFace), textShader(textShader) {
     vertexArrayObject.SetupArrayObject();
@@ -50,7 +50,6 @@ TextRenderer::~TextRenderer() {
 void TextRenderer::RenderText(const std::string& text, float xPosition, float yPosition, float scale, glm::vec3 textColor) {
     textShader.Bind();
     textShader.SetUniform3fv("textColor", textColor /  glm::vec3(255));
-    textShader.SetUniformMatrix4fv("modelMatrix", glm::mat4(1.0f));
 
     GLCall(glActiveTexture(GL_TEXTURE0));
     vertexArrayObject.Bind();
@@ -61,27 +60,36 @@ void TextRenderer::RenderText(const std::string& text, float xPosition, float yP
 
     for (char iterator : text) {
         Character character = characters[iterator];
-
+        
+        glm::mat4 modelMatrix = glm::mat4(1.0f);
         glm::vec2 characterPosition = PixelsToNDC(glm::vec2(xPosition + character.bearing.x * scale, yPosition - (character.size.y - character.bearing.y) * scale));
         glm::vec2 characterSize = PixelsToNDC(glm::vec2(character.size.x * scale, character.size.y * scale)) + glm::vec2(1, 1);
+        modelMatrix = glm::translate(modelMatrix, glm::vec3(characterPosition.x, characterPosition.y, -1.0f));
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(characterSize.x, characterSize.y, 1.0f));
+        textShader.SetUniformMatrix4fv("modelMatrix", modelMatrix);
 
-        float vertices[6][4] = {
-            { characterPosition.x,     characterPosition.y + characterSize.y,   0.0f, 0.0f },            
-            { characterPosition.x,     characterPosition.y,       0.0f, 1.0f },
-            { characterPosition.x + characterSize.x, characterPosition.y,       1.0f, 1.0f },
+        GLfloat vertices[] = {
+            // Positions      // Texture Coordinates
+            0.0f, 0.0f, 0.0f, 1.0f,
+	        1.0f, 0.0f, 1.0f, 1.0f,
+	        1.0f, 1.0f, 1.0f, 0.0f,
+	        0.0f, 1.0f, 0.0f, 0.0f
+        };
 
-            { characterPosition.x,     characterPosition.y + characterSize.y,   0.0f, 0.0f },
-            { characterPosition.x + characterSize.x, characterPosition.y,       1.0f, 1.0f },
-            { characterPosition.x + characterSize.x, characterPosition.y + characterSize.y,   1.0f, 0.0f }           
+        GLuint indices[] = {
+            0, 1, 2,
+	        2, 3, 0,
         };
 
         GLCall(glBindTexture(GL_TEXTURE_2D, character.textureID));
 
         vertexBufferObject.Bind();
-        vertexBufferObject.SetBufferSubData(0, sizeof(vertices), *vertices);
+        vertexBufferObject.SetBufferSubData(0, sizeof(vertices), vertices);
         vertexArrayObject.Bind();
+        indexBufferObject.Bind();
+        indexBufferObject.SetBufferData(sizeof(vertices), indices);
 
-        GLCall(glDrawArrays(GL_TRIANGLES, 0, 6));
+        GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sizeof(indices)), GL_UNSIGNED_INT, 0));
 
         xPosition += (character.advance >> 6) * scale;
     }
