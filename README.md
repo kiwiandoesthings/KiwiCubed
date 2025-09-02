@@ -4,7 +4,7 @@ This game / engine is focused on being extremely expandable, having easy and pow
 
 Currently working on:
 - Adding support for multiple block types, such as grass blocks and stone blocks, along with attributes for (future) gameplay.
-- Gameplay elements such as items and entities of the world.
+- Gameplay elements such as items and entities.
 - UI systems
 - Separating the world from the game
 
