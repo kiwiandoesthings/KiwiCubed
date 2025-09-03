@@ -11,7 +11,7 @@ class SingleplayerHandler {
 		std::unique_ptr<World> singleplayerWorld = nullptr;
 		bool isLoadedIntoSingleplayerWorld = false;
 		
-		SingleplayerHandler() : singleplayerWorld(nullptr), isLoadedIntoSingleplayerWorld(false) {};
+		SingleplayerHandler(DebugRenderer& debugRenderer);
 		
 		void StartSingleplayerWorld(DebugRenderer& debugRenderer);
 		void EndSingleplayerWorld();

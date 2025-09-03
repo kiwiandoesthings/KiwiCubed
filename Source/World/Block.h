@@ -75,10 +75,13 @@ class Block {
         Block(unsigned short blockID) : blockX(0), blockY(0), blockZ(0), blockID(blockID) {}
 
         void GenerateBlock(unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
-        void AddFace(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, FaceDirection faceDirection, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize);
+        void AddFaces(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, std::vector<FaceDirection>* faceDirections, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, TextureAtlasData& atlasData);
 
         unsigned int GetBlockID() const;
-        void SetBlockID(unsigned short newBlockID);
+        void SetBlockID(unsigned int newBlockID);
+
+        unsigned short GetVariant() const;
+        void SetVariant(unsigned short newVariant);
 
         bool IsAir();
 

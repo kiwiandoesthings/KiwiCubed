@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Entity.h"
 #include "World/ChunkHandler.h"
 #include <klogger.hpp>
 
@@ -16,24 +17,32 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler
 	inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
 	inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1));
 	inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1));
+
+	if (playerData.gameMode == CREATIVE) {
+		//entityData.applyCollision = false;
+		//entityData.applyGravity = false;
+	} else {
+		entityData.applyCollision = true;
+		entityData.applyGravity = true;
+	}
 }
 
 void Player::Setup() {
 	camera = std::make_shared<Camera>();
 
-	inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
-		DEBUG("clicked key e");
-		EventManager::GetInstance().TriggerEvent("event/unload_world");
-	});
-	inputHandler.RegisterKeyCallback(GLFW_KEY_R, [&](int key) {
-		DEBUG("clicked key r");
-		EventManager::GetInstance().TriggerEvent("event/generate_world");
-	});
+	//inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
+	//	DEBUG("clicked key e");
+	//	EventManager::GetInstance().TriggerEvent("event/unload_world");
+	//});
+	//inputHandler.RegisterKeyCallback(GLFW_KEY_R, [&](int key) {
+	//	DEBUG("clicked key r");
+	//	EventManager::GetInstance().TriggerEvent("event/generate_world");
+	//});
 	inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
 		if (playerData.gameMode == SURVIVAL) {
 			playerData.gameMode = CREATIVE;
-			entityData.applyGravity = false;
-			entityData.applyCollision = false;
+			//entityData.applyGravity = false;
+			//entityData.applyCollision = false;
 		} else {
 			playerData.gameMode = SURVIVAL;
 			entityData.applyGravity = true;

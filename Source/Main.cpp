@@ -105,7 +105,7 @@ int main() {
     FT_Face face;
     LOG_CHECK_RETURN(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf, exiting", -1);
 
-    FT_Set_Pixel_Sizes(face, 0, 64);
+    FT_Set_Pixel_Sizes(face, 0, 32);
 
 	Shader textShader("Mods/kiwicubed/Resources/Shaders/Text_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Text_Fragment.frag");
 
@@ -172,20 +172,17 @@ int main() {
 
 	UI::GetInstance().Setup(&uiShaderProgram, &uiAtlas, &textRenderer);
 	UIScreen mainMenuUI = UIScreen("ui/main_menu");
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2(100, 100), glm::vec2(64, 16), "", "do nothing lol"));
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 700), glm::vec2(128, 32), "", "still nothing"));
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2(700, 100), glm::vec2(512, 128), "event/generate_world", "Create World"));
+	mainMenuUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/generate_world", "Create World"));
+	mainMenuUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
 	UI::GetInstance().AddScreen(&mainMenuUI);
 	UI::GetInstance().SetCurrentScreen(&mainMenuUI);
 
 	UIScreen settingsUI = UIScreen("ui/settings");
-	settingsUI.AddUIElement(new UIElement(glm::vec2(400, 400), glm::vec2(256, 64), "", "go to settings? nah"));
+	settingsUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_main_menu", "go to settings? nah"));
 	UI::GetInstance().AddScreen(&settingsUI);
 
-	// Create a singleplayer world
-	SingleplayerHandler singleplayerHandler = SingleplayerHandler();
-	//singleplayerHandler.singleplayerWorld->GenerateWorld();
-	singleplayerHandler.StartSingleplayerWorld(debugRenderer);	
+	// Create a singleplayer instance
+	SingleplayerHandler singleplayerHandler = SingleplayerHandler(debugRenderer);
 	
 	// FPS code
 	int frames = 0;

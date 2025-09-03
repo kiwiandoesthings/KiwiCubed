@@ -21,6 +21,24 @@ World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) :
 
 void World::Setup() {
     player.Setup();
+
+    for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
+        auto& chunk = iterator->second;
+
+        if (!chunk.isGenerated || !chunk.isMeshed || chunk.isEmpty) {
+            continue;
+        }
+
+        for (unsigned int x = 0; x < chunkSize; ++x) {
+            for (unsigned int z = 0; z < chunkSize; ++z) {
+                int level = chunk.GetHeightmapLevelAt(glm::vec2(x, z));
+                if (level != -1) {
+                    player.SetPosition((chunk.chunkX * chunkSize) + x + 0.5, (chunk.chunkY * chunkSize) + level + 1.5, (chunk.chunkZ * chunkSize) + z + 0.5);
+                    return;
+                }
+            }
+        }
+    }
 }
 
 void World::Render(Shader shaderProgram) {

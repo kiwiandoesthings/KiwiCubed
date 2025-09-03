@@ -75,6 +75,14 @@ InputHandler& UI::GetInputHandler() {
 
 UIScreen::UIScreen(std::string screenName) : screenName(screenName) {
     OVERRIDE_LOG_NAME("UI Initialization");
+
+    std::string realName = screenName.substr(3);
+
+    EventManager::GetInstance().RegisterEvent("ui/move_screen_" + realName);
+    EventManager::GetInstance().AddEventToDo("ui/move_screen_" + realName, [&](Event& event) {
+        UI::GetInstance().SetCurrentScreen(this);
+    });
+
     INFO("Created screen \"" + screenName + "\"");
 }
 
@@ -89,8 +97,8 @@ void UIScreen::Render() {
         if (*elementLabel != "") {
             glm::vec2* position = element->GetPosition();
             glm::vec2* size = element->GetSize();
-            //ui.uiTextRenderer->RenderText(*elementLabel, (position->y + size->y) / 2, (position->x + size->x) / 2, 1, glm::vec3(255, 255, 255));
-            ui.uiTextRenderer->RenderText(*elementLabel, position->x, position->y, 1, glm::vec3(255, 255, 255));
+            glm::vec2 textDimensions = ui.uiTextRenderer->MeasureText(*elementLabel, 2);
+            ui.uiTextRenderer->RenderText(*elementLabel, (position->x + size->x / 2) - (textDimensions.x / 2), (position->y + size->y / 2) - 24, 2, glm::vec3(150, 150, 150));
         }
     }
 }
@@ -101,6 +109,10 @@ void UIScreen::AddUIElement(UIElement* element) {
 
 glm::vec2 UIElement::PixelsToNDC(glm::vec2 pixelPosition) {
     return glm::vec2((pixelPosition.x / Window::GetInstance().GetWidth()) * 2 - 1, (pixelPosition.y / Window::GetInstance().GetHeight()) * 2 - 1);
+}
+
+UIElement::UIElement(glm::vec2 position, glm::vec2 scale, std::string eventToTrigger, std::string elementLabel) : position(position), scale(scale), eventToTrigger(eventToTrigger), elementLabel(elementLabel) {
+    size = glm::vec2(512, 128) * glm::vec2(scale.x, scale.y);
 }
 
 void UIElement::Render() {
@@ -181,6 +193,10 @@ std::string* UIElement::GetElementLabel() {
 
 glm::vec2* UIElement::GetPosition() {
     return &position;
+}
+
+glm::ivec2* UIElement::GetScale() {
+    return &scale;
 }
 
 glm::vec2* UIElement::GetSize() {

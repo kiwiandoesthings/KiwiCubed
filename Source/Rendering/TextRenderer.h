@@ -29,6 +29,8 @@ class TextRenderer {
 
         void RenderText(const std::string& text, float xPosition, float yPosition, float scale, glm::vec3 textColor);
 
+        glm::vec2 MeasureText(const std::string& text, float scale);
+
     private:
         FT_Library& freeType;
         FT_Face& fontFace;

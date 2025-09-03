@@ -20,11 +20,12 @@
 #include "IndexBufferObject.h"
 #include "Renderer.h"
 #include "Shader.h"
+#include "TextureManager.h"
 #include "VertexArrayObject.h"
 #include "VertexBufferObject.h"
 
 
-const int chunkSize = 32;
+const unsigned int chunkSize = 32;
 
 
 class Chunk;
@@ -110,6 +111,8 @@ class Chunk {
         void SetTotalBlocks(unsigned short newTotalBlocks);
 
         bool GetMeshable(ChunkHandler& chunkHandler) const;
+
+        int GetHeightmapLevelAt(glm::ivec2 position);
     
         std::vector<GLfloat>& GetVertices();
         std::vector<GLuint>& GetIndices();

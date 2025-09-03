@@ -80,7 +80,7 @@ class UIScreen {
 
 class UIElement {
     public:
-        UIElement(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, std::string elementLabel) : position(position), size(size), eventToTrigger(eventToTrigger), elementLabel(elementLabel) {}
+        UIElement(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, std::string elementLabel);
         
         glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
         float PositionToNDC(float number);
@@ -91,6 +91,7 @@ class UIElement {
         void OnHover();
 
         glm::vec2* GetPosition();
+        glm::ivec2* GetScale();
         glm::vec2* GetSize();
 
         std::string* GetEventTrigger();
@@ -98,7 +99,8 @@ class UIElement {
 
     protected:
         glm::vec2 position = glm::vec2(0, 0);
-        glm::vec2 size = glm::vec2(0, 0);
+        glm::ivec2 scale = glm::ivec2(1, 1);
+        glm::vec2 size = glm::vec2(512, 128);
         std::string eventToTrigger = "";
         std::string elementLabel = "";
 

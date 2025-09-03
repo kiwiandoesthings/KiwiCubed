@@ -54,9 +54,9 @@ void TextRenderer::RenderText(const std::string& text, float xPosition, float yP
     GLCall(glActiveTexture(GL_TEXTURE0));
     vertexArrayObject.Bind();
 
-    float temporaryY = yPosition;
-    yPosition = xPosition;
-    xPosition = temporaryY;
+    //float temporaryY = yPosition;
+    //yPosition = xPosition;
+    //xPosition = temporaryY;
 
     for (char iterator : text) {
         Character character = characters[iterator];
@@ -96,6 +96,24 @@ void TextRenderer::RenderText(const std::string& text, float xPosition, float yP
 
     vertexArrayObject.Unbind();
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+// Returns a vec2 containing the maximum width and height of the text
+glm::vec2 TextRenderer::MeasureText(const std::string& text, float scale) {
+    float totalLength = 0.0f;
+    float maxHeight = 0.0f;
+    for (char iterator : text) {
+        Character character = characters[iterator];
+
+        totalLength += (character.advance >> 6) * scale;
+        if (character.size.y > maxHeight) {
+            maxHeight = character.size.y;
+        }
+
+        //std::cout << (character.advance >> 6) * scale << " " << character.size.y << std::endl;
+    }
+
+    return glm::vec2(totalLength, maxHeight);
 }
 
 glm::vec2 TextRenderer::PixelsToNDC(glm::vec2 pixelPosition) {
