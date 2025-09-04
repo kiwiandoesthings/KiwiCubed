@@ -16,6 +16,10 @@ class SingleplayerHandler {
 		void StartSingleplayerWorld(DebugRenderer& debugRenderer);
 		void EndSingleplayerWorld();
 
-		void Delete();
+		void Update();
 
+		void Delete();
+	
+	private:
+		bool shouldUnloadWorld = false;
 };

@@ -170,16 +170,23 @@ int main() {
 	Renderer renderer = Renderer();
 	DebugRenderer debugRenderer = DebugRenderer();
 
-	UI::GetInstance().Setup(&uiShaderProgram, &uiAtlas, &textRenderer);
+	UI& ui = UI::GetInstance();
+	ui.Setup(&uiShaderProgram, &uiAtlas, &textRenderer);
 	UIScreen mainMenuUI = UIScreen("ui/main_menu");
 	mainMenuUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/generate_world", "Create World"));
 	mainMenuUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
-	UI::GetInstance().AddScreen(&mainMenuUI);
-	UI::GetInstance().SetCurrentScreen(&mainMenuUI);
+	ui.AddScreen(&mainMenuUI);
+	ui.SetCurrentScreen(&mainMenuUI);
 
 	UIScreen settingsUI = UIScreen("ui/settings");
-	settingsUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_main_menu", "go to settings? nah"));
-	UI::GetInstance().AddScreen(&settingsUI);
+	settingsUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "event/back_ui", "Back"));
+	ui.AddScreen(&settingsUI);
+
+	UIScreen gamePauseUI = UIScreen("ui/game_pause");
+	gamePauseUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/disable_ui", "Resume game"));
+	gamePauseUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
+	gamePauseUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "event/unload_world", "Quit Game"));
+	ui.AddScreen(&gamePauseUI);
 
 	// Create a singleplayer instance
 	SingleplayerHandler singleplayerHandler = SingleplayerHandler(debugRenderer);
@@ -229,6 +236,10 @@ int main() {
 		// Do rendering stuff
 		globalWindow.QueryInputs();
 		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
+			singleplayerHandler.Update();
+		}
+
+		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
 			singleplayerHandler.singleplayerWorld->GetPlayer().Update();
 			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(terrainShaderProgram);
 			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(wireframeShaderProgram);
@@ -244,8 +255,6 @@ int main() {
 		}
 		
 		UI::GetInstance().Render();
-
-		//textRenderer.RenderText("! i literally am the kiwi and have ui'd this fucking \n game", 300, 600, 1, glm::vec3(frames * 4, 255 - (frames * 4), (frames * 4) / 2));
 
 		ImGui::End();
 		ImGui::Render();

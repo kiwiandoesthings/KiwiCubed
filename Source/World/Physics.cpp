@@ -305,6 +305,10 @@ void ApplyPhysics(Entity& entity, ChunkHandler& chunkHandler, bool applyGravity,
 	}
 	if (applyCollision) {
 		ApplyTerrainCollision(newEntityData, chunkHandler);
+	} else {
+		newEntityData.position.x += newEntityData.velocity.x;
+		newEntityData.position.y += newEntityData.velocity.y;
+		newEntityData.position.z += newEntityData.velocity.z;
 	}
 
 

@@ -1,5 +1,18 @@
 #include "DebugRenderer.h"
 
+
+DebugRenderer::DebugRenderer() {
+	EventManager& eventManager = EventManager::GetInstance();
+	eventManager.RegisterEvent("event/toggle_debug");
+	eventManager.AddEventToDo("event/toggle_debug", [&](Event& event) {
+		if (enabled) {
+			Disable();
+		} else {
+			Enable();
+		}
+	});
+}
+
 // I have so little fucking idea how to make this more modular. I feel it's going to be ultra hardcoded for a very long time.
 void DebugRenderer::SetupBuffers(const std::vector<GLfloat>& chunkDebugVertices, const std::vector<GLuint>& chunkDebugIndices, const std::vector<glm::vec4>& chunkOrigins) {
 	// Chunk debug setup
@@ -67,6 +80,10 @@ void DebugRenderer::UpdateUniforms() const {
 }
 
 void DebugRenderer::RenderDebug(Shader& chunkDebugShaderProgram) const {
+	if (!enabled) {
+		return;
+	}
+	
 	// Chunk debug renderer
 	chunkDebugShaderProgram.Bind();
 	GLCall(glBindVertexArray(chunkDebugVAO));
@@ -75,4 +92,12 @@ void DebugRenderer::RenderDebug(Shader& chunkDebugShaderProgram) const {
 
 
 	// Future renderers go here
+}
+
+void DebugRenderer::Enable() {
+	enabled = true;
+}
+
+void DebugRenderer::Disable() {
+	enabled = false;
 }

@@ -3,13 +3,13 @@
 #include <klogger.hpp>
 
 #include <glm/vec2.hpp>
+#include <stack>
 
 #include "Events.h"
 #include "IndexBufferObject.h"
 #include "Input.h"
 #include "Renderer.h"
 #include "Shader.h"
-//#include "TextRenderer.h"
 #include "Texture.h"
 #include "VertexArrayObject.h"
 #include "VertexBufferObject.h"
@@ -31,9 +31,12 @@ class UI {
         void AddScreen(UIScreen* screen);
         void SetCurrentScreen(UIScreen* screen);
 
-        UIScreen* GetScreen(std::string& screenName);
+        UIScreen* GetScreen(const std::string& screenName);
         UIScreen* GetCurrentScreen();
         std::string GetCurrentScreenName();
+
+        void DisableUI();
+        bool IsDisabled();
 
         InputHandler& GetInputHandler();
 
@@ -59,7 +62,9 @@ class UI {
         UIScreen* currentScreen;
         bool screenVisible = true;
 
-        InputHandler inputHandler = InputHandler();
+        std::stack<UIScreen*> stackedScreens;
+
+        InputHandler inputHandler = InputHandler("UI");
 };
 
 

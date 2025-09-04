@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "GLFW/glfw3.h"
+#include <cstdio>
 
 
 Window::Window() = default;
@@ -63,13 +64,6 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 
 void Window::Setup() {
 	inputHandler.SetupCallbacks(window);
-	inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int button) {
-		isFocused = false;
-	});
-	inputHandler.RegisterKeyCallback(GLFW_KEY_SPACE, [&](int button) {
-		isFocused = true;
-		glfwSetCursorPos(window, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
-	});
 }
 
 void Window::QueryInputs() {
@@ -108,6 +102,18 @@ void Window::SetTitle(const char* newTitle) {
 void Window::SetTitle(std::string newTitle) {
 	glfwSetWindowTitle(window, newTitle.c_str());
 	windowTitle = newTitle.c_str();
+}
+
+void Window::SetFocused(bool focus) {
+	isFocused = focus;
+
+	if (isFocused) {
+		glfwSetCursorPos(window, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
+	}
+}
+
+bool Window::GetFocused() const {
+	return isFocused;
 }
 
 GLFWwindow* Window::GetWindowInstance() {

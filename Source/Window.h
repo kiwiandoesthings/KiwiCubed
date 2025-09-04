@@ -28,9 +28,14 @@ class Window {
 
 		int GetWidth() const;
 		int GetHeight() const;
+
 		const char* GetTitle() const;
+
 		void SetTitle(const char* newTitle);
 		void SetTitle(std::string newTitle);
+
+		void SetFocused(bool focus);
+		bool GetFocused() const;
 
 		GLFWwindow* GetWindowInstance();
 
@@ -39,15 +44,16 @@ class Window {
 		int windowWidth, windowHeight;
 		const char* windowTitle;
 
-		bool isFocused;
-
-	private:
+		
+		private:
 		Window();
         ~Window();
-
+		
         Window(const Window&) = delete;
         Window& operator=(const Window&) = delete;
-
+		
 		GLFWwindow* window;
-		InputHandler inputHandler = InputHandler();
+		InputHandler inputHandler = InputHandler("Window");
+
+		bool isFocused;
 };

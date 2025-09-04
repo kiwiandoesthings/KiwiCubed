@@ -27,21 +27,52 @@ void UI::Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer
     uiShaderProgram = shaderProgram;
     uiAtlas = atlas;
     uiTextRenderer = textRenderer;
+    window = &Window::GetInstance();
 
     inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
     inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, [&](int button){
+        if (currentScreen == nullptr) {
+            return;
+        }
+
         for (int iterator = 0; iterator < currentScreen->uiElements.size(); ++iterator) {
             if (currentScreen->uiElements[iterator]->OnClick()) {
                 return;
             }
         }
     });
+
+    EventManager& eventManager = EventManager::GetInstance();
+    eventManager.RegisterEvent("event/disable_ui");
+    eventManager.AddEventToDo("event/disable_ui", [&](Event& event) {
+        DisableUI();
+    });
+    eventManager.RegisterEvent("event/back_ui");
+    eventManager.AddEventToDo("event/back_ui", [&](Event& event) {
+        if (currentScreen == nullptr) {
+            return;
+        }
+        
+        if (!stackedScreens.empty()) {
+            stackedScreens.pop();
+            if (!stackedScreens.empty()) {
+                currentScreen = stackedScreens.top();
+            } else {
+                currentScreen = nullptr;
+                window->SetFocused(true);
+            }
+        }
+    });
 }
 
 void UI::Render() {
+    if (currentScreen == nullptr) {
+        return;
+    }
+
     uiAtlas->SetActive();
     uiAtlas->Bind();
-    currentScreen->Render();
+    stackedScreens.top()->Render();
 }
 
 void UI::AddScreen(UIScreen* screen) {
@@ -49,10 +80,11 @@ void UI::AddScreen(UIScreen* screen) {
 }
 
 void UI::SetCurrentScreen(UIScreen* screen) {
+    stackedScreens.push(screen);
     currentScreen = screen;
 }
 
-UIScreen* UI::GetScreen(std::string& screenName) {
+UIScreen* UI::GetScreen(const std::string& screenName) {
     for (int iterator = 0; iterator < uiScreens.size(); ++iterator) {
         if (uiScreens[iterator]->screenName == screenName) {
             return uiScreens[iterator];
@@ -67,6 +99,17 @@ UIScreen* UI::GetCurrentScreen() {
 
 std::string UI::GetCurrentScreenName() {
     return currentScreen->screenName;
+}
+
+void UI::DisableUI() {
+    stackedScreens = std::stack<UIScreen*>{};
+    currentScreen = nullptr;
+
+    Window::GetInstance().SetFocused(true);
+}
+
+bool UI::IsDisabled() {
+    return currentScreen == nullptr;
 }
 
 InputHandler& UI::GetInputHandler() {

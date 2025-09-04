@@ -33,7 +33,7 @@ void World::Setup() {
             for (unsigned int z = 0; z < chunkSize; ++z) {
                 int level = chunk.GetHeightmapLevelAt(glm::vec2(x, z));
                 if (level != -1) {
-                    player.SetPosition((chunk.chunkX * chunkSize) + x + 0.5, (chunk.chunkY * chunkSize) + level + 1.5, (chunk.chunkZ * chunkSize) + z + 0.5);
+                    player.SetPosition((chunk.chunkX * chunkSize) + x + 0.5, (chunk.chunkY * chunkSize) + level + 0.5, (chunk.chunkZ * chunkSize) + z + 0.5);
                     return;
                 }
             }
@@ -209,6 +209,7 @@ void World::DisplayImGui(unsigned int option) {
         EntityData playerData = player.GetEntityData();
 
 		ImGui::Text("Player name: %s", player.GetEntityData().name);
+        ImGui::Text("Player gamemode: %s", player.GetGameModeString().c_str());
 		ImGui::Text("Player health: %d", static_cast<int>(player.GetEntityStats().health));
 		ImGui::Text("Player position: %f, %f, %f",
 			playerData.position.x,
@@ -342,6 +343,7 @@ bool World::StopTickThread() {
     shouldTick = false;
     if (tickThread.joinable()) {
         tickThread.join();
+        INFO("Tick thread stopped");
     } else {
         WARN("Tick thread was not joinable (could not be stopped)");
     }
@@ -385,4 +387,5 @@ void World::Delete() {
     StopTickThread();
     chunkHandler.Delete();
     chunkGenerationThreads.Delete();
+    player.Delete();
 }

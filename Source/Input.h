@@ -16,6 +16,24 @@
 
 #include <glm/vec2.hpp>
 
+struct KeyCallbackWrapper {
+    std::function<void(int key)> callback;
+    unsigned int id;
+    std::string instanceID;
+};
+
+struct MouseButtonCallbackWrapper {
+    std::function<void(int button)> callback;
+    unsigned int id;
+    std::string instanceID;
+};
+
+struct ScrollCallbackWrapper {
+    std::function<void(double offset)> callback;
+    unsigned int id;
+    std::string instanceID;
+};
+
 class Window;
 
 class InputHandler {
@@ -24,7 +42,7 @@ public:
     using MouseButtonCallback = std::function<void(int button)>;
     using ScrollCallback = std::function<void(double offset)>;
 
-    InputHandler() {}
+    InputHandler(std::string id) : instanceID(id) {}
 
     void SetupCallbacks(GLFWwindow* window) {
         this->window = window;
@@ -42,9 +60,9 @@ public:
         }
     }
 
-    void RegisterKeyCallback(int key, KeyCallback callback) {
+    unsigned int RegisterKeyCallback(int key, KeyCallback callback) {
         OVERRIDE_LOG_NAME("Input Handler");
-        keyCallbacks[key].push_back(callback);
+        keyCallbacks[key].push_back(KeyCallbackWrapper{callback, latestID + 1, instanceID});
 
         const char* keyName = glfwGetKeyName(key, 0);
         std::stringstream outputString;
@@ -52,30 +70,71 @@ public:
         if (keyName == nullptr) outputString << "keycode: " << key;
         else outputString << "'" << keyName << "'";
         int index = static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin());
-        outputString << ") for input instance[" << index << "]";
+        outputString << ") for input instance[" << index << "] with callback ID of " << latestID + 1 << " and instance ID of " << instanceID;
         INFO(outputString.str());
+
+        latestID += 1;
+
+        return latestID;
     }
 
-    void RegisterMouseButtonCallback(int button, MouseButtonCallback callback) {
+    unsigned int RegisterMouseButtonCallback(int button, MouseButtonCallback callback) {
         OVERRIDE_LOG_NAME("Input Handler");
-        mouseButtonCallbacks[button].push_back(callback);
+        mouseButtonCallbacks[button].push_back(MouseButtonCallbackWrapper{callback, latestID + 1, instanceID});
 
         std::stringstream outputString;
         outputString << "Mouse button callback registered for mouse button: (" << button << ")";
         int index = static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin());
-        outputString << " for input instance[" << index << "]";
+        outputString << " for input instance[" << index << "] with callback ID of " << latestID + 1 << " and instance ID of " << instanceID;
         INFO(outputString.str());
+
+        latestID += 1;
+
+        return latestID;
     }
 
-    void RegisterScrollCallback(bool direction, ScrollCallback callback) {
+    unsigned int RegisterScrollCallback(bool direction, ScrollCallback callback) {
         OVERRIDE_LOG_NAME("Input Handler");
-        scrollCallbacks[direction].push_back(callback);
+        scrollCallbacks[direction].push_back(ScrollCallbackWrapper{callback, latestID + 1, instanceID});
 
         std::stringstream outputString;
         outputString << "Scroll callback registered for scroll direction: (" << (direction ? "y-axis" : "x-axis") << ")";
         int index = static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin());
-        outputString << " for input instance[" << index << "]";
+        outputString << " for input instance[" << index << "] with callback ID of " << latestID + 1 << " and instance ID of " << instanceID;
         INFO(outputString.str());
+
+        latestID += 1;
+
+        return latestID;
+    }
+
+    void DeregisterCallback(unsigned int id, std::string instanceID) {
+        for (auto& [key, vector] : keyCallbacks) {
+            for (int iterator = 0; iterator < vector.size(); ++ iterator) {
+                if (vector[iterator].id == id && vector[iterator].instanceID == instanceID) {
+                    DeregisterKeyCallback(key, id, instanceID);
+                    return;
+                }
+            }
+        }
+
+        for (auto& [key, vector] : mouseButtonCallbacks) {
+            for (int iterator = 0; iterator < vector.size(); ++ iterator) {
+                if (vector[iterator].id == id && vector[iterator].instanceID == instanceID) {
+                    DeregisterMouseButtonCallback(key, id, instanceID);
+                    return;
+                }
+            }
+        }
+
+        for (auto& [key, vector] : scrollCallbacks) {
+            for (int iterator = 0; iterator < vector.size(); ++ iterator) {
+                if (vector[iterator].id == id && vector[iterator].instanceID == instanceID) {
+                    DeregisterScrollCallback(key, id, instanceID);
+                    return;
+                }
+            }
+        }
     }
 
     bool GetKeyState(int key) const {
@@ -99,10 +158,12 @@ private:
     static std::unordered_map<int, bool> mouseButtonStates;
     static std::unordered_map<bool, bool> scrollStates;
 
-    static std::unordered_map<int, std::vector<KeyCallback>> keyCallbacks;
-    static std::unordered_map<int, std::vector<MouseButtonCallback>> mouseButtonCallbacks;
-    static std::unordered_map<bool, std::vector<ScrollCallback>> scrollCallbacks;
+    static std::unordered_map<int, std::vector<KeyCallbackWrapper>> keyCallbacks;
+    static std::unordered_map<int, std::vector<MouseButtonCallbackWrapper>> mouseButtonCallbacks;
+    static std::unordered_map<bool, std::vector<ScrollCallbackWrapper>> scrollCallbacks;
 
+    std::string instanceID;
+    unsigned int latestID = 0;
     static std::vector<InputHandler*> instances;
     GLFWwindow* window;
 
@@ -120,7 +181,7 @@ private:
         auto iterator = keyCallbacks.find(key);
         if (iterator != keyCallbacks.end()) {
             for (auto& callback : iterator->second) {
-                callback(key);   
+                callback.callback(key);   
             }
         }
     }
@@ -132,7 +193,7 @@ private:
             auto iterator = mouseButtonCallbacks.find(button);
             if (iterator != mouseButtonCallbacks.end()) {
                 for (auto& callback : iterator->second) {
-                    callback(button);
+                    callback.callback(button);
                 }
             }
         } else if (action == GLFW_RELEASE) {
@@ -148,15 +209,69 @@ private:
         auto iteratorX = scrollCallbacks.find(false);
         if (iteratorX != scrollCallbacks.end()) {
             for (auto& callback : iteratorX->second) {
-                callback(xoffset);
+                callback.callback(xoffset);
             }
         }
 
         auto iteratorY = scrollCallbacks.find(true);
         if (iteratorY != scrollCallbacks.end()) {
             for (auto& callback : iteratorY->second) {
-                callback(yoffset);
+                callback.callback(yoffset);
             }
         }
+    }
+
+    void DeregisterKeyCallback(int key, unsigned int id, std::string instanceID) {
+        OVERRIDE_LOG_NAME("Input Handler");
+
+        for (int iterator = 0; iterator < keyCallbacks[key].size(); ++iterator) {
+            if (keyCallbacks[key][iterator].id == id && keyCallbacks[key][iterator].instanceID == instanceID) {
+                keyCallbacks[key].erase(keyCallbacks[key].begin() + iterator);
+                break;
+            }
+        }
+
+        const char* keyName = glfwGetKeyName(key, 0);
+        std::stringstream outputString;
+        outputString << "Key callback deregistered for key: (";
+        if (keyName == nullptr) outputString << "keycode: " << key;
+        else outputString << "'" << keyName << "'";
+        int index = static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin());
+        outputString << ") for input instance[" << index << "] with callback ID of " << id << " and instance ID of " << instanceID;
+        INFO(outputString.str());
+    }
+
+    void DeregisterMouseButtonCallback(int button, unsigned int id, std::string instanceID) {
+        OVERRIDE_LOG_NAME("Input Handler");
+        
+        for (int iterator = 0; iterator < mouseButtonCallbacks[button].size(); ++iterator) {
+            if (mouseButtonCallbacks[button][iterator].id == id && mouseButtonCallbacks[button][iterator].instanceID == instanceID) {
+                mouseButtonCallbacks[button].erase(mouseButtonCallbacks[button].begin() + iterator);
+                break;
+            }
+        }
+
+        std::stringstream outputString;
+        outputString << "Mouse button callback deregistered for mouse button: (" << button << ")";
+        int index = static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin());
+        outputString << " for input instance[" << index << "] with callback ID of " << id << " and instance ID of " << instanceID;
+        INFO(outputString.str());
+    }
+
+    void DeregisterScrollCallback(bool direction, unsigned int id, std::string instanceID) {
+        OVERRIDE_LOG_NAME("Input Handler");
+        
+        for (int iterator = 0; iterator < scrollCallbacks[direction].size(); ++iterator) {
+            if (scrollCallbacks[direction][iterator].id == id && scrollCallbacks[direction][iterator].instanceID == instanceID) {
+                scrollCallbacks[direction].erase(scrollCallbacks[direction].begin() + iterator);
+                break;
+            }
+        }
+
+        std::stringstream outputString;
+        outputString << "Scroll callback deregistered for scroll direction: (" << (direction ? "y-axis" : "x-axis") << ")";
+        int index = static_cast<int>(std::find(instances.begin(), instances.end(), this) - instances.begin());
+        outputString << " for input instance[" << index << "] with callback ID of " << id << " and instance ID of " << instanceID;
+        INFO(outputString.str());
     }
 };

@@ -273,7 +273,7 @@ int Chunk::GetHeightmapLevelAt(glm::ivec2 position) {
     }
 
     for (unsigned int iterator = 1; iterator < chunkSize; ++iterator) {
-        if (!blocks[position.x][iterator][position.y].IsAir()) {
+        if (blocks[position.x][iterator][position.y].IsAir()) {
             return iterator;
         }
     }

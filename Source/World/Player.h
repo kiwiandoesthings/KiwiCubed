@@ -38,7 +38,10 @@ class Player : public Entity {
 		void QueryMouseInputs();
 	
 		void SetPosition(float playerX, float playerY, float playerZ);
-		const glm::vec3 GetPosition();
+		glm::vec3 GetPosition() const;
+
+		GameMode GetGameMode() const;
+		std::string GetGameModeString() const;
 	
 		void UpdateCameraMatrix(Shader& shader);
 	
@@ -47,7 +50,8 @@ class Player : public Entity {
 	private:
 		PlayerData playerData = PlayerData();
 		std::shared_ptr<Camera> camera;
-		InputHandler inputHandler = InputHandler();
+		InputHandler inputHandler = InputHandler("Player");
+		std::vector<unsigned int> inputCallbackIDs;
 		ChunkHandler& chunkHandler;
 		std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 

@@ -1,7 +1,13 @@
 #include "Player.h"
 #include "Entity.h"
+#include "Events.h"
 #include "World/ChunkHandler.h"
 #include <klogger.hpp>
+
+const char* gameModeStrings[] = {
+	"Survival",
+	"Creative"
+};
 
 
 Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler) : Entity(), yaw(0), pitch(0), roll(0), width(640), height(480), chunkHandler(chunkHandler) {
@@ -15,12 +21,14 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler
 	entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
 
 	inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
-	inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1));
-	inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1));
+	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
+	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
+
+	playerData.gameMode = SURVIVAL;
 
 	if (playerData.gameMode == CREATIVE) {
-		//entityData.applyCollision = false;
-		//entityData.applyGravity = false;
+		entityData.applyCollision = false;
+		entityData.applyGravity = false;
 	} else {
 		entityData.applyCollision = true;
 		entityData.applyGravity = true;
@@ -30,28 +38,33 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler
 void Player::Setup() {
 	camera = std::make_shared<Camera>();
 
-	//inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
-	//	DEBUG("clicked key e");
-	//	EventManager::GetInstance().TriggerEvent("event/unload_world");
-	//});
-	//inputHandler.RegisterKeyCallback(GLFW_KEY_R, [&](int key) {
-	//	DEBUG("clicked key r");
-	//	EventManager::GetInstance().TriggerEvent("event/generate_world");
-	//});
-	inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
+	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
 		if (playerData.gameMode == SURVIVAL) {
 			playerData.gameMode = CREATIVE;
-			//entityData.applyGravity = false;
-			//entityData.applyCollision = false;
+			entityData.applyGravity = false;
+			entityData.applyCollision = false;
 		} else {
 			playerData.gameMode = SURVIVAL;
 			entityData.applyGravity = true;
 			entityData.applyCollision = true;
 		}
-	});
-	inputHandler.RegisterScrollCallback(true, [this](double offset) {
+	}));
+	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F3, [&](int key) {
+		EventManager::GetInstance().TriggerEvent("event/toggle_debug");
+	}));
+	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int key) {
+		UI& ui = UI::GetInstance();
+		EventManager& eventManager = EventManager::GetInstance();
+		if (ui.IsDisabled()) {
+			eventManager.TriggerEvent("ui/move_screen_game_pause");
+			Window::GetInstance().SetFocused(false);
+		} else {
+			eventManager.TriggerEvent("event/back_ui");
+		}
+	}));
+	inputCallbackIDs.emplace_back(inputHandler.RegisterScrollCallback(true, [this](double offset) {
 		entityStats.health += static_cast<float>(offset);
-	});
+	}));
 }
 
 void Player::Update() {
@@ -61,7 +74,7 @@ void Player::Update() {
 		return;
 	}
 
-	if (camera->GetWindow().isFocused) {
+	if (camera->GetWindow().GetFocused()) {
 		EntityData oldEntityData = entityData;
 		QueryInputs();
 		QueryMouseInputs();
@@ -168,7 +181,7 @@ void Player::MouseButtonCallback(int button) {
 
 void Player::QueryMouseInputs() {
 	Window& window = camera->GetWindow();
-	if (!window.isFocused) {
+	if (!window.GetFocused()) {
 		return;
 	}
 
@@ -221,8 +234,16 @@ void Player::SetPosition(float newPlayerX, float newPlayerY, float newPlayerZ) {
 	camera->UpdateMatrix(80.0f, 0.1f, 1000.0f, entityData.position, entityData.orientation, entityData.upDirection);
 }
 
-const glm::vec3 Player::GetPosition() {
+glm::vec3 Player::GetPosition() const {
 	return glm::vec3(entityData.position.x, entityData.position.y, entityData.position.z);
+}
+
+GameMode Player::GetGameMode() const {
+	return playerData.gameMode;
+}
+
+std::string Player::GetGameModeString() const {
+	return gameModeStrings[playerData.gameMode];
 }
 
 void Player::UpdateCameraMatrix(Shader& shader) {
@@ -235,5 +256,8 @@ void Player::UpdateCameraMatrix(Shader& shader) {
 }
 
 void Player::Delete() {
-
+	for (unsigned int id : inputCallbackIDs) {
+		inputHandler.DeregisterCallback(id, "Player");
+	}
+	inputCallbackIDs.clear();
 }
