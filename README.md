@@ -7,9 +7,9 @@ Currently working on:
 - Gameplay elements such as items and entities.
 - UI systems
 - Separating the world from the game
+- Unloading the world around you
+- Survival gameplay elements
 
 ## Compiling
 
-~~Clone the repository, and run ``just setup`` in the root. Once that finishes, you can run ``just build`` in the root to build the project, and ``just run`` to quickly rebuild and launch the project.~~
-
-LINUX AND POSSIBLY WINDOWS COMPILATION IS CURRENTLY BROKEN. this will be fixed in a future release !!
+Clone the repository, and run ``just setup`` in the root. Once that finishes, you can run ``just build`` in the root to build the project, and ``just run`` to quickly rebuild and launch the project.
