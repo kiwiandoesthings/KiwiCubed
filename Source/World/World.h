@@ -6,6 +6,7 @@
 #include <atomic>
 #include <chrono>
 #include <map>
+#include <random>
 #include <thread>
 #include <unordered_set>
 #include <vector>
@@ -62,6 +63,8 @@ class World {
 
 		std::vector<glm::vec4>& GetChunkOrigins();
 
+		FastNoiseLite& GetNoise();
+
 		void Tick();
 		bool StartTickThread();
 		bool StopTickThread();
@@ -84,6 +87,7 @@ class World {
 		unsigned short playerChunkGenerationRadius = 2;
 
 		ThreadPool chunkGenerationThreads = ThreadPool(4);
+		FastNoiseLite noise;
 
 		bool isWorldAllocated = false;
 		bool isWorldGenerated = false;

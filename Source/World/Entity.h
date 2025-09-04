@@ -30,6 +30,8 @@ struct EntityData {
 
 	bool applyGravity = true;
 	bool applyCollision = true;
+	
+	bool isGrounded = false;
 };
 
 struct ProtectedEntityData {

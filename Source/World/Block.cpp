@@ -67,14 +67,10 @@ GLuint faceIndices[] = {
 };
 
 
-void Block::GenerateBlock(unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug) {
+void Block::GenerateBlock(FastNoiseLite& noise, unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug) {
 	Block::blockX = blockX;
 	Block::blockY = blockY;
 	Block::blockZ = blockZ;
-
-	FastNoiseLite noise;
-	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-	noise.SetSeed(120);
 
 	int newChunkSize = static_cast<int>(chunkSize);
 

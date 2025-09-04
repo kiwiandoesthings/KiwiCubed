@@ -56,10 +56,12 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
         return false;
     }
 
+    FastNoiseLite& noise = world.GetNoise();
+
     for (int blockX = 0; blockX < chunkSize; ++blockX) {
         for (int blockY = 0; blockY < chunkSize; ++blockY) {
             for (int blockZ = 0; blockZ < chunkSize; ++blockZ) {
-                blocks[blockX][blockY][blockZ].GenerateBlock(blockX, blockY, blockZ, chunkX, chunkY, chunkZ, chunkSize, debug);
+                blocks[blockX][blockY][blockZ].GenerateBlock(noise, blockX, blockY, blockZ, chunkX, chunkY, chunkZ, chunkSize, debug);
                 if (blocks[blockX][blockY][blockZ].GetBlockID() != 0) {
                     totalBlocks++;
                 }

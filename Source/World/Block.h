@@ -74,7 +74,7 @@ class Block {
         Block() : blockX(0), blockY(0), blockZ(0), blockID(0) {}
         Block(unsigned short blockID) : blockX(0), blockY(0), blockZ(0), blockID(blockID) {}
 
-        void GenerateBlock(unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
+        void GenerateBlock(FastNoiseLite& noise, unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
         void AddFaces(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, std::vector<FaceDirection>* faceDirections, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, TextureAtlasData& atlasData);
 
         unsigned int GetBlockID() const;

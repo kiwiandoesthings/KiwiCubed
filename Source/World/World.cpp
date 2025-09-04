@@ -1,5 +1,6 @@
 #include "World.h"
 
+#include "FastNoise.h"
 #include "SingleplayerHandler.h"
 
 
@@ -17,6 +18,9 @@ World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) :
     }
     
     isWorldAllocated = true;
+
+	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+	noise.SetSeed(static_cast<unsigned int>(std::time(nullptr)));
 }
 
 void World::Setup() {
@@ -317,6 +321,10 @@ std::vector<glm::vec4>& World::GetChunkOrigins() {
         chunkOrigins.emplace_back(glm::vec4(chunk.chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunk.chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunk.chunkZ * chunkSize + static_cast<int>(chunkSize / 2), chunk.generationStatus));
     }
     return chunkOrigins;
+}
+
+FastNoiseLite& World::GetNoise() {
+    return noise;
 }
 
 bool World::StartTickThread() {

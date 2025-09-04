@@ -78,8 +78,9 @@ void Player::Update() {
 		EntityData oldEntityData = entityData;
 		QueryInputs();
 		QueryMouseInputs();
+		entityData.isGrounded = GetGrounded(*this, chunkHandler);
 		ApplyPhysics(*this, chunkHandler, entityData.applyGravity, entityData.applyCollision);
-
+		
 		if (oldEntityData.globalChunkPosition != entityData.globalChunkPosition) {
 			EventManager::GetInstance().TriggerEvent("event/entity_moved_chunk", std::make_pair("globalChunkPosition", entityData.globalChunkPosition));
 		}
@@ -123,6 +124,9 @@ void Player::QueryInputs() {
 		forward.y = 0;
 		forward = glm::normalize(forward);
 		glm::vec3 right = glm::normalize(glm::cross(forward, entityData.upDirection));
+		glm::vec3 up = entityData.upDirection;
+		up.x = 0;
+		up.z = 0;
 
 		if (inputHandler.GetKeyState(GLFW_KEY_W)) {
 			movementVector += forward;
@@ -135,6 +139,10 @@ void Player::QueryInputs() {
 		}
 		if (inputHandler.GetKeyState(GLFW_KEY_D)) {
 			movementVector += right;
+		}
+		if (inputHandler.GetKeyState(GLFW_KEY_SPACE) && entityData.isGrounded) {
+			std::cout << "jump" << std::endl;
+			movementVector += up;
 		}
 	}
 
