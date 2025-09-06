@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <glm/vec3.hpp>
 
 #include <iostream>
@@ -21,17 +22,21 @@ struct EntityData {
 	glm::ivec3 globalChunkPosition = glm::ivec3(0, 0, 0);
 	glm::ivec3 localChunkPosition = glm::ivec3(0, 0, 0);
 
-	float terminalVelocity = 0.4f;
+	float terminalVelocity = 10.0f;
 
 	PhysicsBoundingBox physicsBoundingBox = PhysicsBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	InteractionBoundingBox interactionBoundingBox = InteractionBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	const char* name = "";
 
+	float walkModifier = 1.0f;
+	float jumpModifier = 1.0f;
+
 	bool applyGravity = true;
 	bool applyCollision = true;
 	
 	bool isGrounded = false;
+	bool isJumping = false;
 };
 
 struct ProtectedEntityData {

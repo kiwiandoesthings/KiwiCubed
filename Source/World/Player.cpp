@@ -18,7 +18,7 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler
 	
 	entityData.name = "Player";
 	
-	entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
+	entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.3f, -1.62f, -0.3f), glm::vec3(0.3f, 0.18f, 0.3f));
 
 	inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
@@ -80,6 +80,9 @@ void Player::Update() {
 		QueryMouseInputs();
 		entityData.isGrounded = GetGrounded(*this, chunkHandler);
 		ApplyPhysics(*this, chunkHandler, entityData.applyGravity, entityData.applyCollision);
+		if (entityData.isGrounded) {
+			entityData.isJumping = false;
+		}
 		
 		if (oldEntityData.globalChunkPosition != entityData.globalChunkPosition) {
 			EventManager::GetInstance().TriggerEvent("event/entity_moved_chunk", std::make_pair("globalChunkPosition", entityData.globalChunkPosition));
@@ -91,15 +94,19 @@ void Player::QueryInputs() {
 	glm::vec3 movementVector = glm::vec3(0);
 
 	if (inputHandler.GetKeyState(GLFW_KEY_LEFT_CONTROL)) {
-		speed = .5f;
+		speed = 10.0f;
 	} else {
-		speed = 0.1f;
+		speed = 5.0f;
 	}
+
+	bool shouldJump = false;
 
 	if (playerData.gameMode == CREATIVE) {
 		glm::vec3 forward = entityData.orientation;
-		glm::vec3 right = glm::normalize(glm::cross(entityData.orientation, entityData.upDirection));
-		glm::vec3 up = entityData.upDirection;
+		forward.y = 0;
+		forward = glm::normalize(forward);
+		glm::vec3 right = glm::normalize(glm::cross(forward, entityData.upDirection));
+		glm::vec3 up = glm::normalize(entityData.upDirection);
 
 		if (inputHandler.GetKeyState(GLFW_KEY_W)) {
 			movementVector += forward;
@@ -119,14 +126,15 @@ void Player::QueryInputs() {
 		if (inputHandler.GetKeyState(GLFW_KEY_LEFT_SHIFT)) {
 			movementVector += -up;
 		}
+
+		if (glm::length(movementVector) > 0.0f) {
+			movementVector = glm::normalize(movementVector) * speed;
+		}
 	} else {
 		glm::vec3 forward = entityData.orientation;
 		forward.y = 0;
 		forward = glm::normalize(forward);
 		glm::vec3 right = glm::normalize(glm::cross(forward, entityData.upDirection));
-		glm::vec3 up = entityData.upDirection;
-		up.x = 0;
-		up.z = 0;
 
 		if (inputHandler.GetKeyState(GLFW_KEY_W)) {
 			movementVector += forward;
@@ -141,13 +149,19 @@ void Player::QueryInputs() {
 			movementVector += right;
 		}
 		if (inputHandler.GetKeyState(GLFW_KEY_SPACE) && entityData.isGrounded) {
-			std::cout << "jump" << std::endl;
-			movementVector += up;
+			shouldJump = true;
+			entityData.isJumping = true;
 		}
-	}
 
-	if (glm::length(movementVector) > 0.0f) {
-		movementVector = glm::normalize(movementVector) * speed;
+		if (glm::length(movementVector) > 0.0f) {
+			movementVector = glm::normalize(movementVector) * speed;
+		}
+
+		if (shouldJump) {
+			movementVector.y = 5;
+		} else {
+			movementVector.y = entityData.velocity.y;
+		}
 	}
 
 	entityData.velocity = movementVector;

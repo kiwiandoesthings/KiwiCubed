@@ -42,6 +42,7 @@ executable(
 
     # Other
     'Source/Events.cpp',
+    'Source/Globals.cpp',
     'Source/Input.cpp',
     'Source/Main.cpp',
     'Source/ModHandler.cpp',

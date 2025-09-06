@@ -34,6 +34,7 @@ bool bitness;
 #include "Entity.h"
 #include "Events.h"
 #include "DebugRenderer.h"
+#include "Globals.h"
 #include "Input.h"
 #include "ModHandler.h"
 #include "Renderer.h"
@@ -193,29 +194,33 @@ int main() {
 	
 	// FPS code
 	int frames = 0;
-	auto start_time = std::chrono::high_resolution_clock::now();
+	auto startTime = std::chrono::high_resolution_clock::now();
 	double fps = 0.0;
 
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
+		auto frameStartTime = std::chrono::high_resolution_clock::now();
 		glfwPollEvents();
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		auto end_time = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+		Globals& globals = Globals::GetInstance();
+
+		auto endTime = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 
 		if (duration >= 1000.0) {
 			fps = static_cast<float>(frames) / (duration / 1000.0);
 			frames = 0;
-			start_time = end_time;
+			startTime = endTime;
 		}
 
 		ImGui::Begin("Debug");
 		ImGui::Text("Total frames: %d", frames);
 		ImGui::Text("FPS: %.2f", fps);
+		ImGui::Text("DeltaTime: %.6f", globals.deltaTime);
 
 		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
 			if (ImGui::CollapsingHeader("Player")) {
@@ -262,6 +267,9 @@ int main() {
 
 		glfwSwapBuffers(globalWindow.GetWindowInstance());
 		++frames;
+
+		auto frameEndTime = std::chrono::high_resolution_clock::now();
+		globals.deltaTime = abs(duration_cast<std::chrono::duration<float>>(frameStartTime - frameEndTime).count());
 	}
 
 

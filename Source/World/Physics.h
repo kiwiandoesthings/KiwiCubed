@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <imgui.h>
 
+#include "Globals.h"
 #include "ChunkHandler.h"
 
 class Entity;

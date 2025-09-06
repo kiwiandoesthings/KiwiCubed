@@ -6,7 +6,7 @@ SingleplayerHandler::SingleplayerHandler(DebugRenderer& debugRenderer) : singlep
 	EventManager& eventManager = EventManager::GetInstance();
 	eventManager.RegisterEvent("event/generate_world");
 	eventManager.AddEventToDo("event/generate_world", [&](Event& event) {
-		singleplayerWorld = std::make_unique<World>(5, this);
+		singleplayerWorld = std::make_unique<World>(5, 3, this);
 		isLoadedIntoSingleplayerWorld = true;
 		singleplayerWorld->GenerateWorld();
 		singleplayerWorld->Setup();
@@ -27,7 +27,7 @@ void SingleplayerHandler::StartSingleplayerWorld(DebugRenderer& debugRenderer) {
 	});
 	eventManager.RegisterEvent("event/entity_moved_chunk");
 	eventManager.AddEventToDo("event/entity_moved_chunk", [&](Event& event) {
-		singleplayerWorld->GenerateChunksAroundPosition(event);
+		singleplayerWorld->GenerateChunksAroundPosition(event, 5, 2);
 	});
 	
 	singleplayerWorld->StartTickThread();

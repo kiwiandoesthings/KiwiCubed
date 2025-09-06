@@ -2,16 +2,16 @@
 
 #include "FastNoise.h"
 #include "SingleplayerHandler.h"
+#include <chrono>
 
 
 std::atomic<bool> keepRunning(true);
 
 
-World::World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), worldSize(worldSize), chunkHandler(*this) {
-    player.SetPosition(static_cast<int>(worldSize * chunkSize / 2), static_cast<int>(worldSize * chunkSize / 2), static_cast<int>(worldSize * chunkSize / 2));
-    for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
-        for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
-            for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
+World::World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, SingleplayerHandler* singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), worldSizeHorizontal(worldSizeHorizontal), worldSizeVertical(worldSizeVertical), chunkHandler(*this) {
+    for (unsigned int chunkX = 0; chunkX < worldSizeHorizontal; ++chunkX) {
+        for (unsigned int chunkY = 0; chunkY < worldSizeVertical; ++chunkY) {
+            for (unsigned int chunkZ = 0; chunkZ < worldSizeHorizontal; ++chunkZ) {
                 chunkHandler.AddChunk(chunkX, chunkY, chunkZ);
             }
         }
@@ -37,7 +37,7 @@ void World::Setup() {
             for (unsigned int z = 0; z < chunkSize; ++z) {
                 int level = chunk.GetHeightmapLevelAt(glm::vec2(x, z));
                 if (level != -1) {
-                    player.SetPosition((chunk.chunkX * chunkSize) + x + 0.5, (chunk.chunkY * chunkSize) + level + 0.5, (chunk.chunkZ * chunkSize) + z + 0.5);
+                    player.SetPosition((chunk.chunkX * chunkSize) + x, (chunk.chunkY * chunkSize) + level + 3, (chunk.chunkZ * chunkSize) + z);
                     return;
                 }
             }
@@ -64,9 +64,9 @@ void World::GenerateWorld() {
     INFO("Generating world");
     
     auto start_time = std::chrono::high_resolution_clock::now();
-    for (unsigned int chunkX = 0; chunkX < worldSize; ++chunkX) {
-        for (unsigned int chunkY = 0; chunkY < worldSize; ++chunkY) {
-            for (unsigned int chunkZ = 0; chunkZ < worldSize; ++chunkZ) {
+    for (unsigned int chunkX = 0; chunkX < worldSizeHorizontal; ++chunkX) {
+        for (unsigned int chunkY = 0; chunkY < worldSizeVertical; ++chunkY) {
+            for (unsigned int chunkZ = 0; chunkZ < worldSizeHorizontal; ++chunkZ) {
                 Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
                 GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
                 totalMemoryUsage += chunk.GetMemoryUsage();
@@ -77,7 +77,7 @@ void World::GenerateWorld() {
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0f;
 
-    int chunkCount = worldSize * worldSize * worldSize;
+    int chunkCount = worldSizeHorizontal * worldSizeVertical * worldSizeHorizontal;
     float chunkGenerationSpeed = static_cast<float>(static_cast<float>(duration) / chunkCount);
     float chunkGenerationSpeedSeconds = 1000.0f / chunkGenerationSpeed;
 
@@ -155,10 +155,10 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
 
 void World::GenerateChunksAroundPosition(Event& event, unsigned short horizontalRadius, unsigned short verticalRadius) {
     if (horizontalRadius == 0) {
-        horizontalRadius = playerChunkGenerationRadius;
+        horizontalRadius = playerChunkGenerationRadiusHorizontal;
     }
     if (verticalRadius == 0) {
-        verticalRadius = playerChunkGenerationRadius;
+        verticalRadius = playerChunkGenerationRadiusVertical;
     }
     auto* playerChunkPosition = event.GetData<glm::ivec3>("globalChunkPosition");
     if (playerChunkPosition == nullptr) {
@@ -189,8 +189,6 @@ void World::GenerateChunksAroundPosition(Event& event, unsigned short horizontal
 }
 
 void World::Update() {
-    //player.Update();
-
     if (generationQueuedChunks > 0) {
         chunkHandler.AddChunk(chunkGenerationQueue.front().x, chunkGenerationQueue.front().y, chunkGenerationQueue.front().z);
         chunkHandler.GenerateChunk(chunkGenerationQueue.front().x, chunkGenerationQueue.front().y, chunkGenerationQueue.front().z, defaultChunk, false, false);
@@ -227,6 +225,7 @@ void World::DisplayImGui(unsigned int option) {
 			player.GetEntityData().velocity.x,
 			player.GetEntityData().velocity.y,
 			player.GetEntityData().velocity.z);
+        ImGui::Text("Player grounded and jumping state: %d, %d", player.GetEntityData().isGrounded, player.GetEntityData().isJumping);
 		ImGui::Text("Global chunk position: %d, %d, %d", 
 			static_cast<int>(player.GetEntityData().globalChunkPosition.x), 
 			static_cast<int>(player.GetEntityData().globalChunkPosition.y),
@@ -251,7 +250,8 @@ void World::DisplayImGui(unsigned int option) {
     }
 
     if (option == 1) {
-        ImGui::Text("TPS: %d", ticksPerSecond);
+        ImGui::Text("TPS: %.2f", ticksPerSecond);
+        ImGui::Text("Until next tick: %.f", tickIntervalMs - tickAccumulator);
         ImGui::Text("Total chunks: %d", totalChunks);
         ImGui::Text("Memory usage: %.2f MB", totalMemoryUsage / (1024.0 * 1024.0));
         if (ImGui::CollapsingHeader("Chunk Generation Queue")) {
@@ -383,11 +383,19 @@ void World::Tick() {
 }
 
 void World::RunTickThread() {
+    auto nextTickTime = std::chrono::steady_clock::now();
+
     while (shouldTick) {
-        auto nextTickTime = std::chrono::steady_clock::now();
-        Tick();
-        nextTickTime += std::chrono::milliseconds(tickIntervalMs);
-        std::this_thread::sleep_until(nextTickTime);
+        auto currentTime = std::chrono::steady_clock::now();
+        auto frameTime = std::chrono::duration<double, std::milli>(currentTime - nextTickTime).count();
+        nextTickTime = currentTime;
+
+        tickAccumulator += frameTime;
+
+        while (tickAccumulator >= tickIntervalMs) {
+            Tick();
+            tickAccumulator -= tickIntervalMs;
+        }
     }
 }
 

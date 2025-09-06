@@ -35,8 +35,8 @@ class World {
 		unsigned int generationQueuedChunks = 0;
 		unsigned int meshingQueuedChunks = 0;
 
-		World() : worldSize(1), chunkHandler(*this), player(0, 0, 0, chunkHandler), singleplayerHandler(singleplayerHandler), totalChunks(0), totalMemoryUsage(0), shouldTick(false), tickIntervalMs(50) {}
-		World(unsigned int worldSize, SingleplayerHandler* singleplayerHandler);
+		World() : worldSizeHorizontal(1), worldSizeVertical(1), chunkHandler(*this), player(0, 0, 0, chunkHandler), singleplayerHandler(singleplayerHandler), totalChunks(0), totalMemoryUsage(0), shouldTick(false), tickIntervalMs(50) {}
+		World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, SingleplayerHandler* singleplayerHandler);
 
 		void Setup();
 		void SetupRenderComponents();
@@ -77,21 +77,24 @@ class World {
 		std::mutex tickThreadMutex;
 		int tickIntervalMs = 50;
 		unsigned int totalTicks = 0;
-		unsigned int ticksPerSecond = 0;
+		float ticksPerSecond = 0.0f;
+		float tickAccumulator = 0.0f;
 		std::chrono::steady_clock::time_point tpsStartTime = std::chrono::steady_clock::now();
 
 		std::queue<glm::ivec3> chunkGenerationQueue;
 		std::unordered_set<std::tuple<int, int, int>, TripleHash> chunkGenerationSet;
 		std::queue<glm::ivec3> chunkMeshingQueue;
 		std::unordered_set<std::tuple<int, int, int>, TripleHash> chunkMeshingSet;
-		unsigned short playerChunkGenerationRadius = 2;
+		unsigned short playerChunkGenerationRadiusHorizontal = 5;
+		unsigned short playerChunkGenerationRadiusVertical = 2;
 
 		ThreadPool chunkGenerationThreads = ThreadPool(4);
 		FastNoiseLite noise;
 
 		bool isWorldAllocated = false;
 		bool isWorldGenerated = false;
-		unsigned int worldSize = 1;
+		unsigned int worldSizeHorizontal;
+		unsigned int worldSizeVertical;
 		Player player = Player(0, 0, 0, chunkHandler);
 		ChunkHandler chunkHandler;
 		SingleplayerHandler* singleplayerHandler;
