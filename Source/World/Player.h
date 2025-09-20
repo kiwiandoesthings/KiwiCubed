@@ -1,6 +1,8 @@
 #pragma once
 
+#include <chrono>
 #include <glad/glad.h>
+#include <klogger.hpp>
 
 #include "Camera.h"
 #include "Entity.h"
@@ -27,8 +29,8 @@ class Player : public Entity {
 		float speed = 0.004f;
 		float sensitivity = 100.0f;
 
-		Player() : Entity(), yaw(0), pitch(0), roll(0), width(640), height(480), chunkHandler(chunkHandler) {}
-		Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler);
+		Player() : world(world), Entity(0, 0, 0, world), yaw(0), pitch(0), roll(0), width(640), height(480) {}
+		Player(int playerX, int playerY, int playerZ, World& world);
 	
 		void Setup();
 	
@@ -52,9 +54,13 @@ class Player : public Entity {
 		std::shared_ptr<Camera> camera;
 		InputHandler inputHandler = InputHandler("Player");
 		std::vector<unsigned int> inputCallbackIDs;
-		ChunkHandler& chunkHandler;
+		World& world;
+		ChunkHandler* chunkHandler;
 		std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 
 		float oldMouseX = 0;
 		float oldMouseY = 0;
+
+		int updates = 0;
+		std::chrono::time_point<std::chrono::high_resolution_clock> jumpStart;
 };

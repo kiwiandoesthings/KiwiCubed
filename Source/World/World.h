@@ -35,7 +35,7 @@ class World {
 		unsigned int generationQueuedChunks = 0;
 		unsigned int meshingQueuedChunks = 0;
 
-		World() : worldSizeHorizontal(1), worldSizeVertical(1), chunkHandler(*this), player(0, 0, 0, chunkHandler), singleplayerHandler(singleplayerHandler), totalChunks(0), totalMemoryUsage(0), shouldTick(false), tickIntervalMs(50) {}
+		World() : worldSizeHorizontal(1), worldSizeVertical(1), chunkHandler(*this), player(0, 0, 0, *this), singleplayerHandler(singleplayerHandler), totalChunks(0), totalMemoryUsage(0), shouldTick(false), tickIntervalMs(50) {}
 		World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, SingleplayerHandler* singleplayerHandler);
 
 		void Setup();
@@ -95,7 +95,7 @@ class World {
 		bool isWorldGenerated = false;
 		unsigned int worldSizeHorizontal;
 		unsigned int worldSizeVertical;
-		Player player = Player(0, 0, 0, chunkHandler);
+		Player player = Player(0, 0, 0, *this);
 		ChunkHandler chunkHandler;
 		SingleplayerHandler* singleplayerHandler;
 

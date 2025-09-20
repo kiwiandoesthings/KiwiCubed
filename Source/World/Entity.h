@@ -3,10 +3,14 @@
 #include <cmath>
 #include <glm/vec3.hpp>
 
+#include <array>
+#include <iomanip>
 #include <iostream>
+#include <random>
 
 #include "Physics.h"
 
+class World;
 
 struct EntityStats {
 	float health;
@@ -22,12 +26,18 @@ struct EntityData {
 	glm::ivec3 globalChunkPosition = glm::ivec3(0, 0, 0);
 	glm::ivec3 localChunkPosition = glm::ivec3(0, 0, 0);
 
-	float terminalVelocity = 10.0f;
+	// Used so physics and other systems don't have to constantly re-find the entity's current chunk
+	Chunk* currentChunkPtr = nullptr;
+
+	float terminalVelocity = 100.0f;
 
 	PhysicsBoundingBox physicsBoundingBox = PhysicsBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	InteractionBoundingBox interactionBoundingBox = InteractionBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-	const char* name = "";
+	std::string name = "";
+
+	float moveSpeed = 1.0f;
+	float jumpHeight = 1.25;
 
 	float walkModifier = 1.0f;
 	float jumpModifier = 1.0f;
@@ -41,20 +51,21 @@ struct EntityData {
 
 struct ProtectedEntityData {
 	// For use later (most likely for multiplayer)
-	const char* UUID = "";
+	std::string UUID = "";
 };
 
 class Entity {
 	protected:
 		EntityStats entityStats;
 		EntityData entityData;
+		ProtectedEntityData protectedEntityData;
 
 	public:
-		Entity() : entityStats(EntityStats()), entityData(EntityData()) {}
-		Entity(float entityX, float entityY, float entityZ);
+		Entity(float entityX, float entityY, float entityZ, World& world);
 	
 		virtual EntityStats GetEntityStats() const;
 		virtual EntityData GetEntityData() const;
+		virtual ProtectedEntityData GetProtectedEntityData() const;
 	
 		virtual void SetEntityStats(EntityStats newEntityStats);
 		virtual void SetEntityData(EntityData newEntityData);
@@ -64,6 +75,11 @@ class Entity {
 		virtual void Update();
 	
 		virtual void Render();
+
+		std::string CreateUUID();
 	
 		virtual void Delete();
+		
+	private:
+		World& world;
 };

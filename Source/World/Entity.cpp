@@ -1,9 +1,12 @@
 #include "Entity.h"
+#include "World.h"
 
-Entity::Entity(float entityX, float entityY, float entityZ) : entityStats(EntityStats()), entityData(EntityData()) {
+Entity::Entity(float entityX, float entityY, float entityZ, World& world) : world(world), entityStats(EntityStats()), entityData(EntityData()) {
 	entityData.position.x = entityX;
 	entityData.position.y = entityY;
 	entityData.position.z = entityZ;
+
+	protectedEntityData.UUID = CreateUUID().c_str();
 }
 
 EntityStats Entity::GetEntityStats() const {
@@ -12,6 +15,10 @@ EntityStats Entity::GetEntityStats() const {
 
 EntityData Entity::GetEntityData() const {
 	return entityData;
+}
+
+ProtectedEntityData Entity::GetProtectedEntityData() const {
+	return protectedEntityData;
 }
 
 void Entity::SetEntityStats(EntityStats newEntityStats) {
@@ -27,11 +34,55 @@ void Entity::DamageEntity(float damage) {
 }
 
 void Entity::Update() {
+	glm::ivec3 oldGlobalChunkPosition = entityData.globalChunkPosition;
+	entityData.globalChunkPosition = glm::ivec3(
+		(entityData.position.x >= 0)
+		? static_cast<int>(entityData.position.x / 32)
+		: static_cast<int>((entityData.position.x - 31) / 32),
+		(entityData.position.y >= 0)
+		? static_cast<int>(entityData.position.y / 32)
+		: static_cast<int>((entityData.position.y - 31) / 32),
+		(entityData.position.z >= 0)
+		? static_cast<int>(entityData.position.z / 32)
+		: static_cast<int>((entityData.position.z - 31) / 32)
+	);
+	entityData.localChunkPosition = glm::ivec3(PositiveModulo(static_cast<int>(entityData.position.x), 32), PositiveModulo(static_cast<int>(entityData.position.y), 32) , PositiveModulo(static_cast<int>(entityData.position.z), 32));
+
+	if (oldGlobalChunkPosition != entityData.globalChunkPosition) {
+		entityData.currentChunkPtr = &world.GetChunkHandler().GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+	}
+
 	return;
 }
 
 void Entity::Render() {
 	return;
+}
+
+std::string Entity::CreateUUID() {
+	std::array<uint8_t, 16> uuidBytes;
+
+	std::random_device random;
+	std::mt19937 gen(random());
+	std::uniform_int_distribution<unsigned int> dist(0, 255);
+
+	for (auto &byte : uuidBytes) {
+		byte = dist(gen);
+	}
+	
+	uuidBytes[6] = (uuidBytes[6] & 0x0F) | 0x40;
+	uuidBytes[8] = (uuidBytes[8] & 0x3F) | 0x80;
+
+	std::ostringstream stringStream;
+	stringStream << std::hex << std::setfill('0');
+	for (size_t i = 0; i < uuidBytes.size(); i++) {
+		stringStream << std::setw(2) << static_cast<unsigned int>(uuidBytes[i]);
+		if (i == 3 || i == 5 || i == 7 || i == 9) {
+			stringStream << "-";
+		}
+	}
+	
+	return stringStream.str();
 }
 
 void Entity::Delete() {

@@ -210,18 +210,19 @@ void World::DisplayImGui(unsigned int option) {
     if (option == 0) {
         EntityData playerData = player.GetEntityData();
 
-		ImGui::Text("Player name: %s", player.GetEntityData().name);
+		ImGui::Text("Player name: %s", player.GetEntityData().name.c_str());
+        ImGui::Text("Player UUID: %s", player.GetProtectedEntityData().UUID.c_str());
         ImGui::Text("Player gamemode: %s", player.GetGameModeString().c_str());
 		ImGui::Text("Player health: %d", static_cast<int>(player.GetEntityStats().health));
-		ImGui::Text("Player position: %f, %f, %f",
+		ImGui::Text("Player position: %.2f, %.2f, %.2f",
 			playerData.position.x,
 			playerData.position.y,
 			playerData.position.z);
-		ImGui::Text("Player orientation: %f, %f, %f", 
+		ImGui::Text("Player orientation: %.2f, %.2f, %.2f", 
 			playerData.orientation.x,
 			playerData.orientation.y, 
 			playerData.orientation.z);
-		ImGui::Text("Player velocity: %f, %f, %f",
+		ImGui::Text("Player velocity: %.2f, %.2f, %.2f",
 			player.GetEntityData().velocity.x,
 			player.GetEntityData().velocity.y,
 			player.GetEntityData().velocity.z);
@@ -253,7 +254,7 @@ void World::DisplayImGui(unsigned int option) {
         ImGui::Text("TPS: %.2f", ticksPerSecond);
         ImGui::Text("Until next tick: %.f", tickIntervalMs - tickAccumulator);
         ImGui::Text("Total chunks: %d", totalChunks);
-        ImGui::Text("Memory usage: %.2f MB", totalMemoryUsage / (1024.0 * 1024.0));
+        ImGui::Text("Rough memory usage: %.2f MB", totalMemoryUsage / (1024.0 * 1024.0));
         if (ImGui::CollapsingHeader("Chunk Generation Queue")) {
             std::queue<glm::ivec3> temporaryQueue = chunkGenerationQueue;
             while (!temporaryQueue.empty()) {
@@ -289,7 +290,7 @@ Chunk World::GetChunk(int chunkX, int chunkY, int chunkZ) {
 
 Entity World::GetEntity(std::string uuid) {
     // Later
-    return Entity(0, 0, 0);
+    return Entity(0, 0, 0, *this);
 }
 
 Player& World::GetPlayer() {

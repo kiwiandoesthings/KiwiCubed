@@ -1,8 +1,10 @@
 #include "Player.h"
+#include "ChunkHandler.h"
 #include "Entity.h"
 #include "Events.h"
-#include "World/ChunkHandler.h"
-#include <klogger.hpp>
+#include "World.h"
+#include <chrono>
+
 
 const char* gameModeStrings[] = {
 	"Survival",
@@ -10,7 +12,7 @@ const char* gameModeStrings[] = {
 };
 
 
-Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler) : Entity(), yaw(0), pitch(0), roll(0), width(640), height(480), chunkHandler(chunkHandler) {
+Player::Player(int playerX, int playerY, int playerZ, World& world) : world(world), Entity(0, 0, 0, world), yaw(0), pitch(0), roll(0), width(640), height(480) {
 	entityData.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
@@ -33,6 +35,10 @@ Player::Player(int playerX, int playerY, int playerZ, ChunkHandler& chunkHandler
 		entityData.applyCollision = true;
 		entityData.applyGravity = true;
 	}
+
+	protectedEntityData.UUID = CreateUUID();
+
+	chunkHandler = &world.GetChunkHandler();
 }
 
 void Player::Setup() {
@@ -78,9 +84,14 @@ void Player::Update() {
 		EntityData oldEntityData = entityData;
 		QueryInputs();
 		QueryMouseInputs();
-		entityData.isGrounded = GetGrounded(*this, chunkHandler);
-		ApplyPhysics(*this, chunkHandler, entityData.applyGravity, entityData.applyCollision);
+		Entity::Update();
+		entityData.isGrounded = GetGrounded(*this, *chunkHandler);
+		ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
 		if (entityData.isGrounded) {
+			if (entityData.isJumping) {
+				auto current = std::chrono::high_resolution_clock::now();
+				std::cout << "jump took " << std::chrono::duration_cast<std::chrono::milliseconds>(current - jumpStart).count() << "ms" << std::endl; 
+			}
 			entityData.isJumping = false;
 		}
 		
@@ -88,6 +99,8 @@ void Player::Update() {
 			EventManager::GetInstance().TriggerEvent("event/entity_moved_chunk", std::make_pair("globalChunkPosition", entityData.globalChunkPosition));
 		}
 	}
+
+	updates++;
 }
 
 void Player::QueryInputs() {
@@ -151,6 +164,7 @@ void Player::QueryInputs() {
 		if (inputHandler.GetKeyState(GLFW_KEY_SPACE) && entityData.isGrounded) {
 			shouldJump = true;
 			entityData.isJumping = true;
+			jumpStart = std::chrono::high_resolution_clock::now();
 		}
 
 		if (glm::length(movementVector) > 0.0f) {
@@ -158,7 +172,7 @@ void Player::QueryInputs() {
 		}
 
 		if (shouldJump) {
-			movementVector.y = 5;
+			movementVector.y = sqrt(2 * 9.81f * entityData.jumpHeight);
 		} else {
 			movementVector.y = entityData.velocity.y;
 		}
@@ -171,31 +185,31 @@ void Player::MouseButtonCallback(int button) {
 	glm::ivec3 chunkPosition = glm::ivec3(0, 0, 0);
 	glm::ivec3 blockPosition = glm::ivec3(0, 0, 0);
 	bool hit = 0;
-	if (RaycastWorld(entityData.position, entityData.orientation, 500, chunkHandler, blockPosition, chunkPosition, hit)) {
+	if (RaycastWorld(entityData.position, entityData.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit)) {
 		if (button == 0) {
-			chunkHandler.RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
+			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
-				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
 				if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1) {
-					chunkHandler.RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
+					chunkHandler->RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
 				}
 				if (blockPosition.y == 0 || blockPosition.y == chunkSize - 1) {
-					chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y - 1, chunkPosition.z, false);
+					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y - 1, chunkPosition.z, false);
 				}
 				if (blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
-					chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z - 1, false);
+					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z - 1, false);
 				}
 				if (blockPosition.x == chunkSize - 1) {
-					chunkHandler.RemeshChunk(chunkPosition.x + 1, chunkPosition.y, chunkPosition.z, false);
+					chunkHandler->RemeshChunk(chunkPosition.x + 1, chunkPosition.y, chunkPosition.z, false);
 				}
 				if (blockPosition.y == chunkSize - 1) {
-					chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y + 1, chunkPosition.z, false);
+					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y + 1, chunkPosition.z, false);
 				}
 				if (blockPosition.z == chunkSize - 1) {
-					chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z + 1, false);
+					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z + 1, false);
 				}
 			} else {
-				chunkHandler.RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
 			}
 		}
 	}

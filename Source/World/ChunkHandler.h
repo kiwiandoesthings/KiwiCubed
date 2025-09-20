@@ -25,7 +25,7 @@
 #include "VertexBufferObject.h"
 
 
-const unsigned int chunkSize = 32;
+const int chunkSize = 32;
 
 
 class Chunk;
