@@ -56,4 +56,5 @@ class Window {
 		InputHandler inputHandler = InputHandler("Window");
 
 		bool isFocused;
+		bool cursorLocked;
 };

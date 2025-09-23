@@ -36,17 +36,11 @@ void Entity::DamageEntity(float damage) {
 void Entity::Update() {
 	glm::ivec3 oldGlobalChunkPosition = entityData.globalChunkPosition;
 	entityData.globalChunkPosition = glm::ivec3(
-		(entityData.position.x >= 0)
-		? static_cast<int>(entityData.position.x / 32)
-		: static_cast<int>((entityData.position.x - 31) / 32),
-		(entityData.position.y >= 0)
-		? static_cast<int>(entityData.position.y / 32)
-		: static_cast<int>((entityData.position.y - 31) / 32),
-		(entityData.position.z >= 0)
-		? static_cast<int>(entityData.position.z / 32)
-		: static_cast<int>((entityData.position.z - 31) / 32)
+		Physics::FloorDiv(entityData.position.x, 32),
+		Physics::FloorDiv(entityData.position.y, 32),
+		Physics::FloorDiv(entityData.position.z, 32)
 	);
-	entityData.localChunkPosition = glm::ivec3(PositiveModulo(static_cast<int>(entityData.position.x), 32), PositiveModulo(static_cast<int>(entityData.position.y), 32) , PositiveModulo(static_cast<int>(entityData.position.z), 32));
+	entityData.localChunkPosition = glm::ivec3(Physics::PositiveModulo(static_cast<int>(entityData.position.x), 32), Physics::PositiveModulo(static_cast<int>(entityData.position.y), 32) , Physics::PositiveModulo(static_cast<int>(entityData.position.z), 32));
 
 	if (oldGlobalChunkPosition != entityData.globalChunkPosition) {
 		entityData.currentChunkPtr = &world.GetChunkHandler().GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);

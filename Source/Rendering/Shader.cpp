@@ -89,6 +89,17 @@ unsigned int Shader::UniformTest(const char* uniform) const {
     return uniformLocation;
 }
 
+void Shader::SetUniform1i(const char* uniform,  int value) const {
+    Bind();
+    unsigned int uniformLocation = UniformTest(uniform);
+
+    if (uniformLocation == -1) {
+        return;
+    }
+
+    GLCall(glUniform1i(uniformLocation, value));
+}
+
 void Shader::SetUniform1ui(const char* uniform, unsigned int value) const {
     Bind();
     unsigned int uniformLocation = UniformTest(uniform);
@@ -120,7 +131,7 @@ void Shader::SetUniform2fv(const char* uniform, glm::vec2 value) const {
         return;
     }
 
-    GLCall(glUniform2fv(uniformLocation, 1, glm::value_ptr((value))));
+    GLCall(glUniform2fv(uniformLocation, 1, glm::value_ptr(value)));
 }
 
 void Shader::SetUniform3fv(const char* uniform, glm::vec3 value) const {

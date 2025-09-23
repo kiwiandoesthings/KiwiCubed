@@ -174,6 +174,8 @@ void UIElement::Render() {
 
     UI& ui = UI::GetInstance();
 
+    ui.uiShaderProgram->Bind();
+
     ui.vertexArrayObject.Bind();
     ui.vertexBufferObject.Bind();
     ui.vertexBufferObject.SetBufferData(sizeof(vertices), vertices);
@@ -181,8 +183,7 @@ void UIElement::Render() {
     ui.vertexArrayObject.LinkAttribute(ui.vertexBufferObject, 1, 2, GL_FLOAT, false, sizeof(float) * 4, (void*)(sizeof(float) * 2));
     ui.indexBufferObject.Bind();
     ui.indexBufferObject.SetBufferData(sizeof(indices), indices);
-
-    ui.uiShaderProgram->Bind();
+        
     ui.vertexArrayObject.Bind();
     ui.vertexBufferObject.Bind();
     ui.indexBufferObject.Bind();

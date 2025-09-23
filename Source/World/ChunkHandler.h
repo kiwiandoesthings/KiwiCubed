@@ -32,6 +32,17 @@ class Chunk;
 class ChunkHandler;
 class World;
 
+struct ChunkHeightmap {
+    std::vector<uint64_t> heightmap;
+    std::vector<uint64_t> heightmapMask;
+
+    int bitsPerColumn;
+    int columnCount;
+
+    int maskBitsPerColumns;
+    int maskColumncount;
+};
+
 // I don't even kind of know what is happening here
 // Seriously what the hell
 struct TripleHash {
@@ -81,6 +92,7 @@ class ObservableInt {
 class Chunk {
     public:
         Block*** blocks = nullptr;
+        ChunkHeightmap heightmap;
         int chunkX = 0;
         int chunkY = 0;
         int chunkZ = 0;
@@ -103,6 +115,7 @@ class Chunk {
         void AllocateChunk();
         bool GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug);
         bool GenerateMesh(ChunkHandler& chunkHandler, const bool remesh);
+        bool GenerateHeightmap();
         void Render();
 
         void SetPosition(int newChunkX, int newChunkY, int newChunkZ);

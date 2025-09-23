@@ -48,9 +48,7 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 }
 
 void Texture::TextureUnit(Shader& shader, const char* uniform) {
-	GLuint textureUnit = glGetUniformLocation(shader.shaderProgramID, uniform);
-	shader.Bind();
-	GLCall(glUniform1i(textureUnit, slot - GL_TEXTURE0));
+	shader.SetUniform1i(uniform, slot - GL_TEXTURE0);
 }
 
 void Texture::SetAtlasSize(Shader& shader, glm::vec2 newAtlasSize) {

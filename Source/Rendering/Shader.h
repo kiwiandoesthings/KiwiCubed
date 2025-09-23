@@ -26,6 +26,7 @@ class Shader
 		Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath);
 
 		unsigned int UniformTest(const char* uniform) const;
+		void SetUniform1i(const char* uniform, int value) const;
 		void SetUniform1ui(const char* uniform, unsigned int value) const;
 		void SetUniform1fv(const char* uniform, glm::vec1 value) const;
 		void SetUniform2fv(const char* uniform, glm::vec2 value) const;

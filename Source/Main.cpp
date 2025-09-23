@@ -156,8 +156,8 @@ int main() {
 
 	// Create texture atlases (needs to be modularized)
 	Texture terrainAtlas("Mods/kiwicubed/Resources/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, "texture/terrain");
-	terrainAtlas.SetAtlasSize(terrainShaderProgram, glm::vec2(3, 3));
-	terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, glm::vec2(3, 3));
+	terrainAtlas.SetAtlasSize(terrainShaderProgram, glm::vec2(4, 4));
+	terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, glm::vec2(4, 4));
 	terrainAtlas.TextureUnit(terrainShaderProgram, "tex0");
 	terrainAtlas.TextureUnit(chunkDebugShaderProgram, "tex0");
 	Texture uiAtlas("Mods/kiwicubed/Resources/Textures/ui_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, "texture/gui");

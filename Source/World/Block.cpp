@@ -96,29 +96,29 @@ void Block::AddFaces(std::vector<GLfloat>& vertices, std::vector<GLuint>& indice
 
 			switch ((i - vertexOffset) / 5 % 4) {
 				case 0: {
-					float u0 = atlasData.xPosition / 3.0f; 
-					float v1 = (atlasData.yPosition + atlasData.ySize) / 3.0f; 
+					float u0 = atlasData.xPosition / 4.0f; 
+					float v1 = (atlasData.yPosition + atlasData.ySize) / 4.0f; 
 					vertices.emplace_back(u0);
 					vertices.emplace_back(v1);
 					break;
 				}
 				case 1: {
-					float u1 = (atlasData.xPosition + atlasData.xSize) / 3.0f; 
-					float v1 = (atlasData.yPosition + atlasData.ySize) / 3.0f;
+					float u1 = (atlasData.xPosition + atlasData.xSize) / 4.0f; 
+					float v1 = (atlasData.yPosition + atlasData.ySize) / 4.0f;
 					vertices.emplace_back(u1);
 					vertices.emplace_back(v1);
 					break;
 				}
 				case 2: {
-					float u1 = (atlasData.xPosition + atlasData.xSize) / 3.0f; 
-					float v0 = atlasData.yPosition / 3.0f; 
+					float u1 = (atlasData.xPosition + atlasData.xSize) / 4.0f; 
+					float v0 = atlasData.yPosition / 4.0f; 
 					vertices.emplace_back(u1);
 					vertices.emplace_back(v0);
 					break;
 				}
 				case 3: {
-					float u0 = atlasData.xPosition / 3.0f; 
-					float v0 = atlasData.yPosition / 3.0f; 
+					float u0 = atlasData.xPosition / 4.0f; 
+					float v0 = atlasData.yPosition / 4.0f; 
 					vertices.emplace_back(u0);
 					vertices.emplace_back(v0);
 					break;

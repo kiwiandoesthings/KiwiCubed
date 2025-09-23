@@ -3,8 +3,9 @@
 #include <GLError.h>
 #include <glad/glad.h>
 
-#include <DebugRenderer.h>
-#include <World.h>
+#include "DebugRenderer.h"
+#include "Physics.h"
+#include "World.h"
 
 class SingleplayerHandler {
 	public:

@@ -85,8 +85,8 @@ void Player::Update() {
 		QueryInputs();
 		QueryMouseInputs();
 		Entity::Update();
-		entityData.isGrounded = GetGrounded(*this, *chunkHandler);
-		ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
+		entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
+		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
 		if (entityData.isGrounded) {
 			if (entityData.isJumping) {
 				auto current = std::chrono::high_resolution_clock::now();
@@ -99,8 +99,6 @@ void Player::Update() {
 			EventManager::GetInstance().TriggerEvent("event/entity_moved_chunk", std::make_pair("globalChunkPosition", entityData.globalChunkPosition));
 		}
 	}
-
-	updates++;
 }
 
 void Player::QueryInputs() {
@@ -172,7 +170,7 @@ void Player::QueryInputs() {
 		}
 
 		if (shouldJump) {
-			movementVector.y = sqrt(2 * 9.81f * entityData.jumpHeight);
+			movementVector.y = sqrt(8 * 9.81f * entityData.jumpHeight);
 		} else {
 			movementVector.y = entityData.velocity.y;
 		}
@@ -185,7 +183,7 @@ void Player::MouseButtonCallback(int button) {
 	glm::ivec3 chunkPosition = glm::ivec3(0, 0, 0);
 	glm::ivec3 blockPosition = glm::ivec3(0, 0, 0);
 	bool hit = 0;
-	if (RaycastWorld(entityData.position, entityData.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit)) {
+	if (Physics::RaycastWorld(entityData.position, entityData.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit)) {
 		if (button == 0) {
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {

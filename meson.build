@@ -36,6 +36,7 @@ executable(
     'Source/Rendering/Camera.cpp',
     'Source/Rendering/DebugRenderer.cpp',
     'Source/Rendering/Renderer.cpp',
+    'Source/Rendering/RenderThread.cpp',
     'Source/Rendering/TextRenderer.cpp',
     'Source/Rendering/Texture.cpp',
     'Source/Rendering/Shader.cpp',

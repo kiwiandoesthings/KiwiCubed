@@ -61,6 +61,5 @@ class Player : public Entity {
 		float oldMouseX = 0;
 		float oldMouseY = 0;
 
-		int updates = 0;
 		std::chrono::time_point<std::chrono::high_resolution_clock> jumpStart;
 };

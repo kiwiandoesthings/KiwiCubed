@@ -28,13 +28,21 @@
 		{
 			"id": "kiwicubed:stone",
 			"variant": 3,
+			"xPosition": 3,
+			"yPosition": 0,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "kiwicubed:dirt",
+			"variant": 0,
 			"xPosition": 0,
 			"yPosition": 1,
 			"xSize": 1,
 			"ySize": 1
 		},
 		{
-			"id": "kiwicubed:chunk_debug_indicator",
+			"id": "kiwicubed:grass_side",
 			"variant": 0,
 			"xPosition": 1,
 			"yPosition": 1,
@@ -42,8 +50,8 @@
 			"ySize": 1
 		},
 		{
-			"id": "kiwicubed:chunk_debug_indicator",
-			"variant": 1,
+			"id": "kiwicubed:grass_top",
+			"variant": 0,
 			"xPosition": 2,
 			"yPosition": 1,
 			"xSize": 1,
@@ -51,8 +59,24 @@
 		},
 		{
 			"id": "kiwicubed:chunk_debug_indicator",
-			"variant": 2,
+			"variant": 0,
+			"xPosition": 3,
+			"yPosition": 1,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "kiwicubed:chunk_debug_indicator",
+			"variant": 0,
 			"xPosition": 0,
+			"yPosition": 2,
+			"xSize": 1,
+			"ySize": 1
+		},
+		{
+			"id": "kiwicubed:chunk_debug_indicator",
+			"variant": 2,
+			"xPosition": 1,
 			"yPosition": 2,
 			"xSize": 1,
 			"ySize": 1

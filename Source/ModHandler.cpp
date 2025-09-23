@@ -15,46 +15,50 @@ bool ModHandler::SetupTextureAtlasData() {
             std::string modResources = modFolder + "/Resources/Textures";
             
             try {
-                if (std::filesystem::exists(modResources) && std::filesystem::is_directory(modResources)) {
-                    for (const auto& entry : std::filesystem::directory_iterator(modResources)) {
-                        if (std::filesystem::is_regular_file(entry.status())) {
-                            auto filePath = entry.path();
-                            if (filePath.extension() == ".json") {
-                                std::ifstream file(filePath);
-                                json jsonData;
+                if (!std::filesystem::exists(modResources) && std::filesystem::is_directory(modResources)) {
+                    return false;
+                }
+                for (const auto& entry : std::filesystem::directory_iterator(modResources)) {
+                    if (std::filesystem::is_regular_file(entry.status())) {
+                        auto filePath = entry.path();
+                        if (filePath.extension() == ".json") {
+                            std::ifstream file(filePath);
 
-                                file >> jsonData;
+                            json jsonData;
 
-                                for (const auto& texture : jsonData["textures"]) {
-                                    std::string id = texture["id"];
-                                    unsigned short variant = texture["variant"];
-                                    unsigned char xPosition = texture["xPosition"];
-                                    unsigned char yPosition = texture["yPosition"];
-                                    unsigned char xSize = texture["xSize"];
-                                    unsigned char ySize = texture["ySize"];
+                            file >> jsonData;
 
-                                    size_t splitPosition = id.find(":");
-                                    std::string modID = "";
-                                    std::string blockID = "";
-                                    if (splitPosition != std::string::npos) {
-                                        modID = id.substr(0, splitPosition);
-                                        blockID = id.substr(splitPosition + 1);
-                                    } else {
-                                        WARN("Tried to register texture with invalid textureID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping texture");
-                                        continue;
-                                    }
+                            for (const auto& texture : jsonData["textures"]) {
+                                std::string id = texture["id"];
+                                unsigned short variant = texture["variant"];
+                                unsigned char xPosition = texture["xPosition"];
+                                unsigned char yPosition = texture["yPosition"];
+                                unsigned char xSize = texture["xSize"];
+                                unsigned char ySize = texture["ySize"];
 
-                                    textureAtlasDataMap[TextureStringID{
-                                        modID.c_str(), 
-                                        blockID.c_str()
-                                    }].push_back(TextureAtlasData{
-                                        variant,
-                                        xPosition,
-                                        yPosition,
-                                        xSize,
-                                        ySize
-                                    });
+                                size_t splitPosition = id.find(":");
+
+                                std::string modID = "";
+                                std::string blockID = "";
+
+                                if (splitPosition != std::string::npos) {
+                                    modID = id.substr(0, splitPosition);
+                                    blockID = id.substr(splitPosition + 1);
+                                } else {
+                                    WARN("Tried to register texture with invalid textureID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping texture");
+                                    continue;
                                 }
+
+                                textureAtlasDataMap[TextureStringID{
+                                    modID.c_str(), 
+                                    blockID.c_str()
+                                }].push_back(TextureAtlasData{
+                                    variant,
+                                    xPosition,
+                                    yPosition,
+                                    xSize,
+                                    ySize
+                                });
                             }
                         }
                     }

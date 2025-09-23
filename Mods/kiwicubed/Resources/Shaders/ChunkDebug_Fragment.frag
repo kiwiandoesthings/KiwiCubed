@@ -13,8 +13,8 @@ float epsilon = 0.00001;
 
 void main()
 {
-    float textureIndexX = mod(generationStatusOut + 4 - 1 + epsilon, atlasSize.x);
-    float textureIndexY = floor((generationStatusOut + 4 - 1 + epsilon) / atlasSize.y);
+    float textureIndexX = mod(generationStatusOut + 7 - 1 + epsilon, atlasSize.x);
+    float textureIndexY = floor((generationStatusOut + 7 - 1 + epsilon) / atlasSize.y);
 
     vec2 newTextureCoordinates = vec2(
         (textureCoordinatesOut.x / float(atlasSize.x)) + (textureIndexX / float(atlasSize.x)),

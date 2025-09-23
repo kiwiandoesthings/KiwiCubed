@@ -14,33 +14,36 @@ void Chunk::SetupRenderComponents() {
     renderComponentsSetup = true;
 }
 
-
 void Chunk::AllocateChunk() {
-    if (!isAllocated) {
-        debugVisualizationVertices = {
-    	     -1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  0.0f,  0.0f,
-    	      1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  1.0f,  0.0f,
-    	     1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 1.0f, 1.0f,
-    	    -1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 0.0f, 1.0f
-	    };
-
-	    debugVisualizationIndices = {
-        	0, 1, 2,
-        	0, 2, 3
-	    };
-
-        // Allocate memory for all the blocks in the chunk
-        blocks = new Block * *[chunkSize];
-        for (int i = 0; i < chunkSize; ++i) {
-            blocks[i] = new Block * [chunkSize];
-            for (int j = 0; j < chunkSize; ++j) {
-                blocks[i][j] = new Block[chunkSize];
-            }
-        }
-    }
-    else {
+    if (isAllocated) {
         //std::cerr << "[Chunk Setup / Warn] Trying to allocate chunk after it had already been allocated, aborting {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
     }
+
+    debugVisualizationVertices = {
+         -1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  0.0f,  0.0f,
+          1.0f * debugVertexScale, -1.0f * debugVertexScale,  0.0f * debugVertexScale,  1.0f,  0.0f,
+         1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 1.0f, 1.0f,
+        -1.0f * debugVertexScale, 1.0f * debugVertexScale, 0.0f * debugVertexScale, 0.0f, 1.0f
+	};
+
+	debugVisualizationIndices = {
+    	0, 1, 2,
+    	0, 2, 3
+	};
+
+    // Allocate memory for all the blocks in the chunk
+    blocks = new Block * *[chunkSize];
+    for (int i = 0; i < chunkSize; ++i) {
+        blocks[i] = new Block * [chunkSize];
+        for (int j = 0; j < chunkSize; ++j) {
+            blocks[i][j] = new Block[chunkSize];
+        }
+    }
+
+    heightmap.bitsPerColumn = static_cast<int>(std::ceil(std::log2(chunkSize)));
+    heightmap.columnCount = chunkSize * chunkSize;
+    heightmap.heightmap.resize(((heightmap.columnCount * heightmap.bitsPerColumn) + 63) / 64, 0);
+    heightmap.heightmapMask.resize((heightmap.columnCount + 63) / 4, 0);
 
     isAllocated = true;
     generationStatus = 1;
@@ -74,10 +77,11 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
         world.GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, *this, true, callerChunk);
     }
 
-    IsEmpty();
-    IsFull();
     isGenerated = true;
     generationStatus = 2;
+    IsEmpty();
+    IsFull();
+    GenerateHeightmap();
     return true;
 }
 
@@ -231,6 +235,53 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
     return true;
 }
 
+bool Chunk::GenerateHeightmap() {
+    OVERRIDE_LOG_NAME("Chunk Heightmap Generation");
+    if (!isGenerated) {
+        WARN("Tried to generate heightmap for ungenerated chunk {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+    }
+
+    int fullColumns = 0;
+
+    for (int blockX = 0; blockX < chunkSize; blockX++) {
+        for (int blockZ = 0; blockZ < chunkSize; blockZ++) {
+            bool foundLevel = false;
+            for (int blockY = chunkSize - 1; blockY >= 0 && foundLevel == false; blockY--) {
+                if (!blocks[blockX][blockY][blockZ].IsAir()) {
+                    int bitStart = (blockX + (blockZ * chunkSize)) * heightmap.bitsPerColumn;
+                    int longIndex = bitStart / 64;
+                    int bitOffset = bitStart % 64;
+
+                    int maskLongIndex = (blockX + (blockZ * chunkSize)) / 64;
+                    int maskBitIndex = (blockX + (blockZ * chunkSize)) % 64;
+
+                    uint64_t mask = ((1ULL << heightmap.bitsPerColumn) - 1) << bitOffset;
+                    heightmap.heightmap[longIndex] &= ~mask;
+                    heightmap.heightmap[longIndex] |= (uint64_t(blockY) << bitOffset);
+
+                    if (bitOffset + heightmap.bitsPerColumn > 64) {
+                        int bitsInNext = bitOffset + heightmap.bitsPerColumn - 64;
+                        heightmap.heightmap[longIndex + 1] &= ~((1ULL << bitsInNext) - 1);
+                        heightmap.heightmap[longIndex + 1] |= uint64_t(blockY) >> (heightmap.bitsPerColumn - bitsInNext);
+                    }
+
+                    bool fullColumn = (blockY == chunkSize - 1);
+                    if (fullColumn) {
+                        heightmap.heightmapMask[maskLongIndex] |= (1ULL << maskBitIndex);
+                        fullColumns++;
+                    } else {
+                        heightmap.heightmapMask[maskLongIndex] &= ~(1ULL << maskBitIndex);
+                    }
+
+                    foundLevel = true;
+                }
+            }
+        }
+    }
+
+    return fullColumns == chunkSize * chunkSize;
+}
+
 void Chunk::Render() {
     if (shouldRender) {
         if (!renderComponentsSetup) {
@@ -274,11 +325,28 @@ int Chunk::GetHeightmapLevelAt(glm::ivec2 position) {
         return -1;
     }
 
-    for (unsigned int iterator = 1; iterator < chunkSize; ++iterator) {
-        if (blocks[position.x][iterator][position.y].IsAir()) {
-            return iterator;
-        }
+    int index = position.x + (position.y * chunkSize);
+
+    int maskLongIndex = index / 64;
+    int maskBitIndex = index % 64;
+
+    int full = (heightmap.heightmapMask[maskLongIndex] >> maskBitIndex) & 1ULL;
+
+    if (full) {
+        return -1;
     }
+
+    int bitStart = index * heightmap.bitsPerColumn;
+    int longIndex = bitStart / 64;
+    int bitOffset = bitStart % 64;
+
+    uint64_t value = (heightmap.heightmap[longIndex] >> bitOffset);
+    if (bitOffset + heightmap.bitsPerColumn > 64) {
+        int bitsInNext = bitOffset + heightmap.bitsPerColumn - 64;
+        value |= heightmap.heightmap[longIndex + 1] << (heightmap.bitsPerColumn - bitsInNext);
+    }
+
+    return static_cast<int>(value & ((1ULL << heightmap.bitsPerColumn) - 1));
 
     return -1;
 }

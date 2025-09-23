@@ -20,6 +20,8 @@ SingleplayerHandler::SingleplayerHandler(DebugRenderer& debugRenderer) : singlep
 }
 
 void SingleplayerHandler::StartSingleplayerWorld(DebugRenderer& debugRenderer) {
+	Physics::Initialize();
+
 	EventManager& eventManager = EventManager::GetInstance();
 	eventManager.RegisterEvent("event/unload_world");
 	eventManager.AddEventToDo("event/unload_world", [&](Event& event) {

@@ -69,11 +69,13 @@ void Window::Setup() {
 void Window::QueryInputs() {
 	if (!isFocused) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		cursorLocked = false;
 		return;
 	}
 	if (isFocused) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_CURSOR_HIDDEN);
+		cursorLocked = true;
 	}
 }
 
