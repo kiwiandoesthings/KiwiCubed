@@ -21,9 +21,10 @@ TextureStringID* TextureManager::GetStringID(unsigned int numericalID) {
     if (iterator != numericalIDsToStringIDs.end()) {
         return &iterator->second;
     } else {
-        WARN("Tried to get string ID for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");
-        return nullptr;
+        ERR("Tried to get string ID for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");
+        psnip_trap();
     }
+    return &iterator->second;
 }
 
 unsigned int TextureManager::GetNumericalID(TextureStringID stringID) {
@@ -32,8 +33,8 @@ unsigned int TextureManager::GetNumericalID(TextureStringID stringID) {
     if (iterator != stringIDsToNumericalIDs.end()) {
         return iterator->second;
     } else {
-        WARN("Tried to get numerical ID for texture with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
-        return 0;
+        ERR("Tried to get numerical ID for texture with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
+        psnip_trap();
     }
     return stringIDsToNumericalIDs[stringID];
 }
@@ -44,9 +45,10 @@ std::vector<TextureAtlasData>* TextureManager::GetTextureAtlasData(unsigned int 
     if (iterator != atlasData.end()) {
         return &iterator->second;
     } else {
-        WARN("Tried to get atlas data for texture with numerical ID \"" + std::to_string(numericalID) + "\" that did not exist, aborting");
-        return nullptr;
+        ERR("Tried to get atlas data for texture with numerical ID \"" + std::to_string(numericalID) + "\" that did not exist, aborting");
+        psnip_trap();
     }
+    return &iterator->second;
 }
 
 std::vector<TextureAtlasData>* TextureManager::GetTextureAtlasData(TextureStringID stringID) {

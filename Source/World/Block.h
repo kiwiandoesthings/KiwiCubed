@@ -2,6 +2,7 @@
 
 #include <GLError.h>
 #include <glad/glad.h>
+#include <debug-trap.h>
 
 #include <bitset>
 #include <iostream>
@@ -141,8 +142,8 @@ class Block {
     public:
         // Don't need this, look at that one convo, remember chunk palettizing
         unsigned short blockID;
-        unsigned short variant;
-        //unsigned short blockState;
+        unsigned char variant;
+        unsigned char blockState;
 
         Block() : blockID(1), variant(0) {}
         Block(unsigned short blockID, unsigned short variant) : blockID(blockID), variant(variant) {}
@@ -154,8 +155,4 @@ class Block {
         void SetVariant(unsigned short newVariant);
 
         bool IsAir();
-
-        unsigned char blockX = 0;
-        unsigned char blockY = 0;
-        unsigned char blockZ = 0;
 };

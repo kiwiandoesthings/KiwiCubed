@@ -1,9 +1,11 @@
 #pragma once
 
 #include <klogger.hpp>
+#include <debug-trap.h>
 
 #include <string>
 #include <unordered_map>
+
 
 struct TextureStringID {
     std::string modName = "";
@@ -57,7 +59,7 @@ class TextureManager {
 
         std::unordered_map<unsigned int, std::vector<TextureAtlasData>> atlasData;
 
-        int latestTextureID = 1;
+        int latestTextureID = 0;
 };
 
 inline TextureManager textureManager = TextureManager();

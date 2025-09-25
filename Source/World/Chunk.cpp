@@ -79,16 +79,13 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
         for (int blockY = 0; blockY < chunkSize; ++blockY) {
             for (int blockZ = 0; blockZ < chunkSize; ++blockZ) {
                 Block& block = blocks[blockX][blockY][blockZ];
-                block.blockX = blockX;
-                block.blockY = blockY;
-                block.blockZ = blockZ;
                 float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
 	            if (blockY + (chunkY * chunkSize) < (density + 1) * 30) {
                     block.blockID = GetCachedID(TextureStringID{"kiwicubed", "stone"});
 		            block.variant = rand() % textureManager.GetTextureAtlasData(block.blockID)->size();
                     totalBlocks++;
 	            } else {
-		            block.blockID = 1;
+		            block.blockID = 0;
 		            block.variant = 0;
 	            }
             }
@@ -111,7 +108,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
 // Returns whether or not the mesh was generated
 bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
     OVERRIDE_LOG_NAME("Chunk Mesh Generation");
-    if (!(!isMeshed || remesh)) {
+    if (isMeshed && !remesh) {
         WARN("Trying to generate mesh for already meshed chunk, aborting");
         return false;
     }
@@ -126,8 +123,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
         return false;
     }
 
-    if (IsEmpty() || IsFull()) {
-        INFO("Chunk is empty or full, skipping mesh generation {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+    if (IsEmpty()) {
+        INFO("Chunk is empty, skipping mesh generation {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
         return false;
     }
 
@@ -387,7 +384,7 @@ void Chunk::SetTotalBlocks(unsigned short newTotalBlocks) {
 }
 
 bool Chunk::GetMeshable(ChunkHandler& chunkHandler) const {
-    if (!isAllocated || !isGenerated || isEmpty || isFull) {
+    if (isMeshed || !isAllocated || !isGenerated || isEmpty) {
         return false;
     } else {
         Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ, false);

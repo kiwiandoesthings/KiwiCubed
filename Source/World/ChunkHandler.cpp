@@ -107,7 +107,7 @@ void ChunkHandler::RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNe
 void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID) {
     Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ, false);
     Block& block = chunk.blocks[blockX][blockY][blockZ];
-    if (block.IsAir() ^ (newBlockID == 1)) {
+    if (block.IsAir() ^ (newBlockID == 0)) {
         int currentBlocks = chunk.GetTotalBlocks();
         if (newBlockID == 0) {
             chunk.SetTotalBlocks(currentBlocks - 1);
@@ -120,7 +120,7 @@ void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int 
 }
 
 void ChunkHandler::RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ) {
-    AddBlock(chunkX, chunkY, chunkZ, blockX, blockY, blockZ, 1);
+    AddBlock(chunkX, chunkY, chunkZ, blockX, blockY, blockZ, 0);
 }
 
 void ChunkHandler::Delete() {
