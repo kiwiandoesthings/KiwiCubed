@@ -40,7 +40,11 @@ void Entity::Update() {
 		Physics::FloorDiv(entityData.position.y, 32),
 		Physics::FloorDiv(entityData.position.z, 32)
 	);
-	entityData.localChunkPosition = glm::ivec3(Physics::PositiveModulo(static_cast<int>(entityData.position.x), 32), Physics::PositiveModulo(static_cast<int>(entityData.position.y), 32) , Physics::PositiveModulo(static_cast<int>(entityData.position.z), 32));
+	entityData.localChunkPosition = glm::ivec3(
+		Physics::PositiveModulo(entityData.position.x, 32), 
+		Physics::PositiveModulo(entityData.position.y, 32) , 
+		Physics::PositiveModulo(entityData.position.z, 32)
+	);
 
 	if (oldGlobalChunkPosition != entityData.globalChunkPosition) {
 		entityData.currentChunkPtr = &world.GetChunkHandler().GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);

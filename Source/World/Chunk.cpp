@@ -72,7 +72,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
             for (int blockZ = 0; blockZ < chunkSize; ++blockZ) {
                 Block& block = GetBlock(blockX, blockY, blockZ);
                 float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
-	            if (blockY + (chunkY * chunkSize) < (density + 1) * 30) {
+	            if (blockY + (chunkY * chunkSize) < (density) * 60) {
                     block.blockID = GetCachedID(TextureStringID{"kiwicubed", "stone"});
 		            block.variant = rand() % textureManager.GetTextureAtlasData(block.blockID)->size();
                     totalBlocks++;
@@ -164,11 +164,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                                         break;
                                     }
                                 }
-                                if (!positiveXChunk.isGenerated) {
-                                    break;
-                                }
-                                if (blockX == chunkSize - 1) {
-                                    if (GetBlock(0, blockY, blockZ).IsAir()) {
+                                else if (blockX == chunkSize - 1 && positiveXChunk.isGenerated) {
+                                    if (positiveXChunk.GetBlock(0, blockY, blockZ).IsAir()) {
                                         facesToAdd.emplace_back(RIGHT);
                                         break;
                                     }

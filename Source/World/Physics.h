@@ -46,17 +46,19 @@ class Physics {
 		static bool RaycastWorld(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, int maxDistance, ChunkHandler& chunkHandler, glm::ivec3& hitBlockPosition, glm::ivec3& hitChunkPosition, bool& isHit);
 		static bool GetGrounded(Entity& entity, ChunkHandler& chunkHandler);
 
-		static inline int PositiveModulo(int a, int b) {
-			return (a % b + b) % b;
+		static inline int PositiveModulo(float value, int modulator) {
+    		int newValue = static_cast<int>(std::floor(value));
+    		int result = newValue % modulator;
+    		return (result < 0) ? result + modulator : result;
 		}
 
-		static inline int FloorMod(int a, int b) {
-    		int m = a % b;
-    		return (m < 0) ? m + b : m;
-		}
-
-		static inline int FloorDiv(int a, int b) {
-    		return (a >= 0) ? a / b : (a - b + 1) / b;
+		static inline int FloorDiv(float value, int divisor) {
+    		int newValue = static_cast<int>(std::floor(value));
+    		int result = newValue / divisor;
+    		if (value < 0 && newValue % divisor != 0) {
+        		result -= 1;
+    		}
+    		return result;
 		}
 
 	private:
