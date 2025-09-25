@@ -54,7 +54,7 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 			targetChunk = newEntityData.currentChunkPtr;
 		}
 
-		Block& block = targetChunk->blocks[blockPosition.blockPosition.x][blockPosition.blockPosition.y][blockPosition.blockPosition.z];
+		Block& block = targetChunk->GetBlock(blockPosition.blockPosition.x, blockPosition.blockPosition.y, blockPosition.blockPosition.z);
 
 		if (!block.IsAir()) {
 			glm::vec3 min2 = glm::vec3(blockPosition.blockPosition.x + (blockPosition.chunkPosition.x * chunkSize), blockPosition.blockPosition.y + (blockPosition.chunkPosition.y * chunkSize), blockPosition.blockPosition.z + (blockPosition.chunkPosition.z * chunkSize));
@@ -99,7 +99,7 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 			targetChunk = newEntityData.currentChunkPtr;
 		}
 
-		Block& block = targetChunk->blocks[blockPosition.blockPosition.x][blockPosition.blockPosition.y][blockPosition.blockPosition.z];
+		Block& block = targetChunk->GetBlock(blockPosition.blockPosition.x, blockPosition.blockPosition.y, blockPosition.blockPosition.z);
 
 		if (!block.IsAir()) {
 			glm::vec3 min2 = glm::vec3(blockPosition.blockPosition.x + (blockPosition.chunkPosition.x * chunkSize), blockPosition.blockPosition.y + (blockPosition.chunkPosition.y * chunkSize), blockPosition.blockPosition.z + (blockPosition.chunkPosition.z * chunkSize));
@@ -210,7 +210,7 @@ bool Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& direction, 
 
 		Chunk chunk = chunkHandler.GetChunk(currentChunk.x, currentChunk.y, currentChunk.z, false);
 		if (chunk.isGenerated) {
-			Block& block = chunk.blocks[localBlockPos.x][localBlockPos.y][localBlockPos.z];
+			Block& block = chunk.GetBlock(localBlockPos.x, localBlockPos.y, localBlockPos.z);
 			if (!block.IsAir()) {
 				blockHitPosition = glm::ivec3(PositiveModulo(currentBlock.x, chunkSize), PositiveModulo(currentBlock.y, chunkSize), PositiveModulo(currentBlock.z, chunkSize));
 				chunkHitPosition = currentChunk;

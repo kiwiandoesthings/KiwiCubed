@@ -106,7 +106,7 @@ void ChunkHandler::RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNe
 
 void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID) {
     Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ, false);
-    Block& block = chunk.blocks[blockX][blockY][blockZ];
+    Block& block = chunk.GetBlock(blockX, blockY, blockZ);
     if (block.IsAir() ^ (newBlockID == 0)) {
         int currentBlocks = chunk.GetTotalBlocks();
         if (newBlockID == 0) {

@@ -25,7 +25,7 @@
 #include "VertexBufferObject.h"
 
 
-const int chunkSize = 32;
+const char chunkSize = 32;
 
 
 class Chunk;
@@ -91,7 +91,7 @@ class ObservableInt {
 
 class Chunk {
     public:
-        Block*** blocks = nullptr;
+        Block* blocks = new Block[chunkSize * chunkSize * chunkSize];
         ChunkHeightmap heightmap;
         int chunkX = 0;
         int chunkY = 0;
@@ -118,8 +118,10 @@ class Chunk {
         bool GenerateHeightmap();
         void Render();
 
+        inline Block& GetBlock(const unsigned char blockX, const unsigned char blockY, const unsigned char blockZ) const;
+
         void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
-    
+
         int GetTotalBlocks() const;
         void SetTotalBlocks(unsigned short newTotalBlocks);
 
