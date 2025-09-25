@@ -9,7 +9,7 @@ void BlockManager::RegisterBlockType(unsigned int numericalID, BlockType blockTy
 }
 
 BlockType* BlockManager::GetBlockType(TextureStringID blockStringID) {
-    return &blockTypes[static_cast<unsigned short>(*textureManager.GetNumericalID(blockStringID))];
+    return &blockTypes[static_cast<unsigned short>(textureManager.GetNumericalID(blockStringID))];
 }
 
 BlockType* BlockManager::GetBlockType(unsigned short blockID) {

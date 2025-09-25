@@ -20,6 +20,7 @@
 #include "Texture.h"
 #include "TextureManager.h"
 
+
 enum FaceDirection {
     FRONT,
     BACK,
@@ -27,6 +28,73 @@ enum FaceDirection {
     RIGHT,
     TOP,
     BOTTOM
+};
+
+struct BlockModel {
+    inline static GLfloat faceVertices[120] = {
+    	// Positions       // Texture Coordinates
+    	// Front
+    	0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+    	1.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+    	1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+    	0.0f, 1.0f, 0.0f,  1.0f, 1.0f,
+
+    	// Back	
+    	0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+    	1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+    	1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+    	0.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+    
+    	// Left						  
+    	0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+    	0.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+    	0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+    	0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+    
+    	// Right			  
+    	1.0f, 1.0f, 0.0f,  1.0f, 1.0f,
+    	1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+    	1.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+    	1.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+    
+    	// Top						  
+    	0.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+    	1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+    	1.0f, 1.0f, 0.0f,  0.0f, 0.0f,
+    	0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+    
+    	// Bottom					  
+    	0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+    	1.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+    	1.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+    	0.0f, 0.0f, 0.0f,  0.0f, 0.0f
+    };
+
+    inline static GLuint faceIndices[36] = {
+    	// Front
+    	0, 1, 2,
+    	2, 3, 0,
+
+    	// Back
+    	4, 5, 6,
+    	6, 7, 4,
+
+    	// Left
+    	8, 9, 10,
+    	10, 11, 8,
+
+    	//Right
+    	12, 13, 14,
+    	14, 15, 12,
+
+    	//Top
+    	16, 17, 18,
+    	18, 19, 16,
+
+    	//Bottom
+    	20, 21, 22,
+    	22, 23, 20
+    };
 };
 
 struct BlockType {
@@ -71,11 +139,13 @@ inline BlockManager blockManager = BlockManager();
 
 class Block {
     public:
-        Block() : blockX(0), blockY(0), blockZ(0), blockID(0) {}
-        Block(unsigned short blockID) : blockX(0), blockY(0), blockZ(0), blockID(blockID) {}
+        // Don't need this, look at that one convo, remember chunk palettizing
+        unsigned short blockID;
+        unsigned short variant;
+        //unsigned short blockState;
 
-        void GenerateBlock(FastNoiseLite& noise, unsigned short blockX, unsigned short blockY, unsigned short blockZ, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, bool debug);
-        void AddFaces(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, std::vector<FaceDirection>* faceDirections, int chunkX, int chunkY, int chunkZ, unsigned int chunkSize, TextureAtlasData& atlasData);
+        Block() : blockID(1), variant(0) {}
+        Block(unsigned short blockID, unsigned short variant) : blockID(blockID), variant(variant) {}
 
         unsigned int GetBlockID() const;
         void SetBlockID(unsigned int newBlockID);
@@ -85,13 +155,7 @@ class Block {
 
         bool IsAir();
 
-    private:
-        // Don't need this, look at that one convo, remember chunk palettizing
-        unsigned short blockX;
-        unsigned short blockY;
-        unsigned short blockZ;
-
-        unsigned short blockID;
-        unsigned short variant;
-        //unsigned short blockState;
+        unsigned char blockX = 0;
+        unsigned char blockY = 0;
+        unsigned char blockZ = 0;
 };

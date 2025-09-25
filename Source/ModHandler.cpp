@@ -1,4 +1,5 @@
 #include "ModHandler.h"
+#include <chrono>
 
 
 ModHandler::ModHandler() {}
@@ -6,12 +7,31 @@ ModHandler::ModHandler() {}
 
 bool ModHandler::SetupTextureAtlasData() {
     OVERRIDE_LOG_NAME("Mod Loading");
+    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
 
     std::unordered_map<TextureStringID, std::vector<TextureAtlasData>> textureAtlasDataMap;
 
     for (const auto& entry : std::filesystem::directory_iterator("Mods")) {
         if (entry.is_directory()) {
             std::string modFolder = entry.path().string();
+            
+            std::ifstream file(modFolder + "/mod.json");
+
+            if (!file.is_open()) {
+                WARN("Could not find or open mod.json for folder in mods directory");
+                return false;
+            }
+
+            json jsonData;
+            file >> jsonData;
+
+            std::string name = jsonData["mod_title"];
+            std::string version = jsonData["mod_version"];
+            std::string authors = jsonData["mod_authors"];
+            std::string builtForVersion = jsonData["built_for_game_version"];
+
+            INFO("Found mod \"" + name + "\", version: " + version + ", by: " + authors + ", built for game version " + builtForVersion);
+
             std::string modResources = modFolder + "/Resources/Textures";
             
             try {
@@ -88,6 +108,8 @@ bool ModHandler::SetupTextureAtlasData() {
             blockTypeData.second
         });
     } 
+
+    INFO("Loading mods took " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startTime).count()) + "us");
 
     return true;
 }

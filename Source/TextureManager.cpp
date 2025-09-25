@@ -26,16 +26,16 @@ TextureStringID* TextureManager::GetStringID(unsigned int numericalID) {
     }
 }
 
-unsigned int* TextureManager::GetNumericalID(TextureStringID stringID) {
+unsigned int TextureManager::GetNumericalID(TextureStringID stringID) {
     OVERRIDE_LOG_NAME("Texture Manager");
     auto iterator = stringIDsToNumericalIDs.find(stringID);
     if (iterator != stringIDsToNumericalIDs.end()) {
-        return &iterator->second;
+        return iterator->second;
     } else {
         WARN("Tried to get numerical ID for texture with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
-        return nullptr;
+        return 0;
     }
-    return &stringIDsToNumericalIDs[stringID];
+    return stringIDsToNumericalIDs[stringID];
 }
 
 std::vector<TextureAtlasData>* TextureManager::GetTextureAtlasData(unsigned int numericalID) {
@@ -50,7 +50,7 @@ std::vector<TextureAtlasData>* TextureManager::GetTextureAtlasData(unsigned int 
 }
 
 std::vector<TextureAtlasData>* TextureManager::GetTextureAtlasData(TextureStringID stringID) {
-    return GetTextureAtlasData(*GetNumericalID(stringID));
+    return GetTextureAtlasData(GetNumericalID(stringID));
 }
 
 TextureManager::~TextureManager() {}

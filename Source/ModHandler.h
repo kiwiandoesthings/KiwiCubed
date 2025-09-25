@@ -2,6 +2,7 @@
 
 #include <klogger.hpp>
 
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -20,7 +21,4 @@ class ModHandler {
         ~ModHandler();
 
        bool SetupTextureAtlasData(); 
-
-    private:
-    
 };

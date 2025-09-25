@@ -1,6 +1,7 @@
 #include "ChunkHandler.h"
 #include "World.h"
 #include <klogger.hpp>
+#include <wingdi.h>
 
 // Currently just sets up the VBO, VAO, and IBO
 void Chunk::SetupRenderComponents() {
@@ -61,13 +62,35 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
 
     FastNoiseLite& noise = world.GetNoise();
 
+    std::unordered_map<TextureStringID, unsigned short> blockIDCache;
+
+    auto GetCachedID = [&](const TextureStringID& textureStringID) -> unsigned short {
+        auto iterator = blockIDCache.find(textureStringID);
+        if (iterator != blockIDCache.end()) {
+            return iterator->second;
+        }
+
+        unsigned short numericalID = static_cast<unsigned short>(textureManager.GetNumericalID(textureStringID));
+        blockIDCache[textureStringID] = numericalID;
+        return numericalID;
+    };
+
     for (int blockX = 0; blockX < chunkSize; ++blockX) {
         for (int blockY = 0; blockY < chunkSize; ++blockY) {
             for (int blockZ = 0; blockZ < chunkSize; ++blockZ) {
-                blocks[blockX][blockY][blockZ].GenerateBlock(noise, blockX, blockY, blockZ, chunkX, chunkY, chunkZ, chunkSize, debug);
-                if (blocks[blockX][blockY][blockZ].GetBlockID() != 0) {
+                Block& block = blocks[blockX][blockY][blockZ];
+                block.blockX = blockX;
+                block.blockY = blockY;
+                block.blockZ = blockZ;
+                float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
+	            if (blockY + (chunkY * chunkSize) < (density + 1) * 30) {
+                    block.blockID = GetCachedID(TextureStringID{"kiwicubed", "stone"});
+		            block.variant = rand() % textureManager.GetTextureAtlasData(block.blockID)->size();
                     totalBlocks++;
-                }
+	            } else {
+		            block.blockID = 1;
+		            block.variant = 0;
+	            }
             }
         }
     }
@@ -119,12 +142,26 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
     Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1, true);     // Negative Z
 
     std::vector<FaceDirection> facesToAdd;
+    facesToAdd.reserve(6);
 
-    for (int x = 0; x < chunkSize; ++x) {
-        for (int y = 0; y < chunkSize; ++y) {
-            for (int z = 0; z < chunkSize; ++z) {
-                if (blocks[x][y][z].GetBlockID() != 0) {
-                    Block& block = blocks[x][y][z];
+    std::unordered_map<unsigned char, std::vector<TextureAtlasData>> textureAtlasDataCache;
+
+    auto GetCachedAtlasData = [&](const unsigned char numericalID) -> const std::vector<TextureAtlasData>& {
+        auto iterator = textureAtlasDataCache.find(numericalID);
+        if (iterator != textureAtlasDataCache.end()) {
+            return iterator->second;
+        }
+
+        std::vector<TextureAtlasData> textureAtlasData = *textureManager.GetTextureAtlasData(numericalID);
+        auto [newIterator, inserted] = textureAtlasDataCache.emplace(numericalID, std::move(textureAtlasData));
+        return newIterator->second;
+    };
+
+    for (int blockX = 0; blockX < chunkSize; ++blockX) {
+        for (int blockY = 0; blockY < chunkSize; ++blockY) {
+            for (int blockZ = 0; blockZ < chunkSize; ++blockZ) {
+                if (!blocks[blockX][blockY][blockZ].IsAir()) {
+                    Block& block = blocks[blockX][blockY][blockZ];
 
                     facesToAdd.clear();
                     
@@ -132,8 +169,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                         FaceDirection faceDirection = static_cast<FaceDirection>(direction);
                         switch (faceDirection) {
                             case RIGHT:
-                                if (x < chunkSize - 1) {
-                                    if (blocks[x + 1][y][z].GetBlockID() == 0) {
+                                if (blockX < chunkSize - 1) {
+                                    if (blocks[blockX + 1][blockY][blockZ].IsAir()) {
                                         facesToAdd.emplace_back(RIGHT);
                                         break;
                                     }
@@ -141,78 +178,78 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                                 if (!positiveXChunk.isGenerated) {
                                     break;
                                 }
-                                if (x == chunkSize - 1) {
-                                    if (positiveXChunk.blocks[0][y][z].GetBlockID() == 0) {
+                                if (blockX == chunkSize - 1) {
+                                    if (positiveXChunk.blocks[0][blockY][blockZ].IsAir()) {
                                         facesToAdd.emplace_back(RIGHT);
                                         break;
                                     }
                                 }
                                 break;
                             case LEFT:
-                                if (x > 0) {
-                                    if (blocks[x - 1][y][z].GetBlockID() == 0) {
+                                if (blockX > 0) {
+                                    if (blocks[blockX - 1][blockY][blockZ].IsAir()) {
                                         facesToAdd.emplace_back(LEFT);
                                         break;
                                     }
                                 }
-                                else if (x == 0 && negativeXChunk.isGenerated) {
-                                    if (negativeXChunk.blocks[chunkSize - 1][y][z].GetBlockID() == 0) {
+                                else if (blockX == 0 && negativeXChunk.isGenerated) {
+                                    if (negativeXChunk.blocks[chunkSize - 1][blockY][blockZ].IsAir()) {
                                         facesToAdd.emplace_back(LEFT);
                                         break;
                                     }
                                 }
                                 break;
                             case TOP:
-                                if (y < chunkSize - 1) {
-                                    if (blocks[x][y + 1][z].GetBlockID() == 0) {
+                                if (blockY < chunkSize - 1) {
+                                    if (blocks[blockX][blockY + 1][blockZ].IsAir()) {
                                         facesToAdd.emplace_back(TOP);
                                         break;
                                     }
                                 }
-                                else if (y == chunkSize - 1 && positiveYChunk.isGenerated) {
-                                    if (positiveYChunk.blocks[x][0][z].GetBlockID() == 0) {
+                                else if (blockY == chunkSize - 1 && positiveYChunk.isGenerated) {
+                                    if (positiveYChunk.blocks[blockX][0][blockZ].IsAir()) {
                                         facesToAdd.emplace_back(TOP);
                                         break;
                                     }
                                 }
                                 break;
                             case BOTTOM:
-                                if (y > 0) {
-                                    if (blocks[x][y - 1][z].GetBlockID() == 0) {
+                                if (blockY > 0) {
+                                    if (blocks[blockX][blockY - 1][blockZ].IsAir()) {
                                         facesToAdd.emplace_back(BOTTOM);
                                         break;
                                     }
                                 }
-                                else if (y == 0 && negativeYChunk.isGenerated) {
-                                    if (negativeYChunk.blocks[x][chunkSize - 1][z].GetBlockID() == 0) {
+                                else if (blockY == 0 && negativeYChunk.isGenerated) {
+                                    if (negativeYChunk.blocks[blockX][chunkSize - 1][blockZ].IsAir()) {
                                         facesToAdd.emplace_back(BOTTOM);
                                         break;
                                     }
                                 }
                                 break;
                             case BACK:
-                                if (z < chunkSize - 1) {
-                                    if (blocks[x][y][z + 1].GetBlockID() == 0) {
+                                if (blockZ < chunkSize - 1) {
+                                    if (blocks[blockX][blockY][blockZ + 1].IsAir()) {
                                         facesToAdd.emplace_back(BACK);
                                         break;
                                     }
                                 }
-                                else if (z == chunkSize - 1 && positiveZChunk.isGenerated) {
-                                    if (positiveZChunk.blocks[x][y][0].GetBlockID() == 0) {
+                                else if (blockZ == chunkSize - 1 && positiveZChunk.isGenerated) {
+                                    if (positiveZChunk.blocks[blockX][blockY][0].IsAir()) {
                                         facesToAdd.emplace_back(BACK);
                                         break;
                                     }
                                 }
                                 break;
                             case FRONT:
-                                if (z > 0) {
-                                    if (blocks[x][y][z - 1].GetBlockID() == 0) {
+                                if (blockZ > 0) {
+                                    if (blocks[blockX][blockY][blockZ - 1].IsAir()) {
                                         facesToAdd.emplace_back(FRONT);
                                         break;
                                     }
                                 }
-                                else if (z == 0 && negativeZChunk.isGenerated) {
-                                    if (negativeZChunk.blocks[x][y][chunkSize - 1].GetBlockID() == 0) {
+                                else if (blockZ == 0 && negativeZChunk.isGenerated) {
+                                    if (negativeZChunk.blocks[blockX][blockY][chunkSize - 1].IsAir()) {
                                         facesToAdd.emplace_back(FRONT);
                                         break;
                                     }
@@ -221,9 +258,53 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                         }
                     }
 
-                    TextureAtlasData atlasData = (*textureManager.GetTextureAtlasData(block.GetBlockID()))[block.GetVariant()];
-                    block.AddFaces(vertices, indices, &facesToAdd, chunkX, chunkY, chunkZ, chunkSize, atlasData);
+                    TextureAtlasData atlasData = GetCachedAtlasData(block.GetBlockID())[block.GetVariant()];
 
+                    for (unsigned int iterator = 0; iterator < facesToAdd.size(); ++iterator) {
+		                GLuint vertexOffset = static_cast<GLuint>(facesToAdd.at(iterator)) * 20;
+		                GLuint baseIndex = static_cast<GLuint>(vertices.size() / 5);
+
+		                for (size_t i = vertexOffset; i < vertexOffset + 20; i += 5) {
+		                	vertices.emplace_back((BlockModel::faceVertices[i + 0]) + static_cast<GLfloat>(blockX + (chunkX * static_cast<int>(chunkSize))));
+		                	vertices.emplace_back((BlockModel::faceVertices[i + 1]) + static_cast<GLfloat>(blockY + (chunkY * static_cast<int>(chunkSize))));
+		                	vertices.emplace_back((BlockModel::faceVertices[i + 2]) + static_cast<GLfloat>(blockZ + (chunkZ * static_cast<int>(chunkSize))));
+                        
+		                	switch ((i - vertexOffset) / 5 % 4) {
+		                		case 0: {
+		                			float u0 = atlasData.xPosition / 4.0f; 
+		                			float v1 = (atlasData.yPosition + atlasData.ySize) / 4.0f; 
+		                			vertices.emplace_back(u0);
+		                			vertices.emplace_back(v1);
+		                			break;
+		                		}
+		                		case 1: {
+		                			float u1 = (atlasData.xPosition + atlasData.xSize) / 4.0f; 
+		                			float v1 = (atlasData.yPosition + atlasData.ySize) / 4.0f;
+		                			vertices.emplace_back(u1);
+		                			vertices.emplace_back(v1);
+		                			break;
+		                		}
+		                		case 2: {
+		                			float u1 = (atlasData.xPosition + atlasData.xSize) / 4.0f; 
+		                			float v0 = atlasData.yPosition / 4.0f; 
+		                			vertices.emplace_back(u1);
+		                			vertices.emplace_back(v0);
+		                			break;
+		                		}
+		                		case 3: {
+		                			float u0 = atlasData.xPosition / 4.0f; 
+		                			float v0 = atlasData.yPosition / 4.0f; 
+		                			vertices.emplace_back(u0);
+		                			vertices.emplace_back(v0);
+		                			break;
+		                		}
+		                	}
+		                }
+                    
+		                for (size_t i = 0; i < 6; ++i) {
+		                	indices.emplace_back(static_cast<GLuint>(baseIndex + BlockModel::faceIndices[i]));
+		                }
+	                }               
                 }
             }
         }

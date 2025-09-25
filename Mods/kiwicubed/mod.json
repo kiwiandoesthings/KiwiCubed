@@ -1,6 +1,7 @@
 {
 	"mod_title": "KiwiCubed",
-	"mod_version": "0.03pre-alpha",
+	"mod_version": "0.04pre-alpha",
 	"mod_authors": "KiwiCubed Engine contributors",
-	"built_for_game_version": "0.0.3pre-alpha"
+	"built_for_game_version": "0.0.4pre-alpha",
+	"mod_description": "wow i'm super cool and awesome"
 }

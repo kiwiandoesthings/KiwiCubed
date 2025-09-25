@@ -46,7 +46,7 @@ class TextureManager {
         void RegisterTexture(MetaTexture texture);
 
         TextureStringID* GetStringID(unsigned int numericalID);
-        unsigned int* GetNumericalID(TextureStringID stringID);
+        unsigned int GetNumericalID(TextureStringID stringID);
 
         std::vector<TextureAtlasData>* GetTextureAtlasData(unsigned int numericalID);
         std::vector<TextureAtlasData>* GetTextureAtlasData(TextureStringID stringID);
@@ -57,7 +57,7 @@ class TextureManager {
 
         std::unordered_map<unsigned int, std::vector<TextureAtlasData>> atlasData;
 
-        int latestTextureID = 0;
+        int latestTextureID = 1;
 };
 
 inline TextureManager textureManager = TextureManager();
