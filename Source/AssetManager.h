@@ -1,0 +1,50 @@
+#pragma once
+
+#include <klogger.hpp>
+#include <debug-trap.h>
+
+#include <string>
+#include <unordered_map>
+
+#include "ModHandler.h"
+
+struct TextureAtlasData {
+    const unsigned short variant = 0;
+    const unsigned char xPosition = 0;
+    const unsigned char yPosition = 0;
+    const unsigned char xSize = 0;
+    const unsigned char ySize = 0;
+};
+
+struct MetaTexture {
+    AssetStringID stringID;
+    std::vector<TextureAtlasData> atlasData;
+
+    bool operator==(const MetaTexture& other) const {
+        return stringID == other.stringID;
+    }
+};
+
+class AssetManager {
+    public:
+        AssetManager();
+        ~AssetManager();
+
+        void RegisterTexture(MetaTexture texture);
+
+        AssetStringID* GetStringID(unsigned int numericalID);
+        unsigned int GetNumericalID(AssetStringID stringID);
+
+        std::vector<TextureAtlasData>* GetTextureAtlasData(unsigned int numericalID);
+        std::vector<TextureAtlasData>* GetTextureAtlasData(AssetStringID stringID);
+
+    private:
+        std::unordered_map<unsigned int, AssetStringID> numericalIDsToStringIDs;
+        std::unordered_map<AssetStringID, unsigned int> stringIDsToNumericalIDs;
+
+        std::unordered_map<unsigned int, std::vector<TextureAtlasData>> atlasData;
+
+        int latestTextureID = 0;
+};
+
+inline AssetManager assetManager = AssetManager();

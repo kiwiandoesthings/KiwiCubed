@@ -6,6 +6,8 @@
 		"window_title": "KiwiCubed Engine",
 
 		"_comment": "window_type can be: fullscreen, window_borderless, window_maximized, or window",
-		"window_type": "window_maximized"
+		"window_type": "window_maximized",
+		
+		"debug_mode": true
 	}
 }

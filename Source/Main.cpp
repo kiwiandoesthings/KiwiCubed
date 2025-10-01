@@ -52,15 +52,17 @@ using json = nlohmann::json;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 
+std::string projectVersion;
 int windowWidth;
 int windowHeight;
 std::string windowTitle;
 std::string windowType;
-std::string projectVersion;
+bool debugMode;
 
 // This main function is getting out of hand
 // yes but hands are in pocket so is it still in the pocket or is it out of pocket? - Astra
 int main() {
+	OVERRIDE_LOG_NAME("Initialization");
 	// Make it so on laptops, it will request the dGPU if possible, without this, you have to force it to use the dGPU
 	#ifdef __linux__
 	// For NVIDIA GPUs
@@ -73,21 +75,23 @@ int main() {
 
 	std::ifstream file("init_config.json");
 
-	OVERRIDE_LOG_NAME("Initialization");
 
-	LOG_CHECK_RETURN(file.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file, exiting", -1);
+	LOG_CHECK_RETURN_CRITICAL(file.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file, exiting", -1);
 
 	json jsonData;
 	file >> jsonData;
-
+	
+	projectVersion = jsonData["project_version"].get<std::string>();
 	windowWidth = jsonData["init_settings"]["window_width"];
 	windowHeight = jsonData["init_settings"]["window_height"];
 	windowTitle = jsonData["init_settings"]["window_title"].get<std::string>();
 	windowType = jsonData["init_settings"]["window_type"].get<std::string>();
-	projectVersion = jsonData["project_version"].get<std::string>();
+	debugMode = jsonData["init_settings"]["debug_mode"];
+
+	Globals::GetInstance().debugMode = debugMode;
 
 	// Initialize GLFW
-	LOG_CHECK_RETURN(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW, exiting", -1);
+	LOG_CHECK_RETURN_CRITICAL(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW, exiting", -1);
 
 	// Create a window
 	Window& globalWindow = Window::GetInstance();
@@ -97,20 +101,7 @@ int main() {
 	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
 
 	// Initialize glad
-	LOG_CHECK_RETURN(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD, exiting", -1);
-
-	// Initialize FreeType
-	FT_Library ft;
-    LOG_CHECK_RETURN(!FT_Init_FreeType(&ft), "Successfully initialized FreeType", "Failed to initialize FreeType, exiting", -1);
-
-    FT_Face face;
-    LOG_CHECK_RETURN(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf, exiting", -1);
-
-    FT_Set_Pixel_Sizes(face, 0, 32);
-
-	Shader textShader("Mods/kiwicubed/Resources/Shaders/Text_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Text_Fragment.frag");
-
-	TextRenderer textRenderer(ft, face, textShader);
+	LOG_CHECK_RETURN_CRITICAL(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD, exiting", -1);
 
 	// Setup ImGui
 	IMGUI_CHECKVERSION();
@@ -146,6 +137,19 @@ int main() {
 	GLCall(glEnable(GL_BLEND));
 	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+	// Initialize FreeType
+	FT_Library ft;
+    LOG_CHECK_RETURN_CRITICAL(!FT_Init_FreeType(&ft), "Successfully initialized FreeType", "Failed to initialize FreeType, exiting", -1);
+
+    FT_Face face;
+    LOG_CHECK_RETURN_CRITICAL(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf, exiting", -1);
+
+    FT_Set_Pixel_Sizes(face, 0, 32);
+
+	Shader textShader("Mods/kiwicubed/Resources/Shaders/Text_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Text_Fragment.frag");
+
+	TextRenderer textRenderer(ft, face, textShader);
+
 	// MAIN PROGRAM SETUP FINISHED - Most of the rest of this is able to be moved into other places to make this more modular
 	
 	// Create shader programs (needs to be modularized)
@@ -165,7 +169,7 @@ int main() {
 	uiAtlas.TextureUnit(uiShaderProgram, "tex0");
 
 	ModHandler modHandler = ModHandler();
-	LOG_CHECK_RETURN_BAD(modHandler.SetupTextureAtlasData(), "Failed to setup texture atlas data, exiting", -1);
+	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.SetupTextureAtlasData(), "Failed to setup texture atlas data, exiting", -1);
 
 	// Setup debug renderer
 	Renderer renderer = Renderer();

@@ -20,7 +20,7 @@
 #include "IndexBufferObject.h"
 #include "Renderer.h"
 #include "Shader.h"
-#include "TextureManager.h"
+#include "AssetManager.h"
 #include "VertexArrayObject.h"
 #include "VertexBufferObject.h"
 
@@ -99,7 +99,7 @@ class Chunk {
         bool isAllocated = false;
         bool isGenerated = false;
         bool isMeshed = false;
-        unsigned int generationStatus = 0;
+        unsigned char generationStatus = 0;
         bool renderComponentsSetup = false;
         bool shouldRender = true;
         bool isEmpty = true;
@@ -118,7 +118,7 @@ class Chunk {
         bool GenerateHeightmap();
         void Render();
 
-        inline Block& GetBlock(const unsigned char blockX, const unsigned char blockY, const unsigned char blockZ) const;
+        Block& GetBlock(const unsigned char blockX, const unsigned char blockY, const unsigned char blockZ) const;
 
         void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
 

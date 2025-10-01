@@ -1,0 +1,40 @@
+{
+	"blocks": [
+		{
+			"blockID": "kiwicubed:stone",
+			"texture_front": "kiwicubed:stone",
+			"texture_back": "kiwicubed:stone",
+			"texture_left": "kiwicubed:stone",
+			"texture_right": "kiwicubed:stone",
+			"texture_top": "kiwicubed:stone",
+			"texture_bottom": "kiwicubed:stone"
+		},
+		{
+			"blockID": "kiwicubed:dirt",
+			"texture_front": "kiwicubed:dirt",
+			"texture_back": "kiwicubed:dirt",
+			"texture_left": "kiwicubed:dirt",
+			"texture_right": "kiwicubed:dirt",
+			"texture_top": "kiwicubed:dirt",
+			"texture_bottom": "kiwicubed:dirt"
+		},
+		{
+			"blockID": "kiwicubed:grass",
+			"texture_front": "kiwicubed:grass_side",
+			"texture_back": "kiwicubed:grass_side",
+			"texture_left": "kiwicubed:grass_side",
+			"texture_right": "kiwicubed:grass_side",
+			"texture_top": "kiwicubed:grass_top",
+			"texture_bottom": "kiwicubed:dirt"
+		},
+		{
+			"blockID": "kiwicubed:chunk_debug_indicator",
+			"texture_front": "kiwicubed:chunk_debug_indicator",
+			"texture_back": "kiwicubed:chunk_debug_indicator",
+			"texture_left": "kiwicubed:chunk_debug_indicator",
+			"texture_right": "kiwicubed:chunk_debug_indicator",
+			"texture_top": "kiwicubed:chunk_debug_indicator",
+			"texture_bottom": "kiwicubed:chunk_debug_indicator"
+		}
+	]
+}

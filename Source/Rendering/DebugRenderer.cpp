@@ -11,6 +11,10 @@ DebugRenderer::DebugRenderer() {
 			Enable();
 		}
 	});
+
+	if (Globals::GetInstance().debugMode) {
+		Enable();
+	}
 }
 
 // I have so little fucking idea how to make this more modular. I feel it's going to be ultra hardcoded for a very long time.

@@ -1,21 +1,22 @@
-#include "TextureManager.h"
+#include "AssetManager.h"
 #include <cstddef>
+#include "Block.h"
 
 
-TextureManager::TextureManager() {}
+AssetManager::AssetManager() {}
 
-void TextureManager::RegisterTexture(MetaTexture texture) {
+void AssetManager::RegisterTexture(MetaTexture texture) {
     OVERRIDE_LOG_NAME("Texture Manager");
     numericalIDsToStringIDs.insert({latestTextureID + 1, texture.stringID});
     stringIDsToNumericalIDs.insert({texture.stringID, latestTextureID + 1});
-    TextureManager::atlasData.insert({latestTextureID + 1, texture.atlasData});
+    AssetManager::atlasData.insert({latestTextureID + 1, texture.atlasData});
 
     latestTextureID++;
 
     INFO("Successfully registered texture of with string ID of \"" + texture.stringID.CanonicalName() + "\" and numerical id of {" + std::to_string(latestTextureID) + "} with: {" + std::to_string(texture.atlasData.size()) + "} variants");
 }
 
-TextureStringID* TextureManager::GetStringID(unsigned int numericalID) {
+AssetStringID* AssetManager::GetStringID(unsigned int numericalID) {
     OVERRIDE_LOG_NAME("Texture Manager");
     auto iterator = numericalIDsToStringIDs.find(numericalID);
     if (iterator != numericalIDsToStringIDs.end()) {
@@ -27,7 +28,7 @@ TextureStringID* TextureManager::GetStringID(unsigned int numericalID) {
     return &iterator->second;
 }
 
-unsigned int TextureManager::GetNumericalID(TextureStringID stringID) {
+unsigned int AssetManager::GetNumericalID(AssetStringID stringID) {
     OVERRIDE_LOG_NAME("Texture Manager");
     auto iterator = stringIDsToNumericalIDs.find(stringID);
     if (iterator != stringIDsToNumericalIDs.end()) {
@@ -39,7 +40,7 @@ unsigned int TextureManager::GetNumericalID(TextureStringID stringID) {
     return stringIDsToNumericalIDs[stringID];
 }
 
-std::vector<TextureAtlasData>* TextureManager::GetTextureAtlasData(unsigned int numericalID) {
+std::vector<TextureAtlasData>* AssetManager::GetTextureAtlasData(unsigned int numericalID) {
     OVERRIDE_LOG_NAME("Texture Manager");
     auto iterator = atlasData.find(numericalID);
     if (iterator != atlasData.end()) {
@@ -51,8 +52,8 @@ std::vector<TextureAtlasData>* TextureManager::GetTextureAtlasData(unsigned int 
     return &iterator->second;
 }
 
-std::vector<TextureAtlasData>* TextureManager::GetTextureAtlasData(TextureStringID stringID) {
+std::vector<TextureAtlasData>* AssetManager::GetTextureAtlasData(AssetStringID stringID) {
     return GetTextureAtlasData(GetNumericalID(stringID));
 }
 
-TextureManager::~TextureManager() {}
+AssetManager::~AssetManager() {}

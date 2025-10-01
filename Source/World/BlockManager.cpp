@@ -1,17 +1,14 @@
 #include "Block.h"
+#include "ModHandler.h"
 
 
-void BlockManager::RegisterBlockType(unsigned int numericalID, BlockType blockType) {
+void BlockManager::RegisterBlockType(AssetStringID blockStringID, BlockType blockType) {
     OVERRIDE_LOG_NAME("Block Type Registration");
-    blockTypes.insert({numericalID, blockType});
+    blockTypes.insert({blockStringID, blockType});
 
-    INFO("Successfully registered block type with numerical ID of {" + std::to_string(numericalID) + "}");
+    INFO("Successfully registered block type with string ID of \"" + blockStringID.CanonicalName() + "\"");
 }
 
-BlockType* BlockManager::GetBlockType(TextureStringID blockStringID) {
-    return &blockTypes[static_cast<unsigned short>(textureManager.GetNumericalID(blockStringID))];
-}
-
-BlockType* BlockManager::GetBlockType(unsigned short blockID) {
-    return &blockTypes[blockID];
+BlockType* BlockManager::GetBlockType(AssetStringID blockStringID) {
+    return &blockTypes[blockStringID];
 }

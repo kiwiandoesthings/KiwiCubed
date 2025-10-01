@@ -47,7 +47,7 @@ executable(
     'Source/Input.cpp',
     'Source/Main.cpp',
     'Source/ModHandler.cpp',
-    'Source/TextureManager.cpp',
+    'Source/AssetManager.cpp',
     'Source/ThreadPool.cpp',
     'Source/UI.cpp',
     'Source/Window.cpp'

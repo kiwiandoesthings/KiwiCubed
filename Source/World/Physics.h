@@ -9,12 +9,17 @@
 #include "ChunkHandler.h"
 #include "Globals.h"
 
+
 class Entity;
 struct EntityData;
 
 struct PhysicsBoundingBox {
 	glm::vec3 corner1;
 	glm::vec3 corner2;
+
+	glm::vec3 Midpoint(const glm::vec3 position) const {
+		return glm::vec3((corner1.x + corner2.x) / 2,(corner1.y + corner2.y) / 2, (corner1.z + corner2.z) / 2);
+	}
 
 	PhysicsBoundingBox(glm::vec3 corner1, glm::vec3 corner2) : corner1(corner1), corner2(corner2) {}
 };

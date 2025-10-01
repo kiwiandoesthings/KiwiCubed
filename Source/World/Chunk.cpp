@@ -54,16 +54,16 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
 
     FastNoiseLite& noise = world.GetNoise();
 
-    std::unordered_map<TextureStringID, unsigned short> blockIDCache;
+    std::unordered_map<AssetStringID, unsigned short> blockIDCache;
 
-    auto GetCachedID = [&](const TextureStringID& textureStringID) -> unsigned short {
-        auto iterator = blockIDCache.find(textureStringID);
+    auto GetCachedID = [&](const AssetStringID& assetStringID) -> unsigned short {
+        auto iterator = blockIDCache.find(assetStringID);
         if (iterator != blockIDCache.end()) {
             return iterator->second;
         }
 
-        unsigned short numericalID = static_cast<unsigned short>(textureManager.GetNumericalID(textureStringID));
-        blockIDCache[textureStringID] = numericalID;
+        unsigned short numericalID = static_cast<unsigned short>(assetManager.GetNumericalID(assetStringID));
+        blockIDCache[assetStringID] = numericalID;
         return numericalID;
     };
 
@@ -72,9 +72,19 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
             for (int blockZ = 0; blockZ < chunkSize; ++blockZ) {
                 Block& block = GetBlock(blockX, blockY, blockZ);
                 float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
-	            if (blockY + (chunkY * chunkSize) < (density) * 60) {
-                    block.blockID = GetCachedID(TextureStringID{"kiwicubed", "stone"});
-		            block.variant = rand() % textureManager.GetTextureAtlasData(block.blockID)->size();
+	            int height = blockY + (chunkY * chunkSize);
+                int reach = density * 30 + 30;
+                if (height < reach) {
+                    if (height + 4 < reach) {
+                        block.blockID = GetCachedID(AssetStringID{"kiwicubed", "stone"});
+		                block.variant = rand() % assetManager.GetTextureAtlasData(block.blockID)->size();
+                    } else if (height + 2 < reach) {
+                        block.blockID = GetCachedID(AssetStringID{"kiwicubed", "dirt"});
+		                block.variant = 0;
+                    } else {
+                        block.blockID = GetCachedID(AssetStringID{"kiwicubed", "grass_side"});
+		                block.variant = 0;
+                    }
                     totalBlocks++;
 	            } else {
 		            block.blockID = 0;
@@ -141,7 +151,7 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
             return iterator->second;
         }
 
-        std::vector<TextureAtlasData> textureAtlasData = *textureManager.GetTextureAtlasData(numericalID);
+        std::vector<TextureAtlasData> textureAtlasData = *assetManager.GetTextureAtlasData(numericalID);
         auto [newIterator, inserted] = textureAtlasDataCache.emplace(numericalID, std::move(textureAtlasData));
         return newIterator->second;
     };
@@ -258,28 +268,28 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
 		                	switch ((i - vertexOffset) / 5 % 4) {
 		                		case 0: {
 		                			float u0 = atlasData.xPosition / 4.0f; 
-		                			float v1 = (atlasData.yPosition + atlasData.ySize) / 4.0f; 
+		                			float v1 = atlasData.yPosition / 4.0f; 
 		                			vertices.emplace_back(u0);
 		                			vertices.emplace_back(v1);
 		                			break;
 		                		}
 		                		case 1: {
 		                			float u1 = (atlasData.xPosition + atlasData.xSize) / 4.0f; 
-		                			float v1 = (atlasData.yPosition + atlasData.ySize) / 4.0f;
+		                			float v1 = atlasData.yPosition / 4.0f; 
 		                			vertices.emplace_back(u1);
 		                			vertices.emplace_back(v1);
 		                			break;
 		                		}
 		                		case 2: {
 		                			float u1 = (atlasData.xPosition + atlasData.xSize) / 4.0f; 
-		                			float v0 = atlasData.yPosition / 4.0f; 
+		                			float v0 = (atlasData.yPosition + atlasData.ySize) / 4.0f; 
 		                			vertices.emplace_back(u1);
 		                			vertices.emplace_back(v0);
 		                			break;
 		                		}
 		                		case 3: {
 		                			float u0 = atlasData.xPosition / 4.0f; 
-		                			float v0 = atlasData.yPosition / 4.0f; 
+		                			float v0 = (atlasData.yPosition + atlasData.ySize) / 4.0f;
 		                			vertices.emplace_back(u0);
 		                			vertices.emplace_back(v0);
 		                			break;

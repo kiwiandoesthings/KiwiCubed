@@ -38,7 +38,11 @@ void OverrideFunctionLogName(const std::string& functionName, const std::string&
 	functionHeaderReplacements[functionName] = replacement;
 }
 
-void Log(LogLevel level, const std::string& message, const std::source_location &srclc) {
+void Log(LogLevel level, const std::string& message, const bool debugMode, const std::source_location &srclc) {
+	if (level == LogLevel::debug && !debugMode) {
+		return;
+	}
+	
 	if (level >= logLevel) {
 
 		std::string header = headerStructure;

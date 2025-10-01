@@ -375,7 +375,7 @@ void World::Tick() {
     Update();
 
     if (duration >= 1000.0) {
-        ticksPerSecond = static_cast<unsigned int>(static_cast<float>(totalTicks) / (duration / 1000.0));
+        ticksPerSecond = static_cast<float>(totalTicks) / (duration / 1000.0);
         totalTicks = 0;
         tpsStartTime = end_time;
     }

@@ -69,8 +69,7 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 				float collision = min1[axis] - min2[axis];
 				if (collision < 0) {
 					newEntityData.position[axis] = min2[axis] - newEntityData.physicsBoundingBox.corner2[axis];
-				}
-				else {
+				} else {
 					newEntityData.position[axis] = max2[axis] - newEntityData.physicsBoundingBox.corner1[axis];
 				}
 				newEntityData.velocity[axis] = 0;
@@ -83,6 +82,7 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 
 float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, ChunkHandler& chunkHandler) {
 	if (!newEntityData.currentChunkPtr->isGenerated) {
+		std::cout << "no gen " << std::endl;
 		return 0.0f;
 	}
 
@@ -93,6 +93,7 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 		if (blockPosition.chunkPosition.x != newEntityData.globalChunkPosition.x || blockPosition.chunkPosition.y != newEntityData.globalChunkPosition.y || blockPosition.chunkPosition.z != newEntityData.globalChunkPosition.z) {
 			targetChunk = &chunkHandler.GetChunk(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
 			if (!targetChunk->isGenerated) {
+				std::cout << "no chunk " << std::endl;
 				continue;
 			}
 		} else {
@@ -113,16 +114,21 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 			if (isColliding) {
 				float collision = min1[axis] - min2[axis];
 				if (collision < 0) {
+					glm::vec3 pos = newEntityData.position;
 					newEntityData.position[axis] = min2[axis] - newEntityData.physicsBoundingBox.corner2[axis];
-				}
-				else {
+					std::cout << "moved from " << pos[axis] << " to " << newEntityData.position[axis] << " on axis " << std::to_string(axis) << std::endl;
+				} else {
+					glm::vec3 pos = newEntityData.position;
 					newEntityData.position[axis] = max2[axis] - newEntityData.physicsBoundingBox.corner1[axis];
+					std::cout << "moved from " << pos[axis] << " to " << newEntityData.position[axis] << " on axis " << std::to_string(axis) << std::endl;
 				}
 				newEntityData.velocity[axis] = 0;
+				std::cout << "got y collision with " << collision << " amt at y " << newEntityData.localChunkPosition[axis] << " specifically " << newEntityData.position[axis] << " from block " << blockPosition.blockPosition.x << " " << blockPosition.blockPosition.y << " " << blockPosition.blockPosition.z << ", chunk " << blockPosition.chunkPosition.x << " " << blockPosition.chunkPosition.y << " " << blockPosition.chunkPosition.z << std::endl;
 				return collision;
 			}
 		}
 	}
+	std::cout << "nothing at " << newEntityData.localChunkPosition.y << " specifically " << newEntityData.position.y << std::endl;
 	return 0.0f;
 }
 
@@ -153,6 +159,11 @@ bool Physics::ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chu
 			}
 		}
 	}
+
+	for (FullBlockPosition blockPos : blockCollisionQueue) {
+		//std::cout << blockPos.chunkPosition.x << " " << blockPos.chunkPosition.y << " " << blockPos.chunkPosition.z << ", " << blockPos.blockPosition.x << " " << blockPos.blockPosition.y << " "<< blockPos.blockPosition.z << std::endl;
+	}
+	//std::cout << "done" << std::endl;
 
 	newEntityData.position.x += newEntityData.velocity.x * globals.deltaTime;
 	bool xAxis = CollideAxis(0, newEntityData, chunkHandler);

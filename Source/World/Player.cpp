@@ -85,7 +85,7 @@ void Player::Update() {
 		QueryInputs();
 		QueryMouseInputs();
 		Entity::Update();
-		entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
+		//entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
 		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
 		if (entityData.isGrounded) {
 			if (entityData.isJumping) {

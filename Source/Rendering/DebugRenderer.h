@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Events.h"
+#include "Globals.h"
 #include "Shader.h"
 
 
