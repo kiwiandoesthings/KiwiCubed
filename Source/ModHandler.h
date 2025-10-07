@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <nlohmann/json.hpp>
+#include <../Vendor/robin_hood.h>
 
 using json = nlohmann::json;
 

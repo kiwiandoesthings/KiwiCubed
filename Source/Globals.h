@@ -5,7 +5,11 @@ class Globals {
     public:
         static Globals& GetInstance(); 
         float deltaTime = 0.0f;
-        bool debugMode = false;
+        #ifdef DEBUG_MODE
+            bool debugMode = true;
+        #else
+            bool debugMode = false;
+        #endif
     
     private:
         Globals() = default;

@@ -17,6 +17,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
+#include "ModHandler.h"
 #include "Renderer.h"
 #include "Texture.h"
 #include "AssetManager.h"
@@ -123,9 +124,21 @@ struct BlockType {
     // This would have to be stored in some custom data structure with another map and everything though so maybe that isn't the best idea.
     // Also, custom block properties need to be accounted for. If a mod wants to add some custom data to its blocks to be read, how should that be done?
 
-    // world's longest constructor
     BlockType() : blockStringID(AssetStringID{"kiwicubed", "invalid"}) {}
-    BlockType(AssetStringID blockStringID, std::vector<MetaTexture> metaTextures, std::vector<unsigned char> faceTextureIDs) : blockStringID(blockStringID), metaTextures(metaTextures), frontFaceID(faceTextureIDs[0]), backFaceID(faceTextureIDs[1]), leftFaceID(faceTextureIDs[2]), rightFaceID(faceTextureIDs[3]), topFaceID(faceTextureIDs[4]), bottomFaceID(faceTextureIDs[5]) {}
+    // world's longest constructor
+    BlockType(AssetStringID blockStringID, std::vector<MetaTexture> metaTextures, std::vector<unsigned char> faceTextureIDs) : blockStringID(blockStringID), metaTextures(metaTextures) {
+        if (faceTextureIDs.size() != 6) {
+            CRITICAL("Tried to create block type with wrong amount of faceTextureIDs, aborting");
+            psnip_trap();
+        }
+
+        frontFaceID = faceTextureIDs[0];
+        backFaceID = faceTextureIDs[1];
+        leftFaceID = faceTextureIDs[2];
+        rightFaceID = faceTextureIDs[3];
+        topFaceID = faceTextureIDs[4];
+        bottomFaceID = faceTextureIDs[5];
+    }
 };
 
 template <>
@@ -138,18 +151,30 @@ struct std::hash<BlockType>{
 
 class BlockManager {
     public:
-        BlockManager(): blockTypes({}) {}
+        static BlockManager& GetInstance();
+
+        BlockManager();
 
         void RegisterBlockType(AssetStringID blockStringID, BlockType blockType);
 
+        AssetStringID* GetStringID(unsigned short numericalID);
+        unsigned short GetNumericalID(AssetStringID);
+        BlockType* GetBlockType(unsigned short numericalID);
         BlockType* GetBlockType(AssetStringID blockStringID);
 
     private:
-        std::unordered_map<AssetStringID, BlockType> blockTypes;
+        ~BlockManager() = default;
+
+        BlockManager(const BlockManager&) = delete;
+        BlockManager& operator=(const BlockManager&) = delete;
+
+        std::unordered_map<unsigned short, AssetStringID> numericalIDsToStringIDs;
+        std::unordered_map<AssetStringID, unsigned short> stringIDsToNumericalIDs;
+        std::unordered_map<unsigned short, BlockType> numericalIDsToBlockTypes;
+        std::unordered_map<AssetStringID, BlockType> stringIDsToBlockTypes;
+
+        unsigned short lastNumericalID = 0;
 };
-
-
-inline BlockManager blockManager = BlockManager();
 
 
 class Block {

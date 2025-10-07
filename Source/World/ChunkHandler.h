@@ -93,9 +93,9 @@ class Chunk {
     public:
         Block* blocks = new Block[chunkSize * chunkSize * chunkSize];
         ChunkHeightmap heightmap;
-        int chunkX = 0;
-        int chunkY = 0;
-        int chunkZ = 0;
+        int chunkX = -1;
+        int chunkY = -1;
+        int chunkZ = -1;
         bool isAllocated = false;
         bool isGenerated = false;
         bool isMeshed = false;

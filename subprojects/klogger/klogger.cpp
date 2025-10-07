@@ -1,26 +1,34 @@
 #include <klogger.hpp>
 
 
+static std::map<std::string, std::string> LogColors() {
+    static std::map<std::string, std::string> instance = {
+	    {"DEBUG", "\033[1;34m"},
+	    {"INFO", "\033[1;32m"},
+	    {"WARN", "\033[1;33m"},
+	    {"ERROR", "\033[1;31m"},
+	    {"CRITICAL", "\033[1;41m"},
+	    {"RESET", "\033[0m"},
+	    {"SRCLOC", "\033[1;30m"},
+	    {"FUNCTION", "\033[1;35m"}
+    };
+    return instance;
+}
 
-static std::map<std::string, std::string> logColors = {
-	{"DEBUG", "\033[1;34m"},
-	{"INFO", "\033[1;32m"},
-	{"WARN", "\033[1;33m"},
-	{"ERROR", "\033[1;31m"},
-	{"CRITICAL", "\033[1;41m"},
-	{"RESET", "\033[0m"},
-	{"SRCLOC", "\033[1;30m"},
-	{"FUNCTION", "\033[1;35m"}
-};
 
-
-#define COLORED_STR(color, str) logColors[color] + str + logColors["RESET"]
+#define COLORED_STR(color, str) LogColors()[color] + str + LogColors()["RESET"]
 
 LogLevel logLevel = LogLevel::debug;
 
-std::map<std::string, std::string> functionHeaderReplacements;
+static std::map<std::string, std::string>& FunctionHeaderReplacements() {
+    static std::map<std::string, std::string> instance;
+    return instance;
+}
 
-std::string headerStructure = "[{level} | {function}]";
+static std::string HeaderStructure() {
+    static std::string instance = "[{level} | {function}]";
+    return instance;
+}
 
 std::string LogLevelToString(LogLevel level) {
 	switch (level) {
@@ -35,7 +43,7 @@ std::string LogLevelToString(LogLevel level) {
 }
 
 void OverrideFunctionLogName(const std::string& functionName, const std::string& replacement) {
-	functionHeaderReplacements[functionName] = replacement;
+	FunctionHeaderReplacements()[functionName] = replacement;
 }
 
 void Log(LogLevel level, const std::string& message, const bool debugMode, const std::source_location &srclc) {
@@ -45,7 +53,7 @@ void Log(LogLevel level, const std::string& message, const bool debugMode, const
 	
 	if (level >= logLevel) {
 
-		std::string header = headerStructure;
+		std::string header = HeaderStructure();
 		#define REPLACE(f, r) header.replace(header.find(f), sizeof(f) - 1, r)
 
 		std::string loglvlstr = LogLevelToString(level);
@@ -53,8 +61,8 @@ void Log(LogLevel level, const std::string& message, const bool debugMode, const
 
 		std::string fname;
 
-		if (functionHeaderReplacements.find(srclc.function_name()) != functionHeaderReplacements.end()) {
-			fname = COLORED_STR("FUNCTION", functionHeaderReplacements[srclc.function_name()]);
+		if (FunctionHeaderReplacements().find(srclc.function_name()) != FunctionHeaderReplacements().end()) {
+			fname = COLORED_STR("FUNCTION", FunctionHeaderReplacements()[srclc.function_name()]);
 		} else {
 			fname = COLORED_STR("FUNCTION", srclc.function_name());
 		}

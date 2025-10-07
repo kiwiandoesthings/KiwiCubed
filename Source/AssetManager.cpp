@@ -46,7 +46,7 @@ std::vector<TextureAtlasData>* AssetManager::GetTextureAtlasData(unsigned int nu
     if (iterator != atlasData.end()) {
         return &iterator->second;
     } else {
-        ERR("Tried to get atlas data for texture with numerical ID \"" + std::to_string(numericalID) + "\" that did not exist, aborting");
+        ERR("Tried to get atlas data for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;

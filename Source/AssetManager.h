@@ -39,10 +39,10 @@ class AssetManager {
         std::vector<TextureAtlasData>* GetTextureAtlasData(AssetStringID stringID);
 
     private:
-        std::unordered_map<unsigned int, AssetStringID> numericalIDsToStringIDs;
-        std::unordered_map<AssetStringID, unsigned int> stringIDsToNumericalIDs;
+        robin_hood::unordered_flat_map<unsigned int, AssetStringID> numericalIDsToStringIDs;
+        robin_hood::unordered_flat_map<AssetStringID, unsigned int> stringIDsToNumericalIDs;
 
-        std::unordered_map<unsigned int, std::vector<TextureAtlasData>> atlasData;
+        robin_hood::unordered_flat_map<unsigned int, std::vector<TextureAtlasData>> atlasData;
 
         int latestTextureID = 0;
 };

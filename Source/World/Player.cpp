@@ -85,12 +85,13 @@ void Player::Update() {
 		QueryInputs();
 		QueryMouseInputs();
 		Entity::Update();
-		//entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
+		entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
 		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
-		if (entityData.isGrounded) {
+        //std::cout << entityData.isGrounded << std::endl;
+        if (entityData.isGrounded) {
 			if (entityData.isJumping) {
 				auto current = std::chrono::high_resolution_clock::now();
-				std::cout << "jump took " << std::chrono::duration_cast<std::chrono::milliseconds>(current - jumpStart).count() << "ms" << std::endl; 
+				//std::cout << "jump took " << std::chrono::duration_cast<std::chrono::milliseconds>(current - jumpStart).count() << "ms" << std::endl; 
 			}
 			entityData.isJumping = false;
 		}
@@ -180,34 +181,36 @@ void Player::QueryInputs() {
 }
 
 void Player::MouseButtonCallback(int button) {
-	glm::ivec3 chunkPosition = glm::ivec3(0, 0, 0);
-	glm::ivec3 blockPosition = glm::ivec3(0, 0, 0);
+	glm::ivec3 chunkPosition = glm::ivec3(-1, -1, -1);
+	glm::ivec3 blockPosition = glm::ivec3(-1, -1, -1);
 	bool hit = 0;
 	if (Physics::RaycastWorld(entityData.position, entityData.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit)) {
 		if (button == 0) {
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
-				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+				world.QueueMesh(chunkPosition, true);
+                //chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
 				if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1) {
-					chunkHandler->RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
+					//chunkHandler->RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
 				}
 				if (blockPosition.y == 0 || blockPosition.y == chunkSize - 1) {
-					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y - 1, chunkPosition.z, false);
+					//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y - 1, chunkPosition.z, false);
 				}
 				if (blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
-					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z - 1, false);
+					//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z - 1, false);
 				}
 				if (blockPosition.x == chunkSize - 1) {
-					chunkHandler->RemeshChunk(chunkPosition.x + 1, chunkPosition.y, chunkPosition.z, false);
+					//chunkHandler->RemeshChunk(chunkPosition.x + 1, chunkPosition.y, chunkPosition.z, false);
 				}
 				if (blockPosition.y == chunkSize - 1) {
-					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y + 1, chunkPosition.z, false);
+					//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y + 1, chunkPosition.z, false);
 				}
 				if (blockPosition.z == chunkSize - 1) {
-					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z + 1, false);
+					//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z + 1, false);
 				}
 			} else {
-				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+				//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+                world.QueueMesh(chunkPosition, true);
 			}
 		}
 	}

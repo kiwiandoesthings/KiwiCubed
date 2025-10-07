@@ -1,18 +1,31 @@
 set windows-shell := ['cmd', '/c']
 
 [unix]
-run: build
-	Build/kiwicubed
+run: builddebug
+	BuildDebug/kiwicubed
+
+[unix]
+release: buildrelease
+    BuildRelease/kiwicubed
 
 [windows]
-run: build
-	Build\kiwicubed.exe
+run: builddebug
+	BuildDebug\kiwicubed.exe
 
-build:
-	meson compile -C Build
+[windows]
+release: buildrelease
+    BuildRelease\kiwicubed.exe
+
+buildrelease:
+	meson setup BuildRelease --buildtype=release
+	meson compile -C BuildRelease
+
+builddebug:
+	meson compile -C BuildDebug
 
 setup:
-	meson setup Build
-	
+	meson setup BuildDebug --buildtype=debug -Dcpp_args=-DDEBUG_MODE
+
 clean:
-	meson setup --reconfigure Build
+	meson setup --reconfigure BuildRelease
+	meson setup --reconfigure BuildDebug

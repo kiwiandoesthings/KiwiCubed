@@ -1,5 +1,6 @@
 #include "World.h"
 
+#include "ChunkHandler.h"
 #include "FastNoise.h"
 #include "SingleplayerHandler.h"
 #include <chrono>
@@ -186,6 +187,12 @@ void World::GenerateChunksAroundPosition(Event& event, unsigned short horizontal
             }
         }
     }
+}
+
+void World::QueueMesh(glm::ivec3 chunkPosition, bool remesh) {
+    chunkGenerationThreads.QueueTask([&]{
+        GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z).GenerateMesh(chunkHandler, true);
+    });
 }
 
 void World::Update() {

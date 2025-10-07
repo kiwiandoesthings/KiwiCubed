@@ -210,7 +210,7 @@ bool ModHandler::SetupTextureAtlasData() {
             }
         }
 
-        blockManager.RegisterBlockType(block.first, BlockType{block.first, textureAtlasDatas, faceTextureIDs});
+        BlockManager::GetInstance().RegisterBlockType(block.first, BlockType{block.first, textureAtlasDatas, faceTextureIDs});
     }
 
     INFO("Loading mods took " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startTime).count()) + "us");

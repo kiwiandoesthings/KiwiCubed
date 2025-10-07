@@ -1,5 +1,6 @@
 #include "ChunkHandler.h"
 #include "World.h"
+#include <chrono>
 #include <klogger.hpp>
 #include <wingdi.h>
 
@@ -62,7 +63,8 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
             return iterator->second;
         }
 
-        unsigned short numericalID = static_cast<unsigned short>(assetManager.GetNumericalID(assetStringID));
+        //unsigned short numericalID = static_cast<unsigned short>(assetManager.GetNumericalID(assetStringID));
+        unsigned short numericalID = static_cast<unsigned short>(BlockManager::GetInstance().GetNumericalID(assetStringID));
         blockIDCache[assetStringID] = numericalID;
         return numericalID;
     };
@@ -74,22 +76,25 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
                 float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
 	            int height = blockY + (chunkY * chunkSize);
                 int reach = density * 30 + 30;
-                if (height < reach) {
-                    if (height + 4 < reach) {
-                        block.blockID = GetCachedID(AssetStringID{"kiwicubed", "stone"});
-		                block.variant = rand() % assetManager.GetTextureAtlasData(block.blockID)->size();
-                    } else if (height + 2 < reach) {
-                        block.blockID = GetCachedID(AssetStringID{"kiwicubed", "dirt"});
-		                block.variant = 0;
-                    } else {
-                        block.blockID = GetCachedID(AssetStringID{"kiwicubed", "grass_side"});
-		                block.variant = 0;
-                    }
-                    totalBlocks++;
-	            } else {
-		            block.blockID = 0;
+                if (!(height < reach)) {
+                    block.blockID = 0;
 		            block.variant = 0;
-	            }
+                    continue;
+                }
+
+                if (height + 4 < reach) {
+                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "stone"});
+		            //block.variant = rand() % assetManager.GetTextureAtlasData(block.blockID)->size();
+                    block.variant = 0;
+                } else if (height + 2 < reach) {
+                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "dirt"});
+		            block.variant = 0;
+                } else {
+                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "grass"});
+		            block.variant = 0;
+                }
+                totalBlocks++;
+                //std::cout << block.blockID;
             }
         }
     }
@@ -130,6 +135,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
         return false;
     }
 
+    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
     vertices.clear();
     indices.clear();
     
@@ -143,16 +150,16 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
     std::vector<FaceDirection> facesToAdd;
     facesToAdd.reserve(6);
 
-    std::unordered_map<unsigned char, std::vector<TextureAtlasData>> textureAtlasDataCache;
+    std::unordered_map<unsigned char, BlockType> textureAtlasDataCache;
 
-    auto GetCachedAtlasData = [&](const unsigned char numericalID) -> const std::vector<TextureAtlasData>& {
+    auto GetCachedBlockType = [&](const unsigned char numericalID) -> const BlockType& {
         auto iterator = textureAtlasDataCache.find(numericalID);
         if (iterator != textureAtlasDataCache.end()) {
             return iterator->second;
         }
 
-        std::vector<TextureAtlasData> textureAtlasData = *assetManager.GetTextureAtlasData(numericalID);
-        auto [newIterator, inserted] = textureAtlasDataCache.emplace(numericalID, std::move(textureAtlasData));
+        BlockType blockType = *BlockManager::GetInstance().GetBlockType(numericalID);
+        auto [newIterator, inserted] = textureAtlasDataCache.emplace(numericalID, std::move(blockType));
         return newIterator->second;
     };
 
@@ -163,6 +170,9 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                     Block& block = GetBlock(blockX, blockY, blockZ);
 
                     facesToAdd.clear();
+
+                    const BlockType& blockType = GetCachedBlockType(block.GetBlockID());
+                    int variant = block.GetVariant();
                     
                     for (int direction = 0; direction < 6; ++direction) {
                         FaceDirection faceDirection = static_cast<FaceDirection>(direction);
@@ -254,9 +264,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                         }
                     }
 
-                    TextureAtlasData atlasData = GetCachedAtlasData(block.GetBlockID())[block.GetVariant()];
-
                     for (unsigned int iterator = 0; iterator < facesToAdd.size(); ++iterator) {
+                        const TextureAtlasData& atlasData = blockType.metaTextures[iterator].atlasData[variant];
 		                GLuint vertexOffset = static_cast<GLuint>(facesToAdd.at(iterator)) * 20;
 		                GLuint baseIndex = static_cast<GLuint>(vertices.size() / 5);
 
@@ -264,7 +273,7 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
 		                	vertices.emplace_back((BlockModel::faceVertices[i + 0]) + static_cast<GLfloat>(blockX + (chunkX * static_cast<int>(chunkSize))));
 		                	vertices.emplace_back((BlockModel::faceVertices[i + 1]) + static_cast<GLfloat>(blockY + (chunkY * static_cast<int>(chunkSize))));
 		                	vertices.emplace_back((BlockModel::faceVertices[i + 2]) + static_cast<GLfloat>(blockZ + (chunkZ * static_cast<int>(chunkSize))));
-                        
+                
 		                	switch ((i - vertexOffset) / 5 % 4) {
 		                		case 0: {
 		                			float u0 = atlasData.xPosition / 4.0f; 
@@ -308,6 +317,12 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
 
     isMeshed = true;
     generationStatus = 3;
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
+    int time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    if (Globals::GetInstance().debugMode) {
+        INFO("chunk meshing took " + std::to_string(time) + "ms");
+    }
 
     return true;
 }
