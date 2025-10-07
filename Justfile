@@ -24,7 +24,7 @@ builddebug:
 	meson compile -C BuildDebug
 
 setup:
-	meson setup BuildDebug --buildtype=debug -Dcpp_args=-DDEBUG_MODE
+	meson setup BuildDebug --buildtype=debug -Dcpp_args=-DKIWI_DEBUG_MODE
 
 clean:
 	meson setup --reconfigure BuildRelease
