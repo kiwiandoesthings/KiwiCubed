@@ -61,6 +61,6 @@ executable(
     dependency('imgui', static: true),
     dependency('glm', static: true),
     dependency('glad-gl', static: true),
-    dependency('freetype2', static: true)
+    dependency('freetype2', static: true),
   ],
 )

@@ -17,14 +17,14 @@ release: buildrelease
     BuildRelease\kiwicubed.exe
 
 buildrelease:
-	meson setup BuildRelease --buildtype=release
+	meson setup BuildRelease --buildtype=release -Ddefault_library=static
 	meson compile -C BuildRelease
 
 builddebug:
 	meson compile -C BuildDebug
 
 setup:
-	meson setup BuildDebug --buildtype=debug -Dcpp_args=-DKIWI_DEBUG_MODE
+	meson setup BuildDebug --buildtype=debug -Dcpp_args=-DKIWI_DEBUG_MODE -Ddefault_library=static
 
 clean:
 	meson setup --reconfigure BuildRelease

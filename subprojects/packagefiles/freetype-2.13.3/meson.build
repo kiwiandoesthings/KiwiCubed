@@ -332,16 +332,27 @@ if bzip2_dep.found()
   ft2_deps += [bzip2_dep]
 endif
 
-# Harfbuzz support.
-harfbuzz_dep = dependency('harfbuzz',
-  version: '>= 2.0.0',
-  required: get_option('harfbuzz'),
-  default_options: ['freetype=disabled'])
+# PNG support.
+libpng_dep = dependency('libpng',
+  required: get_option('png'),
+  fallback: 'libpng',
+  default_options: ['default_library=static'])
 
-if harfbuzz_dep.found()
-  ftoption_command += ['--enable=FT_CONFIG_OPTION_USE_HARFBUZZ']
-  ft2_deps += [harfbuzz_dep]
+if libpng_dep.found()
+  ftoption_command += ['--enable=FT_CONFIG_OPTION_USE_PNG']
+  ft2_deps += [libpng_dep]
 endif
+
+# Harfbuzz support.
+#harfbuzz_dep = dependency('harfbuzz',
+#  version: '>= 2.0.0',
+#  required: get_option('harfbuzz'),
+#  default_options: ['freetype=disabled'])
+
+#if harfbuzz_dep.found()
+#  ftoption_command += ['--enable=FT_CONFIG_OPTION_USE_HARFBUZZ']
+#  ft2_deps += [harfbuzz_dep]
+#endif
 
 # Brotli decompression support.
 brotli_dep = dependency('libbrotlidec',
@@ -467,7 +478,8 @@ summary({'OS': host_machine.system(),
 
 summary({'Zlib': zlib_option,
          'Bzip2': bzip2_dep.found() ? 'yes' : 'no',
-         'Harfbuzz': harfbuzz_dep.found() ? 'yes' : 'no',
+         'Png': libpng_dep.found() ? 'yes' : 'no',
+         #'Harfbuzz': harfbuzz_dep.found() ? 'yes' : 'no',
          'Brotli': brotli_dep.found() ? 'yes' : 'no',
         }, section: 'Used Libraries')
 
