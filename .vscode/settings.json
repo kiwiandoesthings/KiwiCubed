@@ -1,0 +1,5 @@
+{
+    "C_Cpp.default.compileCommands": "c:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug/compile_commands.json",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
+    "mesonbuild.configureOnOpen": false
+}

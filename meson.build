@@ -52,7 +52,7 @@ executable(
     'Source/UI.cpp',
     'Source/Window.cpp'
   ),
-  include_directories: include_directories('Source', 'Source/GPUObjects', 'Source/World', 'Source/Rendering', 'Vendor'),
+  include_directories: include_directories('Source', 'Source/GPUObjects', 'Source/World', 'Source/Rendering'),
   dependencies: [
     dependency('kwport'),
     dependency('klogger', static: true),

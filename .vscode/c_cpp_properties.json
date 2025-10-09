@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "KiwiCubed",
+            "includePath": [
+				"${workspaceFolder}/subprojects/glad-gl/include/glad"
+            ],
+            "defines": [
+                "_DEBUG"
+            ],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c17",
+            "cppStandard": "c++20"
+        }
+    ],
+    "version": 4
+}

@@ -4,11 +4,12 @@
 !/subprojects/packagefiles
 # this one's a straggler from glad
 /subprojects/egl-registry.wrap
+# these absolute fuckers
+/subprojects/libpng.wrap
+/subprojects/zlib.wrap
 # custom subprojects
 !/subprojects/kwport
 !/subprojects/klogger
-
-.vscode/*
 
 # clangd vsc plugin cache
 .cache/*

@@ -2,7 +2,6 @@
 #include "World.h"
 #include <chrono>
 #include <klogger.hpp>
-#include <wingdi.h>
 
 // Currently just sets up the VBO, VAO, and IBO
 void Chunk::SetupRenderComponents() {
@@ -94,7 +93,6 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
 		            block.variant = 0;
                 }
                 totalBlocks++;
-                //std::cout << block.blockID;
             }
         }
     }
