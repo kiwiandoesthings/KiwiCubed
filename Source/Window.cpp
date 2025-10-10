@@ -58,6 +58,7 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 	Window::windowHeight = newWindowHeight;
 
 	glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
 
 	return window;
 }

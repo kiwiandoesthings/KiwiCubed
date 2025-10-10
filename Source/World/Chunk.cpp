@@ -263,7 +263,7 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                     }
 
                     for (unsigned int iterator = 0; iterator < facesToAdd.size(); ++iterator) {
-                        const TextureAtlasData& atlasData = blockType.metaTextures[iterator].atlasData[variant];
+                        const TextureAtlasData& atlasData = blockType.metaTextures[facesToAdd[iterator]].atlasData[variant];
 		                GLuint vertexOffset = static_cast<GLuint>(facesToAdd.at(iterator)) * 20;
 		                GLuint baseIndex = static_cast<GLuint>(vertices.size() / 5);
 

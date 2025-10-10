@@ -188,29 +188,27 @@ void Player::MouseButtonCallback(int button) {
 		if (button == 0) {
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
-				world.QueueMesh(chunkPosition, true);
-                //chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+                chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
 				if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1) {
-					//chunkHandler->RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
+					chunkHandler->RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
 				}
 				if (blockPosition.y == 0 || blockPosition.y == chunkSize - 1) {
-					//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y - 1, chunkPosition.z, false);
+					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y - 1, chunkPosition.z, false);
 				}
 				if (blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
-					//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z - 1, false);
+					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z - 1, false);
 				}
 				if (blockPosition.x == chunkSize - 1) {
-					//chunkHandler->RemeshChunk(chunkPosition.x + 1, chunkPosition.y, chunkPosition.z, false);
+					chunkHandler->RemeshChunk(chunkPosition.x + 1, chunkPosition.y, chunkPosition.z, false);
 				}
 				if (blockPosition.y == chunkSize - 1) {
-					//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y + 1, chunkPosition.z, false);
+					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y + 1, chunkPosition.z, false);
 				}
 				if (blockPosition.z == chunkSize - 1) {
-					//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z + 1, false);
+					chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z + 1, false);
 				}
 			} else {
-				//chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
-                world.QueueMesh(chunkPosition, true);
+				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
 			}
 		}
 	}
