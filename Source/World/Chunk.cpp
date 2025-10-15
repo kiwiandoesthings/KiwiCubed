@@ -55,6 +55,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
     FastNoiseLite& noise = world.GetNoise();
 
     std::unordered_map<AssetStringID, unsigned short> blockIDCache;
+    std::unordered_map<unsigned int, unsigned short> blockVariantCountCache;
 
     auto GetCachedID = [&](const AssetStringID& assetStringID) -> unsigned short {
         auto iterator = blockIDCache.find(assetStringID);
@@ -62,10 +63,20 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
             return iterator->second;
         }
 
-        //unsigned short numericalID = static_cast<unsigned short>(assetManager.GetNumericalID(assetStringID));
         unsigned short numericalID = static_cast<unsigned short>(BlockManager::GetInstance().GetNumericalID(assetStringID));
         blockIDCache[assetStringID] = numericalID;
         return numericalID;
+    };
+
+    auto GetCachedVariantCount = [&](const unsigned int blockNumericalID) -> unsigned short {
+        auto iterator = blockVariantCountCache.find(blockNumericalID);
+        if (iterator != blockVariantCountCache.end()) {
+            return iterator->second;
+        }
+
+        unsigned short variantCount = static_cast<unsigned short>(assetManager.GetTextureAtlasData(blockNumericalID)->size());
+        blockVariantCountCache[blockNumericalID] = variantCount;
+        return variantCount;
     };
 
     for (int blockX = 0; blockX < chunkSize; ++blockX) {
@@ -83,9 +94,9 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
 
                 if (height + 4 < reach) {
                     block.blockID = GetCachedID(AssetStringID{"kiwicubed", "stone"});
-		            //block.variant = rand() % assetManager.GetTextureAtlasData(block.blockID)->size();
+		            block.variant = rand() % GetCachedVariantCount(block.blockID);
                     block.variant = 0;
-                } else if (height + 2 < reach) {
+                } else if (height + 1 < reach) {
                     block.blockID = GetCachedID(AssetStringID{"kiwicubed", "dirt"});
 		            block.variant = 0;
                 } else {

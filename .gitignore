@@ -1,3 +1,5 @@
+# important to keep .vscode/settings.json included, as the fuckass compile_commands.json won't be detected otherwise
+
 # Meson build dir is already ignored by a gitignore inside it
 /subprojects/*
 !/subprojects/*.wrap
