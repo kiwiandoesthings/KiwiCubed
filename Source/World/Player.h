@@ -8,14 +8,17 @@
 #include "Entity.h"
 #include "Events.h"
 
+
 enum GameMode {
 	SURVIVAL,
 	CREATIVE
 };
 
+
 struct PlayerData {
 	GameMode gameMode = CREATIVE;
 };
+
 
 class Player : public Entity {
 	public:

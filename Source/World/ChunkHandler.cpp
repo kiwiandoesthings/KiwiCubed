@@ -46,12 +46,10 @@ void ChunkHandler::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk calle
 
 bool ChunkHandler::MeshChunk(int chunkX, int chunkY, int chunkZ) {
     Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ, false);
-    std::cout << "chunk id is " << chunk.id << std::endl;
     if (chunk.id == 0) {
         WARN("Tried to mesh chunk that didn't exist {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}, aborting");
         return false;
     }
-    std::cout << "chunk id above is NOT 0" << std::endl;
     
     return chunk.GenerateMesh(*this, false);
 }

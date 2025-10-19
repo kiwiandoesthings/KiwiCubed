@@ -32,6 +32,7 @@ enum FaceDirection {
     BOTTOM
 };
 
+
 struct BlockModel {
     inline static GLfloat faceVertices[120] = {
         // Positions       // Texture Coordinates
@@ -99,7 +100,6 @@ struct BlockModel {
     };
 };
 
-
 struct BlockType {
     AssetStringID blockStringID;
 
@@ -124,7 +124,7 @@ struct BlockType {
     // This would have to be stored in some custom data structure with another map and everything though so maybe that isn't the best idea.
     // Also, custom block properties need to be accounted for. If a mod wants to add some custom data to its blocks to be read, how should that be done?
 
-    BlockType() : blockStringID(AssetStringID{"kiwicubed", "invalid"}) {}
+    BlockType() : blockStringID(AssetStringID{"kiwicubed", "air"}) {}
     // world's longest constructor
     BlockType(AssetStringID blockStringID, std::vector<MetaTexture> metaTextures, std::vector<unsigned char> faceTextureIDs) : blockStringID(blockStringID), metaTextures(metaTextures) {
         if (faceTextureIDs.size() != 6) {
@@ -175,7 +175,6 @@ class BlockManager {
 
         unsigned short lastNumericalID = 0;
 };
-
 
 class Block {
     public:

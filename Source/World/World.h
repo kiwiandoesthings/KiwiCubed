@@ -22,6 +22,7 @@
 class Chunk;
 class SingleplayerHandler;
 
+
 struct ChunkData {
 	glm::vec3 position;
 };

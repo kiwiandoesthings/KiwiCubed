@@ -10,7 +10,9 @@
 
 #include "Physics.h"
 
+
 class World;
+
 
 struct EntityStats {
 	float health;
@@ -53,6 +55,7 @@ struct ProtectedEntityData {
 	// For use later (most likely for multiplayer)
 	std::string UUID = "";
 };
+
 
 class Entity {
 	protected:

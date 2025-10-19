@@ -155,7 +155,6 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
 }
 
 void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius, unsigned short verticalRadius) {
-    std::cout << "recalc" << std::endl;
     if (horizontalRadius == 0) {
         horizontalRadius = playerChunkGenerationRadiusHorizontal;
     }
@@ -293,11 +292,7 @@ void World::Update() {
         }
         auto iterator = chunkHandler.chunks.find(std::tuple(chunkPosition.x, chunkPosition.y, chunkPosition.z));
         if (iterator != chunkHandler.chunks.end()) {
-            std::cout << "unloading " << chunkPosition.x << " " << chunkPosition.y << " " << chunkPosition.z << " exists? " << chunkHandler.GetChunkExists(chunkPosition.x, chunkPosition.y, chunkPosition.z) << std::endl;
-            std::cout.flush();
             chunkHandler.chunks.erase(iterator);
-            std::cout << "unloadedd " << chunkPosition.x << " " << chunkPosition.y << " " << chunkPosition.z << " exists? " << chunkHandler.GetChunkExists(chunkPosition.x, chunkPosition.y, chunkPosition.z) << std::endl;
-            std::cout.flush();
         }
     }
 

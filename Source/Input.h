@@ -16,6 +16,7 @@
 
 #include <glm/vec2.hpp>
 
+
 struct KeyCallbackWrapper {
     std::function<void(int key)> callback;
     unsigned int id;
@@ -34,7 +35,9 @@ struct ScrollCallbackWrapper {
     std::string instanceID;
 };
 
+
 class Window;
+
 
 class InputHandler {
 public:

@@ -8,6 +8,7 @@
 
 #include "ModHandler.h"
 
+
 struct TextureAtlasData {
     const unsigned short variant = 0;
     const unsigned char xPosition = 0;
@@ -24,6 +25,7 @@ struct MetaTexture {
         return stringID == other.stringID;
     }
 };
+
 
 class AssetManager {
     public:

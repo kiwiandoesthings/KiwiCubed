@@ -13,6 +13,7 @@
 class Entity;
 struct EntityData;
 
+
 struct PhysicsBoundingBox {
 	glm::vec3 corner1;
 	glm::vec3 corner2;
@@ -38,6 +39,7 @@ struct FullBlockPosition {
 
 	FullBlockPosition(glm::ivec3 blockPosition, glm::ivec3 chunkPosition) : blockPosition(blockPosition), chunkPosition(chunkPosition) {}
 };
+
 
 class Physics {
 	public:

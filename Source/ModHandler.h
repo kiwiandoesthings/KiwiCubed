@@ -10,6 +10,7 @@
 #include <nlohmann/json.hpp>
 #include <robin_hood.h>
 
+
 using json = nlohmann::json;
 
 
@@ -24,6 +25,9 @@ struct AssetStringID {
     bool operator==(const AssetStringID& other) const {
         return modName == other.modName && assetName == other.assetName;
     }
+
+    AssetStringID() : modName("kiwicubed"), assetName("air") {}
+    AssetStringID(std::string modName, std::string assetName) : modName(modName), assetName(assetName) {}
 };
 
 template <>
@@ -32,6 +36,7 @@ struct std::hash<AssetStringID>{
         return std::hash<std::string>()(stringID.modName + ":" + stringID.assetName);
     }
 };
+
 
 class ModHandler {
     public:

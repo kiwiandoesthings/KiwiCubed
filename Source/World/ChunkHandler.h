@@ -32,6 +32,7 @@ class Chunk;
 class ChunkHandler;
 class World;
 
+
 struct ChunkHeightmap {
     std::vector<uint64_t> heightmap;
     std::vector<uint64_t> heightmapMask;
@@ -51,6 +52,7 @@ struct TripleHash {
         return std::hash<T1>()(std::get<0>(tuple)) ^ std::hash<T2>()(std::get<1>(tuple)) ^ std::hash<T3>()(std::get<2>(tuple));
     }
 };
+
 
 class ObservableInt {
     private:

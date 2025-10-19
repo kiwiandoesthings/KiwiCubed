@@ -17,8 +17,7 @@
 #include <fstream>
 
 
-class Shader
-{
+class Shader {
 	public:
 		GLuint shaderProgramID;
 		std::string shaderName = "";

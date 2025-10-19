@@ -22,6 +22,7 @@ struct Character {
     unsigned int advance;
 };
 
+
 class TextRenderer {
     public:
         TextRenderer(FT_Library& freeType, FT_Face& fontFace, Shader& textShader);
