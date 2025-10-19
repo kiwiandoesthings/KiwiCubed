@@ -8,10 +8,10 @@ SingleplayerHandler::SingleplayerHandler(DebugRenderer& debugRenderer) : singlep
 	eventManager.AddEventToDo("event/generate_world", [&](Event& event) {
 		singleplayerWorld = std::make_unique<World>(5, 3, this);
 		isLoadedIntoSingleplayerWorld = true;
+		StartSingleplayerWorld(debugRenderer);
 		singleplayerWorld->GenerateWorld();
 		singleplayerWorld->Setup();
 		debugRenderer.SetupBuffers(singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerWorld->GetChunkOrigins());
-		StartSingleplayerWorld(debugRenderer);
 
 		if (UI::GetInstance().GetCurrentScreenName() == "ui/main_menu") {
 			UI::GetInstance().DisableUI();
@@ -27,9 +27,11 @@ void SingleplayerHandler::StartSingleplayerWorld(DebugRenderer& debugRenderer) {
 	eventManager.AddEventToDo("event/unload_world", [&](Event& event) {
 		shouldUnloadWorld = true;
 	});
-	eventManager.RegisterEvent("event/entity_moved_chunk");
-	eventManager.AddEventToDo("event/entity_moved_chunk", [&](Event& event) {
-		singleplayerWorld->GenerateChunksAroundPosition(event, 5, 2);
+	eventManager.RegisterEvent("event/player_moved_chunk");
+	eventManager.AddEventToDo("event/player_moved_chunk", [&](Event& event) {
+		singleplayerWorld->QueueTickTask([=, this] {
+			singleplayerWorld->RecalculateChunksToLoad(event, 5, 2);
+		});
 	});
 	
 	singleplayerWorld->StartTickThread();

@@ -30,6 +30,8 @@ bool bitness;
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <nlohmann/json.hpp>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #include "Entity.h"
 #include "Events.h"
@@ -199,6 +201,8 @@ int main() {
 	int frames = 0;
 	auto startTime = std::chrono::high_resolution_clock::now();
 	double fps = 0.0;
+	
+	Globals& globals = Globals::GetInstance();
 
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
@@ -208,8 +212,6 @@ int main() {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-
-		Globals& globals = Globals::GetInstance();
 
 		auto endTime = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
@@ -255,11 +257,13 @@ int main() {
 			
 			terrainAtlas.SetActive();
 			terrainAtlas.Bind();
-			singleplayerHandler.singleplayerWorld->Render(terrainShaderProgram);
-			
 			debugRenderer.UpdateBuffers(singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld->GetChunkOrigins());
 			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(chunkDebugShaderProgram);
+			auto endTime = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - frameStartTime).count();
+			//std::cout << "frame took " << duration << "ms" << std::endl;
+			singleplayerHandler.singleplayerWorld->Render(terrainShaderProgram);
 		}
 		
 		UI::GetInstance().Render();

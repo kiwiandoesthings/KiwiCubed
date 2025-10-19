@@ -41,6 +41,18 @@ void UI::Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer
             }
         }
     });
+    inputHandler.RegisterKeyCallback(GLFW_KEY_TAB, [&](int key) {
+        int totalElements = currentScreen->uiElements.size();
+        int tabIndex = currentScreen->GetTabIndex();
+        if (tabIndex + 2 > totalElements) {
+            currentScreen->SetTabIndex(0);
+        } else {
+            currentScreen->SetTabIndex(tabIndex + 1);
+        }
+    });
+    inputHandler.RegisterKeyCallback(GLFW_KEY_ENTER, [&](int key) {
+        currentScreen->uiElements[currentScreen->GetTabIndex()]->Trigger();
+    });
 
     EventManager& eventManager = EventManager::GetInstance();
     eventManager.RegisterEvent("event/disable_ui");
@@ -150,6 +162,21 @@ void UIScreen::AddUIElement(UIElement* element) {
     uiElements.emplace_back(element);
 }
 
+int UIScreen::GetTabIndex() {
+    return tabIndex;
+}
+
+void UIScreen::SetTabIndex(int newTabIndex) {
+    tabIndex = newTabIndex;
+
+    if (tabIndex == 0) {
+        uiElements[uiElements.size() - 1]->SetSelected(false);
+    } else {
+        uiElements[tabIndex - 1]->SetSelected(false);
+    }
+    uiElements[tabIndex]->SetSelected(true);
+}
+
 glm::vec2 UIElement::PixelsToNDC(glm::vec2 pixelPosition) {
     return glm::vec2((pixelPosition.x / Window::GetInstance().GetWidth()) * 2 - 1, (pixelPosition.y / Window::GetInstance().GetHeight()) * 2 - 1);
 }
@@ -188,12 +215,14 @@ void UIElement::Render() {
     ui.vertexBufferObject.Bind();
     ui.indexBufferObject.Bind();
 
-    if (GetHovered()) {
+    if ((GetHovered())) {
         if (UI::GetInstance().GetInputHandler().GetMouseButtonState(GLFW_MOUSE_BUTTON_LEFT)) {
             textureIndex = 2;
         } else {
             textureIndex = 1;
         }
+    } else if (tabSelected) {
+        textureIndex = 1;
     } else {
         textureIndex = 0;
     }
@@ -207,6 +236,10 @@ void UIElement::Render() {
     ui.uiShaderProgram->SetUniform1ui("textureIndex", textureIndex);
 
     GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sizeof(indices)), GL_UNSIGNED_INT, 0));
+}
+
+void UIElement::Trigger() {
+    EventManager::GetInstance().TriggerEvent(eventToTrigger);
 }
 
 bool UIElement::OnClick() {
@@ -223,8 +256,9 @@ bool UIElement::GetHovered() {
     int windowHeight = Window::GetInstance().windowHeight;
     mousePosition.y = windowHeight - mousePosition.y;
 
-    return (mousePosition.x >= position.x && mousePosition.y >= position.y && mousePosition.x <= position.x + size.x && mousePosition.y <= position.y + size.y);
-    return false;
+    hoverSelected = mousePosition.x >= position.x && mousePosition.y >= position.y && mousePosition.x <= position.x + size.x && mousePosition.y <= position.y + size.y;
+
+    return hoverSelected;
 }
 
 std::string* UIElement::GetEventTrigger() {
@@ -245,4 +279,12 @@ glm::ivec2* UIElement::GetScale() {
 
 glm::vec2* UIElement::GetSize() {
     return &size;
+}
+
+bool UIElement::GetSelected() {
+    return tabSelected;
+}
+
+void UIElement::SetSelected(bool selected) {
+    tabSelected = selected;
 }

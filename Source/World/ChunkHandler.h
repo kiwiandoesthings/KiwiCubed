@@ -101,7 +101,7 @@ class Chunk {
         bool isMeshed = false;
         unsigned char generationStatus = 0;
         bool renderComponentsSetup = false;
-        bool shouldRender = true;
+        bool shouldRender = false;
         bool isEmpty = true;
         bool isFull;
         bool shouldGenerate = true;
@@ -174,7 +174,9 @@ class ChunkHandler {
         void GenerateWorld();
 
         Chunk& GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotFound);
+        Chunk& GetChunkUnlocked(int chunkX, int chunkY, int chunkZ, bool addIfNotFound);
         Chunk& AddChunk(int chunkX, int chunkY, int chunkZ);
+        Chunk& AddChunkUnlocked(int chunkX, int chunkY, int chunkZ);
         bool GetChunkExists(int chunkX, int chunkY, int chunkZ);
         void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk callerChunk, bool updateCallerChunk, bool debug);
         bool MeshChunk(int chunkX, int chunkY, int chunkZ);

@@ -37,8 +37,11 @@ static void ClipVelocity(EntityData& newEntityData, int axis) {
 }
 
 bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHandler& chunkHandler) {
-	if (!newEntityData.currentChunkPtr->isGenerated) {
-		return false;
+	{
+		std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+		if (newEntityData.currentChunkPtr == nullptr || !newEntityData.currentChunkPtr->isGenerated) {
+			return false;
+		}
 	}
 
  	glm::vec3 min1 = glm::vec3(newEntityData.physicsBoundingBox.corner1.x + newEntityData.position.x, newEntityData.physicsBoundingBox.corner1.y + newEntityData.position.y, newEntityData.physicsBoundingBox.corner1.z + newEntityData.position.z);
@@ -46,15 +49,19 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 	for (auto& blockPosition : blockCollisionQueue) {
 		Chunk* targetChunk = nullptr;
 		if (blockPosition.chunkPosition.x != newEntityData.globalChunkPosition.x || blockPosition.chunkPosition.y != newEntityData.globalChunkPosition.y || blockPosition.chunkPosition.z != newEntityData.globalChunkPosition.z) {
-			targetChunk = &chunkHandler.GetChunk(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
+			std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+			targetChunk = &chunkHandler.GetChunkUnlocked(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
 			if (!targetChunk->isGenerated) {
 				continue;
 			}
 		} else {
 			targetChunk = newEntityData.currentChunkPtr;
 		}
-
-		Block& block = targetChunk->GetBlock(blockPosition.blockPosition.x, blockPosition.blockPosition.y, blockPosition.blockPosition.z);
+		Block block;
+		{
+			std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+			block = targetChunk->GetBlock(blockPosition.blockPosition.x, blockPosition.blockPosition.y, blockPosition.blockPosition.z);
+		}
 
 		if (!block.IsAir()) {
 			glm::vec3 min2 = glm::vec3(blockPosition.blockPosition.x + (blockPosition.chunkPosition.x * chunkSize), blockPosition.blockPosition.y + (blockPosition.chunkPosition.y * chunkSize), blockPosition.blockPosition.z + (blockPosition.chunkPosition.z * chunkSize));
@@ -81,9 +88,11 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 }
 
 float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, ChunkHandler& chunkHandler) {
-	if (!newEntityData.currentChunkPtr->isGenerated) {
-		//std::cout << "no gen " << std::endl;
-		return 0.0f;
+	{
+		std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+		if (newEntityData.currentChunkPtr == nullptr || !newEntityData.currentChunkPtr->isGenerated) {
+			return false;
+		}
 	}
 
 	glm::vec3 min1 = glm::vec3(newEntityData.physicsBoundingBox.corner1.x + newEntityData.position.x, newEntityData.physicsBoundingBox.corner1.y + newEntityData.position.y, newEntityData.physicsBoundingBox.corner1.z + newEntityData.position.z);
@@ -91,16 +100,20 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 	for (auto& blockPosition : blockCollisionQueue) {
 		Chunk* targetChunk = nullptr;
 		if (blockPosition.chunkPosition.x != newEntityData.globalChunkPosition.x || blockPosition.chunkPosition.y != newEntityData.globalChunkPosition.y || blockPosition.chunkPosition.z != newEntityData.globalChunkPosition.z) {
-			targetChunk = &chunkHandler.GetChunk(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
+			std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+			targetChunk = &chunkHandler.GetChunkUnlocked(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
 			if (!targetChunk->isGenerated) {
-				//std::cout << "no chunk " << std::endl;
 				continue;
 			}
 		} else {
 			targetChunk = newEntityData.currentChunkPtr;
 		}
 
-		Block& block = targetChunk->GetBlock(blockPosition.blockPosition.x, blockPosition.blockPosition.y, blockPosition.blockPosition.z);
+		Block block;
+		{
+			std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+			block = targetChunk->GetBlock(blockPosition.blockPosition.x, blockPosition.blockPosition.y, blockPosition.blockPosition.z);
+		}
 
 		if (!block.IsAir()) {
 			glm::vec3 min2 = glm::vec3(blockPosition.blockPosition.x + (blockPosition.chunkPosition.x * chunkSize), blockPosition.blockPosition.y + (blockPosition.chunkPosition.y * chunkSize), blockPosition.blockPosition.z + (blockPosition.chunkPosition.z * chunkSize));

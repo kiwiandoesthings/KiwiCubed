@@ -28,6 +28,15 @@ public:
         }
     }
 
+    template<typename T>
+    const T* GetDataConst(const std::string& key) const {
+        auto data = eventData.find(key);
+        if (data != eventData.end()) {
+            return std::any_cast<T>(&data->second);
+        }
+        return nullptr;
+    }
+
     void TriggerEvent();
     void AddToDo(std::function<void(Event&)> todo);
 

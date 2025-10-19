@@ -79,7 +79,11 @@ class UIScreen {
 
         void AddUIElement(UIElement* uiElement);
 
+        int GetTabIndex();
+        void SetTabIndex(int newTabIndex);
+
     private:
+        int tabIndex = -1;
 };
 
 
@@ -92,6 +96,8 @@ class UIElement {
 
         void Render();
 
+        void Trigger();
+
         bool OnClick();
         void OnHover();
 
@@ -102,12 +108,17 @@ class UIElement {
         std::string* GetEventTrigger();
         std::string* GetElementLabel();
 
+        bool GetSelected();
+        void SetSelected(bool selected);
+
     protected:
         glm::vec2 position = glm::vec2(0, 0);
         glm::ivec2 scale = glm::ivec2(1, 1);
         glm::vec2 size = glm::vec2(512, 128);
         std::string eventToTrigger = "";
         std::string elementLabel = "";
+        bool tabSelected = false;
+        bool hoverSelected = false;
 
         unsigned int textureIndex;
 

@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "GLFW/glfw3.h"
 #include <cstdio>
+#include "stb_image.h"
 
 
 Window::Window() = default;
@@ -54,11 +55,20 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 
 	glfwGetWindowSize(window, &newWindowWidth, &newWindowHeight);
 
+	GLFWimage processIcon;
+	processIcon.pixels = stbi_load("Assets/kiwi_exe_64x.png", &processIcon.width, &processIcon.height, 0, 4);
+	if (!processIcon.pixels) {
+		CRITICAL("Failed to set process icon. Icon was likely not available at \"Assets/kiwi_exe_64x.png\"");
+		psnip_trap();
+	}
+
+	glfwSetWindowIcon(window, 1, &processIcon);
+	stbi_image_free(processIcon.pixels);
+
 	Window::windowWidth = newWindowWidth;
 	Window::windowHeight = newWindowHeight;
 
 	glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
 
 	return window;
 }

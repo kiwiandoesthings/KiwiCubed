@@ -2,7 +2,6 @@ set windows-shell := ['cmd', '/c']
 
 [unix]
 run: builddebug
-	#BuildDebug/kiwicubed
 	build/kiwicubed
 
 [unix]
@@ -11,7 +10,6 @@ release: buildrelease
 
 [windows]
 run: builddebug
-	#BuildDebug\kiwicubed.exe
 	build\kiwicubed.exe
 
 [windows]

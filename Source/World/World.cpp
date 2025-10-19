@@ -154,7 +154,8 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool
     }
 }
 
-void World::GenerateChunksAroundPosition(Event& event, unsigned short horizontalRadius, unsigned short verticalRadius) {
+void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius, unsigned short verticalRadius) {
+    std::cout << "recalc" << std::endl;
     if (horizontalRadius == 0) {
         horizontalRadius = playerChunkGenerationRadiusHorizontal;
     }
@@ -166,26 +167,68 @@ void World::GenerateChunksAroundPosition(Event& event, unsigned short horizontal
         return;
     }
 
-    for (int chunkX = playerChunkPosition->x - horizontalRadius; chunkX < playerChunkPosition->x + horizontalRadius; ++chunkX) {
-        for (int chunkY = playerChunkPosition->y - verticalRadius; chunkY < playerChunkPosition->y + verticalRadius; ++chunkY) {
-            for (int chunkZ = playerChunkPosition->z - horizontalRadius; chunkZ < playerChunkPosition->z + horizontalRadius; ++chunkZ) {
-                std::tuple<int, int, int> chunkPosition = {chunkX, chunkY, chunkZ};
-                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
-                if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk.GetMeshable(chunkHandler) && chunk.generationStatus != 3) {
-                    if (chunkMeshingSet.find(chunkPosition) == chunkMeshingSet.end()) {
-                        chunkMeshingSet.insert(chunkPosition);
-                        chunkMeshingQueue.push(glm::ivec3(chunkX, chunkY, chunkZ));
-                        meshingQueuedChunks++;
-                    }
-                } else {
-                    if (chunkGenerationSet.find(chunkPosition) == chunkGenerationSet.end()) {
-                        chunkGenerationSet.insert(chunkPosition);
-                        chunkGenerationQueue.push(glm::ivec3(chunkX, chunkY, chunkZ));
-                        generationQueuedChunks++;
+    std::lock_guard<std::mutex> lock(ChunkQueueMutex);
+    {
+        for (int chunkX = playerChunkPosition->x - horizontalRadius; chunkX < playerChunkPosition->x + horizontalRadius; ++chunkX) {
+            for (int chunkY = playerChunkPosition->y - verticalRadius; chunkY < playerChunkPosition->y + verticalRadius; ++chunkY) {
+                for (int chunkZ = playerChunkPosition->z - horizontalRadius; chunkZ < playerChunkPosition->z + horizontalRadius; ++chunkZ) {
+                    std::tuple<int, int, int> chunkPosition = {chunkX, chunkY, chunkZ};
+                    Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
+                    if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk.GetMeshable(chunkHandler) && chunk.generationStatus != 3) {
+                        if (chunkMeshingSet.find(chunkPosition) == chunkMeshingSet.end()) {
+                            chunkMeshingSet.insert(chunkPosition);
+                            chunkMeshingQueue.push_back(glm::ivec3(chunkX, chunkY, chunkZ));
+                        }
+                    } else {
+                        if (chunkGenerationSet.find(chunkPosition) == chunkGenerationSet.end()) {
+                            chunkGenerationSet.insert(chunkPosition);
+                            chunkGenerationQueue.push_back(glm::ivec3(chunkX, chunkY, chunkZ));
+                        }
                     }
                 }
             }
         }
+        
+        // this is bad code probably. maybe remove unload-needing chunks from gen/mesh queues in below loop instead of separate loops
+        glm::ivec3 playerPosition = player.GetEntityData().globalChunkPosition;
+        for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); iterator++) {
+            auto& chunk = iterator->second;
+            int distanceX = playerPosition.x - chunk.chunkX - 1;
+            int distanceY = playerPosition.y - chunk.chunkY - 1;
+            int distanceZ = playerPosition.z - chunk.chunkZ - 1;
+
+            if (abs(distanceX) > playerChunkGenerationRadiusHorizontal + 2 || abs(distanceY) > playerChunkGenerationRadiusVertical + 2 || abs(distanceZ) > playerChunkGenerationRadiusHorizontal + 2) {            
+                chunkUnloadingQueue.push(glm::ivec3(chunk.chunkX, chunk.chunkY, chunk.chunkZ));
+            }
+        }
+          
+        for (int iterator = 0; iterator < chunkGenerationQueue.size();) {
+            glm::ivec3 chunkPosition = chunkGenerationQueue[iterator];
+            int distanceX = playerPosition.x - chunkPosition.x;
+            int distanceY = playerPosition.y - chunkPosition.y;
+            int distanceZ = playerPosition.z - chunkPosition.z;
+          
+            if (abs(distanceX) > playerChunkGenerationRadiusHorizontal + 2 || abs(distanceY) > playerChunkGenerationRadiusVertical + 2 || abs(distanceZ) > playerChunkGenerationRadiusHorizontal + 2) {
+                chunkGenerationQueue.erase(chunkGenerationQueue.begin() + iterator);
+                chunkGenerationSet.erase(std::tuple<int, int, int>(chunkPosition.x, chunkPosition.y, chunkPosition.z));
+            } else {
+                iterator++;
+            }
+        }   
+          
+        for (int iterator = 0; iterator < chunkMeshingQueue.size(); iterator++) {
+            glm::ivec3 chunkPosition = chunkMeshingQueue[iterator];
+            int distanceX = playerPosition.x - chunkPosition.x;
+            int distanceY = playerPosition.y - chunkPosition.y;
+            int distanceZ = playerPosition.z - chunkPosition.z;
+          
+            if (abs(distanceX) > playerChunkGenerationRadiusHorizontal + 2 || abs(distanceY) > playerChunkGenerationRadiusVertical + 2 || abs(distanceZ) > playerChunkGenerationRadiusHorizontal + 2) {
+                chunkMeshingQueue.erase(chunkMeshingQueue.begin() + iterator);
+                chunkMeshingSet.erase(std::tuple<int, int, int>(chunkPosition.x, chunkPosition.y, chunkPosition.z));
+            } else {
+                iterator++;
+            }
+        } 
     }
 }
 
@@ -195,20 +238,75 @@ void World::QueueMesh(glm::ivec3 chunkPosition, bool remesh) {
     });
 }
 
+void World::QueueTickTask(std::function<void()> task) {
+    tickTaskQueue.push(task);
+}
+
 void World::Update() {
-    if (generationQueuedChunks > 0) {
-        chunkHandler.AddChunk(chunkGenerationQueue.front().x, chunkGenerationQueue.front().y, chunkGenerationQueue.front().z);
-        chunkHandler.GenerateChunk(chunkGenerationQueue.front().x, chunkGenerationQueue.front().y, chunkGenerationQueue.front().z, defaultChunk, false, false);
-        chunkGenerationQueue.pop();
-        generationQueuedChunks--;
+    OVERRIDE_LOG_NAME("World Updating");
+
+    std::vector<glm::ivec3> chunkGenerationQueueCopy;
+    std::vector<glm::ivec3> chunkMeshingQueueCopy;
+    std::queue<glm::ivec3> chunkUnloadingQueueCopy;
+    std::queue<std::function<void()>> tickTaskQueueCopy;
+
+    {
+        std::lock_guard<std::mutex> lock(ChunkQueueMutex);
+        std::swap(tickTaskQueueCopy, tickTaskQueue);
     }
 
-    if (meshingQueuedChunks > 0) {
-        bool meshed = chunkHandler.MeshChunk(chunkMeshingQueue.front().x, chunkMeshingQueue.front().y, chunkMeshingQueue.front().z);
-        if (meshed) {
-            chunkMeshingQueue.pop();
-            meshingQueuedChunks--;
+    while (tickTaskQueueCopy.size() > 0) {
+        tickTaskQueueCopy.front()();
+        tickTaskQueueCopy.pop();
+    }
+    
+    {
+        std::lock_guard<std::mutex> lock(ChunkQueueMutex);
+        std::swap(chunkGenerationQueueCopy, chunkGenerationQueue);
+        std::swap(chunkMeshingQueueCopy, chunkMeshingQueue);
+        std::swap(chunkUnloadingQueueCopy, chunkUnloadingQueue);
+    }
+
+    if (chunkGenerationQueueCopy.size() > 0) {
+        glm::ivec3 chunkPosition = chunkGenerationQueueCopy.front();
+        if (!chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false).isAllocated) {
+            chunkHandler.AddChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z);
         }
+        chunkHandler.GenerateChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, defaultChunk, false, false);
+        chunkGenerationQueueCopy.erase(chunkGenerationQueueCopy.begin());
+    }
+
+    if (chunkMeshingQueueCopy.size() > 0) {
+        glm::ivec3 chunkPosition = chunkMeshingQueueCopy.front();
+        chunkHandler.MeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z);
+        chunkMeshingQueueCopy.erase(chunkMeshingQueueCopy.begin());
+    }
+
+    while (chunkUnloadingQueueCopy.size() > 0) {
+        glm::ivec3 chunkPosition = chunkUnloadingQueueCopy.front();
+        Chunk chunk = chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+        chunkUnloadingQueueCopy.pop();
+        totalChunks--;
+        if (chunk.id == 0) {
+            WARN("Trying to unload already unloaded chunk at position {" + std::to_string(chunkPosition.x) + ", " + std::to_string(chunkPosition.y) + ", " + std::to_string(chunkPosition.z) + "}, aborting");
+            return;
+        }
+        auto iterator = chunkHandler.chunks.find(std::tuple(chunkPosition.x, chunkPosition.y, chunkPosition.z));
+        if (iterator != chunkHandler.chunks.end()) {
+            std::cout << "unloading " << chunkPosition.x << " " << chunkPosition.y << " " << chunkPosition.z << " exists? " << chunkHandler.GetChunkExists(chunkPosition.x, chunkPosition.y, chunkPosition.z) << std::endl;
+            std::cout.flush();
+            chunkHandler.chunks.erase(iterator);
+            std::cout << "unloadedd " << chunkPosition.x << " " << chunkPosition.y << " " << chunkPosition.z << " exists? " << chunkHandler.GetChunkExists(chunkPosition.x, chunkPosition.y, chunkPosition.z) << std::endl;
+            std::cout.flush();
+        }
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(ChunkQueueMutex);
+        std::swap(chunkGenerationQueueCopy, chunkGenerationQueue);
+        std::swap(chunkMeshingQueueCopy, chunkMeshingQueue);
+        std::swap(chunkUnloadingQueueCopy, chunkUnloadingQueue);
+        std::swap(tickTaskQueueCopy, tickTaskQueue);
     }
 }
 
@@ -260,18 +358,33 @@ void World::DisplayImGui(unsigned int option) {
     if (option == 1) {
         ImGui::Text("TPS: %.2f", ticksPerSecond);
         ImGui::Text("Until next tick: %.f", tickIntervalMs - tickAccumulator);
+        std::queue<std::function<void()>> temporaryQueue = tickTaskQueue;
+        int tasks = 0;
+        while (!temporaryQueue.empty()) {
+            tasks++;
+            temporaryQueue.pop();
+        }
+        ImGui::Text("%d tasks currently queued for tick thread", tasks);
         ImGui::Text("Total chunks: %d", totalChunks);
         ImGui::Text("Rough memory usage: %.2f MB", totalMemoryUsage / (1024.0 * 1024.0));
         if (ImGui::CollapsingHeader("Chunk Generation Queue")) {
-            std::queue<glm::ivec3> temporaryQueue = chunkGenerationQueue;
+            std::vector<glm::ivec3> temporaryQueue = chunkGenerationQueue;
             while (!temporaryQueue.empty()) {
                 const glm::ivec3& pos = temporaryQueue.front();
                 ImGui::Text("{%d, %d, %d}", pos.x, pos.y, pos.z);
-                temporaryQueue.pop();
+                temporaryQueue.erase(temporaryQueue.begin());
             }
         }
         if (ImGui::CollapsingHeader("Chunk Meshing Queue")) {
-            std::queue<glm::ivec3> temporaryQueue = chunkMeshingQueue;
+            std::vector<glm::ivec3> temporaryQueue = chunkMeshingQueue;
+            while (!temporaryQueue.empty()) {
+                const glm::ivec3& pos = temporaryQueue.front();
+                ImGui::Text("{%d, %d, %d}", pos.x, pos.y, pos.z);
+                temporaryQueue.erase(temporaryQueue.begin());
+            }
+        }
+        if (ImGui::CollapsingHeader("Chunk Unloading Queue")) {
+            std::queue<glm::ivec3> temporaryQueue = chunkUnloadingQueue;
             while (!temporaryQueue.empty()) {
                 const glm::ivec3& pos = temporaryQueue.front();
                 ImGui::Text("{%d, %d, %d}", pos.x, pos.y, pos.z);

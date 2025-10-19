@@ -48,7 +48,8 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
         return false;
     }
     if (!isAllocated) {
-        WARN("Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        CRITICAL("Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        psnip_trap();
         return false;
     }
 
@@ -130,15 +131,15 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
     }
 
     if (!isAllocated) {
-        ERR("Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        CRITICAL("Trying to generate mesh for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        psnip_trap();
         return false;
     }
     
     if (!isGenerated) {
-        WARN("Trying to generate mesh for ungenerated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        WARN("Trying to generate mesh for ungenerated chunk, aborting. {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
         return false;
     }
-
     if (IsEmpty()) {
         INFO("Chunk is empty, skipping mesh generation {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
         return false;
@@ -148,13 +149,12 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
 
     vertices.clear();
     indices.clear();
-    
-    Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ, true);     // Positive X
-    Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ, true);     // Negative X
-    Chunk& positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ, true);     // Positive Y
-    Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ, true);     // Negative Y
-    Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1, true);     // Positive Z
-    Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1, true);     // Negative Z
+    Chunk& positiveXChunk = chunkHandler.GetChunkUnlocked(chunkX + 1, chunkY, chunkZ, true);
+    Chunk& negativeXChunk = chunkHandler.GetChunkUnlocked(chunkX - 1, chunkY, chunkZ, true);
+    Chunk& positiveYChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY + 1, chunkZ, true);
+    Chunk& negativeYChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY - 1, chunkZ, true);
+    Chunk& positiveZChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY, chunkZ + 1, true);
+    Chunk& negativeZChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY, chunkZ - 1, true);
 
     std::vector<FaceDirection> facesToAdd;
     facesToAdd.reserve(6);
@@ -326,11 +326,12 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
 
     isMeshed = true;
     generationStatus = 3;
+    shouldRender = true;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
     int time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     if (Globals::GetInstance().debugMode) {
-        INFO("chunk meshing took " + std::to_string(time) + "ms");
+        //INFO("chunk meshing took " + std::to_string(time) + "ms");
     }
 
     return true;
@@ -500,7 +501,7 @@ bool Chunk::IsFull() {
 }
 
 void Chunk::DisplayImGui() {
-    ImGui::Text("Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %d, Indices: %d, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, static_cast<int>(vertices.size()), static_cast<int>(indices.size()), vertexBufferObject.vertexBufferObjectID, vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID, static_cast<int>(static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) / 1024.0));
+    ImGui::Text("Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %d, Indices: %d, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB, ID: %d", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, static_cast<int>(vertices.size()), static_cast<int>(indices.size()), vertexBufferObject.vertexBufferObjectID, vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID, static_cast<int>(static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) / 1024.0), id);
 }
 
 void Chunk::Delete() {

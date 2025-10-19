@@ -26,7 +26,7 @@ Player::Player(int playerX, int playerY, int playerZ, World& world) : world(worl
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 
-	playerData.gameMode = SURVIVAL;
+	playerData.gameMode = CREATIVE;
 
 	if (playerData.gameMode == CREATIVE) {
 		entityData.applyCollision = false;
@@ -42,6 +42,7 @@ Player::Player(int playerX, int playerY, int playerZ, World& world) : world(worl
 }
 
 void Player::Setup() {
+	EventManager& eventManager = EventManager::GetInstance();
 	camera = std::make_shared<Camera>();
 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
@@ -56,11 +57,10 @@ void Player::Setup() {
 		}
 	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F3, [&](int key) {
-		EventManager::GetInstance().TriggerEvent("event/toggle_debug");
+		eventManager.TriggerEvent("event/toggle_debug");
 	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int key) {
 		UI& ui = UI::GetInstance();
-		EventManager& eventManager = EventManager::GetInstance();
 		if (ui.IsDisabled()) {
 			eventManager.TriggerEvent("ui/move_screen_game_pause");
 			Window::GetInstance().SetFocused(false);
@@ -71,6 +71,11 @@ void Player::Setup() {
 	inputCallbackIDs.emplace_back(inputHandler.RegisterScrollCallback(true, [this](double offset) {
 		entityStats.health += static_cast<float>(offset);
 	}));
+
+	entityData.currentChunkPtr = &chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+	if (entityData.currentChunkPtr->id == 0) {
+		entityData.currentChunkPtr = nullptr;
+	}
 }
 
 void Player::Update() {
@@ -87,7 +92,6 @@ void Player::Update() {
 		Entity::Update();
 		entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
 		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
-        //std::cout << entityData.isGrounded << std::endl;
         if (entityData.isGrounded) {
 			if (entityData.isJumping) {
 				auto current = std::chrono::high_resolution_clock::now();
@@ -97,7 +101,14 @@ void Player::Update() {
 		}
 		
 		if (oldEntityData.globalChunkPosition != entityData.globalChunkPosition) {
-			EventManager::GetInstance().TriggerEvent("event/entity_moved_chunk", std::make_pair("globalChunkPosition", entityData.globalChunkPosition));
+			EventManager::GetInstance().TriggerEvent("event/player_moved_chunk", 
+				std::make_pair("globalChunkPosition", entityData.globalChunkPosition), 
+				std::make_pair("entity", this), 
+				std::make_pair("chunkHandler", chunkHandler));
+			entityData.currentChunkPtr = &chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+			if (entityData.currentChunkPtr->id == 0) {
+				entityData.currentChunkPtr = nullptr;
+			}
 		}
 	}
 }
@@ -188,7 +199,7 @@ void Player::MouseButtonCallback(int button) {
 		if (button == 0) {
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
-                chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
 				if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1) {
 					chunkHandler->RemeshChunk(chunkPosition.x - 1, chunkPosition.y, chunkPosition.z, false);
 				}

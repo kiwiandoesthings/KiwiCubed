@@ -2,7 +2,7 @@ project('kiwicubed', 'cpp', default_options: ['cpp_std=c++20'])
 
 # Stops KiwiCubed\subprojects\glm-1.0.1\glm\gtx\../gtx/transform.hpp(23): fatal error C1189
 add_project_arguments('-DGLM_ENABLE_EXPERIMENTAL', language: 'cpp')
-add_project_arguments('-DSTB_IMAGE_IMPLEMENTATION', language: 'cpp')
+#add_project_arguments('-DSTB_IMAGE_IMPLEMENTATION', language: 'cpp')
 add_project_arguments('-GL_WITH_GLAD', language: 'c')
 
 if host_machine.system() == 'linux'
@@ -13,8 +13,18 @@ if meson.get_compiler('cpp').get_id() == 'msvc'
     add_project_link_arguments('/ignore:4099', language: 'cpp')
 endif
 
+rc_compiler = find_program('rc', required: true)
+
+app_icon = custom_target('app_icon_res',
+  input: 'Source/AppIcon.rc',
+  output: 'AppIcon.res',
+  command: [rc_compiler, '/nologo', '/fo', '@OUTPUT@', '@INPUT@']
+)
+
+freetype = dependency('freetype2', static: true, default_options: ['png=false'])
+
 executable(
-  'kiwicubed',
+  'kiwicubed', [
   files(
     # GPU objects
     'Source/GPUObjects/IndexBufferObject.cpp',
@@ -50,8 +60,12 @@ executable(
     'Source/AssetManager.cpp',
     'Source/ThreadPool.cpp',
     'Source/UI.cpp',
-    'Source/Window.cpp'
+    'Source/Window.cpp',
+
+    # Windows
+    #'Source/AppIcon.rc'
   ),
+  app_icon],
   include_directories: include_directories('Source', 'Source/GPUObjects', 'Source/World', 'Source/Rendering'),
   dependencies: [
     dependency('kwport'),
@@ -61,6 +75,6 @@ executable(
     dependency('imgui', static: true),
     dependency('glm', static: true),
     dependency('glad-gl', static: true),
-    dependency('freetype2', static: true),
+    freetype
   ],
 )

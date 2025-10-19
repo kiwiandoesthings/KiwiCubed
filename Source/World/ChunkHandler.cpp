@@ -13,9 +13,9 @@ Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotF
         return chunk->second;
     }
     else {
-        //WARN("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        //INFO("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
         if (addIfNotFound) {
-            Chunk& chunk = AddChunk(chunkX, chunkY, chunkZ);
+            Chunk& chunk = AddChunkUnlocked(chunkX, chunkY, chunkZ);
             return chunk;
         } else {
             return defaultChunk;
@@ -24,6 +24,7 @@ Chunk& ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotF
 }
 
 bool ChunkHandler::GetChunkExists(int chunkX, int chunkY, int chunkZ) {
+    std::lock_guard<std::mutex> lock(ChunkMutex);
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk != chunks.end()) {
         return true;
@@ -35,22 +36,8 @@ bool ChunkHandler::GetChunkExists(int chunkX, int chunkY, int chunkZ) {
 
 Chunk& ChunkHandler::AddChunk(int chunkX, int chunkY, int chunkZ) {
     OVERRIDE_LOG_NAME("ChunkHandler");
-    auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
-    if (chunk == chunks.end()) {
-        chunks.insert(std::make_pair(std::tuple<int, int, int>(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
-        chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
-        chunk->second.SetPosition(chunkX, chunkY, chunkZ);
-        chunk->second.AllocateChunk();
-        chunk->second.id = world.totalChunks;
-
-        world.totalChunks++;
-
-        return chunk->second;
-    }
-    else {
-        //INFO("Chunk already found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
-        return GetChunk(chunkX, chunkY, chunkZ, false);
-    }
+    std::lock_guard<std::mutex> lock(ChunkMutex);
+    return AddChunkUnlocked(chunkX, chunkY, chunkZ);
 }
 
 void ChunkHandler::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk callerChunk, bool updateCallerChunk, bool debug) {
@@ -58,7 +45,15 @@ void ChunkHandler::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk calle
 }
 
 bool ChunkHandler::MeshChunk(int chunkX, int chunkY, int chunkZ) {
-    return GetChunk(chunkX, chunkY, chunkZ, false).GenerateMesh(*this, false);
+    Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ, false);
+    std::cout << "chunk id is " << chunk.id << std::endl;
+    if (chunk.id == 0) {
+        WARN("Tried to mesh chunk that didn't exist {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}, aborting");
+        return false;
+    }
+    std::cout << "chunk id above is NOT 0" << std::endl;
+    
+    return chunk.GenerateMesh(*this, false);
 }
 
 // Specifically uses the world's GenerateChunk() function that makes sure chunks mesh correctly
@@ -92,20 +87,24 @@ void ChunkHandler::RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNe
         return;
     }
 
-    chunk.GenerateMesh(*this, true);
+    {
+        std::lock_guard<std::mutex> lock(ChunkMutex);
+        chunk.GenerateMesh(*this, true);
 
-    if (updateNeighbors) {
-        GetChunk(chunkX + 1, chunkY, chunkZ, false).GenerateMesh(*this, true);
-        GetChunk(chunkX - 1, chunkY, chunkZ, false).GenerateMesh(*this, true);
-        GetChunk(chunkX, chunkY + 1, chunkZ, false).GenerateMesh(*this, true);
-        GetChunk(chunkX, chunkY - 1, chunkZ, false).GenerateMesh(*this, true);
-        GetChunk(chunkX, chunkY, chunkZ + 1, false).GenerateMesh(*this, true);
-        GetChunk(chunkX, chunkY, chunkZ - 1, false).GenerateMesh(*this, true);
+        if (updateNeighbors) {
+            GetChunkUnlocked(chunkX + 1, chunkY, chunkZ, false).GenerateMesh(*this, true);
+            GetChunkUnlocked(chunkX - 1, chunkY, chunkZ, false).GenerateMesh(*this, true);
+            GetChunkUnlocked(chunkX, chunkY + 1, chunkZ, false).GenerateMesh(*this, true);
+            GetChunkUnlocked(chunkX, chunkY - 1, chunkZ, false).GenerateMesh(*this, true);
+            GetChunkUnlocked(chunkX, chunkY, chunkZ + 1, false).GenerateMesh(*this, true);
+            GetChunkUnlocked(chunkX, chunkY, chunkZ - 1, false).GenerateMesh(*this, true);
+        }
     }
 }
 
 void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID) {
-    Chunk& chunk = GetChunk(chunkX, chunkY, chunkZ, false);
+    std::lock_guard<std::mutex> lock(ChunkMutex);
+    Chunk& chunk = GetChunkUnlocked(chunkX, chunkY, chunkZ, false);
     Block& block = chunk.GetBlock(blockX, blockY, blockZ);
     if (block.IsAir() ^ (newBlockID == 0)) {
         int currentBlocks = chunk.GetTotalBlocks();
@@ -123,7 +122,42 @@ void ChunkHandler::RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, i
     AddBlock(chunkX, chunkY, chunkZ, blockX, blockY, blockZ, 0);
 }
 
+Chunk& ChunkHandler::GetChunkUnlocked(int chunkX, int chunkY, int chunkZ, bool addIfNotFound) {
+    OVERRIDE_LOG_NAME("ChunkHandler");
+    auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
+    if (chunk != chunks.end()) {
+        return chunk->second;
+    }
+    else {
+        //INFO("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        if (addIfNotFound) {
+            Chunk& chunk = AddChunkUnlocked(chunkX, chunkY, chunkZ);
+            return chunk;
+        } else {
+            return defaultChunk;
+        }
+    }
+}
+
+Chunk& ChunkHandler::AddChunkUnlocked(int chunkX, int chunkY, int chunkZ) {
+    auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
+    if (chunk == chunks.end()) {
+        chunks.insert(std::make_pair(std::tuple<int, int, int>(chunkX, chunkY, chunkZ), Chunk(chunkX, chunkY, chunkZ)));
+        chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
+        chunk->second.SetPosition(chunkX, chunkY, chunkZ);
+        chunk->second.AllocateChunk();
+        chunk->second.id = world.totalChunks + 1;
+
+        world.totalChunks++;
+
+        return chunk->second;
+    } else {
+        return defaultChunk;
+    }
+}
+
 void ChunkHandler::Delete() {
+    std::lock_guard<std::mutex> lock(ChunkMutex);
     for (auto it = chunks.begin(); it != chunks.end(); ++it) {
         auto& chunk = it->second;
         chunk.Delete();

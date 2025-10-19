@@ -32,9 +32,6 @@ class World {
 		unsigned int totalChunks;
 		float totalMemoryUsage;
 
-		unsigned int generationQueuedChunks = 0;
-		unsigned int meshingQueuedChunks = 0;
-
 		World() : worldSizeHorizontal(1), worldSizeVertical(1), chunkHandler(*this), player(0, 0, 0, *this), singleplayerHandler(singleplayerHandler), totalChunks(0), totalMemoryUsage(0), shouldTick(false), tickIntervalMs(50) {}
 		World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, SingleplayerHandler* singleplayerHandler);
 
@@ -45,8 +42,9 @@ class World {
 		void GenerateWorld();
 		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk);
 
-		void GenerateChunksAroundPosition(Event& event, unsigned short horizontalRadius = 0, unsigned short verticalRadius = 0);
+		void RecalculateChunksToLoad(Event event, unsigned short horizontalRadius = 0, unsigned short verticalRadius = 0);
         void QueueMesh(glm::ivec3 chunkPosition, bool remesh);
+		void QueueTickTask(std::function<void()> task);
 
 		void Update();
 
@@ -82,10 +80,13 @@ class World {
 		float tickAccumulator = 0.0f;
 		std::chrono::steady_clock::time_point tpsStartTime = std::chrono::steady_clock::now();
 
-		std::queue<glm::ivec3> chunkGenerationQueue;
+		std::mutex ChunkQueueMutex;
+		std::vector<glm::ivec3> chunkGenerationQueue;
 		std::unordered_set<std::tuple<int, int, int>, TripleHash> chunkGenerationSet;
-		std::queue<glm::ivec3> chunkMeshingQueue;
+		std::vector<glm::ivec3> chunkMeshingQueue;
 		std::unordered_set<std::tuple<int, int, int>, TripleHash> chunkMeshingSet;
+		std::queue<glm::ivec3> chunkUnloadingQueue;
+		std::queue<std::function<void()>> tickTaskQueue;
 		unsigned short playerChunkGenerationRadiusHorizontal = 5;
 		unsigned short playerChunkGenerationRadiusVertical = 2;
 
