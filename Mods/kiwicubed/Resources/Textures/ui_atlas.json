@@ -24,6 +24,14 @@
 			"yPosition": 0,
 			"xSize": 3,
 			"ySize": 1
+		},
+		{
+			"id": "kiwicubed:inventory",
+			"variant": 0,
+			"xPosition": 0,
+			"yPosition": 1,
+			"xSize": 5,
+			"ySize": 2
 		}
 	]
 }

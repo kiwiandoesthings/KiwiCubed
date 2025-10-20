@@ -68,6 +68,14 @@ void Player::Setup() {
 			eventManager.TriggerEvent("event/back_ui");
 		}
 	}));
+	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
+		if (!inInterface) {
+			EventManager::GetInstance().TriggerEvent("ui/move_screen_inventory");
+		} else {
+			EventManager::GetInstance().TriggerEvent("event/back_ui");
+		}
+		inInterface = !inInterface;
+	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterScrollCallback(true, [this](double offset) {
 		entityStats.health += static_cast<float>(offset);
 	}));

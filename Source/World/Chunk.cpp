@@ -393,10 +393,6 @@ void Chunk::Render() {
     }
 }
 
-inline Block& Chunk::GetBlock(const unsigned char blockX, const unsigned char blockY, const unsigned char blockZ) const {
-    return blocks[blockX + chunkSize * (blockY + chunkSize * blockZ)];
-}
-
 void Chunk::SetPosition(int newChunkX, int newChunkY, int newChunkZ) {
     chunkX = newChunkX;
     chunkY = newChunkY;

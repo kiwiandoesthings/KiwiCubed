@@ -51,6 +51,8 @@ void SingleplayerHandler::Update() {
 		singleplayerWorld.reset();
 		isLoadedIntoSingleplayerWorld = false;
 		eventManager.TriggerEvent("ui/move_screen_main_menu");
+		eventManager.DeregisterEvent("event/unload_world");
+		eventManager.DeregisterEvent("event/player_moved_chunk");
 		shouldUnloadWorld = false;
 	}
 }

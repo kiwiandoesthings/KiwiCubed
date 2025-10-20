@@ -10,7 +10,7 @@
 	}
 #endif
 
-bool bitness;
+unsigned char bitness;
 
 
 #include <glad/glad.h>
@@ -121,14 +121,14 @@ int main() {
 
 	// System info
 	if (sizeof(void*) == 8) {
-		bitness = 1;
+		bitness = 64;
 	} else if (sizeof(void*) == 4) {
-		bitness = 0;
+		bitness = 32;
 	} else {
 		ERR("Failed to find machine bitness");
 		return -1;
 	}
-	INFO("Machine bitness: " + std::to_string(bitness == 1 ? 64 : 32));
+	INFO("Machine bitness: " + std::to_string(bitness));
 	INFO("Using OpenGL version: " + std::string((char*)glGetString(GL_VERSION)));
 	INFO("Using graphics device: " + std::string((char*)glGetString(GL_RENDERER)));
 	INFO("Using resolution: " + std::to_string(globalWindow.GetWidth()) + " x " + std::to_string(globalWindow.GetHeight()));
@@ -139,35 +139,41 @@ int main() {
 	GLCall(glEnable(GL_BLEND));
 	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+	EventManager::GetInstance().RegisterEvent("event/blank");
+
 	// Initialize FreeType
 	FT_Library ft;
     LOG_CHECK_RETURN_CRITICAL(!FT_Init_FreeType(&ft), "Successfully initialized FreeType", "Failed to initialize FreeType, exiting", -1);
-
     FT_Face face;
     LOG_CHECK_RETURN_CRITICAL(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf, exiting", -1);
-
     FT_Set_Pixel_Sizes(face, 0, 32);
 
 	Shader textShader("Mods/kiwicubed/Resources/Shaders/Text_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Text_Fragment.frag");
-
+	assetManager.RegisterShaderProgram({"kiwicubed", "text_shader"}, textShader);
 	TextRenderer textRenderer(ft, face, textShader);
 
 	// MAIN PROGRAM SETUP FINISHED - Most of the rest of this is able to be moved into other places to make this more modular
 	
 	// Create shader programs (needs to be modularized)
 	Shader terrainShaderProgram("Mods/kiwicubed/Resources/Shaders/Terrain_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Terrain_Fragment.frag");
+	assetManager.RegisterShaderProgram({"kiwicubed", "terrain_shader"}, terrainShaderProgram);
 	Shader wireframeShaderProgram("Mods/kiwicubed/Resources/Shaders/Wireframe_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Wireframe_Fragment.frag");
+	assetManager.RegisterShaderProgram({"kiwicubed", "wireframe_shader"}, terrainShaderProgram);
 	Shader chunkDebugShaderProgram("Mods/kiwicubed/Resources/Shaders/ChunkDebug_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/ChunkDebug_Fragment.frag");
+	assetManager.RegisterShaderProgram({"kiwicubed", "chunk_debug_shader"}, terrainShaderProgram);
 	Shader uiShaderProgram("Mods/kiwicubed/Resources/Shaders/UI_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/UI_Fragment.frag");
+	assetManager.RegisterShaderProgram({"kiwicubed", "ui_shader"}, terrainShaderProgram);
 
 	// Create texture atlases (needs to be modularized)
 	Texture terrainAtlas("Mods/kiwicubed/Resources/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, "texture/terrain");
 	terrainAtlas.SetAtlasSize(chunkDebugShaderProgram, glm::vec2(4, 4));
 	terrainAtlas.TextureUnit(terrainShaderProgram, "tex0");
 	terrainAtlas.TextureUnit(chunkDebugShaderProgram, "tex0");
+	assetManager.RegisterTextureAtlas({"kiwicubed", "terrain_atlas"}, terrainAtlas);
 	Texture uiAtlas("Mods/kiwicubed/Resources/Textures/ui_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, "texture/gui");
-	uiAtlas.SetAtlasSize(uiShaderProgram, glm::vec2(3, 1));
+	uiAtlas.SetAtlasSize(uiShaderProgram, glm::vec2(3, 3));
 	uiAtlas.TextureUnit(uiShaderProgram, "tex0");
+	assetManager.RegisterTextureAtlas({"kiwicubed", "ui_atlas"}, uiAtlas);
 
 	ModHandler modHandler = ModHandler();
 	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.SetupTextureAtlasData(), "Failed to setup texture atlas data, exiting", -1);
@@ -176,23 +182,34 @@ int main() {
 	Renderer renderer = Renderer();
 	DebugRenderer debugRenderer = DebugRenderer();
 
+	EventManager& eventManager = EventManager::GetInstance();
+	eventManager.RegisterEvent("event/close_game");
+	eventManager.AddEventToDo("event/close_game", [&](Event& event) {
+		glfwSetWindowShouldClose(globalWindow.GetWindowInstance(), true);
+	});
+
 	UI& ui = UI::GetInstance();
 	ui.Setup(&uiShaderProgram, &uiAtlas, &textRenderer);
 	UIScreen mainMenuUI = UIScreen("ui/main_menu");
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/generate_world", "Create World"));
-	mainMenuUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
+	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/generate_world", "Create World"));
+	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
+	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "event/close_game", "Exit"));
 	ui.AddScreen(&mainMenuUI);
 	ui.SetCurrentScreen(&mainMenuUI);
 
 	UIScreen settingsUI = UIScreen("ui/settings");
-	settingsUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "event/back_ui", "Back"));
+	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "event/back_ui", "Back"));
 	ui.AddScreen(&settingsUI);
 
 	UIScreen gamePauseUI = UIScreen("ui/game_pause");
-	gamePauseUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/disable_ui", "Resume game"));
-	gamePauseUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
-	gamePauseUI.AddUIElement(new UIElement(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "event/unload_world", "Quit Game"));
+	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/disable_ui", "Resume game"));
+	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
+	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "event/unload_world", "Quit Game"));
 	ui.AddScreen(&gamePauseUI);
+
+	UIScreen inventoryUI = UIScreen("ui/inventory");
+	inventoryUI.AddUIElement(new UIImage(glm::vec2((globalWindow.GetWidth() / 2) - 46, 500), glm::vec2(1, 1), "event/blank", {"kiwicubed", "inventory"}));
+	ui.AddScreen(&inventoryUI);
 
 	// Create a singleplayer instance
 	SingleplayerHandler singleplayerHandler = SingleplayerHandler(debugRenderer);
@@ -286,6 +303,8 @@ int main() {
 	if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
 		singleplayerHandler.EndSingleplayerWorld();
 	}
+
+	EventManager::GetInstance().Delete();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

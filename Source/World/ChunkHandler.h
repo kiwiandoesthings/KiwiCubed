@@ -120,7 +120,9 @@ class Chunk {
         bool GenerateHeightmap();
         void Render();
 
-        Block& GetBlock(const unsigned char blockX, const unsigned char blockY, const unsigned char blockZ) const;
+        inline Block& GetBlock(const unsigned char blockX, const unsigned char blockY, const unsigned char blockZ) {
+            return blocks[blockX + chunkSize * (blockY + chunkSize * blockZ)];
+        }
 
         void SetPosition(int newChunkX, int newChunkY, int newChunkZ);
 

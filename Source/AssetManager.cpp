@@ -1,9 +1,17 @@
 #include "AssetManager.h"
 #include <cstddef>
 #include "Block.h"
+#include "Texture.h"
 
 
 AssetManager::AssetManager() {}
+
+void AssetManager::RegisterTextureAtlas(AssetStringID atlasStringID, Texture textureAtlas) {
+    OVERRIDE_LOG_NAME("Texture Manager");
+    textureAtlases.insert({atlasStringID, textureAtlas});
+
+    INFO("Successfully registered texture atlas with string ID of \"" + atlasStringID.CanonicalName() + "\"");
+}
 
 void AssetManager::RegisterTexture(MetaTexture texture) {
     OVERRIDE_LOG_NAME("Texture Manager");
@@ -14,6 +22,25 @@ void AssetManager::RegisterTexture(MetaTexture texture) {
     latestTextureID++;
 
     INFO("Successfully registered texture of with string ID of \"" + texture.stringID.CanonicalName() + "\" and numerical id of {" + std::to_string(latestTextureID) + "} with: {" + std::to_string(texture.atlasData.size()) + "} variants");
+}
+
+void AssetManager::RegisterShaderProgram(AssetStringID shaderProgramStringID, Shader shaderProgram) {
+    OVERRIDE_LOG_NAME("Texture Manager");
+    shaderPrograms.insert({shaderProgramStringID, shaderProgram});
+
+    INFO("Successfully registered texture atlas with string ID of \"" + shaderProgramStringID.CanonicalName() + "\"");
+}
+
+Texture* AssetManager::GetTextureAtlas(AssetStringID atlasStringID) {
+    OVERRIDE_LOG_NAME("Texture Manager");
+    auto iterator = textureAtlases.find(atlasStringID);
+    if (iterator != textureAtlases.end()) {
+        return &iterator->second;
+    } else {
+        ERR("Tried to get texture atlas with string id \"" + atlasStringID.CanonicalName() + "\" that did not exist, aborting");
+        psnip_trap();
+    }
+    return &iterator->second;
 }
 
 AssetStringID* AssetManager::GetStringID(unsigned int numericalID) {
@@ -38,6 +65,18 @@ unsigned int AssetManager::GetNumericalID(AssetStringID stringID) {
         psnip_trap();
     }
     return stringIDsToNumericalIDs[stringID];
+}
+
+Shader* AssetManager::GetShaderProgram(AssetStringID shaderProgramStringID) {
+    OVERRIDE_LOG_NAME("Texture Manager");
+    auto iterator = shaderPrograms.find(shaderProgramStringID);
+    if (iterator != shaderPrograms.end()) {
+        return &iterator->second;
+    } else {
+        ERR("Tried to get shader program with string id \"" + shaderProgramStringID.CanonicalName() + "\" that did not exist, aborting");
+        psnip_trap();
+    }
+    return &iterator->second;
 }
 
 std::vector<TextureAtlasData>* AssetManager::GetTextureAtlasData(unsigned int numericalID) {

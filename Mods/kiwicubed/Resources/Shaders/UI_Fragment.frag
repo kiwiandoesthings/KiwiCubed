@@ -10,6 +10,7 @@ uniform vec2 textureSize;
 uniform vec2 borderSize;
 uniform vec2 elementDimensions;
 uniform uint textureIndex;
+uniform bool caluclateTextureCoordinates;
 
 const float epsilon = 0.00001;
 
@@ -28,10 +29,9 @@ void main()
     vec2 borders = borderSize / textureSize;
     vec2 dimensions = borderSize / elementDimensions * borderSize;
 
-    //newTextureCoordinates = vec2(
-    //    processAxis(newTextureCoordinates.x, borders.x, dimensions.x),
-    //    processAxis(newTextureCoordinates.y, borders.y, dimensions.y)
-    //);
-    
-    FragColor = texture(tex0, newTextureCoordinates);
+    if (caluclateTextureCoordinates) {
+        FragColor = texture(tex0, newTextureCoordinates);
+    } else {
+        FragColor = texture(tex0, textureCoordinatesOut);
+    }
 }

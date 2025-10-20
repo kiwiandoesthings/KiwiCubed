@@ -19,27 +19,30 @@ void EventManager::RegisterEvent(const std::string& eventName) {
     INFO("Successfully registered event \"" + eventName + "\"");
 }
 
-void EventManager::DeregisterEvent(const std::string& eventName) {
+std::unordered_map<std::string, Event*>::iterator EventManager::DeregisterEvent(const std::string& eventName) {
     OVERRIDE_LOG_NAME("Events");
-    auto it = eventMap.find(eventName);
-    if (it == eventMap.end()) {
+    if (eventName == "event/blank") {
+        return eventMap.end();
+    }
+    auto iterator = eventMap.find(eventName);
+    if (iterator == eventMap.end()) {
         WARN("Tried to deregister non-existent event \"" + eventName + "\", aborting");
-        return;
+        return eventMap.end();
     }
 
-    // Remove from vector
+    std::string eventNameCopy = eventName;
+
     registeredEvents.erase(
         std::remove_if(
             registeredEvents.begin(),
             registeredEvents.end(),
-            [&eventName](const std::unique_ptr<Event>& e) { return e->eventName == eventName; }
+            [&eventName](const std::unique_ptr<Event>& event) { return event->eventName == eventName; }
         ),
         registeredEvents.end()
     );
 
-    // Remove from map
-    eventMap.erase(it);
-    INFO("Successfully deregistered event \"" + eventName + "\"");
+    INFO("Successfully deregistered event \"" + eventNameCopy + "\"");
+    return eventMap.erase(iterator);
 }
 
 void EventManager::AddEventToDo(const std::string& eventName, std::function<void(Event&)> eventTodo) {
@@ -49,6 +52,16 @@ void EventManager::AddEventToDo(const std::string& eventName, std::function<void
         it->second->AddToDo(std::move(eventTodo));
     } else {
         WARN("Tried to add a todo to non-existent event \"" + eventName + "\"");
+    }
+}
+
+void EventManager::Delete() {
+    OVERRIDE_LOG_NAME("Events");
+
+    std::unordered_map<std::string, Event*> eventMapCopy = eventMap;
+
+    for (auto iterator = eventMapCopy.begin(); iterator != eventMapCopy.end(); iterator++) {
+        DeregisterEvent(iterator->second->eventName);
     }
 }
 

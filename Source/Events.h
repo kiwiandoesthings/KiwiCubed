@@ -1,5 +1,8 @@
 #pragma once
+
 #include <klogger.hpp>
+
+#include <algorithm>
 #include <any>
 #include <functional>
 #include <string>
@@ -50,9 +53,10 @@ class Event {
 class EventManager {
     public:
         static EventManager& GetInstance();
+        void Delete();
 
         void RegisterEvent(const std::string& eventName);
-        void DeregisterEvent(const std::string& eventName);
+        std::unordered_map<std::string, Event*>::iterator DeregisterEvent(const std::string& eventName);
 
         template<typename... KVs>
         void TriggerEvent(const std::string& eventName, KVs&&... kvs) {

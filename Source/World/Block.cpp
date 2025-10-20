@@ -18,9 +18,5 @@ void Block::SetVariant(unsigned short newVariant) {
 }
 
 bool Block::IsAir() {
-	if (blockID == 0) {
-		return true;
-	} else {
-		return false;
-	}
+	return blockID == 0;
 }

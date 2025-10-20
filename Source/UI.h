@@ -5,6 +5,7 @@
 #include <glm/vec2.hpp>
 #include <stack>
 
+#include "AssetManager.h"
 #include "Events.h"
 #include "IndexBufferObject.h"
 #include "Input.h"
@@ -89,38 +90,68 @@ class UIScreen {
 
 class UIElement {
     public:
-        UIElement(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, std::string elementLabel);
+        UIElement(glm::vec2 position, glm::vec2 scale, std::string eventToTrigger);
         
         glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
         float PositionToNDC(float number);
 
-        void Render();
+        virtual void Render();
 
         void Trigger();
 
-        bool OnClick();
-        void OnHover();
+        virtual bool OnClick();
+        virtual void OnHover();
 
         glm::vec2* GetPosition();
         glm::ivec2* GetScale();
         glm::vec2* GetSize();
 
         std::string* GetEventTrigger();
-        std::string* GetElementLabel();
 
         bool GetSelected();
-        void SetSelected(bool selected);
+        virtual void SetSelected(bool selected);
 
     protected:
         glm::vec2 position = glm::vec2(0, 0);
         glm::ivec2 scale = glm::ivec2(1, 1);
         glm::vec2 size = glm::vec2(512, 128);
         std::string eventToTrigger = "";
-        std::string elementLabel = "";
         bool tabSelected = false;
         bool hoverSelected = false;
 
         unsigned int textureIndex;
 
-        bool GetHovered();
+        virtual bool GetHovered();
+};
+
+
+class UIButton : public UIElement {
+    public:
+        UIButton(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, std::string elementLabel);
+        
+        void Render() override;
+
+        bool OnClick() override;
+        void OnHover() override;
+
+        void SetSelected(bool selected) override;
+        
+        std::string* GetElementLabel();
+
+    private:
+        glm::vec2 size;
+        std::string elementLabel = "";
+};
+
+
+class UIImage : public UIElement {
+    public:
+        UIImage(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, AssetStringID imageStringID);
+
+        void Render() override;
+
+    private:
+        glm::vec2 size;
+        MetaTexture image;
+        float frame = 0;
 };

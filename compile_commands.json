@@ -1,0 +1,698 @@
+[
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/adler32.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\adler32.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/adler32.c.obj \"-c\" ../subprojects/zlib-1.3.1/adler32.c",
+    "file": "../subprojects/zlib-1.3.1/adler32.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/adler32.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/crc32.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\crc32.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/crc32.c.obj \"-c\" ../subprojects/zlib-1.3.1/crc32.c",
+    "file": "../subprojects/zlib-1.3.1/crc32.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/crc32.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/deflate.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\deflate.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/deflate.c.obj \"-c\" ../subprojects/zlib-1.3.1/deflate.c",
+    "file": "../subprojects/zlib-1.3.1/deflate.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/deflate.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/infback.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\infback.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/infback.c.obj \"-c\" ../subprojects/zlib-1.3.1/infback.c",
+    "file": "../subprojects/zlib-1.3.1/infback.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/infback.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/inffast.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\inffast.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/inffast.c.obj \"-c\" ../subprojects/zlib-1.3.1/inffast.c",
+    "file": "../subprojects/zlib-1.3.1/inffast.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/inffast.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/inflate.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\inflate.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/inflate.c.obj \"-c\" ../subprojects/zlib-1.3.1/inflate.c",
+    "file": "../subprojects/zlib-1.3.1/inflate.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/inflate.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/inftrees.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\inftrees.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/inftrees.c.obj \"-c\" ../subprojects/zlib-1.3.1/inftrees.c",
+    "file": "../subprojects/zlib-1.3.1/inftrees.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/inftrees.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/trees.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\trees.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/trees.c.obj \"-c\" ../subprojects/zlib-1.3.1/trees.c",
+    "file": "../subprojects/zlib-1.3.1/trees.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/trees.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/zutil.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\zutil.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/zutil.c.obj \"-c\" ../subprojects/zlib-1.3.1/zutil.c",
+    "file": "../subprojects/zlib-1.3.1/zutil.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/zutil.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/compress.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\compress.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/compress.c.obj \"-c\" ../subprojects/zlib-1.3.1/compress.c",
+    "file": "../subprojects/zlib-1.3.1/compress.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/compress.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/gzclose.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\gzclose.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/gzclose.c.obj \"-c\" ../subprojects/zlib-1.3.1/gzclose.c",
+    "file": "../subprojects/zlib-1.3.1/gzclose.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/gzclose.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/gzlib.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\gzlib.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/gzlib.c.obj \"-c\" ../subprojects/zlib-1.3.1/gzlib.c",
+    "file": "../subprojects/zlib-1.3.1/gzlib.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/gzlib.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/gzread.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\gzread.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/gzread.c.obj \"-c\" ../subprojects/zlib-1.3.1/gzread.c",
+    "file": "../subprojects/zlib-1.3.1/gzread.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/gzread.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/gzwrite.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\gzwrite.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/gzwrite.c.obj \"-c\" ../subprojects/zlib-1.3.1/gzwrite.c",
+    "file": "../subprojects/zlib-1.3.1/gzwrite.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/gzwrite.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\libz.a.p\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/libz.a.p/uncompr.c.obj -MF \"subprojects\\zlib-1.3.1\\libz.a.p\\uncompr.c.obj.d\" -o subprojects/zlib-1.3.1/libz.a.p/uncompr.c.obj \"-c\" ../subprojects/zlib-1.3.1/uncompr.c",
+    "file": "../subprojects/zlib-1.3.1/uncompr.c",
+    "output": "subprojects/zlib-1.3.1/libz.a.p/uncompr.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\zlib-1.3.1\\test\\example.exe.p\" \"-Isubprojects\\zlib-1.3.1\\test\" \"-I..\\subprojects\\zlib-1.3.1\\test\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-D_LARGEFILE64_SOURCE\" -MD -MQ subprojects/zlib-1.3.1/test/example.exe.p/example.c.obj -MF \"subprojects\\zlib-1.3.1\\test\\example.exe.p\\example.c.obj.d\" -o subprojects/zlib-1.3.1/test/example.exe.p/example.c.obj \"-c\" ../subprojects/zlib-1.3.1/test/example.c",
+    "file": "../subprojects/zlib-1.3.1/test/example.c",
+    "output": "subprojects/zlib-1.3.1/test/example.exe.p/example.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftbase.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftbase.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftbase.c.obj \"-c\" ../subprojects/freetype/src/base/ftbase.c",
+    "file": "../subprojects/freetype/src/base/ftbase.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftbase.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftinit.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftinit.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftinit.c.obj \"-c\" ../subprojects/freetype/src/base/ftinit.c",
+    "file": "../subprojects/freetype/src/base/ftinit.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftinit.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_truetype_truetype.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_truetype_truetype.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_truetype_truetype.c.obj \"-c\" ../subprojects/freetype/src/truetype/truetype.c",
+    "file": "../subprojects/freetype/src/truetype/truetype.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_truetype_truetype.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_type1_type1.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_type1_type1.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_type1_type1.c.obj \"-c\" ../subprojects/freetype/src/type1/type1.c",
+    "file": "../subprojects/freetype/src/type1/type1.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_type1_type1.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_cff_cff.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_cff_cff.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_cff_cff.c.obj \"-c\" ../subprojects/freetype/src/cff/cff.c",
+    "file": "../subprojects/freetype/src/cff/cff.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_cff_cff.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_cid_type1cid.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_cid_type1cid.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_cid_type1cid.c.obj \"-c\" ../subprojects/freetype/src/cid/type1cid.c",
+    "file": "../subprojects/freetype/src/cid/type1cid.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_cid_type1cid.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_pfr_pfr.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_pfr_pfr.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_pfr_pfr.c.obj \"-c\" ../subprojects/freetype/src/pfr/pfr.c",
+    "file": "../subprojects/freetype/src/pfr/pfr.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_pfr_pfr.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_type42_type42.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_type42_type42.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_type42_type42.c.obj \"-c\" ../subprojects/freetype/src/type42/type42.c",
+    "file": "../subprojects/freetype/src/type42/type42.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_type42_type42.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_winfonts_winfnt.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_winfonts_winfnt.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_winfonts_winfnt.c.obj \"-c\" ../subprojects/freetype/src/winfonts/winfnt.c",
+    "file": "../subprojects/freetype/src/winfonts/winfnt.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_winfonts_winfnt.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_pcf_pcf.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_pcf_pcf.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_pcf_pcf.c.obj \"-c\" ../subprojects/freetype/src/pcf/pcf.c",
+    "file": "../subprojects/freetype/src/pcf/pcf.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_pcf_pcf.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_bdf_bdf.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_bdf_bdf.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_bdf_bdf.c.obj \"-c\" ../subprojects/freetype/src/bdf/bdf.c",
+    "file": "../subprojects/freetype/src/bdf/bdf.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_bdf_bdf.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_sfnt_sfnt.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_sfnt_sfnt.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_sfnt_sfnt.c.obj \"-c\" ../subprojects/freetype/src/sfnt/sfnt.c",
+    "file": "../subprojects/freetype/src/sfnt/sfnt.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_sfnt_sfnt.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_autofit_autofit.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_autofit_autofit.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_autofit_autofit.c.obj \"-c\" ../subprojects/freetype/src/autofit/autofit.c",
+    "file": "../subprojects/freetype/src/autofit/autofit.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_autofit_autofit.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_pshinter_pshinter.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_pshinter_pshinter.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_pshinter_pshinter.c.obj \"-c\" ../subprojects/freetype/src/pshinter/pshinter.c",
+    "file": "../subprojects/freetype/src/pshinter/pshinter.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_pshinter_pshinter.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_smooth_smooth.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_smooth_smooth.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_smooth_smooth.c.obj \"-c\" ../subprojects/freetype/src/smooth/smooth.c",
+    "file": "../subprojects/freetype/src/smooth/smooth.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_smooth_smooth.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_raster_raster.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_raster_raster.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_raster_raster.c.obj \"-c\" ../subprojects/freetype/src/raster/raster.c",
+    "file": "../subprojects/freetype/src/raster/raster.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_raster_raster.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_svg_svg.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_svg_svg.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_svg_svg.c.obj \"-c\" ../subprojects/freetype/src/svg/svg.c",
+    "file": "../subprojects/freetype/src/svg/svg.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_svg_svg.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_sdf_sdf.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_sdf_sdf.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_sdf_sdf.c.obj \"-c\" ../subprojects/freetype/src/sdf/sdf.c",
+    "file": "../subprojects/freetype/src/sdf/sdf.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_sdf_sdf.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_cache_ftcache.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_cache_ftcache.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_cache_ftcache.c.obj \"-c\" ../subprojects/freetype/src/cache/ftcache.c",
+    "file": "../subprojects/freetype/src/cache/ftcache.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_cache_ftcache.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_gzip_ftgzip.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_gzip_ftgzip.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_gzip_ftgzip.c.obj \"-c\" ../subprojects/freetype/src/gzip/ftgzip.c",
+    "file": "../subprojects/freetype/src/gzip/ftgzip.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_gzip_ftgzip.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_lzw_ftlzw.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_lzw_ftlzw.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_lzw_ftlzw.c.obj \"-c\" ../subprojects/freetype/src/lzw/ftlzw.c",
+    "file": "../subprojects/freetype/src/lzw/ftlzw.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_lzw_ftlzw.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_psaux_psaux.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_psaux_psaux.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_psaux_psaux.c.obj \"-c\" ../subprojects/freetype/src/psaux/psaux.c",
+    "file": "../subprojects/freetype/src/psaux/psaux.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_psaux_psaux.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_psnames_psnames.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_psnames_psnames.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_psnames_psnames.c.obj \"-c\" ../subprojects/freetype/src/psnames/psnames.c",
+    "file": "../subprojects/freetype/src/psnames/psnames.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_psnames_psnames.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftbbox.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftbbox.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftbbox.c.obj \"-c\" ../subprojects/freetype/src/base/ftbbox.c",
+    "file": "../subprojects/freetype/src/base/ftbbox.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftbbox.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftbdf.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftbdf.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftbdf.c.obj \"-c\" ../subprojects/freetype/src/base/ftbdf.c",
+    "file": "../subprojects/freetype/src/base/ftbdf.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftbdf.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftbitmap.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftbitmap.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftbitmap.c.obj \"-c\" ../subprojects/freetype/src/base/ftbitmap.c",
+    "file": "../subprojects/freetype/src/base/ftbitmap.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftbitmap.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftcid.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftcid.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftcid.c.obj \"-c\" ../subprojects/freetype/src/base/ftcid.c",
+    "file": "../subprojects/freetype/src/base/ftcid.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftcid.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftfstype.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftfstype.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftfstype.c.obj \"-c\" ../subprojects/freetype/src/base/ftfstype.c",
+    "file": "../subprojects/freetype/src/base/ftfstype.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftfstype.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftgasp.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftgasp.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftgasp.c.obj \"-c\" ../subprojects/freetype/src/base/ftgasp.c",
+    "file": "../subprojects/freetype/src/base/ftgasp.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftgasp.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftglyph.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftglyph.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftglyph.c.obj \"-c\" ../subprojects/freetype/src/base/ftglyph.c",
+    "file": "../subprojects/freetype/src/base/ftglyph.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftglyph.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftgxval.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftgxval.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftgxval.c.obj \"-c\" ../subprojects/freetype/src/base/ftgxval.c",
+    "file": "../subprojects/freetype/src/base/ftgxval.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftgxval.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftmm.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftmm.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftmm.c.obj \"-c\" ../subprojects/freetype/src/base/ftmm.c",
+    "file": "../subprojects/freetype/src/base/ftmm.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftmm.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftotval.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftotval.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftotval.c.obj \"-c\" ../subprojects/freetype/src/base/ftotval.c",
+    "file": "../subprojects/freetype/src/base/ftotval.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftotval.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftpatent.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftpatent.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftpatent.c.obj \"-c\" ../subprojects/freetype/src/base/ftpatent.c",
+    "file": "../subprojects/freetype/src/base/ftpatent.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftpatent.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftpfr.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftpfr.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftpfr.c.obj \"-c\" ../subprojects/freetype/src/base/ftpfr.c",
+    "file": "../subprojects/freetype/src/base/ftpfr.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftpfr.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftstroke.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftstroke.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftstroke.c.obj \"-c\" ../subprojects/freetype/src/base/ftstroke.c",
+    "file": "../subprojects/freetype/src/base/ftstroke.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftstroke.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftsynth.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftsynth.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftsynth.c.obj \"-c\" ../subprojects/freetype/src/base/ftsynth.c",
+    "file": "../subprojects/freetype/src/base/ftsynth.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftsynth.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_fttype1.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_fttype1.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_fttype1.c.obj \"-c\" ../subprojects/freetype/src/base/fttype1.c",
+    "file": "../subprojects/freetype/src/base/fttype1.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_fttype1.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/src_base_ftwinfnt.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\src_base_ftwinfnt.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/src_base_ftwinfnt.c.obj \"-c\" ../subprojects/freetype/src/base/ftwinfnt.c",
+    "file": "../subprojects/freetype/src/base/ftwinfnt.c",
+    "output": "subprojects/freetype/libfreetype.a.p/src_base_ftwinfnt.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/builds_windows_ftsystem.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\builds_windows_ftsystem.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/builds_windows_ftsystem.c.obj \"-c\" ../subprojects/freetype/builds/windows/ftsystem.c",
+    "file": "../subprojects/freetype/builds/windows/ftsystem.c",
+    "output": "subprojects/freetype/libfreetype.a.p/builds_windows_ftsystem.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\freetype\\libfreetype.a.p\" \"-Isubprojects\\freetype\" \"-I..\\subprojects\\freetype\" \"-I..\\subprojects\\freetype\\include\" \"-Isubprojects\\zlib-1.3.1\" \"-I..\\subprojects\\zlib-1.3.1\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" \"-DFT_CONFIG_MODULES_H=<ftmodule.h>\" \"-DFT2_BUILD_LIBRARY=1\" \"-DFT_CONFIG_OPTIONS_H=<ftoption.h>\" -MD -MQ subprojects/freetype/libfreetype.a.p/builds_windows_ftdebug.c.obj -MF \"subprojects\\freetype\\libfreetype.a.p\\builds_windows_ftdebug.c.obj.d\" -o subprojects/freetype/libfreetype.a.p/builds_windows_ftdebug.c.obj \"-c\" ../subprojects/freetype/builds/windows/ftdebug.c",
+    "file": "../subprojects/freetype/builds/windows/ftdebug.c",
+    "output": "subprojects/freetype/libfreetype.a.p/builds_windows_ftdebug.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\klogger\\libklogger.a.p\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" -MD -MQ subprojects/klogger/libklogger.a.p/klogger.cpp.obj -MF \"subprojects\\klogger\\libklogger.a.p\\klogger.cpp.obj.d\" -o subprojects/klogger/libklogger.a.p/klogger.cpp.obj \"-c\" ../subprojects/klogger/klogger.cpp",
+    "file": "../subprojects/klogger/klogger.cpp",
+    "output": "subprojects/klogger/libklogger.a.p/klogger.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_context.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_context.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_context.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/context.c",
+    "file": "../subprojects/glfw-3.3.10/src/context.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_context.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_init.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_init.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_init.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/init.c",
+    "file": "../subprojects/glfw-3.3.10/src/init.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_init.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_input.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_input.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_input.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/input.c",
+    "file": "../subprojects/glfw-3.3.10/src/input.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_input.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_monitor.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_monitor.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_monitor.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/monitor.c",
+    "file": "../subprojects/glfw-3.3.10/src/monitor.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_monitor.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_vulkan.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_vulkan.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_vulkan.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/vulkan.c",
+    "file": "../subprojects/glfw-3.3.10/src/vulkan.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_vulkan.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_window.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_window.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_window.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/window.c",
+    "file": "../subprojects/glfw-3.3.10/src/window.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_window.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_egl_context.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_egl_context.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_egl_context.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/egl_context.c",
+    "file": "../subprojects/glfw-3.3.10/src/egl_context.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_egl_context.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_osmesa_context.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_osmesa_context.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_osmesa_context.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/osmesa_context.c",
+    "file": "../subprojects/glfw-3.3.10/src/osmesa_context.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_osmesa_context.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_wgl_context.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_wgl_context.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_wgl_context.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/wgl_context.c",
+    "file": "../subprojects/glfw-3.3.10/src/wgl_context.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_wgl_context.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_init.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_win32_init.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_init.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/win32_init.c",
+    "file": "../subprojects/glfw-3.3.10/src/win32_init.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_init.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_joystick.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_win32_joystick.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_joystick.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/win32_joystick.c",
+    "file": "../subprojects/glfw-3.3.10/src/win32_joystick.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_joystick.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_monitor.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_win32_monitor.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_monitor.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/win32_monitor.c",
+    "file": "../subprojects/glfw-3.3.10/src/win32_monitor.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_monitor.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_thread.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_win32_thread.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_thread.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/win32_thread.c",
+    "file": "../subprojects/glfw-3.3.10/src/win32_thread.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_thread.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_time.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_win32_time.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_time.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/win32_time.c",
+    "file": "../subprojects/glfw-3.3.10/src/win32_time.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_time.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glfw-3.3.10\\libglfw3.a.p\" \"-Isubprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-std=c99\" \"-O0\" \"-g\" \"-D_GLFW_USE_CONFIG_H\" \"-pthread\" -MD -MQ subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_window.c.obj -MF \"subprojects\\glfw-3.3.10\\libglfw3.a.p\\src_win32_window.c.obj.d\" -o subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_window.c.obj \"-c\" ../subprojects/glfw-3.3.10/src/win32_window.c",
+    "file": "../subprojects/glfw-3.3.10/src/win32_window.c",
+    "output": "subprojects/glfw-3.3.10/libglfw3.a.p/src_win32_window.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/misc_cpp_imgui_stdlib.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\misc_cpp_imgui_stdlib.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/misc_cpp_imgui_stdlib.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/misc/cpp/imgui_stdlib.cpp",
+    "file": "../subprojects/imgui-1.91.6/misc/cpp/imgui_stdlib.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/misc_cpp_imgui_stdlib.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/imgui.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\imgui.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/imgui.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/imgui.cpp",
+    "file": "../subprojects/imgui-1.91.6/imgui.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/imgui.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/imgui_demo.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\imgui_demo.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/imgui_demo.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/imgui_demo.cpp",
+    "file": "../subprojects/imgui-1.91.6/imgui_demo.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/imgui_demo.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/imgui_draw.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\imgui_draw.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/imgui_draw.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/imgui_draw.cpp",
+    "file": "../subprojects/imgui-1.91.6/imgui_draw.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/imgui_draw.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/imgui_tables.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\imgui_tables.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/imgui_tables.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/imgui_tables.cpp",
+    "file": "../subprojects/imgui-1.91.6/imgui_tables.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/imgui_tables.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/imgui_widgets.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\imgui_widgets.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/imgui_widgets.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/imgui_widgets.cpp",
+    "file": "../subprojects/imgui-1.91.6/imgui_widgets.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/imgui_widgets.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx9.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\backends_imgui_impl_dx9.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx9.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/backends/imgui_impl_dx9.cpp",
+    "file": "../subprojects/imgui-1.91.6/backends/imgui_impl_dx9.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx9.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx10.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\backends_imgui_impl_dx10.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx10.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/backends/imgui_impl_dx10.cpp",
+    "file": "../subprojects/imgui-1.91.6/backends/imgui_impl_dx10.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx10.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx11.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\backends_imgui_impl_dx11.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx11.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/backends/imgui_impl_dx11.cpp",
+    "file": "../subprojects/imgui-1.91.6/backends/imgui_impl_dx11.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_dx11.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_opengl3.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\backends_imgui_impl_opengl3.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_opengl3.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/backends/imgui_impl_opengl3.cpp",
+    "file": "../subprojects/imgui-1.91.6/backends/imgui_impl_opengl3.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_opengl3.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_glfw.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\backends_imgui_impl_glfw.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_glfw.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/backends/imgui_impl_glfw.cpp",
+    "file": "../subprojects/imgui-1.91.6/backends/imgui_impl_glfw.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_glfw.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Isubprojects\\imgui-1.91.6\\libimgui.a.p\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-fvisibility=hidden\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_win32.cpp.obj -MF \"subprojects\\imgui-1.91.6\\libimgui.a.p\\backends_imgui_impl_win32.cpp.obj.d\" -o subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_win32.cpp.obj \"-c\" ../subprojects/imgui-1.91.6/backends/imgui_impl_win32.cpp",
+    "file": "../subprojects/imgui-1.91.6/backends/imgui_impl_win32.cpp",
+    "output": "subprojects/imgui-1.91.6/libimgui.a.p/backends_imgui_impl_win32.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-gcc\" \"-Isubprojects\\glad-gl\\libglad-gl-3.3-compatibility.a.p\" \"-Isubprojects\\glad-gl\" \"-I..\\subprojects\\glad-gl\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-fdiagnostics-color=always\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-O0\" \"-g\" -MD -MQ subprojects/glad-gl/libglad-gl-3.3-compatibility.a.p/src_glad.c.obj -MF \"subprojects\\glad-gl\\libglad-gl-3.3-compatibility.a.p\\src_glad.c.obj.d\" -o subprojects/glad-gl/libglad-gl-3.3-compatibility.a.p/src_glad.c.obj \"-c\" ../subprojects/glad-gl/src/glad.c",
+    "file": "../subprojects/glad-gl/src/glad.c",
+    "output": "subprojects/glad-gl/libglad-gl-3.3-compatibility.a.p/src_glad.c.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_GPUObjects_IndexBufferObject.cpp.obj -MF \"kiwicubed.exe.p\\Source_GPUObjects_IndexBufferObject.cpp.obj.d\" -o kiwicubed.exe.p/Source_GPUObjects_IndexBufferObject.cpp.obj \"-c\" ../Source/GPUObjects/IndexBufferObject.cpp",
+    "file": "../Source/GPUObjects/IndexBufferObject.cpp",
+    "output": "kiwicubed.exe.p/Source_GPUObjects_IndexBufferObject.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_GPUObjects_VertexArrayObject.cpp.obj -MF \"kiwicubed.exe.p\\Source_GPUObjects_VertexArrayObject.cpp.obj.d\" -o kiwicubed.exe.p/Source_GPUObjects_VertexArrayObject.cpp.obj \"-c\" ../Source/GPUObjects/VertexArrayObject.cpp",
+    "file": "../Source/GPUObjects/VertexArrayObject.cpp",
+    "output": "kiwicubed.exe.p/Source_GPUObjects_VertexArrayObject.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_GPUObjects_VertexBufferObject.cpp.obj -MF \"kiwicubed.exe.p\\Source_GPUObjects_VertexBufferObject.cpp.obj.d\" -o kiwicubed.exe.p/Source_GPUObjects_VertexBufferObject.cpp.obj \"-c\" ../Source/GPUObjects/VertexBufferObject.cpp",
+    "file": "../Source/GPUObjects/VertexBufferObject.cpp",
+    "output": "kiwicubed.exe.p/Source_GPUObjects_VertexBufferObject.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_Block.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_Block.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_Block.cpp.obj \"-c\" ../Source/World/Block.cpp",
+    "file": "../Source/World/Block.cpp",
+    "output": "kiwicubed.exe.p/Source_World_Block.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_BlockManager.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_BlockManager.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_BlockManager.cpp.obj \"-c\" ../Source/World/BlockManager.cpp",
+    "file": "../Source/World/BlockManager.cpp",
+    "output": "kiwicubed.exe.p/Source_World_BlockManager.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_Chunk.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_Chunk.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_Chunk.cpp.obj \"-c\" ../Source/World/Chunk.cpp",
+    "file": "../Source/World/Chunk.cpp",
+    "output": "kiwicubed.exe.p/Source_World_Chunk.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_ChunkHandler.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_ChunkHandler.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_ChunkHandler.cpp.obj \"-c\" ../Source/World/ChunkHandler.cpp",
+    "file": "../Source/World/ChunkHandler.cpp",
+    "output": "kiwicubed.exe.p/Source_World_ChunkHandler.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_Entity.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_Entity.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_Entity.cpp.obj \"-c\" ../Source/World/Entity.cpp",
+    "file": "../Source/World/Entity.cpp",
+    "output": "kiwicubed.exe.p/Source_World_Entity.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_Physics.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_Physics.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_Physics.cpp.obj \"-c\" ../Source/World/Physics.cpp",
+    "file": "../Source/World/Physics.cpp",
+    "output": "kiwicubed.exe.p/Source_World_Physics.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_Player.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_Player.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_Player.cpp.obj \"-c\" ../Source/World/Player.cpp",
+    "file": "../Source/World/Player.cpp",
+    "output": "kiwicubed.exe.p/Source_World_Player.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_SingleplayerHandler.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_SingleplayerHandler.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_SingleplayerHandler.cpp.obj \"-c\" ../Source/World/SingleplayerHandler.cpp",
+    "file": "../Source/World/SingleplayerHandler.cpp",
+    "output": "kiwicubed.exe.p/Source_World_SingleplayerHandler.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_World_World.cpp.obj -MF \"kiwicubed.exe.p\\Source_World_World.cpp.obj.d\" -o kiwicubed.exe.p/Source_World_World.cpp.obj \"-c\" ../Source/World/World.cpp",
+    "file": "../Source/World/World.cpp",
+    "output": "kiwicubed.exe.p/Source_World_World.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Rendering_Camera.cpp.obj -MF \"kiwicubed.exe.p\\Source_Rendering_Camera.cpp.obj.d\" -o kiwicubed.exe.p/Source_Rendering_Camera.cpp.obj \"-c\" ../Source/Rendering/Camera.cpp",
+    "file": "../Source/Rendering/Camera.cpp",
+    "output": "kiwicubed.exe.p/Source_Rendering_Camera.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Rendering_DebugRenderer.cpp.obj -MF \"kiwicubed.exe.p\\Source_Rendering_DebugRenderer.cpp.obj.d\" -o kiwicubed.exe.p/Source_Rendering_DebugRenderer.cpp.obj \"-c\" ../Source/Rendering/DebugRenderer.cpp",
+    "file": "../Source/Rendering/DebugRenderer.cpp",
+    "output": "kiwicubed.exe.p/Source_Rendering_DebugRenderer.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Rendering_Renderer.cpp.obj -MF \"kiwicubed.exe.p\\Source_Rendering_Renderer.cpp.obj.d\" -o kiwicubed.exe.p/Source_Rendering_Renderer.cpp.obj \"-c\" ../Source/Rendering/Renderer.cpp",
+    "file": "../Source/Rendering/Renderer.cpp",
+    "output": "kiwicubed.exe.p/Source_Rendering_Renderer.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Rendering_RenderThread.cpp.obj -MF \"kiwicubed.exe.p\\Source_Rendering_RenderThread.cpp.obj.d\" -o kiwicubed.exe.p/Source_Rendering_RenderThread.cpp.obj \"-c\" ../Source/Rendering/RenderThread.cpp",
+    "file": "../Source/Rendering/RenderThread.cpp",
+    "output": "kiwicubed.exe.p/Source_Rendering_RenderThread.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Rendering_TextRenderer.cpp.obj -MF \"kiwicubed.exe.p\\Source_Rendering_TextRenderer.cpp.obj.d\" -o kiwicubed.exe.p/Source_Rendering_TextRenderer.cpp.obj \"-c\" ../Source/Rendering/TextRenderer.cpp",
+    "file": "../Source/Rendering/TextRenderer.cpp",
+    "output": "kiwicubed.exe.p/Source_Rendering_TextRenderer.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Rendering_Texture.cpp.obj -MF \"kiwicubed.exe.p\\Source_Rendering_Texture.cpp.obj.d\" -o kiwicubed.exe.p/Source_Rendering_Texture.cpp.obj \"-c\" ../Source/Rendering/Texture.cpp",
+    "file": "../Source/Rendering/Texture.cpp",
+    "output": "kiwicubed.exe.p/Source_Rendering_Texture.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Rendering_Shader.cpp.obj -MF \"kiwicubed.exe.p\\Source_Rendering_Shader.cpp.obj.d\" -o kiwicubed.exe.p/Source_Rendering_Shader.cpp.obj \"-c\" ../Source/Rendering/Shader.cpp",
+    "file": "../Source/Rendering/Shader.cpp",
+    "output": "kiwicubed.exe.p/Source_Rendering_Shader.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Events.cpp.obj -MF \"kiwicubed.exe.p\\Source_Events.cpp.obj.d\" -o kiwicubed.exe.p/Source_Events.cpp.obj \"-c\" ../Source/Events.cpp",
+    "file": "../Source/Events.cpp",
+    "output": "kiwicubed.exe.p/Source_Events.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Globals.cpp.obj -MF \"kiwicubed.exe.p\\Source_Globals.cpp.obj.d\" -o kiwicubed.exe.p/Source_Globals.cpp.obj \"-c\" ../Source/Globals.cpp",
+    "file": "../Source/Globals.cpp",
+    "output": "kiwicubed.exe.p/Source_Globals.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Input.cpp.obj -MF \"kiwicubed.exe.p\\Source_Input.cpp.obj.d\" -o kiwicubed.exe.p/Source_Input.cpp.obj \"-c\" ../Source/Input.cpp",
+    "file": "../Source/Input.cpp",
+    "output": "kiwicubed.exe.p/Source_Input.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Main.cpp.obj -MF \"kiwicubed.exe.p\\Source_Main.cpp.obj.d\" -o kiwicubed.exe.p/Source_Main.cpp.obj \"-c\" ../Source/Main.cpp",
+    "file": "../Source/Main.cpp",
+    "output": "kiwicubed.exe.p/Source_Main.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_ModHandler.cpp.obj -MF \"kiwicubed.exe.p\\Source_ModHandler.cpp.obj.d\" -o kiwicubed.exe.p/Source_ModHandler.cpp.obj \"-c\" ../Source/ModHandler.cpp",
+    "file": "../Source/ModHandler.cpp",
+    "output": "kiwicubed.exe.p/Source_ModHandler.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_AssetManager.cpp.obj -MF \"kiwicubed.exe.p\\Source_AssetManager.cpp.obj.d\" -o kiwicubed.exe.p/Source_AssetManager.cpp.obj \"-c\" ../Source/AssetManager.cpp",
+    "file": "../Source/AssetManager.cpp",
+    "output": "kiwicubed.exe.p/Source_AssetManager.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_ThreadPool.cpp.obj -MF \"kiwicubed.exe.p\\Source_ThreadPool.cpp.obj.d\" -o kiwicubed.exe.p/Source_ThreadPool.cpp.obj \"-c\" ../Source/ThreadPool.cpp",
+    "file": "../Source/ThreadPool.cpp",
+    "output": "kiwicubed.exe.p/Source_ThreadPool.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_UI.cpp.obj -MF \"kiwicubed.exe.p\\Source_UI.cpp.obj.d\" -o kiwicubed.exe.p/Source_UI.cpp.obj \"-c\" ../Source/UI.cpp",
+    "file": "../Source/UI.cpp",
+    "output": "kiwicubed.exe.p/Source_UI.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_UIButton.cpp.obj -MF \"kiwicubed.exe.p\\Source_UIButton.cpp.obj.d\" -o kiwicubed.exe.p/Source_UIButton.cpp.obj \"-c\" ../Source/UIButton.cpp",
+    "file": "../Source/UIButton.cpp",
+    "output": "kiwicubed.exe.p/Source_UIButton.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_UIImage.cpp.obj -MF \"kiwicubed.exe.p\\Source_UIImage.cpp.obj.d\" -o kiwicubed.exe.p/Source_UIImage.cpp.obj \"-c\" ../Source/UIImage.cpp",
+    "file": "../Source/UIImage.cpp",
+    "output": "kiwicubed.exe.p/Source_UIImage.cpp.obj"
+  },
+  {
+    "directory": "C:\\Users\\Kiwian\\Downloads\\Github Repos\\kiwicubed\\BuildDebug",
+    "command": "\"x86_64-w64-mingw32-g++\" \"-Ikiwicubed.exe.p\" \"-I.\" \"-I..\" \"-I..\\Source\" \"-I..\\Source\\GPUObjects\" \"-I..\\Source\\World\" \"-I..\\Source\\Rendering\" \"-I..\\subprojects\\kwport\\include\" \"-Isubprojects\\klogger\" \"-I..\\subprojects\\klogger\" \"-I..\\subprojects\\json-3.2.0\\single_include\" \"-I..\\subprojects\\glfw-3.3.10\\include\" \"-I..\\subprojects\\glfw-3.3.10\\src\" \"-Isubprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\" \"-I..\\subprojects\\imgui-1.91.6\\backends\" \"-Isubprojects\\glm-1.0.1\" \"-I..\\subprojects\\glm-1.0.1\" \"-I..\\subprojects\\glad-gl\\include\" \"-I..\\subprojects\\egl-registry\\api\" \"-I..\\subprojects\\freetype\\include\" \"-fdiagnostics-color=always\" \"-D_GLIBCXX_ASSERTIONS=1\" \"-D_FILE_OFFSET_BITS=64\" \"-Wall\" \"-Winvalid-pch\" \"-std=c++20\" \"-O0\" \"-g\" \"-DGLM_ENABLE_EXPERIMENTAL\" \"-DKIWI_DEBUG_MODE\" \"-DIMGUI_API=\" -MD -MQ kiwicubed.exe.p/Source_Window.cpp.obj -MF \"kiwicubed.exe.p\\Source_Window.cpp.obj.d\" -o kiwicubed.exe.p/Source_Window.cpp.obj \"-c\" ../Source/Window.cpp",
+    "file": "../Source/Window.cpp",
+    "output": "kiwicubed.exe.p/Source_Window.cpp.obj"
+  }
+]
