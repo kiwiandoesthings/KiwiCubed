@@ -305,7 +305,7 @@ void Player::UpdateCameraMatrix(Shader& shader) {
 	if (!camera) {
 		WARN("Trying to update camera matrix without a camera, aborting");
 	}
-	camera->UpdateMatrix(80.0f, 0.1f, 1000.0f, entityData.position, entityData.orientation, entityData.upDirection);
+	camera->UpdateMatrix(fov, 0.1f, 1000.0f, entityData.position, entityData.orientation, entityData.upDirection);
 	camera->SetCameraMatrix(shader);
 }
 

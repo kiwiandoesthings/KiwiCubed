@@ -64,11 +64,12 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 
 	glfwSetWindowIcon(window, 1, &processIcon);
 	stbi_image_free(processIcon.pixels);
-
+	
 	Window::windowWidth = newWindowWidth;
 	Window::windowHeight = newWindowHeight;
-
+	
 	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1);
 
 	return window;
 }

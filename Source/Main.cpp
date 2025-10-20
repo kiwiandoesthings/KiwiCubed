@@ -182,10 +182,26 @@ int main() {
 	Renderer renderer = Renderer();
 	DebugRenderer debugRenderer = DebugRenderer();
 
+	// Create a singleplayer instance
+	SingleplayerHandler singleplayerHandler = SingleplayerHandler(debugRenderer);
+
+	// "temporary" setup of certain events in main
 	EventManager& eventManager = EventManager::GetInstance();
 	eventManager.RegisterEvent("event/close_game");
 	eventManager.AddEventToDo("event/close_game", [&](Event& event) {
 		glfwSetWindowShouldClose(globalWindow.GetWindowInstance(), true);
+	});
+	eventManager.RegisterEvent("event/settings/change_fov");
+	eventManager.AddEventToDo("event/settings/change_fov", [&](Event& event) {
+		if (!singleplayerHandler.singleplayerWorld) {
+			return;
+		}
+
+		Player& player = singleplayerHandler.singleplayerWorld->GetPlayer();
+		player.fov += 10;
+		if (player.fov > 120) {
+			player.fov = 30;
+		}
 	});
 
 	UI& ui = UI::GetInstance();
@@ -198,6 +214,7 @@ int main() {
 	ui.SetCurrentScreen(&mainMenuUI);
 
 	UIScreen settingsUI = UIScreen("ui/settings");
+	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/settings/change_fov", "Change FOV"));
 	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "event/back_ui", "Back"));
 	ui.AddScreen(&settingsUI);
 
@@ -210,9 +227,6 @@ int main() {
 	UIScreen inventoryUI = UIScreen("ui/inventory");
 	inventoryUI.AddUIElement(new UIImage(glm::vec2((globalWindow.GetWidth() / 2) - 46, 500), glm::vec2(1, 1), "event/blank", {"kiwicubed", "inventory"}));
 	ui.AddScreen(&inventoryUI);
-
-	// Create a singleplayer instance
-	SingleplayerHandler singleplayerHandler = SingleplayerHandler(debugRenderer);
 	
 	// FPS code
 	int frames = 0;

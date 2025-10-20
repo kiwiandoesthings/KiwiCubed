@@ -13,19 +13,21 @@ if meson.get_compiler('cpp').get_id() == 'msvc'
     add_project_link_arguments('/ignore:4099', language: 'cpp')
 endif
 
-rc_compiler = find_program('rc', required: true)
+rc_compiler = find_program('windres', required: true)
 
-app_icon = custom_target('app_icon_res',
+app_icon = custom_target(
+  'app_icon',
   input: 'Source/AppIcon.rc',
   output: 'AppIcon.res',
-  command: [rc_compiler, '/nologo', '/fo', '@OUTPUT@', '@INPUT@']
+  command: [rc_compiler, '@INPUT@', '-O', 'coff', '-o', '@OUTPUT@'],
+  build_by_default: true
 )
 
 freetype = dependency('freetype2', static: true, default_options: ['png=disabled'])
 
 executable(
-  'kiwicubed', [
-  files(
+  'kiwicubed', 
+  [
     # GPU objects
     'Source/GPUObjects/IndexBufferObject.cpp',
     'Source/GPUObjects/VertexArrayObject.cpp',
@@ -63,8 +65,9 @@ executable(
     'Source/UIButton.cpp',
     'Source/UIImage.cpp',
     'Source/Window.cpp',
-  ),
-  #app_icon
+
+    # Windows
+    app_icon,
   ],
   include_directories: include_directories('Source', 'Source/GPUObjects', 'Source/World', 'Source/Rendering'),
   dependencies: [

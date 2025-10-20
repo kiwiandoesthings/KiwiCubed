@@ -26,6 +26,8 @@ class Player : public Entity {
 		float pitch;
 		float roll;
 
+		float fov = 80.0f;
+
 		int width;
 		int height;
 
