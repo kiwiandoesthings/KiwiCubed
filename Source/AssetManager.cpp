@@ -4,7 +4,10 @@
 #include "Texture.h"
 
 
-AssetManager::AssetManager() {}
+AssetManager::AssetManager() {
+    TextureAtlasData empty = TextureAtlasData{};
+    RegisterTexture(MetaTexture{AssetStringID{"kiwicubed", "air"}, std::vector<TextureAtlasData>{empty}});
+}
 
 void AssetManager::RegisterTextureAtlas(AssetStringID atlasStringID, Texture textureAtlas) {
     OVERRIDE_LOG_NAME("Texture Manager");

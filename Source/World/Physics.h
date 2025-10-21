@@ -37,7 +37,17 @@ struct FullBlockPosition {
 	glm::ivec3 blockPosition;
 	glm::ivec3 chunkPosition;
 
+	FullBlockPosition() : blockPosition(glm::ivec3(-1)), chunkPosition(glm::ivec3(-1)) {}
 	FullBlockPosition(glm::ivec3 blockPosition, glm::ivec3 chunkPosition) : blockPosition(blockPosition), chunkPosition(chunkPosition) {}
+};
+
+struct BlockRayHit {
+	bool hit;
+	FullBlockPosition fullBlockPosition;
+	unsigned char faceHitIndex;
+
+	// Should only be used when hit is false
+	BlockRayHit(bool hit) : hit(false), fullBlockPosition(FullBlockPosition{}), faceHitIndex(0) {}
 };
 
 
@@ -50,8 +60,9 @@ class Physics {
 		static void Initialize();
 
 		static bool ApplyPhysics(Entity& entity, ChunkHandler& chunkHandler, bool applyGravity, bool applyCollision);
-		static bool RaycastWorld(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, int maxDistance, ChunkHandler& chunkHandler, glm::ivec3& hitBlockPosition, glm::ivec3& hitChunkPosition, bool& isHit);
+		static BlockRayHit RaycastWorld(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, int maxDistance, ChunkHandler& chunkHandler, glm::ivec3& hitBlockPosition, glm::ivec3& hitChunkPosition, bool& isHit);
 		static bool GetGrounded(Entity& entity, ChunkHandler& chunkHandler);
+		static bool CollideBlock(Entity& entity, FullBlockPosition fullBlockPosition, bool resolveCollision);
 
 		static inline int PositiveModulo(float value, int modulator) {
     		int newValue = static_cast<int>(std::floor(value));

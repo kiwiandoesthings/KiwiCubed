@@ -2,6 +2,7 @@
 // ~2008-2/8/2024
 // R.I.P.
 
+
 #ifdef _WIN32
 	extern "C"
 	{
@@ -9,8 +10,6 @@
 		__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;   // For AMD GPUs
 	}
 #endif
-
-unsigned char bitness;
 
 
 #include <glad/glad.h>
@@ -53,6 +52,7 @@ using json = nlohmann::json;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+unsigned char bitness;
 
 std::string projectVersion;
 int windowWidth;
@@ -60,6 +60,7 @@ int windowHeight;
 std::string windowTitle;
 std::string windowType;
 bool debugMode;
+
 
 // This main function is getting out of hand
 // yes but hands are in pocket so is it still in the pocket or is it out of pocket? - Astra
@@ -76,7 +77,6 @@ int main() {
 	#endif
 
 	std::ifstream file("init_config.json");
-
 
 	LOG_CHECK_RETURN_CRITICAL(file.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file, exiting", -1);
 
@@ -171,7 +171,7 @@ int main() {
 	terrainAtlas.TextureUnit(chunkDebugShaderProgram, "tex0");
 	assetManager.RegisterTextureAtlas({"kiwicubed", "terrain_atlas"}, terrainAtlas);
 	Texture uiAtlas("Mods/kiwicubed/Resources/Textures/ui_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, "texture/gui");
-	uiAtlas.SetAtlasSize(uiShaderProgram, glm::vec2(3, 3));
+	uiAtlas.SetAtlasSize(uiShaderProgram, glm::vec2(12, 12));
 	uiAtlas.TextureUnit(uiShaderProgram, "tex0");
 	assetManager.RegisterTextureAtlas({"kiwicubed", "ui_atlas"}, uiAtlas);
 
@@ -223,28 +223,24 @@ int main() {
 	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
 	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "event/unload_world", "Quit Game"));
 	ui.AddScreen(&gamePauseUI);
-
-	UIScreen inventoryUI = UIScreen("ui/inventory");
-	inventoryUI.AddUIElement(new UIImage(glm::vec2((globalWindow.GetWidth() / 2) - 46, 500), glm::vec2(1, 1), "event/blank", {"kiwicubed", "inventory"}));
-	ui.AddScreen(&inventoryUI);
 	
 	// FPS code
 	int frames = 0;
-	auto startTime = std::chrono::high_resolution_clock::now();
+	auto startTime = std::chrono::steady_clock::now();
 	double fps = 0.0;
 	
 	Globals& globals = Globals::GetInstance();
 
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
-		auto frameStartTime = std::chrono::high_resolution_clock::now();
+		auto frameStartTime = std::chrono::steady_clock::now();
 		glfwPollEvents();
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		auto endTime = std::chrono::high_resolution_clock::now();
+		auto endTime = std::chrono::steady_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 
 		if (duration >= 1000.0) {
@@ -291,7 +287,7 @@ int main() {
 			debugRenderer.UpdateBuffers(singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld->GetChunkOrigins());
 			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(chunkDebugShaderProgram);
-			auto endTime = std::chrono::high_resolution_clock::now();
+			auto endTime = std::chrono::steady_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - frameStartTime).count();
 			//std::cout << "frame took " << duration << "ms" << std::endl;
 			singleplayerHandler.singleplayerWorld->Render(terrainShaderProgram);
@@ -306,7 +302,7 @@ int main() {
 		glfwSwapBuffers(globalWindow.GetWindowInstance());
 		++frames;
 
-		auto frameEndTime = std::chrono::high_resolution_clock::now();
+		auto frameEndTime = std::chrono::steady_clock::now();
 		globals.deltaTime = abs(duration_cast<std::chrono::duration<float>>(frameStartTime - frameEndTime).count());
 	}
 
@@ -319,6 +315,7 @@ int main() {
 	}
 
 	EventManager::GetInstance().Delete();
+	UI::GetInstance().Delete();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

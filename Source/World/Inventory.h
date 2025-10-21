@@ -15,8 +15,12 @@ struct InventorySlot {
 
 class Inventory {
     public:
+        Inventory();
         Inventory(std::vector<AssetStringID> slotStringIDs);
         void Delete();
+
+        bool AddItem(InventorySlot itemStringID);
+        bool AddItem(InventorySlot itemStringID, AssetStringID slotStringID);
 
         void SetSlot(AssetStringID slotStringID, InventorySlot newItem);
         InventorySlot* GetSlot(AssetStringID slotStringID);
@@ -27,5 +31,5 @@ class Inventory {
     private:
         AssetStringID inventoryStringID;
 
-        std::unordered_map<AssetStringID, InventorySlot> inventorySlots;
+        std::map<AssetStringID, InventorySlot> inventorySlots;
 };

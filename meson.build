@@ -2,7 +2,6 @@ project('kiwicubed', 'cpp', default_options: ['cpp_std=c++20'])
 
 # Stops KiwiCubed\subprojects\glm-1.0.1\glm\gtx\../gtx/transform.hpp(23): fatal error C1189
 add_project_arguments('-DGLM_ENABLE_EXPERIMENTAL', language: 'cpp')
-#add_project_arguments('-DSTB_IMAGE_IMPLEMENTATION', language: 'cpp')
 add_project_arguments('-GL_WITH_GLAD', language: 'c')
 
 if host_machine.system() == 'linux'
@@ -11,6 +10,8 @@ endif
 
 if meson.get_compiler('cpp').get_id() == 'msvc'
     add_project_link_arguments('/ignore:4099', language: 'cpp')
+    add_project_arguments('/Zi', language: 'cpp')
+    add_project_link_arguments('/DEBUG', language: 'cpp')
 endif
 
 rc_compiler = find_program('windres', required: true)
@@ -39,6 +40,7 @@ executable(
     'Source/World/Chunk.cpp',
     'Source/World/ChunkHandler.cpp',
     'Source/World/Entity.cpp',
+    'Source/World/Inventory.cpp',
     'Source/World/Physics.cpp',
     'Source/World/Player.cpp',
     'Source/World/SingleplayerHandler.cpp',
@@ -78,6 +80,7 @@ executable(
     dependency('imgui', static: true),
     dependency('glm', static: true),
     dependency('glad-gl', static: true),
+    dependency('fmt', static: true),
     freetype
   ],
 )

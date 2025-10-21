@@ -26,6 +26,13 @@ struct AssetStringID {
         return modName == other.modName && assetName == other.assetName;
     }
 
+    bool operator<(const AssetStringID& other) const {
+        if (modName == other.modName) {
+            return assetName < other.assetName;
+        }
+        return modName < other.modName;
+    }
+
     AssetStringID() : modName("kiwicubed"), assetName("air") {}
     AssetStringID(std::string modName, std::string assetName) : modName(modName), assetName(assetName) {}
 };

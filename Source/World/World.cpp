@@ -27,19 +27,23 @@ World::World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, S
 void World::Setup() {
     player.Setup();
 
-    for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
-        auto& chunk = iterator->second;
-
-        if (!chunk.isGenerated || !chunk.isMeshed || chunk.isEmpty) {
-            continue;
-        }
-
-        for (unsigned int x = 0; x < chunkSize; ++x) {
-            for (unsigned int z = 0; z < chunkSize; ++z) {
-                int level = chunk.GetHeightmapLevelAt(glm::vec2(x, z));
-                if (level != -1) {
-                    player.SetPosition((chunk.chunkX * chunkSize) + x, (chunk.chunkY * chunkSize) + level + 3, (chunk.chunkZ * chunkSize) + z);
-                    return;
+    for (int chunkX = 2; chunkX < worldSizeHorizontal - 2; chunkX++) {
+        for (int chunkZ = 2; chunkZ < worldSizeHorizontal - 2; chunkZ++) {
+            for (int chunkY = worldSizeHorizontal; chunkY > 0; chunkY--) {
+                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
+        
+                if (!chunk.isGenerated || !chunk.isMeshed || chunk.isEmpty) {
+                    continue;
+                }
+            
+                for (unsigned int x = 0; x < chunkSize; ++x) {
+                    for (unsigned int z = 0; z < chunkSize; ++z) {
+                        int level = chunk.GetHeightmapLevelAt(glm::vec2(x, z));
+                        if (level != -1) {
+                            player.SetPosition((chunk.chunkX * chunkSize) + x, (chunk.chunkY * chunkSize) + level + 3, (chunk.chunkZ * chunkSize) + z);
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -64,7 +68,7 @@ void World::GenerateWorld() {
     OVERRIDE_LOG_NAME("World Generation");
     INFO("Generating world");
     
-    auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_time = std::chrono::steady_clock::now();
     for (unsigned int chunkX = 0; chunkX < worldSizeHorizontal; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSizeVertical; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSizeHorizontal; ++chunkZ) {
@@ -75,7 +79,7 @@ void World::GenerateWorld() {
         }
     }
 
-    auto end_time = std::chrono::high_resolution_clock::now();
+    auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0f;
 
     int chunkCount = worldSizeHorizontal * worldSizeVertical * worldSizeHorizontal;
@@ -174,15 +178,17 @@ void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius
                     std::tuple<int, int, int> chunkPosition = {chunkX, chunkY, chunkZ};
                     Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
                     if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk.GetMeshable(chunkHandler) && chunk.generationStatus != 3) {
-                        if (chunkMeshingSet.find(chunkPosition) == chunkMeshingSet.end()) {
-                            chunkMeshingSet.insert(chunkPosition);
-                            chunkMeshingQueue.push_back(glm::ivec3(chunkX, chunkY, chunkZ));
+                        if (chunkMeshingSet.find(chunkPosition) != chunkMeshingSet.end()) {
+                            continue;
                         }
+                        chunkMeshingSet.insert(chunkPosition);
+                        chunkMeshingQueue.push_back(glm::ivec3(chunkX, chunkY, chunkZ));
                     } else {
-                        if (chunkGenerationSet.find(chunkPosition) == chunkGenerationSet.end()) {
-                            chunkGenerationSet.insert(chunkPosition);
-                            chunkGenerationQueue.push_back(glm::ivec3(chunkX, chunkY, chunkZ));
+                        if (chunkGenerationSet.find(chunkPosition) != chunkGenerationSet.end()) {
+                            continue;
                         }
+                        chunkGenerationSet.insert(chunkPosition);
+                        chunkGenerationQueue.push_back(glm::ivec3(chunkX, chunkY, chunkZ));
                     }
                 }
             }
@@ -266,7 +272,7 @@ void World::Update() {
         std::swap(chunkUnloadingQueueCopy, chunkUnloadingQueue);
     }
 
-    if (chunkGenerationQueueCopy.size() > 0) {
+    while (chunkGenerationQueueCopy.size() > 0) {
         glm::ivec3 chunkPosition = chunkGenerationQueueCopy.front();
         if (!chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false).isAllocated) {
             chunkHandler.AddChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z);
@@ -275,7 +281,7 @@ void World::Update() {
         chunkGenerationQueueCopy.erase(chunkGenerationQueueCopy.begin());
     }
 
-    if (chunkMeshingQueueCopy.size() > 0) {
+    while (chunkMeshingQueueCopy.size() > 0) {
         glm::ivec3 chunkPosition = chunkMeshingQueueCopy.front();
         chunkHandler.MeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z);
         chunkMeshingQueueCopy.erase(chunkMeshingQueueCopy.begin());
@@ -293,6 +299,14 @@ void World::Update() {
         auto iterator = chunkHandler.chunks.find(std::tuple(chunkPosition.x, chunkPosition.y, chunkPosition.z));
         if (iterator != chunkHandler.chunks.end()) {
             chunkHandler.chunks.erase(iterator);
+        }
+        auto generationIterator = chunkGenerationSet.find(std::tuple(chunkPosition.x, chunkPosition.y, chunkPosition.z));
+        if (generationIterator != chunkGenerationSet.end()) {
+            chunkGenerationSet.erase(generationIterator);
+        }
+        auto meshingIterator = chunkMeshingSet.find(std::tuple(chunkPosition.x, chunkPosition.y, chunkPosition.z));
+        if (meshingIterator != chunkMeshingSet.end()) {
+            chunkMeshingSet.erase(meshingIterator);
         }
     }
 
@@ -414,8 +428,9 @@ Player& World::GetPlayer() {
 
 std::vector<float>& World::GetChunkDebugVisualizationVertices() {
     chunkDebugVisualizationVertices.clear();
-    for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
-        auto& chunk = it->second;
+    std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+    for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
+        auto& chunk = iterator->second;
         chunkDebugVisualizationVertices.insert(chunkDebugVisualizationVertices.end(), chunk.GetDebugVisualizationVertices().begin(), chunk.GetDebugVisualizationVertices().end());
     }
     return chunkDebugVisualizationVertices;
@@ -423,8 +438,9 @@ std::vector<float>& World::GetChunkDebugVisualizationVertices() {
 
 std::vector<GLuint>& World::GetChunkDebugVisualizationIndices() {
     chunkDebugVisualizationIndices.clear();
-    for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
-        auto& chunk = it->second;
+    std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+    for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
+        auto& chunk = iterator->second;
         chunkDebugVisualizationIndices.insert(chunkDebugVisualizationIndices.end(), chunk.GetDebugVisualizationIndices().begin(), chunk.GetDebugVisualizationIndices().end());
     }
     return chunkDebugVisualizationIndices;
@@ -432,8 +448,9 @@ std::vector<GLuint>& World::GetChunkDebugVisualizationIndices() {
 
 std::vector<glm::vec4>& World::GetChunkOrigins() {
     chunkOrigins.clear();
-    for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
-        auto& chunk = it->second;
+    std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
+    for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
+        auto& chunk = iterator->second;
         chunkOrigins.emplace_back(glm::vec4(chunk.chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunk.chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunk.chunkZ * chunkSize + static_cast<int>(chunkSize / 2), chunk.generationStatus));
     }
     return chunkOrigins;

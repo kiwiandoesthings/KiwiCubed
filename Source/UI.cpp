@@ -12,7 +12,7 @@ UI& UI::GetInstance() {
 }
 
 void UI::Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer) {
-    OVERRIDE_LOG_NAME("UI Render Components Setup");
+    OVERRIDE_LOG_NAME("UI Setup");
     if (!renderComponentsSetup) {
         vertexBufferObject.SetupBuffer();
         vertexArrayObject.SetupArrayObject();
@@ -128,6 +128,15 @@ InputHandler& UI::GetInputHandler() {
     return inputHandler;
 }
 
+void UI::Delete() {
+    OVERRIDE_LOG_NAME("UI");
+    INFO("Deleting screens");
+    for (int iterator = 0; iterator < uiScreens.size(); ++iterator) {
+        uiScreens[iterator]->Delete();
+    }
+    uiScreens.clear();
+}
+
 UIScreen::UIScreen(std::string screenName) : screenName(screenName) {
     OVERRIDE_LOG_NAME("UI Initialization");
 
@@ -142,9 +151,22 @@ UIScreen::UIScreen(std::string screenName) : screenName(screenName) {
 }
 
 void UIScreen::Render() {
-    for (int iterator = 0; iterator < uiElements.size(); ++iterator) {
-        uiElements[iterator]->Render();
+    for (int iterator = 0; iterator < customRenderCommands.size(); iterator++) {
+        customRenderCommands[iterator]();
     }
+    for (int iterator = 0; iterator < uiElements.size(); iterator++) {
+        if (uiElements[iterator]->GetVisible()) {
+            uiElements[iterator]->Render();
+        }
+    }
+}
+
+void UIScreen::AddCustomRenderCommand(std::function<void()> customCommand) {
+    customRenderCommands.push_back(customCommand);
+}
+
+void UIScreen::ClearCustomRenderCommands() {
+    customRenderCommands.clear();
 }
 
 void UIScreen::AddUIElement(UIElement* element) {
@@ -153,6 +175,15 @@ void UIScreen::AddUIElement(UIElement* element) {
 
 int UIScreen::GetTabIndex() {
     return tabIndex;
+}
+
+void UIScreen::Delete() {
+    OVERRIDE_LOG_NAME("UI Screen");
+    INFO("Deleted screen \"" + screenName + "\" with {" + std::to_string(uiElements.size()) + "} elements");
+    for (int iterator = 0; iterator < uiElements.size(); iterator++) {
+        delete uiElements[iterator];
+    }
+    uiElements.clear();
 }
 
 void UIScreen::SetTabIndex(int newTabIndex) {
@@ -199,9 +230,13 @@ std::string* UIElement::GetEventTrigger() {
     return &eventToTrigger;
 }
 
-//std::string* UIElement::GetElementLabel() {
-//    return &elementLabel;
-//}
+bool UIElement::GetVisible() {
+    return visible;
+}
+
+void UIElement::SetVisible(bool visible) {
+    UIElement::visible = visible;
+}
 
 glm::vec2* UIElement::GetPosition() {
     return &position;

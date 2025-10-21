@@ -86,7 +86,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
                 Block& block = GetBlock(blockX, blockY, blockZ);
                 float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
 	            int height = blockY + (chunkY * chunkSize);
-                int reach = density * 30 + 30;
+                int reach = density * 16 + 30;
                 if (!(height < reach)) {
                     block.blockID = 0;
 		            block.variant = 0;
@@ -145,7 +145,7 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
         return false;
     }
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+    std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
 
     vertices.clear();
     indices.clear();
@@ -328,7 +328,7 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
     generationStatus = 3;
     shouldRender = true;
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
+    std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
     int time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     if (Globals::GetInstance().debugMode) {
         //INFO("chunk meshing took " + std::to_string(time) + "ms");

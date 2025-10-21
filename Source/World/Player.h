@@ -4,9 +4,14 @@
 #include <glad/glad.h>
 #include <klogger.hpp>
 
+#include "fmt/core.h"
+#include "fmt/format.h"
+
+#include "Block.h"
 #include "Camera.h"
 #include "Entity.h"
 #include "Events.h"
+#include "TextRenderer.h"
 
 
 enum GameMode {
@@ -68,5 +73,5 @@ class Player : public Entity {
 
 		bool inInterface = false;
 
-		std::chrono::time_point<std::chrono::high_resolution_clock> jumpStart;
+		std::chrono::time_point<std::chrono::steady_clock> jumpStart;
 };

@@ -9,7 +9,7 @@ ModHandler::ModHandler() {}
 
 bool ModHandler::SetupTextureAtlasData() {
     OVERRIDE_LOG_NAME("Mod Loading");
-    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
 
     std::unordered_map<AssetStringID, std::vector<TextureAtlasData>> textureAtlasDataMap;
     std::unordered_map<AssetStringID, std::vector<AssetStringID>> blockTextureMap;
@@ -213,7 +213,7 @@ bool ModHandler::SetupTextureAtlasData() {
         BlockManager::GetInstance().RegisterBlockType(block.first, BlockType{block.first, textureAtlasDatas, faceTextureIDs});
     }
 
-    INFO("Loading mods took " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startTime).count()) + "us");
+    INFO("Loading mods took " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count()) + "us");
 
     return true;
 }

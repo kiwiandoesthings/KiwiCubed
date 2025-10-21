@@ -25,6 +25,7 @@ class UIElement;
 class UI {
     public:
         static UI& GetInstance();
+        void Delete();
 
         void Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer);
         void Render();
@@ -75,8 +76,11 @@ class UIScreen {
         std::vector<UIElement*> uiElements;
 
         UIScreen(std::string screenName);
+        void Delete();
 
         void Render();
+        void AddCustomRenderCommand(std::function<void()> customCommand);
+        void ClearCustomRenderCommands();
 
         void AddUIElement(UIElement* uiElement);
 
@@ -85,6 +89,8 @@ class UIScreen {
 
     private:
         int tabIndex = -1;
+
+        std::vector<std::function<void()>> customRenderCommands;
 };
 
 
@@ -92,8 +98,8 @@ class UIElement {
     public:
         UIElement(glm::vec2 position, glm::vec2 scale, std::string eventToTrigger);
         
-        glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
-        float PositionToNDC(float number);
+        static glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
+        static float PositionToNDC(float number);
 
         virtual void Render();
 
@@ -101,6 +107,9 @@ class UIElement {
 
         virtual bool OnClick();
         virtual void OnHover();
+
+        bool GetVisible();
+        void SetVisible(bool visible);
 
         glm::vec2* GetPosition();
         glm::ivec2* GetScale();
@@ -112,14 +121,13 @@ class UIElement {
         virtual void SetSelected(bool selected);
 
     protected:
+        bool visible = true;
         glm::vec2 position = glm::vec2(0, 0);
         glm::ivec2 scale = glm::ivec2(1, 1);
         glm::vec2 size = glm::vec2(512, 128);
         std::string eventToTrigger = "";
         bool tabSelected = false;
         bool hoverSelected = false;
-
-        unsigned int textureIndex;
 
         virtual bool GetHovered();
 };
@@ -141,17 +149,21 @@ class UIButton : public UIElement {
     private:
         glm::vec2 size;
         std::string elementLabel = "";
+        MetaTexture image;
+        float frame = 0;
 };
 
 
 class UIImage : public UIElement {
     public:
-        UIImage(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, AssetStringID imageStringID);
+        UIImage(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, AssetStringID imageStringID, AssetStringID textureAtlasStringID);
 
+        static void Render(glm::vec2 position, glm::vec2 size, TextureAtlasData atlasData, Texture* atlas);
         void Render() override;
 
     private:
         glm::vec2 size;
         MetaTexture image;
         float frame = 0;
+        AssetStringID textureAtlasStringID;
 };

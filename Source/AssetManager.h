@@ -17,6 +17,7 @@ struct TextureAtlasData {
     const unsigned char xSize = 0;
     const unsigned char ySize = 0;
 
+    TextureAtlasData() : variant(0), xPosition(0), yPosition(0), xSize(0), ySize(0) {}
     TextureAtlasData(unsigned short variant, unsigned char xPosition, unsigned char yPosition, unsigned char xSize, unsigned char ySize) : variant(variant), xPosition(xPosition), yPosition(yPosition), xSize(xSize), ySize(ySize) {}
 };
 

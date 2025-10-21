@@ -1,7 +1,9 @@
 #include "Player.h"
+#include "Block.h"
 #include "ChunkHandler.h"
 #include "Entity.h"
 #include "Events.h"
+#include "Physics.h"
 #include "World.h"
 #include <chrono>
 
@@ -22,11 +24,19 @@ Player::Player(int playerX, int playerY, int playerZ, World& world) : world(worl
 	
 	entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.3f, -1.62f, -0.3f), glm::vec3(0.3f, 0.18f, 0.3f));
 
+	std::vector<AssetStringID> slotStringIDs;
+	slotStringIDs.reserve(27);
+	for (int slot = 0; slot < 27; slot++) {
+		slotStringIDs.push_back(AssetStringID{"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slot)});
+	}
+
+	entityData.inventory = Inventory(slotStringIDs);
+
 	inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 
-	playerData.gameMode = CREATIVE;
+	playerData.gameMode = SURVIVAL;
 
 	if (playerData.gameMode == CREATIVE) {
 		entityData.applyCollision = false;
@@ -44,6 +54,13 @@ Player::Player(int playerX, int playerY, int playerZ, World& world) : world(worl
 void Player::Setup() {
 	EventManager& eventManager = EventManager::GetInstance();
 	camera = std::make_shared<Camera>();
+
+	Window& globalWindow = Window::GetInstance();
+	auto inventoryUI = std::make_unique<UIScreen>("ui/inventory");
+	int containerX = (globalWindow.GetWidth() / 2) - 576;
+	int containerY = (globalWindow.GetHeight() / 2) - 192;
+	inventoryUI->AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), "event/blank", AssetStringID{"kiwicubed", "inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
+	UI::GetInstance().AddScreen(std::move(inventoryUI).release());
 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
 		if (playerData.gameMode == SURVIVAL) {
@@ -102,7 +119,7 @@ void Player::Update() {
 		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
         if (entityData.isGrounded) {
 			if (entityData.isJumping) {
-				auto current = std::chrono::high_resolution_clock::now();
+				auto current = std::chrono::steady_clock::now();
 				//std::cout << "jump took " << std::chrono::duration_cast<std::chrono::milliseconds>(current - jumpStart).count() << "ms" << std::endl; 
 			}
 			entityData.isJumping = false;
@@ -119,6 +136,36 @@ void Player::Update() {
 			}
 		}
 	}
+
+	Window& globalWindow = Window::GetInstance();
+	glm::ivec2 windowSize = glm::ivec2(globalWindow.GetWidth(), globalWindow.GetHeight());
+	UIScreen* inventoryUI = UI::GetInstance().GetScreen("ui/inventory");
+	std::vector<TextureAtlasData> atlasData;
+	atlasData.reserve(9 * 3);
+	for (int slot = 0; slot < 27; slot++) {
+		BlockType* blockType = BlockManager::GetInstance().GetBlockType(entityData.inventory.GetSlot(AssetStringID{"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slot)})->itemStringID);
+		atlasData.push_back(blockType->metaTextures[0].atlasData[0]);
+	}
+	Texture* atlas = assetManager.GetTextureAtlas({"kiwicubed", "terrain_atlas"});
+	Inventory* inventory = &entityData.inventory;
+	inventoryUI->ClearCustomRenderCommands();
+	inventoryUI->AddCustomRenderCommand([=]() {
+		int containerX = (windowSize.x / 2) - 576;
+		int containerY = (windowSize.y / 2) - 192;
+		int slotIndex = 0;
+		for (int imageY = 2; imageY <= 22; imageY += 10) {
+			for (int imageX = 4; imageX <= 84; imageX += 10) {
+				int slotX = containerX + (imageX * 12);
+				int slotY = containerY + (imageY * 12);
+				UIImage::Render(glm::vec2(slotX, slotY), glm::vec2(96, 96), atlasData[slotIndex], atlas);
+				int itemCount = inventory->GetSlot({"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slotIndex)})->itemCount;
+				if (itemCount > 0) {
+					UI::GetInstance().uiTextRenderer->RenderText(std::to_string(itemCount), slotX, slotY, 1, glm::vec3(1, 1, 1));
+				}
+				slotIndex++;
+			}
+		}
+	});
 }
 
 void Player::QueryInputs() {
@@ -133,6 +180,8 @@ void Player::QueryInputs() {
 	bool shouldJump = false;
 
 	if (playerData.gameMode == CREATIVE) {
+		speed *= 3;
+
 		glm::vec3 forward = entityData.orientation;
 		forward.y = 0;
 		forward = glm::normalize(forward);
@@ -167,22 +216,22 @@ void Player::QueryInputs() {
 		forward = glm::normalize(forward);
 		glm::vec3 right = glm::normalize(glm::cross(forward, entityData.upDirection));
 
-		if (inputHandler.GetKeyState(GLFW_KEY_W)) {
+		if (inputHandler.GetKeyState(GLFW_KEY_W) && !inInterface) {
 			movementVector += forward;
 		}
-		if (inputHandler.GetKeyState(GLFW_KEY_A)) {
+		if (inputHandler.GetKeyState(GLFW_KEY_A) && !inInterface) {
 			movementVector += -right;
 		}
-		if (inputHandler.GetKeyState(GLFW_KEY_S)) {
+		if (inputHandler.GetKeyState(GLFW_KEY_S) && !inInterface) {
 			movementVector += -forward;
 		}
-		if (inputHandler.GetKeyState(GLFW_KEY_D)) {
+		if (inputHandler.GetKeyState(GLFW_KEY_D) && !inInterface) {
 			movementVector += right;
 		}
-		if (inputHandler.GetKeyState(GLFW_KEY_SPACE) && entityData.isGrounded) {
+		if (inputHandler.GetKeyState(GLFW_KEY_SPACE) && entityData.isGrounded && !inInterface) {
 			shouldJump = true;
 			entityData.isJumping = true;
-			jumpStart = std::chrono::high_resolution_clock::now();
+			jumpStart = std::chrono::steady_clock::now();
 		}
 
 		if (glm::length(movementVector) > 0.0f) {
@@ -203,8 +252,11 @@ void Player::MouseButtonCallback(int button) {
 	glm::ivec3 chunkPosition = glm::ivec3(-1, -1, -1);
 	glm::ivec3 blockPosition = glm::ivec3(-1, -1, -1);
 	bool hit = 0;
-	if (Physics::RaycastWorld(entityData.position, entityData.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit)) {
+	BlockRayHit rayHit = Physics::RaycastWorld(entityData.position, entityData.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit);
+	if (rayHit.hit) {
 		if (button == 0) {
+			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false).GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
+			entityData.inventory.AddItem(InventorySlot{*BlockManager::GetInstance().GetStringID(block.GetBlockID()), 1});
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
 				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
@@ -228,6 +280,103 @@ void Player::MouseButtonCallback(int button) {
 				}
 			} else {
 				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+			}
+		} else if (button == 1) {
+			glm::ivec3 chunkPosition = rayHit.fullBlockPosition.chunkPosition;
+			glm::ivec3 blockPosition = rayHit.fullBlockPosition.blockPosition;
+			glm::ivec3 placingBlockPosition = glm::ivec3(blockPosition);
+			glm::ivec3 placingChunkPosition = glm::ivec3(chunkPosition);
+			bool remesh = false;
+			switch (rayHit.faceHitIndex) {
+				case LEFT:
+					if (blockPosition.x - 1 < 0) {
+						placingBlockPosition.x = chunkSize - 1;
+						placingChunkPosition -= 1;
+						remesh = true;
+					} else {
+						placingBlockPosition.x -= 1;
+						placingChunkPosition.x = chunkPosition.x;
+					}
+					break;
+				case RIGHT:
+					if (blockPosition.x + 1 == chunkSize - 1) {
+						placingBlockPosition.x = 0;
+						placingChunkPosition += 1;
+						remesh = true;
+					} else {
+						placingBlockPosition.x += 1;
+						placingChunkPosition.x = chunkPosition.x;
+					}
+					break;
+				case BOTTOM:
+					if (blockPosition.y - 1 < 0) {
+						placingBlockPosition.y = chunkSize - 1;
+						placingChunkPosition -= 1;
+						remesh = true;
+					} else {
+						placingBlockPosition.y -= 1;
+						placingChunkPosition.y = chunkPosition.y;
+					}
+					break;
+				case TOP:
+					if (blockPosition.y + 1 == chunkSize - 1) {
+						placingBlockPosition.y = 0;
+						placingChunkPosition += 1;
+						remesh = true;
+					} else {
+						placingBlockPosition.y += 1;
+						placingChunkPosition.y = chunkPosition.y;
+					}
+					break;
+				case BACK:
+					if (blockPosition.z - 1 < 0) {
+						placingBlockPosition.z = chunkSize - 1;
+						placingChunkPosition -= 1;
+						remesh = true;
+					} else {
+						placingBlockPosition.z -= 1;
+						placingChunkPosition.z = chunkPosition.z;
+					}
+					break;
+				case FRONT:
+					if (blockPosition.z + 1 == chunkSize - 1) {
+						placingBlockPosition.z = 0;
+						placingChunkPosition += 1;
+						remesh = true;
+					} else {
+						placingBlockPosition.z += 1;
+						placingChunkPosition.z = chunkPosition.z;
+					}
+					break;
+			}
+			bool emptyBlock = chunkHandler->GetChunk(placingChunkPosition.x, placingChunkPosition.y, placingChunkPosition.z, false).GetBlock(placingBlockPosition.x, placingBlockPosition.y, placingBlockPosition.z).IsAir();
+			bool collidesEntity = Physics::CollideBlock(*this, FullBlockPosition{placingBlockPosition, placingChunkPosition}, false);
+			if (emptyBlock && !collidesEntity) {
+				int usingSlotIndex = -1;
+				int newBlockID = 0;
+				for (int slotIndex = 0; slotIndex < 27; slotIndex++) {
+					AssetStringID slotStringID = AssetStringID{"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slotIndex)};
+					InventorySlot* slot = entityData.inventory.GetSlot(slotStringID);
+					if (slot->itemStringID.assetName != "air") {
+						InventorySlot newSlot = *slot;
+						newBlockID = BlockManager::GetInstance().GetNumericalID((*entityData.inventory.GetSlot(slotStringID)).itemStringID);
+						newSlot.itemCount--;
+						if (newSlot.itemCount == 0) {
+							newSlot.itemStringID = AssetStringID{"kiwicubed", "air"};
+						}
+						entityData.inventory.SetSlot(slotStringID, newSlot);
+						usingSlotIndex = slotIndex;
+						break;
+					}
+				}
+				if (usingSlotIndex == -1) {
+					return;
+				}
+				chunkHandler->AddBlock(placingChunkPosition.x, placingChunkPosition.y, placingChunkPosition.z, placingBlockPosition.x, placingBlockPosition.y, placingBlockPosition.z, newBlockID);
+				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+				if (remesh) {
+					chunkHandler->RemeshChunk(placingChunkPosition.x, placingChunkPosition.y, placingChunkPosition.z, false);
+				}
 			}
 		}
 	}

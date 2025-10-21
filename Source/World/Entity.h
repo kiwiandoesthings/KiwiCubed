@@ -8,6 +8,7 @@
 #include <iostream>
 #include <random>
 
+#include "Inventory.h"
 #include "Physics.h"
 
 
@@ -37,6 +38,8 @@ struct EntityData {
 	InteractionBoundingBox interactionBoundingBox = InteractionBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	std::string name = "";
+
+	Inventory inventory;
 
 	float moveSpeed = 1.0f;
 	float jumpHeight = 1.25;
