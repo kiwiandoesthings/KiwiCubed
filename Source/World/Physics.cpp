@@ -67,10 +67,11 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 			glm::vec3 min2 = glm::vec3(blockPosition.blockPosition.x + (blockPosition.chunkPosition.x * chunkSize), blockPosition.blockPosition.y + (blockPosition.chunkPosition.y * chunkSize), blockPosition.blockPosition.z + (blockPosition.chunkPosition.z * chunkSize));
 			glm::vec3 max2 = min2 + glm::vec3(1.0f);
 			
+			const float epsilon = 1e-5f;
 			bool isColliding =
-				(min1.x < max2.x && max1.x > min2.x) &&
-				(min1.y < max2.y && max1.y > min2.y) &&
-				(min1.z < max2.z && max1.z > min2.z);
+				(min1.x < max2.x - epsilon && max1.x > min2.x + epsilon) &&
+				(min1.y < max2.y - epsilon && max1.y > min2.y + epsilon) &&
+				(min1.z < max2.z - epsilon && max1.z > min2.z + epsilon);
 
 			if (isColliding) {
 				float collision = min1[axis] - min2[axis];
@@ -80,7 +81,6 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 					newEntityData.position[axis] = max2[axis] - newEntityData.physicsBoundingBox.corner1[axis];
 				}
 				newEntityData.velocity[axis] = 0;
-				//std::cout << "=== got x/z {" + std::to_string(axis) + "} collision with " << collision << " amt at pos " << newEntityData.localChunkPosition[axis] << " specifically " << newEntityData.position[axis] << " from block " << blockPosition.blockPosition.x << " " << blockPosition.blockPosition.y << " " << blockPosition.blockPosition.z << ", chunk " << blockPosition.chunkPosition.x << " " << blockPosition.chunkPosition.y << " " << blockPosition.chunkPosition.z << std::endl;
 				return true;
 			}
 		}
@@ -92,7 +92,7 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 	{
 		std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
 		if (newEntityData.currentChunkPtr == nullptr || !newEntityData.currentChunkPtr->isGenerated) {
-			return false;
+			return 0.0f;
 		}
 	}
 
@@ -120,32 +120,24 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 			glm::vec3 min2 = glm::vec3(blockPosition.blockPosition.x + (blockPosition.chunkPosition.x * chunkSize), blockPosition.blockPosition.y + (blockPosition.chunkPosition.y * chunkSize), blockPosition.blockPosition.z + (blockPosition.chunkPosition.z * chunkSize));
 			glm::vec3 max2 = min2 + glm::vec3(1.0f);
 
-			//std::cout << "0  colliding block " << blockPosition.blockPosition.x << " " << blockPosition.blockPosition.y << " " << blockPosition.blockPosition.z << " chunk " << blockPosition.chunkPosition.x << " " << blockPosition.chunkPosition.y << " " << blockPosition.chunkPosition.z << std::endl;
-
+			const float epsilon = 1e-5f;
 			bool isColliding =
-				(min1.x < max2.x && max1.x > min2.x) &&
-				(min1.y < max2.y && max1.y > min2.y) &&
-				(min1.z < max2.z && max1.z > min2.z);
+				(min1.x < max2.x - epsilon && max1.x > min2.x + epsilon) &&
+				(min1.y < max2.y - epsilon && max1.y > min2.y + epsilon) &&
+				(min1.z < max2.z - epsilon && max1.z > min2.z + epsilon);
 
 			if (isColliding) {
 				float collision = min1[axis] - min2[axis];
 				if (collision < 0) {
-					glm::vec3 pos = newEntityData.position;
 					newEntityData.position[axis] = min2[axis] - newEntityData.physicsBoundingBox.corner2[axis];
-					//std::cout << "1  moved from " << pos[axis] << " to " << newEntityData.position[axis] << " on axis " << std::to_string(axis) << std::endl;
 				} else {
-					glm::vec3 pos = newEntityData.position;
 					newEntityData.position[axis] = max2[axis] - newEntityData.physicsBoundingBox.corner1[axis];
-					//std::cout << "1  moved from " << pos[axis] << " to " << newEntityData.position[axis] << " on axis " << std::to_string(axis) << std::endl;
 				}
 				newEntityData.velocity[axis] = 0;
-				//std::cout << "2  got y collision with " << collision << " amt at y " << newEntityData.localChunkPosition[axis] << " specifically " << newEntityData.position[axis] << " from block " << blockPosition.blockPosition.x << " " << blockPosition.blockPosition.y << " " << blockPosition.blockPosition.z << ", chunk " << blockPosition.chunkPosition.x << " " << blockPosition.chunkPosition.y << " " << blockPosition.chunkPosition.z << std::endl;
 				return collision;
 			}
 		}
 	}
-	//std::cout << "3  nothing at " << newEntityData.localChunkPosition.y << " specifically " << newEntityData.position.y << std::endl;
-	//std::cout.flush();
 	return 0.0f;
 }
 
@@ -161,15 +153,15 @@ bool Physics::ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chu
 		for (int blockY = static_cast<int>(std::floor(minCorner.y)) - 1; blockY <= static_cast<int>(std::ceil(maxCorner.y)) + 1; ++blockY) {
 			for (int blockZ = static_cast<int>(std::floor(minCorner.z)) - 1; blockZ <= static_cast<int>(std::ceil(maxCorner.z)) + 1; ++blockZ) {
 				glm::ivec3 chunkPosition = glm::ivec3(
-					FloorDiv(blockX, 32),
-					FloorDiv(blockY, 32),
-					FloorDiv(blockZ, 32)
+					FloorDiv(blockX, chunkSize),
+					FloorDiv(blockY, chunkSize),
+					FloorDiv(blockZ, chunkSize)
 				);
 
 				glm::ivec3 blockPosition = glm::ivec3(
-					PositiveModulo(blockX, 32),
-					PositiveModulo(blockY, 32),
-					PositiveModulo(blockZ, 32)
+					PositiveModulo(blockX, chunkSize),
+					PositiveModulo(blockY, chunkSize),
+					PositiveModulo(blockZ, chunkSize)
 				);
 
 				if (chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false).GetBlock(blockPosition.x, blockPosition.y, blockPosition.z).blockID != 0) {
@@ -179,21 +171,10 @@ bool Physics::ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chu
 		}
 	}
 
-	for (FullBlockPosition blockPos : blockCollisionQueue) {
-		//std::cout << blockPos.chunkPosition.x << " " << blockPos.chunkPosition.y << " " << blockPos.chunkPosition.z << ", " << blockPos.blockPosition.x << " " << blockPos.blockPosition.y << " "<< blockPos.blockPosition.z << std::endl;
-		//std::cout.flush();
-	}
-	//std::cout << "done" << std::endl;
-	//std::cout.flush();
-
 	newEntityData.position.x += newEntityData.velocity.x * globals.deltaTime;
 	bool xAxis = CollideAxis(0, newEntityData, chunkHandler);
 	newEntityData.position.y += newEntityData.velocity.y * globals.deltaTime;
-	//std::cout << "-  collide start" << std::endl;
-	//std::cout.flush();
 	float yAxis = CollideAxisFloat(1, newEntityData, chunkHandler);
-	//std::cout << "-  collide end" << std::endl;
-	//std::cout.flush();
 	newEntityData.position.z += newEntityData.velocity.z * globals.deltaTime;
 	bool zAxis = CollideAxis(2, newEntityData, chunkHandler);
 
@@ -239,7 +220,7 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 
 	glm::ivec3 stepDirection = glm::ivec3(direction.x > 0 ? 1 : -1, direction.y > 0 ? 1 : -1, direction.z > 0 ? 1 : -1);
 
-	glm::vec3 stepSize = glm::vec3(std::abs(1.0f / direction.x), std::abs(1.0f / direction.y), std::abs(1.0f / direction.z));
+	glm::vec3 stepsilonize = glm::vec3(std::abs(1.0f / direction.x), std::abs(1.0f / direction.y), std::abs(1.0f / direction.z));
 	glm::vec3 distanceToBlockBoundary = glm::vec3((currentBlock.x + (stepDirection.x > 0 ? 1 : 0) - origin.x) / direction.x, (currentBlock.y + (stepDirection.y > 0 ? 1 : 0) - origin.y) / direction.y, (currentBlock.z + (stepDirection.z > 0 ? 1 : 0) - origin.z) / direction.z);
 
 	BlockRayHit rayHit = BlockRayHit{false};
@@ -269,7 +250,7 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 
 			if (distanceToBlockBoundary.x < distanceToBlockBoundary.y && distanceToBlockBoundary.x < distanceToBlockBoundary.z) {
 				currentBlock.x += stepDirection.x;
-				distanceToBlockBoundary.x += stepSize.x;
+				distanceToBlockBoundary.x += stepsilonize.x;
 
 				int newChunkX = static_cast<int>(glm::floor(float(currentBlock.x) / float(chunkSize)));
 				if (newChunkX != currentChunk.x) {
@@ -278,7 +259,7 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 			}
 			else if (distanceToBlockBoundary.y < distanceToBlockBoundary.z) {
 				currentBlock.y += stepDirection.y;
-				distanceToBlockBoundary.y += stepSize.y;
+				distanceToBlockBoundary.y += stepsilonize.y;
 
 				int newChunkY = static_cast<int>(glm::floor(float(currentBlock.y) / float(chunkSize)));
 				if (newChunkY != currentChunk.y) {
@@ -287,7 +268,7 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 			}
 			else {
 				currentBlock.z += stepDirection.z;
-				distanceToBlockBoundary.z += stepSize.z;
+				distanceToBlockBoundary.z += stepsilonize.z;
 
 				int newChunkZ = static_cast<int>(glm::floor(float(currentBlock.z) / float(chunkSize)));
 				if (newChunkZ != currentChunk.z) {

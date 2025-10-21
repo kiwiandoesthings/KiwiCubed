@@ -36,14 +36,14 @@ void Entity::DamageEntity(float damage) {
 void Entity::Update() {
 	glm::ivec3 oldGlobalChunkPosition = entityData.globalChunkPosition;
 	entityData.globalChunkPosition = glm::ivec3(
-		Physics::FloorDiv(entityData.position.x, 32),
-		Physics::FloorDiv(entityData.position.y, 32),
-		Physics::FloorDiv(entityData.position.z, 32)
+		Physics::FloorDiv(entityData.position.x, chunkSize),
+		Physics::FloorDiv(entityData.position.y, chunkSize),
+		Physics::FloorDiv(entityData.position.z, chunkSize)
 	);
 	entityData.localChunkPosition = glm::ivec3(
-		Physics::PositiveModulo(entityData.position.x, 32), 
-		Physics::PositiveModulo(entityData.position.y, 32) , 
-		Physics::PositiveModulo(entityData.position.z, 32)
+		Physics::PositiveModulo(entityData.position.x, chunkSize), 
+		Physics::PositiveModulo(entityData.position.y, chunkSize) , 
+		Physics::PositiveModulo(entityData.position.z, chunkSize)
 	);
 
 	if (oldGlobalChunkPosition != entityData.globalChunkPosition) {
