@@ -4,11 +4,7 @@
 This game / engine is focused on being extremely expandable, having easy and powerful modding support, being ultra performant, and having official tools for creating content and mods that anyone can use and get the hang of.
 
 Currently working on:
-- Adding support for multiple block types, such as grass blocks and stone blocks, along with attributes for (future) gameplay.
 - Gameplay elements such as items and entities.
-- UI systems
-- Separating the world from the game
-- Unloading the world around you
 - Survival gameplay elements
 
 # Table of Contents
@@ -16,7 +12,7 @@ Currently working on:
 2. Controls
 3. Other Information lol
 
-## 01. Compiling
+## 1. Compiling
 
 Clone the repository, and run ``just setup`` in the root. Once that finishes, you can run ``just debugbuild`` in the root to build the project, and ``just run`` to quickly rebuild and launch the project.
 
@@ -24,7 +20,7 @@ To compile a release build, run ``just releasebuild``. To run the release build 
 
 Use ``just clean`` to reconfigure both the debug and release build directories.
 
-## 02. Controls
+## 2. Controls
 
 You can use ``tab/enter`` in most uis to select/trigger buttons.
 
@@ -45,7 +41,7 @@ You can toggle the chunk debug visualization by hitting ``f3``.
 To open your inventory, hit ``e``.
 You can mine/place blocks using ``left/right click`` respectively, which will add and remove from your inventory.
 
-## 03. Other Information lol
+## 3. Other Information lol
 
 The game looks for new chunks to load/unload around you when you cross a chunk boundary. When you first load in, you will likely need to move around a little bit for it to realize it needs to generate more of the world around you. 
 
