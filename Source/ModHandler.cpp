@@ -35,13 +35,14 @@ bool ModHandler::SetupTextureAtlasData() {
 
             INFO("Found mod \"" + name + "\", version: " + version + ", by: " + authors + ", built for game version " + builtForVersion);
 
-            std::string modResources = modFolder + "/Resources/Textures";
+            std::string modTextures = modFolder + "/Resources/Textures";
             
             try {
-                if (!std::filesystem::exists(modResources) && std::filesystem::is_directory(modResources)) {
+                if (!std::filesystem::exists(modTextures) || !std::filesystem::is_directory(modTextures)) {
+                    ERR("Could not find mod's textures folder");
                     return false;
                 }
-                for (const auto& entry : std::filesystem::directory_iterator(modResources)) {
+                for (const auto& entry : std::filesystem::directory_iterator(modTextures)) {
                     if (std::filesystem::is_regular_file(entry.status())) {
                         auto filePath = entry.path();
                         if (filePath.extension() == ".json") {
@@ -94,7 +95,8 @@ bool ModHandler::SetupTextureAtlasData() {
             std::string blocks = modFolder + "/Resources/Blocks";
             
             try {
-                if (!std::filesystem::exists(blocks) && std::filesystem::is_directory(blocks)) {
+                if (!std::filesystem::exists(blocks) || !std::filesystem::is_directory(blocks)) {
+                    ERR("Could not find mod's blocks folder");
                     return false;
                 }
                 for (const auto& entry : std::filesystem::directory_iterator(blocks)) {
@@ -170,8 +172,72 @@ bool ModHandler::SetupTextureAtlasData() {
                 ERR("Filesystem error: " + std::string(error.what()) + ", aborting");
                 return false;
             }
+
+            std::string modModels = modFolder + "/Resources/Models";
+            
+            try {
+                if (!std::filesystem::exists(modModels) || !std::filesystem::is_directory(modModels)) {
+                    ERR("Could not find mod's models folder");
+                    return false;
+                }
+                for (const auto& entry : std::filesystem::directory_iterator(modModels)) {
+                    if (std::filesystem::is_regular_file(entry.status())) {
+                        auto filePath = entry.path();
+                        if (filePath.extension() == ".json") {
+                            std::ifstream file(filePath);
+
+                            json jsonData;
+
+                            file >> jsonData;
+
+                            std::string id = jsonData["id"];
+
+                            size_t splitPosition = id.find(":");
+
+                            std::string modID = "";
+                            std::string blockID = "";
+
+                            if (splitPosition != std::string::npos) {
+                                modID = id.substr(0, splitPosition);
+                                blockID = id.substr(splitPosition + 1);
+                            } else {
+                                WARN("Tried to register texture with invalid textureID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping texture");
+                                continue;
+                            }
+
+                            AssetStringID modelStringID = AssetStringID{modID, blockID};
+
+                            std::vector<GLfloat> modelVertices;
+                            std::vector<GLuint> modelIndices;
+
+                            for (const auto& vertex : jsonData["model"]["vertices"]) {
+                                for (const auto& coordinate : vertex) {
+                                    modelVertices.push_back(coordinate);
+                                }
+                            }
+
+                            for (const auto& index : jsonData["model"]["indices"]) {
+                                modelIndices.push_back(index);
+                            }
+
+                            assetManager.RegisterEntityModel(MetaEntityModel{
+                                modelStringID,
+                                Model{
+                                    modelVertices,
+                                    modelIndices
+                                }
+                            });
+                        }
+                    }
+                }
+            } catch (const std::filesystem::filesystem_error& error) {
+                ERR("Filesystem error: " + std::string(error.what()) + ", aborting");
+                return false;
+            }
         }
     }
+
+    
 
     for (const auto& blockTypeData : textureAtlasDataMap) {
         unsigned short highestVariant = 0;

@@ -51,7 +51,7 @@ class World {
 
 		ChunkHandler& GetChunkHandler();
 		Chunk* GetChunk(int chunkX, int chunkY, int chunkZ);
-		Entity GetEntity(std::string uuid);
+		Entity* GetEntity(std::string uuid);
 
 		//temporary - merge into GetEntity
 		Player& GetPlayer();
@@ -96,7 +96,7 @@ class World {
 		bool isWorldGenerated = false;
 		unsigned int worldSizeHorizontal;
 		unsigned int worldSizeVertical;
-		Player player = Player(0, 0, 0, *this);
+		Player player = Player(0, 0, 0, this);
 		ChunkHandler chunkHandler;
 		SingleplayerHandler* singleplayerHandler;
 

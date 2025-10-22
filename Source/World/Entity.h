@@ -67,7 +67,9 @@ class Entity {
 		ProtectedEntityData protectedEntityData;
 
 	public:
-		Entity(float entityX, float entityY, float entityZ, World& world);
+		Entity(float entityX, float entityY, float entityZ, World* world);
+
+		void SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID);
 	
 		virtual EntityStats GetEntityStats() const;
 		virtual EntityData GetEntityData() const;
@@ -87,5 +89,13 @@ class Entity {
 		virtual void Delete();
 		
 	private:
-		World& world;
+		World* world;
+
+		Model* entityModel;
+		Texture* entityTexture;
+		std::vector<TextureAtlasData>* entityTextureAtlasData;
+
+		VertexBufferObject vertexBufferObject;
+        VertexArrayObject vertexArrayObject;
+        IndexBufferObject indexBufferObject;
 };

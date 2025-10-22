@@ -419,9 +419,9 @@ Chunk* World::GetChunk(int chunkX, int chunkY, int chunkZ) {
     return chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
 }
 
-Entity World::GetEntity(std::string uuid) {
+Entity* World::GetEntity(std::string uuid) {
     // Later
-    return Entity(0, 0, 0, *this);
+    return nullptr;
 }
 
 Player& World::GetPlayer() {

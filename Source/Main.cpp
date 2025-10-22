@@ -160,11 +160,13 @@ int main() {
 	Shader terrainShaderProgram("Mods/kiwicubed/Resources/Shaders/Terrain_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Terrain_Fragment.frag");
 	assetManager.RegisterShaderProgram({"kiwicubed", "terrain_shader"}, terrainShaderProgram);
 	Shader wireframeShaderProgram("Mods/kiwicubed/Resources/Shaders/Wireframe_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Wireframe_Fragment.frag");
-	assetManager.RegisterShaderProgram({"kiwicubed", "wireframe_shader"}, terrainShaderProgram);
+	assetManager.RegisterShaderProgram({"kiwicubed", "wireframe_shader"}, wireframeShaderProgram);
 	Shader chunkDebugShaderProgram("Mods/kiwicubed/Resources/Shaders/ChunkDebug_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/ChunkDebug_Fragment.frag");
-	assetManager.RegisterShaderProgram({"kiwicubed", "chunk_debug_shader"}, terrainShaderProgram);
+	assetManager.RegisterShaderProgram({"kiwicubed", "chunk_debug_shader"}, chunkDebugShaderProgram);
 	Shader uiShaderProgram("Mods/kiwicubed/Resources/Shaders/UI_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/UI_Fragment.frag");
-	assetManager.RegisterShaderProgram({"kiwicubed", "ui_shader"}, terrainShaderProgram);
+	assetManager.RegisterShaderProgram({"kiwicubed", "ui_shader"}, uiShaderProgram);
+	Shader entityShaderProgram("Mods/kiwicubed/Resources/Shaders/Entity_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Entity_Fragment.frag");
+	assetManager.RegisterShaderProgram({"kiwicubed", "entity_shader"}, entityShaderProgram);
 
 	// Create texture atlases (needs to be modularized)
 	Texture terrainAtlas("Mods/kiwicubed/Resources/Textures/terrain_atlas.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, "texture/terrain");
@@ -233,6 +235,9 @@ int main() {
 	
 	Globals& globals = Globals::GetInstance();
 
+	Entity test(0, 0, 0, singleplayerHandler.singleplayerWorld.get());
+	test.SetupRenderComponents(AssetStringID{"kiwicubed", "dropped_item"}, AssetStringID{"kiwicubed", "terrain_atlas"}, AssetStringID{"kiwicubed", "stone"});
+
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
 		auto frameStartTime = std::chrono::steady_clock::now();
@@ -283,6 +288,7 @@ int main() {
 			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(terrainShaderProgram);
 			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(wireframeShaderProgram);
 			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(chunkDebugShaderProgram);
+			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(entityShaderProgram);
 			singleplayerHandler.singleplayerWorld->GetChunkHandler().CleanChunks();
 			
 			terrainAtlas.SetActive();
@@ -290,10 +296,8 @@ int main() {
 			debugRenderer.UpdateBuffers(singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld->GetChunkOrigins());
 			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(chunkDebugShaderProgram);
-			//auto endTime = std::chrono::steady_clock::now();
-			//auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - frameStartTime).count();
-			//std::cout << "frame took " << duration << "ms" << std::endl;
 			singleplayerHandler.singleplayerWorld->Render(terrainShaderProgram);
+			test.Render();
 		}
 		
 		UI::GetInstance().Render();

@@ -1,5 +1,6 @@
 #include "AssetManager.h"
 #include <cstddef>
+#include "AssetDefinitions.h"
 #include "Block.h"
 #include "Texture.h"
 
@@ -10,32 +11,39 @@ AssetManager::AssetManager() {
 }
 
 void AssetManager::RegisterTextureAtlas(AssetStringID atlasStringID, Texture textureAtlas) {
-    OVERRIDE_LOG_NAME("Texture Manager");
+    OVERRIDE_LOG_NAME("Asset Manager");
     textureAtlases.insert({atlasStringID, textureAtlas});
 
     INFO("Successfully registered texture atlas with string ID of \"" + atlasStringID.CanonicalName() + "\"");
 }
 
 void AssetManager::RegisterTexture(MetaTexture texture) {
-    OVERRIDE_LOG_NAME("Texture Manager");
-    numericalIDsToStringIDs.insert({latestTextureID + 1, texture.stringID});
-    stringIDsToNumericalIDs.insert({texture.stringID, latestTextureID + 1});
-    AssetManager::atlasData.insert({latestTextureID + 1, texture.atlasData});
+    OVERRIDE_LOG_NAME("Asset Manager");
+    textureNumericalIDsToStringIDs.insert({latestTextureID + 1, texture.stringID});
+    textureStringIDsToNumericalIDs.insert({texture.stringID, latestTextureID + 1});
+    AssetManager::atlasDatas.insert({latestTextureID + 1, texture.atlasData});
 
     latestTextureID++;
 
     INFO("Successfully registered texture of with string ID of \"" + texture.stringID.CanonicalName() + "\" and numerical id of {" + std::to_string(latestTextureID) + "} with: {" + std::to_string(texture.atlasData.size()) + "} variants");
 }
 
-void AssetManager::RegisterShaderProgram(AssetStringID shaderProgramStringID, Shader shaderProgram) {
-    OVERRIDE_LOG_NAME("Texture Manager");
-    shaderPrograms.insert({shaderProgramStringID, shaderProgram});
+void AssetManager::RegisterShaderProgram(AssetStringID stringID, Shader shaderProgram) {
+    OVERRIDE_LOG_NAME("Asset Manager");
+    shaderPrograms.insert({stringID, shaderProgram});
 
-    INFO("Successfully registered texture atlas with string ID of \"" + shaderProgramStringID.CanonicalName() + "\"");
+    INFO("Successfully registered shader program with string ID of \"" + stringID.CanonicalName() + "\"");
+}
+
+void AssetManager::RegisterEntityModel(MetaEntityModel entityModel) {
+    OVERRIDE_LOG_NAME("Asset Manager");
+    entityModels.insert({entityModel.stringID, entityModel.model});
+
+    INFO("Successfully registered entity model with string ID of \"" + entityModel.stringID.CanonicalName() + "\" with {" + std::to_string(entityModel.model.vertices.size()) + "} vertices and {" + std::to_string(entityModel.model.indices.size()) + "} indices");
 }
 
 Texture* AssetManager::GetTextureAtlas(AssetStringID atlasStringID) {
-    OVERRIDE_LOG_NAME("Texture Manager");
+    OVERRIDE_LOG_NAME("Asset Manager");
     auto iterator = textureAtlases.find(atlasStringID);
     if (iterator != textureAtlases.end()) {
         return &iterator->second;
@@ -47,9 +55,9 @@ Texture* AssetManager::GetTextureAtlas(AssetStringID atlasStringID) {
 }
 
 AssetStringID* AssetManager::GetStringID(unsigned int numericalID) {
-    OVERRIDE_LOG_NAME("Texture Manager");
-    auto iterator = numericalIDsToStringIDs.find(numericalID);
-    if (iterator != numericalIDsToStringIDs.end()) {
+    OVERRIDE_LOG_NAME("Asset Manager");
+    auto iterator = textureNumericalIDsToStringIDs.find(numericalID);
+    if (iterator != textureNumericalIDsToStringIDs.end()) {
         return &iterator->second;
     } else {
         ERR("Tried to get string ID for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");
@@ -59,33 +67,45 @@ AssetStringID* AssetManager::GetStringID(unsigned int numericalID) {
 }
 
 unsigned int AssetManager::GetNumericalID(AssetStringID stringID) {
-    OVERRIDE_LOG_NAME("Texture Manager");
-    auto iterator = stringIDsToNumericalIDs.find(stringID);
-    if (iterator != stringIDsToNumericalIDs.end()) {
+    OVERRIDE_LOG_NAME("Asset Manager");
+    auto iterator = textureStringIDsToNumericalIDs.find(stringID);
+    if (iterator != textureStringIDsToNumericalIDs.end()) {
         return iterator->second;
     } else {
         ERR("Tried to get numerical ID for texture with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
-    return stringIDsToNumericalIDs[stringID];
+    return textureStringIDsToNumericalIDs[stringID];
 }
 
-Shader* AssetManager::GetShaderProgram(AssetStringID shaderProgramStringID) {
-    OVERRIDE_LOG_NAME("Texture Manager");
-    auto iterator = shaderPrograms.find(shaderProgramStringID);
+Shader* AssetManager::GetShaderProgram(AssetStringID stringID) {
+    OVERRIDE_LOG_NAME("Asset Manager");
+    auto iterator = shaderPrograms.find(stringID);
     if (iterator != shaderPrograms.end()) {
         return &iterator->second;
     } else {
-        ERR("Tried to get shader program with string id \"" + shaderProgramStringID.CanonicalName() + "\" that did not exist, aborting");
+        ERR("Tried to get shader program with string id \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
+        psnip_trap();
+    }
+    return &iterator->second;
+}
+
+Model* AssetManager::GetEntityModel(AssetStringID stringID) {
+    OVERRIDE_LOG_NAME("Asset Manager");
+    auto iterator = entityModels.find(stringID);
+    if (iterator != entityModels.end()) {
+        return &iterator->second;
+    } else {
+        ERR("Tried to get entity model with string id \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;
 }
 
 std::vector<TextureAtlasData>* AssetManager::GetTextureAtlasData(unsigned int numericalID) {
-    OVERRIDE_LOG_NAME("Texture Manager");
-    auto iterator = atlasData.find(numericalID);
-    if (iterator != atlasData.end()) {
+    OVERRIDE_LOG_NAME("Asset Manager");
+    auto iterator = atlasDatas.find(numericalID);
+    if (iterator != atlasDatas.end()) {
         return &iterator->second;
     } else {
         ERR("Tried to get atlas data for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");

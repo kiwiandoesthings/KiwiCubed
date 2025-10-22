@@ -39,7 +39,7 @@ class Player : public Entity {
 		float speed = 0.004f;
 		float sensitivity = 100.0f;
 
-		Player(int playerX, int playerY, int playerZ, World& world);
+		Player(int playerX, int playerY, int playerZ, World* world);
 	
 		void Setup();
 	
@@ -63,7 +63,7 @@ class Player : public Entity {
 		std::shared_ptr<Camera> camera;
 		InputHandler inputHandler = InputHandler("Player");
 		std::vector<unsigned int> inputCallbackIDs;
-		World& world;
+		World* world;
 		ChunkHandler* chunkHandler;
 		std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 

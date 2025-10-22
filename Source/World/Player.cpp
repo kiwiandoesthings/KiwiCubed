@@ -14,7 +14,7 @@ const char* gameModeStrings[] = {
 };
 
 
-Player::Player(int playerX, int playerY, int playerZ, World& world) : Entity(0, 0, 0, world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
+Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(0, 0, 0, world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
 	entityData.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
@@ -48,7 +48,7 @@ Player::Player(int playerX, int playerY, int playerZ, World& world) : Entity(0, 
 
 	protectedEntityData.UUID = CreateUUID();
 
-	chunkHandler = &world.GetChunkHandler();
+	chunkHandler = &world->GetChunkHandler();
 }
 
 void Player::Setup() {

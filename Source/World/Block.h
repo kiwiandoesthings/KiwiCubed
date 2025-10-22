@@ -131,8 +131,6 @@ struct BlockType {
             psnip_trap();
         }
 
-        std::cout << "block " << blockStringID.CanonicalName() << " has " << metaTextures.size() << std::endl;
-
         frontFaceID = faceTextureIDs[0];
         backFaceID = faceTextureIDs[1];
         leftFaceID = faceTextureIDs[2];
