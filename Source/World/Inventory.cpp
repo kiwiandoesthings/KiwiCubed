@@ -34,6 +34,7 @@ void Inventory::SetSlot(AssetStringID slotStringID, InventorySlot newItem) {
         inventorySlots[slotStringID] = newItem;
     } else {
         WARN("Could not find slot: \"" + slotStringID.CanonicalName() + "\" in inventory: \"" + inventoryStringID.CanonicalName() + "\"");
+        psnip_trap();
     }
 }
 
@@ -43,6 +44,8 @@ InventorySlot* Inventory::GetSlot(AssetStringID slotStringID) {
         return &inventorySlots[slotStringID];
     } else {
         WARN("Could not find slot: \"" + slotStringID.CanonicalName() + "\" in inventory: \"" + inventoryStringID.CanonicalName() + "\"");
+        psnip_trap();
+        return nullptr;
     }
 }
 

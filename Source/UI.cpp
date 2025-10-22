@@ -267,3 +267,5 @@ bool UIElement::GetHovered() {
 
     return hoverSelected;
 }
+
+UIElement::~UIElement() = default;

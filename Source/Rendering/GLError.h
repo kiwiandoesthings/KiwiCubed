@@ -14,7 +14,7 @@
     if (!GLLogCall(#x, __FILE__, __LINE__)) psnip_trap()
 
 static void GLClearError() {
-    while (glGetError() != GL_NO_ERROR);
+    //while (glGetError() != GL_NO_ERROR);
 }
 
 static bool GLLogCall(const char* function, const char* file, int line) {

@@ -281,14 +281,15 @@ int main() {
 			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(terrainShaderProgram);
 			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(wireframeShaderProgram);
 			singleplayerHandler.singleplayerWorld->GetPlayer().UpdateCameraMatrix(chunkDebugShaderProgram);
+			singleplayerHandler.singleplayerWorld->GetChunkHandler().CleanChunks();
 			
 			terrainAtlas.SetActive();
 			terrainAtlas.Bind();
 			debugRenderer.UpdateBuffers(singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerHandler.singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerHandler.singleplayerWorld->GetChunkOrigins());
 			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(chunkDebugShaderProgram);
-			auto endTime = std::chrono::steady_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - frameStartTime).count();
+			//auto endTime = std::chrono::steady_clock::now();
+			//auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - frameStartTime).count();
 			//std::cout << "frame took " << duration << "ms" << std::endl;
 			singleplayerHandler.singleplayerWorld->Render(terrainShaderProgram);
 		}

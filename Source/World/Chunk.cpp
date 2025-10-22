@@ -3,6 +3,15 @@
 #include <chrono>
 #include <klogger.hpp>
 
+
+unsigned int Chunk::totalChunks = 0;
+
+
+Chunk::Chunk(int chunkX, int chunkY, int chunkZ, ChunkHandler& chunkHandler) : chunkX(chunkX), chunkY(chunkY), chunkZ(chunkZ), chunkHandler(chunkHandler) {
+    totalChunks++;
+}
+
+
 // Currently just sets up the VBO, VAO, and IBO
 void Chunk::SetupRenderComponents() {
     OVERRIDE_LOG_NAME("Chunk Render Components Setup");
@@ -42,7 +51,7 @@ void Chunk::AllocateChunk() {
     generationStatus = 1;
 }
 
-bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug) {
+bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerChunk, bool debug) {
     if (isGenerated) {
         //std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks after they had already been generated, aborting {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
         return false;
@@ -111,7 +120,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
 
 
     if (updateCallerChunk) {
-        world.GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, *this, true, callerChunk);
+        world.GenerateChunk(callerChunk->chunkX, callerChunk->chunkY, callerChunk->chunkZ, this, true, callerChunk);
     }
 
     isGenerated = true;
@@ -123,7 +132,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerCh
 }
 
 // Returns whether or not the mesh was generated
-bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
+bool Chunk::GenerateMesh(const bool remesh) {
     OVERRIDE_LOG_NAME("Chunk Mesh Generation");
     if (isMeshed && !remesh) {
         WARN("Trying to generate mesh for already meshed chunk, aborting");
@@ -149,12 +158,12 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
 
     vertices.clear();
     indices.clear();
-    Chunk& positiveXChunk = chunkHandler.GetChunkUnlocked(chunkX + 1, chunkY, chunkZ, true);
-    Chunk& negativeXChunk = chunkHandler.GetChunkUnlocked(chunkX - 1, chunkY, chunkZ, true);
-    Chunk& positiveYChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY + 1, chunkZ, true);
-    Chunk& negativeYChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY - 1, chunkZ, true);
-    Chunk& positiveZChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY, chunkZ + 1, true);
-    Chunk& negativeZChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY, chunkZ - 1, true);
+    Chunk* positiveXChunk = chunkHandler.GetChunkUnlocked(chunkX + 1, chunkY, chunkZ, true);
+    Chunk* negativeXChunk = chunkHandler.GetChunkUnlocked(chunkX - 1, chunkY, chunkZ, true);
+    Chunk* positiveYChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY + 1, chunkZ, true);
+    Chunk* negativeYChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY - 1, chunkZ, true);
+    Chunk* positiveZChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY, chunkZ + 1, true);
+    Chunk* negativeZChunk = chunkHandler.GetChunkUnlocked(chunkX, chunkY, chunkZ - 1, true);
 
     std::vector<FaceDirection> facesToAdd;
     facesToAdd.reserve(6);
@@ -193,8 +202,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                                         break;
                                     }
                                 }
-                                else if (blockX == chunkSize - 1 && positiveXChunk.isGenerated) {
-                                    if (positiveXChunk.GetBlock(0, blockY, blockZ).IsAir()) {
+                                else if (blockX == chunkSize - 1 && positiveXChunk->isGenerated) {
+                                    if (positiveXChunk->GetBlock(0, blockY, blockZ).IsAir()) {
                                         facesToAdd.emplace_back(RIGHT);
                                         break;
                                     }
@@ -207,8 +216,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                                         break;
                                     }
                                 }
-                                else if (blockX == 0 && negativeXChunk.isGenerated) {
-                                    if (negativeXChunk.GetBlock(chunkSize - 1, blockY, blockZ).IsAir()) {
+                                else if (blockX == 0 && negativeXChunk->isGenerated) {
+                                    if (negativeXChunk->GetBlock(chunkSize - 1, blockY, blockZ).IsAir()) {
                                         facesToAdd.emplace_back(LEFT);
                                         break;
                                     }
@@ -221,8 +230,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                                         break;
                                     }
                                 }
-                                else if (blockY == chunkSize - 1 && positiveYChunk.isGenerated) {
-                                    if (positiveYChunk.GetBlock(blockX, 0, blockZ).IsAir()) {
+                                else if (blockY == chunkSize - 1 && positiveYChunk->isGenerated) {
+                                    if (positiveYChunk->GetBlock(blockX, 0, blockZ).IsAir()) {
                                         facesToAdd.emplace_back(TOP);
                                         break;
                                     }
@@ -235,8 +244,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                                         break;
                                     }
                                 }
-                                else if (blockY == 0 && negativeYChunk.isGenerated) {
-                                    if (negativeYChunk.GetBlock(blockX, chunkSize - 1, blockZ).IsAir()) {
+                                else if (blockY == 0 && negativeYChunk->isGenerated) {
+                                    if (negativeYChunk->GetBlock(blockX, chunkSize - 1, blockZ).IsAir()) {
                                         facesToAdd.emplace_back(BOTTOM);
                                         break;
                                     }
@@ -249,8 +258,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                                         break;
                                     }
                                 }
-                                else if (blockZ == chunkSize - 1 && positiveZChunk.isGenerated) {
-                                    if (positiveZChunk.GetBlock(blockX, blockY, 0).IsAir()) {
+                                else if (blockZ == chunkSize - 1 && positiveZChunk->isGenerated) {
+                                    if (positiveZChunk->GetBlock(blockX, blockY, 0).IsAir()) {
                                         facesToAdd.emplace_back(BACK);
                                         break;
                                     }
@@ -263,8 +272,8 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
                                         break;
                                     }
                                 }
-                                else if (blockZ == 0 && negativeZChunk.isGenerated) {
-                                    if (negativeZChunk.GetBlock(blockX, blockY, chunkSize - 1).IsAir()) {
+                                else if (blockZ == 0 && negativeZChunk->isGenerated) {
+                                    if (negativeZChunk->GetBlock(blockX, blockY, chunkSize - 1).IsAir()) {
                                         facesToAdd.emplace_back(FRONT);
                                         break;
                                     }
@@ -331,7 +340,7 @@ bool Chunk::GenerateMesh(ChunkHandler& chunkHandler, const bool remesh) {
     std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
     int time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     if (Globals::GetInstance().debugMode) {
-        //INFO("chunk meshing took " + std::to_string(time) + "ms");
+        INFO("Chunk meshing took " + std::to_string(time) + "ms");
     }
 
     return true;
@@ -411,14 +420,14 @@ bool Chunk::GetMeshable(ChunkHandler& chunkHandler) const {
     if (isMeshed || !isAllocated || !isGenerated || isEmpty) {
         return false;
     } else {
-        Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ, false);
-        Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ, false);
-        Chunk& positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ, false);
-        Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ, false);
-        Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1, false);
-        Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1, false);
+        Chunk* positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ, false);
+        Chunk* negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ, false);
+        Chunk* positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ, false);
+        Chunk* negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ, false);
+        Chunk* positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1, false);
+        Chunk* negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1, false);
 
-        return positiveXChunk.isGenerated && negativeXChunk.isGenerated && positiveYChunk.isGenerated && negativeYChunk.isGenerated && positiveZChunk.isGenerated && negativeZChunk.isGenerated;
+        return positiveXChunk->isGenerated && negativeXChunk->isGenerated && positiveYChunk->isGenerated && negativeYChunk->isGenerated && positiveZChunk->isGenerated && negativeZChunk->isGenerated;
     }
 }
 
@@ -501,20 +510,14 @@ void Chunk::DisplayImGui() {
 }
 
 void Chunk::Delete() {
-    vertexArrayObject.Delete();
-    vertexBufferObject.Delete();
-    indexBufferObject.Delete();
+    if (renderComponentsSetup) {
+        vertexArrayObject.Delete();
+        vertexBufferObject.Delete();
+        indexBufferObject.Delete();
+    }
 
     delete[] blocks;
     blocks = nullptr;
-
-    isAllocated = false;
-    isGenerated = false;
-    isMeshed = false;
-    generationStatus = 0;
-    isEmpty = true;
-    isFull = false;
-    totalBlocks = 0;
 
     vertices.clear();
     indices.clear();
@@ -522,4 +525,8 @@ void Chunk::Delete() {
     debugVisualizationVertices.clear();
     debugVisualizationIndices.clear();
 
+}
+
+Chunk::~Chunk() {
+    Delete();
 }

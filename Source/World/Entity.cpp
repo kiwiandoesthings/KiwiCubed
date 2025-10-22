@@ -1,7 +1,7 @@
 #include "Entity.h"
 #include "World.h"
 
-Entity::Entity(float entityX, float entityY, float entityZ, World& world) : world(world), entityStats(EntityStats()), entityData(EntityData()) {
+Entity::Entity(float entityX, float entityY, float entityZ, World& world) : entityStats(EntityStats()), entityData(EntityData()), world(world) {
 	entityData.position.x = entityX;
 	entityData.position.y = entityY;
 	entityData.position.z = entityZ;
@@ -47,7 +47,7 @@ void Entity::Update() {
 	);
 
 	if (oldGlobalChunkPosition != entityData.globalChunkPosition) {
-		entityData.currentChunkPtr = &world.GetChunkHandler().GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+		entityData.currentChunkPtr = world.GetChunkHandler().GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
 	}
 
 	return;

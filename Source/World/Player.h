@@ -39,7 +39,6 @@ class Player : public Entity {
 		float speed = 0.004f;
 		float sensitivity = 100.0f;
 
-		Player() : world(world), Entity(0, 0, 0, world), yaw(0), pitch(0), roll(0), width(640), height(480) {}
 		Player(int playerX, int playerY, int playerZ, World& world);
 	
 		void Setup();

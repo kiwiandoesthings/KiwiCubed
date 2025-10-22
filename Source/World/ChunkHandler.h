@@ -93,6 +93,7 @@ class ObservableInt {
 
 class Chunk {
     public:
+        static unsigned int totalChunks;
         Block* blocks = new Block[chunkSize * chunkSize * chunkSize];
         ChunkHeightmap heightmap;
         int chunkX = -1;
@@ -101,22 +102,29 @@ class Chunk {
         bool isAllocated = false;
         bool isGenerated = false;
         bool isMeshed = false;
+        bool isEmpty = true;
+        bool isFull = false;
         unsigned char generationStatus = 0;
         bool renderComponentsSetup = false;
         bool shouldRender = false;
-        bool isEmpty = true;
-        bool isFull;
         bool shouldGenerate = true;
+        bool shouldDelete = false;
         unsigned int totalMemoryUsage;
         unsigned int id = 0;
+        ChunkHandler& chunkHandler;
 
-        Chunk() {}
-        Chunk(int chunkX, int chunkY, int chunkZ) : chunkX(chunkX), chunkY(chunkY), chunkZ(chunkZ), isEmpty(false) {}
+        Chunk(int chunkX, int chunkY, int chunkZ, ChunkHandler& chunkHandler);
+        ~Chunk();
+
+        Chunk(const Chunk&) = delete;
+        Chunk& operator=(const Chunk&) = delete;
+        Chunk(Chunk&& other) noexcept;
+        Chunk& operator=(Chunk&& other) noexcept;
 
         void SetupRenderComponents();
         void AllocateChunk();
-        bool GenerateBlocks(World& world, Chunk& callerChunk, bool updateCallerChunk, bool debug);
-        bool GenerateMesh(ChunkHandler& chunkHandler, const bool remesh);
+        bool GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerChunk, bool debug);
+        bool GenerateMesh(const bool remesh);
         bool GenerateHeightmap();
         void Render();
 
@@ -169,20 +177,21 @@ class Chunk {
 
 class ChunkHandler {
     public:
-        std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
+        std::unordered_map<std::tuple<int, int, int>, std::unique_ptr<Chunk>, TripleHash> chunks;
         std::mutex ChunkMutex;
 
-        ChunkHandler(World& world) : world(world) {};
+        ChunkHandler(World& world);
         void Delete();
 
         void GenerateWorld();
+        void CleanChunks();
 
-        Chunk& GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotFound);
-        Chunk& GetChunkUnlocked(int chunkX, int chunkY, int chunkZ, bool addIfNotFound);
-        Chunk& AddChunk(int chunkX, int chunkY, int chunkZ);
-        Chunk& AddChunkUnlocked(int chunkX, int chunkY, int chunkZ);
+        Chunk* GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotFound);
+        Chunk* GetChunkUnlocked(int chunkX, int chunkY, int chunkZ, bool addIfNotFound);
+        Chunk* AddChunk(int chunkX, int chunkY, int chunkZ);
+        Chunk* AddChunkUnlocked(int chunkX, int chunkY, int chunkZ);
         bool GetChunkExists(int chunkX, int chunkY, int chunkZ);
-        void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk callerChunk, bool updateCallerChunk, bool debug);
+        void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* callerChunk, bool updateCallerChunk, bool debug);
         bool MeshChunk(int chunkX, int chunkY, int chunkZ);
         void SmartGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ);
         void ForceGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ);
@@ -194,5 +203,5 @@ class ChunkHandler {
     private:
         World& world;
 
-        Chunk defaultChunk = Chunk(0, 0, 0);
+        std::unique_ptr<Chunk> defaultChunk = nullptr;
 };

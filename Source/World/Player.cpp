@@ -14,7 +14,7 @@ const char* gameModeStrings[] = {
 };
 
 
-Player::Player(int playerX, int playerY, int playerZ, World& world) : world(world), Entity(0, 0, 0, world), yaw(0), pitch(0), roll(0), width(640), height(480) {
+Player::Player(int playerX, int playerY, int playerZ, World& world) : Entity(0, 0, 0, world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
 	entityData.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
@@ -97,7 +97,7 @@ void Player::Setup() {
 		entityStats.health += static_cast<float>(offset);
 	}));
 
-	entityData.currentChunkPtr = &chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+	entityData.currentChunkPtr = chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
 	if (entityData.currentChunkPtr->id == 0) {
 		entityData.currentChunkPtr = nullptr;
 	}
@@ -119,7 +119,7 @@ void Player::Update() {
 		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
         if (entityData.isGrounded) {
 			if (entityData.isJumping) {
-				auto current = std::chrono::steady_clock::now();
+				//auto current = std::chrono::steady_clock::now();
 				//std::cout << "jump took " << std::chrono::duration_cast<std::chrono::milliseconds>(current - jumpStart).count() << "ms" << std::endl; 
 			}
 			entityData.isJumping = false;
@@ -130,7 +130,7 @@ void Player::Update() {
 				std::make_pair("globalChunkPosition", entityData.globalChunkPosition), 
 				std::make_pair("entity", this), 
 				std::make_pair("chunkHandler", chunkHandler));
-			entityData.currentChunkPtr = &chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+			entityData.currentChunkPtr = chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
 			if (entityData.currentChunkPtr->id == 0) {
 				entityData.currentChunkPtr = nullptr;
 			}
@@ -255,7 +255,7 @@ void Player::MouseButtonCallback(int button) {
 	BlockRayHit rayHit = Physics::RaycastWorld(entityData.position, entityData.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit);
 	if (rayHit.hit) {
 		if (button == 0) {
-			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false).GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
+			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
 			entityData.inventory.AddItem(InventorySlot{*BlockManager::GetInstance().GetStringID(block.GetBlockID()), 1});
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
@@ -349,7 +349,7 @@ void Player::MouseButtonCallback(int button) {
 					}
 					break;
 			}
-			bool emptyBlock = chunkHandler->GetChunk(placingChunkPosition.x, placingChunkPosition.y, placingChunkPosition.z, false).GetBlock(placingBlockPosition.x, placingBlockPosition.y, placingBlockPosition.z).IsAir();
+			bool emptyBlock = chunkHandler->GetChunk(placingChunkPosition.x, placingChunkPosition.y, placingChunkPosition.z, false)->GetBlock(placingBlockPosition.x, placingBlockPosition.y, placingBlockPosition.z).IsAir();
 			bool collidesEntity = Physics::CollideBlock(*this, FullBlockPosition{placingBlockPosition, placingChunkPosition}, false);
 			if (emptyBlock && !collidesEntity) {
 				int usingSlotIndex = -1;

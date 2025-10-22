@@ -30,10 +30,8 @@ struct ChunkData {
 
 class World {
 	public:
-		unsigned int totalChunks;
 		float totalMemoryUsage;
 
-		World() : worldSizeHorizontal(1), worldSizeVertical(1), chunkHandler(*this), player(0, 0, 0, *this), singleplayerHandler(singleplayerHandler), totalChunks(0), totalMemoryUsage(0), shouldTick(false), tickIntervalMs(50) {}
 		World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, SingleplayerHandler* singleplayerHandler);
 
 		void Setup();
@@ -41,7 +39,7 @@ class World {
 
 		void Render(Shader shaderProgram);
 		void GenerateWorld();
-		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk);
+		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool updateCallerChunk, Chunk* callerChunk);
 
 		void RecalculateChunksToLoad(Event event, unsigned short horizontalRadius = 0, unsigned short verticalRadius = 0);
         void QueueMesh(glm::ivec3 chunkPosition, bool remesh);
@@ -52,7 +50,7 @@ class World {
 		void DisplayImGui(unsigned int option);
 
 		ChunkHandler& GetChunkHandler();
-		Chunk GetChunk(int chunkX, int chunkY, int chunkZ);
+		Chunk* GetChunk(int chunkX, int chunkY, int chunkZ);
 		Entity GetEntity(std::string uuid);
 
 		//temporary - merge into GetEntity
@@ -119,8 +117,6 @@ class World {
 		//IndexBufferObject indexBufferObject;
 		//VertexArrayObject vertexArrayObject;
 		//VertexBufferObject vertexBufferObject = VertexBufferObject(/*"world*/);
-
-		Chunk defaultChunk = Chunk(0, 0, 0);
 
 		void RunTickThread();
 };

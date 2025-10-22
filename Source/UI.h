@@ -97,6 +97,7 @@ class UIScreen {
 class UIElement {
     public:
         UIElement(glm::vec2 position, glm::vec2 scale, std::string eventToTrigger);
+        virtual ~UIElement();
         
         static glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
         static float PositionToNDC(float number);

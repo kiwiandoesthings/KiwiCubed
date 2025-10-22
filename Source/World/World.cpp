@@ -9,7 +9,7 @@
 std::atomic<bool> keepRunning(true);
 
 
-World::World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, SingleplayerHandler* singleplayerHandler) : totalChunks(0), totalMemoryUsage(0), singleplayerHandler(singleplayerHandler), worldSizeHorizontal(worldSizeHorizontal), worldSizeVertical(worldSizeVertical), chunkHandler(*this) {
+World::World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, SingleplayerHandler* singleplayerHandler) : totalMemoryUsage(0), worldSizeHorizontal(worldSizeHorizontal), worldSizeVertical(worldSizeVertical), chunkHandler(*this), singleplayerHandler(singleplayerHandler) {
     for (unsigned int chunkX = 0; chunkX < worldSizeHorizontal; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSizeVertical; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSizeHorizontal; ++chunkZ) {
@@ -30,17 +30,21 @@ void World::Setup() {
     for (int chunkX = 2; chunkX < worldSizeHorizontal - 2; chunkX++) {
         for (int chunkZ = 2; chunkZ < worldSizeHorizontal - 2; chunkZ++) {
             for (int chunkY = worldSizeHorizontal; chunkY > 0; chunkY--) {
-                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
+                Chunk* chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
+
+                if (chunk == nullptr) {
+                    continue;
+                }
         
-                if (!chunk.isGenerated || !chunk.isMeshed || chunk.isEmpty) {
+                if (!chunk->isGenerated || !chunk->isMeshed || chunk->isEmpty) {
                     continue;
                 }
             
                 for (unsigned int x = 0; x < chunkSize; ++x) {
                     for (unsigned int z = 0; z < chunkSize; ++z) {
-                        int level = chunk.GetHeightmapLevelAt(glm::vec2(x, z));
+                        int level = chunk->GetHeightmapLevelAt(glm::vec2(x, z));
                         if (level != -1) {
-                            player.SetPosition((chunk.chunkX * chunkSize) + x, (chunk.chunkY * chunkSize) + level + 3, (chunk.chunkZ * chunkSize) + z);
+                            player.SetPosition((chunk->chunkX * chunkSize) + x, (chunk->chunkY * chunkSize) + level + 3, (chunk->chunkZ * chunkSize) + z);
                             return;
                         }
                     }
@@ -58,8 +62,8 @@ void World::Render(Shader shaderProgram) {
     shaderProgram.Bind();
     for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
         auto& chunk = iterator->second;
-        if (!chunk.isEmpty) {
-            chunk.Render();
+        if (!chunk->isEmpty) {
+            chunk->Render();
         }
     }
 }
@@ -72,9 +76,9 @@ void World::GenerateWorld() {
     for (unsigned int chunkX = 0; chunkX < worldSizeHorizontal; ++chunkX) {
         for (unsigned int chunkY = 0; chunkY < worldSizeVertical; ++chunkY) {
             for (unsigned int chunkZ = 0; chunkZ < worldSizeHorizontal; ++chunkZ) {
-                Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
+                Chunk* chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
                 GenerateChunk(chunkX, chunkY, chunkZ, chunk, false, chunk);
-                totalMemoryUsage += chunk.GetMemoryUsage();
+                totalMemoryUsage += chunk->GetMemoryUsage();
             }
         }
     }
@@ -95,70 +99,70 @@ void World::GenerateWorld() {
 
     for (auto it = chunkHandler.chunks.begin(); it != chunkHandler.chunks.end(); ++it) {
         auto& chunk = it->second;
-        chunk.SetupRenderComponents();
+        chunk->SetupRenderComponents();
     }
 
     singleplayerHandler->isLoadedIntoSingleplayerWorld = true;
 }
 
-void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk& chunk, bool updateCallerChunk, Chunk& callerChunk) {
+void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool updateCallerChunk, Chunk* callerChunk) {
     // Basic procedures for preparing a chunk, SetPosition should be done before ANYTHING ELSE, or functions relying on the chunks position will not work properly
-    chunk.SetPosition(chunkX, chunkY, chunkZ);
+    chunk->SetPosition(chunkX, chunkY, chunkZ);
 
-    if (!chunk.shouldGenerate) {
+    if (!chunk->shouldGenerate) {
         return;
     }
-    if (!chunk.isAllocated) {
-        chunk.AllocateChunk();
+    if (!chunk->isAllocated) {
+        chunk->AllocateChunk();
     }
-    if (!chunk.isGenerated) {
-		chunk.GenerateBlocks(*this, chunk, false, false);
+    if (!chunk->isGenerated) {
+		chunk->GenerateBlocks(*this, chunk, false, false);
 	}
 
-    totalChunks++;
+    Chunk* positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ, true);     // Positive X
+    Chunk* negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ, true);     // Negative X
+    Chunk* positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ, true);     // Positive Y
+    Chunk* negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ, true);     // Negative Y
+    Chunk* positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1, true);     // Positive Z
+    Chunk* negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1, true);     // Negative Z
 
-    Chunk& positiveXChunk = chunkHandler.GetChunk(chunkX + 1, chunkY, chunkZ, true);     // Positive X
-    Chunk& negativeXChunk = chunkHandler.GetChunk(chunkX - 1, chunkY, chunkZ, true);     // Negative X
-    Chunk& positiveYChunk = chunkHandler.GetChunk(chunkX, chunkY + 1, chunkZ, true);     // Positive Y
-    Chunk& negativeYChunk = chunkHandler.GetChunk(chunkX, chunkY - 1, chunkZ, true);     // Negative Y
-    Chunk& positiveZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ + 1, true);     // Positive Z
-    Chunk& negativeZChunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ - 1, true);     // Negative Z
-
-    if (positiveXChunk.isGenerated && negativeXChunk.isGenerated && positiveYChunk.isGenerated && negativeYChunk.isGenerated && positiveZChunk.isGenerated && negativeZChunk.isGenerated && !chunk.isMeshed) {
-        chunk.GenerateMesh(chunkHandler, false);
+    if (positiveXChunk->isGenerated && negativeXChunk->isGenerated && positiveYChunk->isGenerated && negativeYChunk->isGenerated && positiveZChunk->isGenerated && negativeZChunk->isGenerated && !chunk->isMeshed) {
+        chunk->GenerateMesh(false);
     }
     else if (!updateCallerChunk) {
-        if (!positiveXChunk.isGenerated) {
+        if (!positiveXChunk->isGenerated) {
             GenerateChunk(chunkX + 1, chunkY, chunkZ, positiveXChunk, true, chunk);
         }
     
-        if (!negativeXChunk.isGenerated) {
+        if (!negativeXChunk->isGenerated) {
             GenerateChunk(chunkX - 1, chunkY, chunkZ, negativeXChunk, true, chunk);
         }
     
-        if (!positiveYChunk.isGenerated) {
+        if (!positiveYChunk->isGenerated) {
             GenerateChunk(chunkX, chunkY + 1, chunkZ, positiveYChunk, true, chunk);
         }
     
-        if (!negativeYChunk.isGenerated) {
+        if (!negativeYChunk->isGenerated) {
             GenerateChunk(chunkX, chunkY - 1, chunkZ, negativeYChunk, true, chunk);
         }
     
-        if (!positiveZChunk.isGenerated) {
+        if (!positiveZChunk->isGenerated) {
             GenerateChunk(chunkX, chunkY, chunkZ + 1, positiveZChunk, true, chunk);
         }
     
-        if (!negativeZChunk.isGenerated) {
+        if (!negativeZChunk->isGenerated) {
             GenerateChunk(chunkX, chunkY, chunkZ - 1, negativeZChunk, true, chunk);
         }
     }
 
     if (updateCallerChunk) {
-        GenerateChunk(callerChunk.chunkX, callerChunk.chunkY, callerChunk.chunkZ, callerChunk, false, chunk);
+        GenerateChunk(callerChunk->chunkX, callerChunk->chunkY, callerChunk->chunkZ, callerChunk, false, chunk);
     }
 }
 
 void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius, unsigned short verticalRadius) {
+    std::cout << "recalc" << std::endl;
+    std::cout.flush();
     if (horizontalRadius == 0) {
         horizontalRadius = playerChunkGenerationRadiusHorizontal;
     }
@@ -176,8 +180,8 @@ void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius
             for (int chunkY = playerChunkPosition->y - verticalRadius; chunkY < playerChunkPosition->y + verticalRadius; ++chunkY) {
                 for (int chunkZ = playerChunkPosition->z - horizontalRadius; chunkZ < playerChunkPosition->z + horizontalRadius; ++chunkZ) {
                     std::tuple<int, int, int> chunkPosition = {chunkX, chunkY, chunkZ};
-                    Chunk& chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
-                    if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk.GetMeshable(chunkHandler) && chunk.generationStatus != 3) {
+                    Chunk* chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
+                    if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk->GetMeshable(chunkHandler) && chunk->generationStatus != 3) {
                         if (chunkMeshingSet.find(chunkPosition) != chunkMeshingSet.end()) {
                             continue;
                         }
@@ -198,12 +202,12 @@ void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius
         glm::ivec3 playerPosition = player.GetEntityData().globalChunkPosition;
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); iterator++) {
             auto& chunk = iterator->second;
-            int distanceX = playerPosition.x - chunk.chunkX - 1;
-            int distanceY = playerPosition.y - chunk.chunkY - 1;
-            int distanceZ = playerPosition.z - chunk.chunkZ - 1;
+            int distanceX = playerPosition.x - chunk->chunkX - 1;
+            int distanceY = playerPosition.y - chunk->chunkY - 1;
+            int distanceZ = playerPosition.z - chunk->chunkZ - 1;
 
             if (abs(distanceX) > playerChunkGenerationRadiusHorizontal + 2 || abs(distanceY) > playerChunkGenerationRadiusVertical + 2 || abs(distanceZ) > playerChunkGenerationRadiusHorizontal + 2) {            
-                chunkUnloadingQueue.push(glm::ivec3(chunk.chunkX, chunk.chunkY, chunk.chunkZ));
+                chunkUnloadingQueue.push(glm::ivec3(chunk->chunkX, chunk->chunkY, chunk->chunkZ));
             }
         }
           
@@ -235,11 +239,13 @@ void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius
             }
         } 
     }
+    std::cout << "finish" << std::endl;
+    std::cout.flush();
 }
 
 void World::QueueMesh(glm::ivec3 chunkPosition, bool remesh) {
     chunkGenerationThreads.QueueTask([&]{
-        GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z).GenerateMesh(chunkHandler, true);
+        GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z)->GenerateMesh(true);
     });
 }
 
@@ -249,6 +255,8 @@ void World::QueueTickTask(std::function<void()> task) {
 
 void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
+    std::cout << "tick" << std::endl;
+    std::cout.flush();
 
     std::vector<glm::ivec3> chunkGenerationQueueCopy;
     std::vector<glm::ivec3> chunkMeshingQueueCopy;
@@ -274,10 +282,10 @@ void World::Update() {
 
     while (chunkGenerationQueueCopy.size() > 0) {
         glm::ivec3 chunkPosition = chunkGenerationQueueCopy.front();
-        if (!chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false).isAllocated) {
+        if (!chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->isAllocated) {
             chunkHandler.AddChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z);
         }
-        chunkHandler.GenerateChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, defaultChunk, false, false);
+        chunkHandler.GenerateChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, nullptr, false, false);
         chunkGenerationQueueCopy.erase(chunkGenerationQueueCopy.begin());
     }
 
@@ -289,16 +297,16 @@ void World::Update() {
 
     while (chunkUnloadingQueueCopy.size() > 0) {
         glm::ivec3 chunkPosition = chunkUnloadingQueueCopy.front();
-        Chunk chunk = chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
+        Chunk* chunk = chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
         chunkUnloadingQueueCopy.pop();
-        totalChunks--;
-        if (chunk.id == 0) {
+        if (chunk->id == 0) {
             WARN("Trying to unload already unloaded chunk at position {" + std::to_string(chunkPosition.x) + ", " + std::to_string(chunkPosition.y) + ", " + std::to_string(chunkPosition.z) + "}, aborting");
             return;
         }
         auto iterator = chunkHandler.chunks.find(std::tuple(chunkPosition.x, chunkPosition.y, chunkPosition.z));
         if (iterator != chunkHandler.chunks.end()) {
-            chunkHandler.chunks.erase(iterator);
+            auto& chunk = iterator->second;
+            chunk->shouldDelete = true;
         }
         auto generationIterator = chunkGenerationSet.find(std::tuple(chunkPosition.x, chunkPosition.y, chunkPosition.z));
         if (generationIterator != chunkGenerationSet.end()) {
@@ -317,6 +325,8 @@ void World::Update() {
         std::swap(chunkUnloadingQueueCopy, chunkUnloadingQueue);
         std::swap(tickTaskQueueCopy, tickTaskQueue);
     }
+    std::cout << "finish" << std::endl;
+    std::cout.flush();
 }
 
 // Pass 0 for world ImGui, 1 for chunk ImGui...
@@ -353,15 +363,15 @@ void World::DisplayImGui(unsigned int option) {
 			GetChunk(
 				player.GetEntityData().globalChunkPosition.x,
 				player.GetEntityData().globalChunkPosition.y,
-				player.GetEntityData().globalChunkPosition.z).generationStatus,
+				player.GetEntityData().globalChunkPosition.z)->generationStatus,
 			GetChunk(
 				player.GetEntityData().globalChunkPosition.x,
 				player.GetEntityData().globalChunkPosition.y,
-				player.GetEntityData().globalChunkPosition.z).GetTotalBlocks(),
+				player.GetEntityData().globalChunkPosition.z)->GetTotalBlocks(),
 			GetChunk(
 				player.GetEntityData().globalChunkPosition.x,
 				player.GetEntityData().globalChunkPosition.y,
-				player.GetEntityData().globalChunkPosition.z).id);
+				player.GetEntityData().globalChunkPosition.z)->id);
     }
 
     if (option == 1) {
@@ -374,7 +384,7 @@ void World::DisplayImGui(unsigned int option) {
             temporaryQueue.pop();
         }
         ImGui::Text("%d tasks currently queued for tick thread", tasks);
-        ImGui::Text("Total chunks: %d", totalChunks);
+        ImGui::Text("Total chunks: %d", Chunk::totalChunks);
         ImGui::Text("Rough memory usage: %.2f MB", totalMemoryUsage / (1024.0 * 1024.0));
         if (ImGui::CollapsingHeader("Chunk Generation Queue")) {
             std::vector<glm::ivec3> temporaryQueue = chunkGenerationQueue;
@@ -404,7 +414,7 @@ void World::DisplayImGui(unsigned int option) {
     else if (option == 2) {
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
             auto& chunk = iterator->second;
-            chunk.DisplayImGui();
+            chunk->DisplayImGui();
         }
     }
 }
@@ -413,7 +423,7 @@ ChunkHandler& World::GetChunkHandler() {
     return chunkHandler;
 }
 
-Chunk World::GetChunk(int chunkX, int chunkY, int chunkZ) {
+Chunk* World::GetChunk(int chunkX, int chunkY, int chunkZ) {
     return chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
 }
 
@@ -431,7 +441,7 @@ std::vector<float>& World::GetChunkDebugVisualizationVertices() {
     std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
     for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
         auto& chunk = iterator->second;
-        chunkDebugVisualizationVertices.insert(chunkDebugVisualizationVertices.end(), chunk.GetDebugVisualizationVertices().begin(), chunk.GetDebugVisualizationVertices().end());
+        chunkDebugVisualizationVertices.insert(chunkDebugVisualizationVertices.end(), chunk->GetDebugVisualizationVertices().begin(), chunk->GetDebugVisualizationVertices().end());
     }
     return chunkDebugVisualizationVertices;
 }
@@ -441,7 +451,7 @@ std::vector<GLuint>& World::GetChunkDebugVisualizationIndices() {
     std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
     for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
         auto& chunk = iterator->second;
-        chunkDebugVisualizationIndices.insert(chunkDebugVisualizationIndices.end(), chunk.GetDebugVisualizationIndices().begin(), chunk.GetDebugVisualizationIndices().end());
+        chunkDebugVisualizationIndices.insert(chunkDebugVisualizationIndices.end(), chunk->GetDebugVisualizationIndices().begin(), chunk->GetDebugVisualizationIndices().end());
     }
     return chunkDebugVisualizationIndices;
 }
@@ -451,7 +461,7 @@ std::vector<glm::vec4>& World::GetChunkOrigins() {
     std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
     for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
         auto& chunk = iterator->second;
-        chunkOrigins.emplace_back(glm::vec4(chunk.chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunk.chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunk.chunkZ * chunkSize + static_cast<int>(chunkSize / 2), chunk.generationStatus));
+        chunkOrigins.emplace_back(glm::vec4(chunk->chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunk->chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunk->chunkZ * chunkSize + static_cast<int>(chunkSize / 2), chunk->generationStatus));
     }
     return chunkOrigins;
 }
@@ -500,7 +510,7 @@ void World::Tick() {
         totalMemoryUsage = 0;
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
             auto& chunk = iterator->second;
-            totalMemoryUsage += chunk.GetMemoryUsage();
+            totalMemoryUsage += chunk->GetMemoryUsage();
         }
     }
 

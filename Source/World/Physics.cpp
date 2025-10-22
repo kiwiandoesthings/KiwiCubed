@@ -18,7 +18,7 @@ void Physics::Initialize() {
 }
 
 static void ApplyGravity(EntityData& newEntityData) {
-	Globals& globals = Globals::GetInstance();
+	//Globals& globals = Globals::GetInstance();
 	float gravityPerSecond = 9.81f;
 	// makeshift deltatime until render thread is set up. first frame after creating world,
 	// deltatime is super high and you get like -60 velocity in 1 frame
@@ -50,7 +50,7 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 		Chunk* targetChunk = nullptr;
 		if (blockPosition.chunkPosition.x != newEntityData.globalChunkPosition.x || blockPosition.chunkPosition.y != newEntityData.globalChunkPosition.y || blockPosition.chunkPosition.z != newEntityData.globalChunkPosition.z) {
 			std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
-			targetChunk = &chunkHandler.GetChunkUnlocked(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
+			targetChunk = chunkHandler.GetChunkUnlocked(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
 			if (!targetChunk->isGenerated) {
 				continue;
 			}
@@ -102,7 +102,7 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 		Chunk* targetChunk = nullptr;
 		if (blockPosition.chunkPosition.x != newEntityData.globalChunkPosition.x || blockPosition.chunkPosition.y != newEntityData.globalChunkPosition.y || blockPosition.chunkPosition.z != newEntityData.globalChunkPosition.z) {
 			std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
-			targetChunk = &chunkHandler.GetChunkUnlocked(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
+			targetChunk = chunkHandler.GetChunkUnlocked(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
 			if (!targetChunk->isGenerated) {
 				continue;
 			}
@@ -164,7 +164,7 @@ bool Physics::ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chu
 					PositiveModulo(blockZ, chunkSize)
 				);
 
-				if (chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false).GetBlock(blockPosition.x, blockPosition.y, blockPosition.z).blockID != 0) {
+				if (chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z).blockID != 0) {
 					blockCollisionQueue.emplace_back(FullBlockPosition(blockPosition, chunkPosition));
 				}
 			}
@@ -228,9 +228,9 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 	for (int i = 0; i < maxDistance; ++i) {
 		glm::ivec3 localBlockPos = glm::ivec3(PositiveModulo(currentBlock.x, chunkSize), PositiveModulo(currentBlock.y, chunkSize), PositiveModulo(currentBlock.z, chunkSize));
 
-		Chunk chunk = chunkHandler.GetChunk(currentChunk.x, currentChunk.y, currentChunk.z, false);
-		if (chunk.isGenerated) {
-			Block& block = chunk.GetBlock(localBlockPos.x, localBlockPos.y, localBlockPos.z);
+		Chunk* chunk = chunkHandler.GetChunk(currentChunk.x, currentChunk.y, currentChunk.z, false);
+		if (chunk->isGenerated) {
+			Block& block = chunk->GetBlock(localBlockPos.x, localBlockPos.y, localBlockPos.z);
 			if (!block.IsAir()) {
 				blockHitPosition = glm::ivec3(PositiveModulo(currentBlock.x, chunkSize), PositiveModulo(currentBlock.y, chunkSize), PositiveModulo(currentBlock.z, chunkSize));
 				chunkHitPosition = currentChunk;
