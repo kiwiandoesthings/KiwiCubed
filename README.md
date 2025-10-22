@@ -12,9 +12,9 @@ Currently working on:
 - Survival gameplay elements
 
 # Table of Contents
-* 01. Compiling
-* 02. Controls
-* 03. Other Information lol
+1. Compiling
+2. Controls
+3. Other Information lol
 
 ## 01. Compiling
 
