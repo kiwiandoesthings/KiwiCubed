@@ -38,7 +38,7 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 	if (usage != "texture_gui") {
 		GLCall(glGenerateMipmap(textureType));
 	}
-	GLCall(glTexParameterf(textureType, GL_TEXTURE_LOD_BIAS, 0.5f));
+	GLCall(glTexParameterf(textureType, GL_TEXTURE_LOD_BIAS, 0.0f));
 
 	stbi_image_free(bytes);
 	GLCall(glBindTexture(textureType, 0));

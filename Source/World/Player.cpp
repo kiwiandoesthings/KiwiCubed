@@ -249,6 +249,11 @@ void Player::QueryInputs() {
 }
 
 void Player::MouseButtonCallback(int button) {
+	// will be reworked much later probably
+	if (!UI::GetInstance().IsDisabled()) {
+		return;
+	}
+
 	glm::ivec3 chunkPosition = glm::ivec3(-1, -1, -1);
 	glm::ivec3 blockPosition = glm::ivec3(-1, -1, -1);
 	bool hit = 0;
@@ -384,7 +389,7 @@ void Player::MouseButtonCallback(int button) {
 
 void Player::QueryMouseInputs() {
 	Window& window = camera->GetWindow();
-	if (!window.GetFocused()) {
+	if (!window.GetFocused() || !UI::GetInstance().IsDisabled()) {
 		return;
 	}
 

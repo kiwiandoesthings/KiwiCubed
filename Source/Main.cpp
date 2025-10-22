@@ -50,7 +50,8 @@
 using json = nlohmann::json;
 
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+void WindowFocusCallback(GLFWwindow* window, int focused);
 
 unsigned char bitness;
 
@@ -100,7 +101,8 @@ int main() {
 	globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
 
 	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
-	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), FramebufferSizeCallback);
+	glfwSetWindowFocusCallback(globalWindow.GetWindowInstance(), WindowFocusCallback);
 
 	// Initialize glad
 	LOG_CHECK_RETURN_CRITICAL(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD, exiting", -1);
@@ -329,13 +331,28 @@ int main() {
 	return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+	OVERRIDE_LOG_NAME("GLFW Callback / Framebuffer Size");
 	if (width == 0 || height == 0) {
 		return;
 	}
 	glViewport(0, 0, width, height);
 	Window* globalWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
-	if (globalWindow) {
-		globalWindow->UpdateWindowSize(width, height);
+	if (!globalWindow) {
+		ERR("Could not get window instance for GLFW callback");
+	}
+	globalWindow->UpdateWindowSize(width, height);
+}
+
+void WindowFocusCallback(GLFWwindow* window, int focused) {
+	OVERRIDE_LOG_NAME("GLFW Callback / Window Focus");
+	Window* globalWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	if (!globalWindow) {
+		ERR("Could not get window instance for GLFW callback");
+	}
+	if (focused) {
+		globalWindow->SetFocused(true);
+	} else {
+		globalWindow->SetFocused(false);
 	}
 }

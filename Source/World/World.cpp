@@ -161,8 +161,6 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool
 }
 
 void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius, unsigned short verticalRadius) {
-    std::cout << "recalc" << std::endl;
-    std::cout.flush();
     if (horizontalRadius == 0) {
         horizontalRadius = playerChunkGenerationRadiusHorizontal;
     }
@@ -239,8 +237,6 @@ void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius
             }
         } 
     }
-    std::cout << "finish" << std::endl;
-    std::cout.flush();
 }
 
 void World::QueueMesh(glm::ivec3 chunkPosition, bool remesh) {
@@ -255,8 +251,6 @@ void World::QueueTickTask(std::function<void()> task) {
 
 void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
-    std::cout << "tick" << std::endl;
-    std::cout.flush();
 
     std::vector<glm::ivec3> chunkGenerationQueueCopy;
     std::vector<glm::ivec3> chunkMeshingQueueCopy;
@@ -325,8 +319,6 @@ void World::Update() {
         std::swap(chunkUnloadingQueueCopy, chunkUnloadingQueue);
         std::swap(tickTaskQueueCopy, tickTaskQueue);
     }
-    std::cout << "finish" << std::endl;
-    std::cout.flush();
 }
 
 // Pass 0 for world ImGui, 1 for chunk ImGui...

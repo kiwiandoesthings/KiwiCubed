@@ -190,7 +190,10 @@ private:
     }
 
     static void MouseButtonCallbackHandler(GLFWwindow* window, int button, int action, int mods) {
-        ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+        if (ImGui::GetIO().WantCaptureMouse) {
+            ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+            return;
+        }
         if (action == GLFW_PRESS) {
             mouseButtonStates[button] = true;
             auto iterator = mouseButtonCallbacks.find(button);
@@ -205,7 +208,10 @@ private:
     }
 
     static void ScrollCallbackHandler(GLFWwindow* window, double xoffset, double yoffset) {
-        ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+        if (ImGui::GetIO().WantCaptureMouse) {
+            ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+            return;
+        }
         scrollStates[false] = xoffset > 0;
         scrollStates[true] = yoffset > 0;
 

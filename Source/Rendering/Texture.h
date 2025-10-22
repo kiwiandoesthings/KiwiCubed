@@ -14,7 +14,6 @@ class Texture {
 		glm::vec2 atlasSize;
 		GLenum slot;
 	
-		Texture() : ID(0), type(0), atlasSize(0) {}
 		Texture(const char* filepath, GLenum texType, GLenum slot, GLenum format, GLenum pixelType, std::string usage);
 	
 		void TextureUnit(Shader& shader, const char* uniform);
