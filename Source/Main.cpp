@@ -233,7 +233,7 @@ int main() {
 	// FPS code
 	int frames = 0;
 	auto startTime = std::chrono::steady_clock::now();
-	double fps = 0.0;
+	double fps = 0.0f;
 	
 	Globals& globals = Globals::GetInstance();
 
@@ -249,8 +249,8 @@ int main() {
 		auto endTime = std::chrono::steady_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 
-		if (duration >= 1000.0) {
-			fps = static_cast<float>(frames) / (duration / 1000.0);
+		if (duration >= 1000.0f) {
+			fps = static_cast<float>(frames) / (duration / 1000.0f);
 			frames = 0;
 			startTime = endTime;
 		}
@@ -308,7 +308,11 @@ int main() {
 		++frames;
 
 		auto frameEndTime = std::chrono::steady_clock::now();
+		if (singleplayerHandler.isLoadedIntoSingleplayerWorld) {
+			singleplayerHandler.singleplayerWorld->UpdateFrameTime(frameEndTime);
+		}
 		globals.deltaTime = abs(duration_cast<std::chrono::duration<float>>(frameStartTime - frameEndTime).count());
+		globals.frameCount++;
 	}
 
 
@@ -352,9 +356,10 @@ void WindowFocusCallback(GLFWwindow* window, int focused) {
 	if (!globalWindow) {
 		ERR("Could not get window instance for GLFW callback");
 	}
+	// Disabled until I have a better solution for this
 	if (focused) {
-		globalWindow->SetFocused(true);
+		//globalWindow->SetFocused(true);
 	} else {
-		globalWindow->SetFocused(false);
+		//globalWindow->SetFocused(false);
 	}
 }

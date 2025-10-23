@@ -30,14 +30,12 @@ void Entity::SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID,
 	std::vector<GLfloat> newVertices;
 	newVertices.reserve((entityModel.vertices.size() / 3) * 5);
 	for (int vertex = 0, latestTextureCoordinate = 0; vertex < entityModel.vertices.size(); vertex += 3, latestTextureCoordinate += 2) {
-		newVertices.push_back(entityModel.vertices[vertex] + entityData.position.x);
-		newVertices.push_back(entityModel.vertices[vertex + 1] + entityData.position.y);
-		newVertices.push_back(entityModel.vertices[vertex + 2] + entityData.position.z);
+		newVertices.push_back(entityModel.vertices[vertex]);
+		newVertices.push_back(entityModel.vertices[vertex + 1]);
+		newVertices.push_back(entityModel.vertices[vertex + 2]);
 		newVertices.push_back(textureCoordinates[latestTextureCoordinate]);
 		newVertices.push_back(textureCoordinates[latestTextureCoordinate + 1]);
 	}
-
-	entityData.position = glm::vec3(0);
 
 	entityModel.vertices = std::move(newVertices);
 
@@ -71,7 +69,15 @@ void Entity::DamageEntity(float damage) {
 }
 
 void Entity::Update() {
-	entityData.orientation.y += 75.0f * Globals::GetInstance().deltaTime;
+	entityRenderData.oldPosition = entityData.position;
+	entityRenderData.oldOrientation = entityData.orientation;
+	entityRenderData.oldUpDirection = entityData.upDirection;
+	entityRenderData.oldVelocity = entityData.velocity;
+	entityRenderData.oldPositionOffset = entityRenderData.positionOffset;
+	entityRenderData.oldOrientationOffset = entityRenderData.orientationOffset;
+
+	entityData.orientation.y += 150.0f * Globals::GetInstance().deltaTime;
+	entityRenderData.positionOffset.y = sin(world->GetTotalTicks() / 3.0f) * 0.025;
 
 	glm::ivec3 oldGlobalChunkPosition = entityData.globalChunkPosition;
 	entityData.globalChunkPosition = glm::ivec3(
@@ -81,7 +87,7 @@ void Entity::Update() {
 	);
 	entityData.localChunkPosition = glm::ivec3(
 		Physics::PositiveModulo(entityData.position.x, chunkSize), 
-		Physics::PositiveModulo(entityData.position.y, chunkSize) , 
+		Physics::PositiveModulo(entityData.position.y, chunkSize), 
 		Physics::PositiveModulo(entityData.position.z, chunkSize)
 	);
 
@@ -113,9 +119,16 @@ void Entity::Render() {
     indexBufferObject.Bind();
     
     glm::mat4 modelMatrix = glm::mat4(1.0f);
-    modelMatrix = glm::translate(modelMatrix, entityData.position);
-	glm::quat rotationQuaternion = glm::quat(glm::radians(entityData.orientation));
-	modelMatrix *= glm::mat4_cast(rotationQuaternion);
+
+	glm::vec3 interpolatedPosition = entityRenderData.oldPosition + (entityData.position - entityRenderData.oldPosition) * world->GetPartialTicks();
+	glm::vec3 interpolatedOrientation = entityRenderData.oldOrientation + (entityData.orientation - entityRenderData.oldOrientation) * world->GetPartialTicks();
+	glm::vec3 interpolatedPositionOffset = entityRenderData.oldPositionOffset + (entityRenderData.positionOffset - entityRenderData.oldPositionOffset) * world->GetPartialTicks();
+	glm::vec3 interpolatedOrientationOffset = entityRenderData.oldOrientationOffset + (entityRenderData.orientationOffset - entityRenderData.oldOrientationOffset) * world->GetPartialTicks();
+
+    modelMatrix = glm::translate(modelMatrix, interpolatedPosition);
+	modelMatrix = glm::translate(modelMatrix, interpolatedPositionOffset);
+	modelMatrix *= glm::mat4_cast(glm::quat(glm::radians(interpolatedOrientation)));
+	modelMatrix *= glm::mat4_cast(glm::quat(glm::radians(interpolatedOrientationOffset)));
     shader->SetUniformMatrix4fv("modelMatrix", modelMatrix);
     
     GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(entityModel.indices.size()), GL_UNSIGNED_INT, 0));

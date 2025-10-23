@@ -44,6 +44,9 @@ class World {
 		void RecalculateChunksToLoad(Event event, unsigned short horizontalRadius = 0, unsigned short verticalRadius = 0);
         void QueueMesh(glm::ivec3 chunkPosition, bool remesh);
 		void QueueTickTask(std::function<void()> task);
+		void UpdateFrameTime(std::chrono::steady_clock::time_point newFrameTime);
+		unsigned int GetTotalTicks();
+		float GetPartialTicks();
 
 		void SpawnItemFromBlock(glm::ivec3 chunkPosition, glm::ivec3 blockPosition, BlockType* blockType);
 
@@ -75,12 +78,15 @@ class World {
 		std::atomic<bool> shouldTick;
 		std::thread tickThread;
 		std::mutex tickThreadMutex;
-		int tickIntervalMs = 50;
+		int tickIntervalMs = 1000.0f / 19.9f;
 		unsigned int totalTicks = 0;
+		float tickDeltaTime = 0.0f;
 		float ticksPerSecond = 0.0f;
 		float tickAccumulator = 0.0f;
-		std::chrono::steady_clock::time_point tpsStartTime = std::chrono::steady_clock::now();
-
+		float frameTimeSinceTick = 0.0f;
+		std::chrono::steady_clock::time_point lastTickTime = std::chrono::steady_clock::now();
+		float partialTicks = 0.0f;
+		
 		std::mutex ChunkQueueMutex;
 		std::vector<glm::ivec3> chunkGenerationQueue;
 		std::unordered_set<std::tuple<int, int, int>, TripleHash> chunkGenerationSet;

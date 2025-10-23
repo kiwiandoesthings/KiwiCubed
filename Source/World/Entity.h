@@ -61,6 +61,18 @@ struct EntityData {
 	bool isJumping = false;
 };
 
+struct EntityRenderData {
+	glm::vec3 oldPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 oldOrientation = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 oldUpDirection = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 oldVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	glm::vec3 positionOffset = glm::vec3(0);
+	glm::vec3 orientationOffset = glm::vec3(0);
+	glm::vec3 oldPositionOffset = glm::vec3(0);
+	glm::vec3 oldOrientationOffset = glm::vec3(0);
+};
+
 struct ProtectedEntityData {
 	// For use later (most likely for multiplayer)
 	std::string UUID = "";
@@ -71,6 +83,7 @@ class Entity {
 	protected:
 		EntityStats entityStats;
 		EntityData entityData;
+		EntityRenderData entityRenderData;
 		ProtectedEntityData protectedEntityData;
 
 	public:

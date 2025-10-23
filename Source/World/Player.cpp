@@ -432,7 +432,7 @@ void Player::QueryMouseInputs() {
 	}
 
 	// We don't want anyone to be able to move the mouse off the screen, that would be very very very bad and horrible and would make the game absolutely unplayable
-	glfwSetCursorPos(window.GetWindowInstance(), (static_cast<float>(window.GetWidth()) / 2.0), (static_cast<float>(window.GetHeight()) / 2.0));
+	glfwSetCursorPos(window.GetWindowInstance(), (static_cast<float>(window.GetWidth()) / 2.0f), (static_cast<float>(window.GetHeight()) / 2.0f));
 
 	oldMouseX = mouseX;
 	oldMouseY = mouseY;

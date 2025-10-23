@@ -254,8 +254,21 @@ void World::QueueTickTask(std::function<void()> task) {
     tickTaskQueue.push(task);
 }
 
+void World::UpdateFrameTime(std::chrono::steady_clock::time_point newFrameTime) {
+    frameTimeSinceTick = std::chrono::duration<float>(newFrameTime - lastTickTime).count();
+    partialTicks = frameTimeSinceTick / (tickIntervalMs);
+}
+
+unsigned int World::GetTotalTicks() {
+    return totalTicks;
+}
+
+float World::GetPartialTicks() {
+    return partialTicks;
+}
+
 void World::SpawnItemFromBlock(glm::ivec3 chunkPosition, glm::ivec3 blockPosition, BlockType* blockType) {
-    entities.push_back(std::make_unique<Entity>(blockPosition.x + (chunkPosition.x * chunkSize) + 0.25, blockPosition.y + (chunkPosition.y * chunkSize) + 0.25, blockPosition.z + (chunkPosition.z * chunkSize) + 0.5, this));
+    entities.push_back(std::make_unique<Entity>(blockPosition.x + (chunkPosition.x * chunkSize) + 0.5, blockPosition.y + (chunkPosition.y * chunkSize) + 0.15, blockPosition.z + (chunkPosition.z * chunkSize) + 0.5, this));
     Entity* entity = entities[entities.size() - 1].get();
     entity->SetupRenderComponents(AssetStringID{"kiwicubed", "model/dropped_item"}, AssetStringID{"kiwicubed", "terrain_atlas"}, blockType->metaTextures[0].stringID);
 }
@@ -264,7 +277,7 @@ void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
 
     for (int iterator = 0; iterator < entities.size(); iterator++) {
-        entities[iterator].get()->Update();
+        entities[iterator]->Update();
     }
 
     std::vector<glm::ivec3> chunkGenerationQueueCopy;
@@ -392,7 +405,7 @@ void World::DisplayImGui(unsigned int option) {
         }
         ImGui::Text("%d tasks currently queued for tick thread", tasks);
         ImGui::Text("Total chunks: %d", Chunk::totalChunks);
-        ImGui::Text("Rough memory usage: %.2f MB", totalMemoryUsage / (1024.0 * 1024.0));
+        ImGui::Text("Rough memory usage: %.2f MB", totalMemoryUsage / (1024.0f * 1024.0f));
         if (ImGui::CollapsingHeader("Chunk Generation Queue")) {
             std::vector<glm::ivec3> temporaryQueue = chunkGenerationQueue;
             while (!temporaryQueue.empty()) {
@@ -512,7 +525,7 @@ void World::Tick() {
     std::lock_guard<std::mutex> lock(tickThreadMutex);
 
     auto end_time = std::chrono::steady_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - tpsStartTime).count();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - lastTickTime).count();
     if (totalTicks == 1) {
         totalMemoryUsage = 0;
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
@@ -523,10 +536,10 @@ void World::Tick() {
 
     Update();
 
-    if (duration >= 1000.0) {
-        ticksPerSecond = static_cast<float>(totalTicks) / (duration / 1000.0);
+    if (duration >= 1000.0f) {
+        ticksPerSecond = static_cast<float>(totalTicks) / (duration / 1000.0f);
         totalTicks = 0;
-        tpsStartTime = end_time;
+        lastTickTime = end_time;
     }
 
     ++totalTicks;
