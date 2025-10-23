@@ -14,9 +14,9 @@ Currently working on:
 
 ## 1. Compiling
 
-Clone the repository, and run ``just setup`` in the root. Once that finishes, you can run ``just debugbuild`` in the root to build the project, and ``just run`` to quickly rebuild and launch the project.
+Clone the repository, and run ``just setup`` in the root. Once that finishes, you can run ``just builddebug`` in the root to build the project, and ``just run`` to quickly rebuild and launch the project.
 
-To compile a release build, run ``just releasebuild``. To run the release build quickly use ``just release``.
+To compile a release build, run ``just buildrelease``. To run the release build quickly use ``just release``.
 
 Use ``just clean`` to reconfigure both the debug and release build directories.
 
