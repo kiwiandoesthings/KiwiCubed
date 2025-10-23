@@ -30,8 +30,15 @@ void SingleplayerHandler::StartSingleplayerWorld(DebugRenderer& debugRenderer) {
 	eventManager.RegisterEvent("event/player_moved_chunk");
 	eventManager.AddEventToDo("event/player_moved_chunk", [&](Event& event) {
 		singleplayerWorld->QueueTickTask([=, this] {
-			singleplayerWorld->RecalculateChunksToLoad(event, 5, 2);
+			singleplayerWorld->RecalculateChunksToLoad(event);
 		});
+	});
+	eventManager.RegisterEvent("event/player_mined_block");
+	eventManager.AddEventToDo("event/player_mined_block", [&](Event& event) {
+		auto* chunkPosition = event.GetData<glm::ivec3>("chunkPosition");
+		auto* blockPosition = event.GetData<glm::ivec3>("blockPosition");
+		auto* blockType = event.GetData<BlockType*>("blockType");
+		singleplayerWorld->SpawnItemFromBlock(*chunkPosition, *blockPosition, *blockType);
 	});
 	
 	singleplayerWorld->StartTickThread();
@@ -45,8 +52,8 @@ void SingleplayerHandler::EndSingleplayerWorld() {
 }
 
 void SingleplayerHandler::Update() {
-	EventManager& eventManager = EventManager::GetInstance();
 	if (shouldUnloadWorld) {
+		EventManager& eventManager = EventManager::GetInstance();
 		singleplayerWorld->Delete();
 		singleplayerWorld.reset();
 		isLoadedIntoSingleplayerWorld = false;

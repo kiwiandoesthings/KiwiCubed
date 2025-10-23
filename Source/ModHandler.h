@@ -33,7 +33,7 @@ struct AssetStringID {
         return modName < other.modName;
     }
 
-    AssetStringID() : modName("kiwicubed"), assetName("air") {}
+    AssetStringID() : modName("kiwicubed"), assetName("osadoaair") {}
     AssetStringID(std::string modName, std::string assetName) : modName(modName), assetName(assetName) {}
 };
 
@@ -51,4 +51,7 @@ class ModHandler {
         ~ModHandler();
 
        bool SetupTextureAtlasData(); 
+
+    private:
+        std::vector<std::string> modNamespaces;
 };

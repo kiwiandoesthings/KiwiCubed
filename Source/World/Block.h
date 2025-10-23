@@ -154,10 +154,10 @@ class BlockManager {
 
         BlockManager();
 
-        void RegisterBlockType(AssetStringID blockStringID, BlockType blockType);
+        void RegisterBlockType(BlockType blockType);
 
         AssetStringID* GetStringID(unsigned short numericalID);
-        unsigned short GetNumericalID(AssetStringID);
+        unsigned short* GetNumericalID(AssetStringID);
         BlockType* GetBlockType(unsigned short numericalID);
         BlockType* GetBlockType(AssetStringID blockStringID);
 

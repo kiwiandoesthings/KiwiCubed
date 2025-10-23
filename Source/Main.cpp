@@ -91,6 +91,8 @@ int main() {
 	windowType = jsonData["init_settings"]["window_type"].get<std::string>();
 	debugMode = jsonData["init_settings"]["debug_mode"];
 
+	Globals::GetInstance().gameVersion = projectVersion;
+
 	Globals::GetInstance().debugMode = debugMode;
 
 	// Initialize GLFW
@@ -235,9 +237,6 @@ int main() {
 	
 	Globals& globals = Globals::GetInstance();
 
-	Entity test(0, 0, 0, singleplayerHandler.singleplayerWorld.get());
-	test.SetupRenderComponents(AssetStringID{"kiwicubed", "dropped_item"}, AssetStringID{"kiwicubed", "terrain_atlas"}, AssetStringID{"kiwicubed", "stone"});
-
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {
 		auto frameStartTime = std::chrono::steady_clock::now();
@@ -297,7 +296,6 @@ int main() {
 			debugRenderer.UpdateUniforms();
 			debugRenderer.RenderDebug(chunkDebugShaderProgram);
 			singleplayerHandler.singleplayerWorld->Render(terrainShaderProgram);
-			test.Render();
 		}
 		
 		UI::GetInstance().Render();

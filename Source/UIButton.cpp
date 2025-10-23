@@ -3,7 +3,7 @@
 
 UIButton::UIButton(glm::vec2 position, glm::vec2 scale, std::string eventToTrigger, std::string elementLabel) : UIElement(position, scale, eventToTrigger), elementLabel(elementLabel) {
     UIButton::size = glm::vec2(512, 128) * glm::vec2(scale.x, scale.y);
-    image = MetaTexture{{"kiwicubed", "button"}, *assetManager.GetTextureAtlasData({"kiwicubed", "button"})};
+    image = MetaTexture{{"kiwicubed", "texure/button"}, *assetManager.GetTextureAtlasData({"kiwicubed", "texture/button"})};
 }
 
 void UIButton::Render() {

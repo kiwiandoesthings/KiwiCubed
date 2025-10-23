@@ -7,7 +7,7 @@
 
 AssetManager::AssetManager() {
     TextureAtlasData empty = TextureAtlasData{};
-    RegisterTexture(MetaTexture{AssetStringID{"kiwicubed", "air"}, std::vector<TextureAtlasData>{empty}});
+    RegisterTexture(MetaTexture{AssetStringID{"kiwicubed", "texture/air"}, std::vector<TextureAtlasData>{empty}});
 }
 
 void AssetManager::RegisterTextureAtlas(AssetStringID atlasStringID, Texture textureAtlas) {
@@ -19,13 +19,13 @@ void AssetManager::RegisterTextureAtlas(AssetStringID atlasStringID, Texture tex
 
 void AssetManager::RegisterTexture(MetaTexture texture) {
     OVERRIDE_LOG_NAME("Asset Manager");
-    textureNumericalIDsToStringIDs.insert({latestTextureID + 1, texture.stringID});
-    textureStringIDsToNumericalIDs.insert({texture.stringID, latestTextureID + 1});
-    AssetManager::atlasDatas.insert({latestTextureID + 1, texture.atlasData});
+    textureNumericalIDsToStringIDs.insert({latestTextureID, texture.stringID});
+    textureStringIDsToNumericalIDs.insert({texture.stringID, latestTextureID});
+    AssetManager::atlasDatas.insert({latestTextureID, texture.atlasData});
 
     latestTextureID++;
 
-    INFO("Successfully registered texture of with string ID of \"" + texture.stringID.CanonicalName() + "\" and numerical id of {" + std::to_string(latestTextureID) + "} with: {" + std::to_string(texture.atlasData.size()) + "} variants");
+    INFO("Successfully registered texture of with string ID of \"" + texture.stringID.CanonicalName() + "\" and numerical id of {" + std::to_string(latestTextureID - 1) + "} with: {" + std::to_string(texture.atlasData.size()) + "} variants");
 }
 
 void AssetManager::RegisterShaderProgram(AssetStringID stringID, Shader shaderProgram) {
@@ -48,7 +48,7 @@ Texture* AssetManager::GetTextureAtlas(AssetStringID atlasStringID) {
     if (iterator != textureAtlases.end()) {
         return &iterator->second;
     } else {
-        ERR("Tried to get texture atlas with string id \"" + atlasStringID.CanonicalName() + "\" that did not exist, aborting");
+        CRITICAL("Tried to get texture atlas with string id \"" + atlasStringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;
@@ -60,7 +60,7 @@ AssetStringID* AssetManager::GetStringID(unsigned int numericalID) {
     if (iterator != textureNumericalIDsToStringIDs.end()) {
         return &iterator->second;
     } else {
-        ERR("Tried to get string ID for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");
+        CRITICAL("Tried to get string ID for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;
@@ -72,7 +72,7 @@ unsigned int AssetManager::GetNumericalID(AssetStringID stringID) {
     if (iterator != textureStringIDsToNumericalIDs.end()) {
         return iterator->second;
     } else {
-        ERR("Tried to get numerical ID for texture with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
+        CRITICAL("Tried to get numerical ID for texture with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
     return textureStringIDsToNumericalIDs[stringID];
@@ -84,7 +84,7 @@ Shader* AssetManager::GetShaderProgram(AssetStringID stringID) {
     if (iterator != shaderPrograms.end()) {
         return &iterator->second;
     } else {
-        ERR("Tried to get shader program with string id \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
+        CRITICAL("Tried to get shader program with string id \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;
@@ -96,7 +96,7 @@ Model* AssetManager::GetEntityModel(AssetStringID stringID) {
     if (iterator != entityModels.end()) {
         return &iterator->second;
     } else {
-        ERR("Tried to get entity model with string id \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
+        CRITICAL("Tried to get entity model with string id \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;
@@ -108,7 +108,7 @@ std::vector<TextureAtlasData>* AssetManager::GetTextureAtlasData(unsigned int nu
     if (iterator != atlasDatas.end()) {
         return &iterator->second;
     } else {
-        ERR("Tried to get atlas data for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");
+        CRITICAL("Tried to get atlas data for texture with numerical ID {" + std::to_string(numericalID) + "} that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;

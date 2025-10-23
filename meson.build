@@ -40,6 +40,7 @@ executable(
     'Source/World/Chunk.cpp',
     'Source/World/ChunkHandler.cpp',
     'Source/World/Entity.cpp',
+    'Source/World/EntityManager.cpp',
     'Source/World/Inventory.cpp',
     'Source/World/Physics.cpp',
     'Source/World/Player.cpp',

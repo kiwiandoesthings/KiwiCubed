@@ -8,14 +8,14 @@ Inventory::Inventory() {
 
 Inventory::Inventory(std::vector<AssetStringID> slotStringIDs) {
     for (int iterator = 0; iterator < slotStringIDs.size(); iterator++) {
-        inventorySlots.insert(std::make_pair(slotStringIDs[iterator], InventorySlot{}));
+        inventorySlots.insert(std::make_pair(slotStringIDs[iterator], InventorySlot{AssetStringID{"kiwicubed", "block/air"}, 0}));
     }
 }
 
 bool Inventory::AddItem(InventorySlot newItemSlot) {
     for (auto iterator = inventorySlots.begin(); iterator != inventorySlots.end(); iterator++) {
         InventorySlot& itemSlot = iterator->second;
-        if (itemSlot.itemStringID.assetName == "air") {
+        if (itemSlot.itemStringID.assetName == "block/air") {
             itemSlot.itemStringID = newItemSlot.itemStringID;
             itemSlot.itemCount++;
             return true;
@@ -33,7 +33,7 @@ void Inventory::SetSlot(AssetStringID slotStringID, InventorySlot newItem) {
     if (slot != inventorySlots.end()) {
         inventorySlots[slotStringID] = newItem;
     } else {
-        WARN("Could not find slot: \"" + slotStringID.CanonicalName() + "\" in inventory: \"" + inventoryStringID.CanonicalName() + "\"");
+        CRITICAL("Could not find slot: \"" + slotStringID.CanonicalName() + "\" in inventory: \"" + inventoryStringID.CanonicalName() + "\"");
         psnip_trap();
     }
 }
@@ -43,7 +43,7 @@ InventorySlot* Inventory::GetSlot(AssetStringID slotStringID) {
     if (slot != inventorySlots.end()) {
         return &inventorySlots[slotStringID];
     } else {
-        WARN("Could not find slot: \"" + slotStringID.CanonicalName() + "\" in inventory: \"" + inventoryStringID.CanonicalName() + "\"");
+        CRITICAL("Could not find slot: \"" + slotStringID.CanonicalName() + "\" in inventory: \"" + inventoryStringID.CanonicalName() + "\"");
         psnip_trap();
         return nullptr;
     }

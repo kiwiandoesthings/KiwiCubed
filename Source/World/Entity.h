@@ -15,6 +15,13 @@
 class World;
 
 
+struct EntityType {
+	AssetStringID entityStringID;
+
+	MetaEntityModel metaModel;
+	MetaTexture metaTexture;
+};
+
 struct EntityStats {
 	float health;
 	unsigned int armor;
@@ -91,7 +98,7 @@ class Entity {
 	private:
 		World* world;
 
-		Model* entityModel;
+		Model entityModel;
 		Texture* entityTexture;
 		std::vector<TextureAtlasData>* entityTextureAtlasData;
 

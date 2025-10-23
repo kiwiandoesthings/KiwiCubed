@@ -52,8 +52,10 @@ void Chunk::AllocateChunk() {
 }
 
 bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerChunk, bool debug) {
+    OVERRIDE_LOG_NAME("Chunk Block Generation");
     if (isGenerated) {
-        //std::cerr << "[Chunk Terrain Generation / Warn] Trying to generate blocks after they had already been generated, aborting {" << chunkX << ", " << chunkY << ", " << chunkZ << "}" << std::endl;
+        //CRITICAL("Trying to generate blocks after they had already been generated, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        //psnip_trap();
         return false;
     }
     if (!isAllocated) {
@@ -61,6 +63,8 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
         psnip_trap();
         return false;
     }
+
+    std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
 
     FastNoiseLite& noise = world.GetNoise();
 
@@ -73,7 +77,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
             return iterator->second;
         }
 
-        unsigned short numericalID = static_cast<unsigned short>(BlockManager::GetInstance().GetNumericalID(assetStringID));
+        unsigned short numericalID = static_cast<unsigned short>(*BlockManager::GetInstance().GetNumericalID(assetStringID));
         blockIDCache[assetStringID] = numericalID;
         return numericalID;
     };
@@ -103,14 +107,14 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
                 }
 
                 if (height + 4 < reach) {
-                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "stone"});
+                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/stone"});
 		            block.variant = rand() % GetCachedVariantCount(block.blockID);
                     block.variant = 0;
                 } else if (height + 1 < reach) {
-                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "dirt"});
+                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/dirt"});
 		            block.variant = 0;
                 } else {
-                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "grass"});
+                    block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/grass"});
 		            block.variant = 0;
                 }
                 totalBlocks++;
@@ -128,6 +132,13 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
     IsEmpty();
     IsFull();
     GenerateHeightmap();
+
+    std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
+    int time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    if (Globals::GetInstance().debugMode) {
+        //INFO("Chunk generation took " + std::to_string(time) + "us");
+    }
+
     return true;
 }
 
@@ -338,9 +349,9 @@ bool Chunk::GenerateMesh(const bool remesh) {
     shouldRender = true;
 
     std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
-    int time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    int time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     if (Globals::GetInstance().debugMode) {
-        INFO("Chunk meshing took " + std::to_string(time) + "ms");
+        //INFO("Chunk meshing took " + std::to_string(time) + "us");
     }
 
     return true;

@@ -2,6 +2,7 @@
 	"mod_title": "KiwiCubed",
 	"mod_version": "0.04pre-alpha",
 	"mod_authors": "KiwiCubed Engine contributors",
+	"mod_description": "wow i'm super cool and awesome",
 	"built_for_game_version": "0.0.4pre-alpha",
-	"mod_description": "wow i'm super cool and awesome"
+	"namespace": "kiwicubed"
 }

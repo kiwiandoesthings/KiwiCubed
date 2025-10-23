@@ -66,6 +66,11 @@ void World::Render(Shader shaderProgram) {
             chunk->Render();
         }
     }
+
+    assetManager.GetShaderProgram({"kiwicubed", "entity_shader"})->Bind();
+    for (int iterator = 0; iterator < entities.size(); iterator++) {
+        entities[iterator].get()->Render();
+    }
 }
 
 void World::GenerateWorld() {
@@ -249,8 +254,18 @@ void World::QueueTickTask(std::function<void()> task) {
     tickTaskQueue.push(task);
 }
 
+void World::SpawnItemFromBlock(glm::ivec3 chunkPosition, glm::ivec3 blockPosition, BlockType* blockType) {
+    entities.push_back(std::make_unique<Entity>(blockPosition.x + (chunkPosition.x * chunkSize) + 0.25, blockPosition.y + (chunkPosition.y * chunkSize) + 0.25, blockPosition.z + (chunkPosition.z * chunkSize) + 0.5, this));
+    Entity* entity = entities[entities.size() - 1].get();
+    entity->SetupRenderComponents(AssetStringID{"kiwicubed", "model/dropped_item"}, AssetStringID{"kiwicubed", "terrain_atlas"}, blockType->metaTextures[0].stringID);
+}
+
 void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
+
+    for (int iterator = 0; iterator < entities.size(); iterator++) {
+        entities[iterator].get()->Update();
+    }
 
     std::vector<glm::ivec3> chunkGenerationQueueCopy;
     std::vector<glm::ivec3> chunkMeshingQueueCopy;

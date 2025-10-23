@@ -1,7 +1,9 @@
 #include "ModHandler.h"
 #include <chrono>
+#include "AssetDefinitions.h"
 #include "AssetManager.h"
 #include "Block.h"
+#include "EntityManager.h"
 
 
 ModHandler::ModHandler() {}
@@ -32,8 +34,22 @@ bool ModHandler::SetupTextureAtlasData() {
             std::string version = jsonData["mod_version"];
             std::string authors = jsonData["mod_authors"];
             std::string builtForVersion = jsonData["built_for_game_version"];
+            std::string modNamespace = jsonData["namespace"];
 
-            INFO("Found mod \"" + name + "\", version: " + version + ", by: " + authors + ", built for game version " + builtForVersion);
+            if (builtForVersion != Globals::GetInstance().gameVersion) {
+                WARN("Mod below is built for different game version than currently running!");
+            }
+
+            for (int iterator = 0; iterator < modNamespaces.size(); iterator++) {
+                if (modNamespaces[iterator] == modNamespace) {
+                    CRITICAL("Tried to register multiple mods with the same namespace, \"" + modNamespace + "\"");
+                    psnip_trap();
+                }
+            }
+
+            modNamespaces.push_back(modNamespace);
+
+            INFO("Found mod \"" + name + "\", version {" + version + "}, by \"" + authors + "\", built for game version {" + builtForVersion + "}, using namespace \"" + modNamespace + "\"");
 
             std::string modTextures = modFolder + "/Resources/Textures";
             
@@ -63,19 +79,19 @@ bool ModHandler::SetupTextureAtlasData() {
                                 size_t splitPosition = id.find(":");
 
                                 std::string modID = "";
-                                std::string textureID = "";
+                                std::string assetID = "";
 
                                 if (splitPosition != std::string::npos) {
                                     modID = id.substr(0, splitPosition);
-                                    textureID = id.substr(splitPosition + 1);
+                                    assetID = "texture/" + id.substr(splitPosition + 1);
                                 } else {
-                                    WARN("Tried to register texture with invalid textureID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping texture");
+                                    WARN("Tried to register texture with invalid string id \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
                                     continue;
                                 }
 
                                 textureAtlasDataMap[AssetStringID{
-                                    modID.c_str(), 
-                                    textureID.c_str()
+                                    modID, 
+                                    assetID
                                 }].push_back(TextureAtlasData{
                                     variant,
                                     xPosition,
@@ -138,9 +154,9 @@ bool ModHandler::SetupTextureAtlasData() {
 
                                     if (splitPosition != std::string::npos) {
                                         modID = id.substr(0, splitPosition);
-                                        textureID = id.substr(splitPosition + 1);
+                                        textureID = "texture/" + id.substr(splitPosition + 1);
                                     } else {
-                                        WARN("Tried to register texture with invalid textureID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping texture");
+                                        WARN("Tried to register texture with invalid string id \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
                                         continue;
                                     }
 
@@ -150,19 +166,19 @@ bool ModHandler::SetupTextureAtlasData() {
                                 size_t splitPosition = id.find(":");
 
                                 std::string modID = "";
-                                std::string blockID = "";
+                                std::string assetID = "";
 
                                 if (splitPosition != std::string::npos) {
                                     modID = id.substr(0, splitPosition);
-                                    blockID = id.substr(splitPosition + 1);
+                                    assetID = "block/" + id.substr(splitPosition + 1);
                                 } else {
-                                    WARN("Tried to register texture with invalid textureID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping texture");
+                                    WARN("Tried to register block with invalid string id \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
                                     continue;
                                 }
 
                                 blockTextureMap[AssetStringID{
-                                    modID.c_str(), 
-                                    blockID.c_str()
+                                    modID, 
+                                    assetID
                                 }] = (textureAssetIDs);
                             }
                         }
@@ -195,17 +211,17 @@ bool ModHandler::SetupTextureAtlasData() {
                             size_t splitPosition = id.find(":");
 
                             std::string modID = "";
-                            std::string blockID = "";
+                            std::string assetID = "";
 
                             if (splitPosition != std::string::npos) {
                                 modID = id.substr(0, splitPosition);
-                                blockID = id.substr(splitPosition + 1);
+                                assetID = "model/" + id.substr(splitPosition + 1);
                             } else {
-                                WARN("Tried to register texture with invalid textureID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping texture");
+                                WARN("Tried to register entity model with invalid string id \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
                                 continue;
                             }
 
-                            AssetStringID modelStringID = AssetStringID{modID, blockID};
+                            AssetStringID modelStringID = AssetStringID{modID, assetID};
 
                             std::vector<GLfloat> modelVertices;
                             std::vector<GLuint> modelIndices;
@@ -220,12 +236,20 @@ bool ModHandler::SetupTextureAtlasData() {
                                 modelIndices.push_back(index);
                             }
 
-                            assetManager.RegisterEntityModel(MetaEntityModel{
+                            MetaEntityModel entityModel = MetaEntityModel{
                                 modelStringID,
                                 Model{
                                     modelVertices,
                                     modelIndices
                                 }
+                            };
+
+                            assetManager.RegisterEntityModel(entityModel);
+
+                            EntityManager::GetInstance().RegisterEntity(EntityType{
+                                AssetStringID{"kiwicubed", "entity/" + id.substr(splitPosition + 1)},
+                                entityModel,
+                                MetaTexture{}
                             });
                         }
                     }
@@ -276,7 +300,7 @@ bool ModHandler::SetupTextureAtlasData() {
             }
         }
 
-        BlockManager::GetInstance().RegisterBlockType(block.first, BlockType{block.first, textureAtlasDatas, faceTextureIDs});
+        BlockManager::GetInstance().RegisterBlockType(BlockType{block.first, textureAtlasDatas, faceTextureIDs});
     }
 
     INFO("Loading mods took " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count()) + "us");

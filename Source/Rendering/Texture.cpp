@@ -11,7 +11,7 @@ Texture::Texture(const char* filepath, GLenum textureType, GLenum slot, GLenum f
 	unsigned char* bytes = stbi_load(filepath, &imageWidth, &imageHeight, &colorChannels, 0);
 
 	if (!bytes) {
-		ERR("Failed to load image from file path: " + std::string(filepath));
+		CRITICAL("Failed to load image from file path: " + std::string(filepath));
 		psnip_trap();
 	}
 

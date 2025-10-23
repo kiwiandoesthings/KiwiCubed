@@ -61,10 +61,12 @@ int Shader::CompileShader(unsigned int type, const std::string& source, const st
 }
 
 int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& vertexFilePath, const std::string& fragmentFilePath) {
+    OVERRIDE_LOG_NAME("Shader Compilation");
     unsigned int shaderProgram = glCreateProgram();
     int vertexShaderResult = CompileShader(GL_VERTEX_SHADER, vertexShader, vertexFilePath);
     int fragmentShaderResult = CompileShader(GL_FRAGMENT_SHADER, fragmentShader, fragmentFilePath);
     if (vertexShaderResult == -1 || fragmentShaderResult == -1) {
+        CRITICAL("Failed to compile vertex or fragment shaders at \"" + vertexFilePath + "\" and \"" + fragmentFilePath + "\" respectively");
         psnip_trap();
     }
 

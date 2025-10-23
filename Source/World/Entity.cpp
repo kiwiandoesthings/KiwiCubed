@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "AssetManager.h"
+#include "Block.h"
 #include "ModHandler.h"
 #include "World.h"
 
@@ -12,7 +13,7 @@ Entity::Entity(float entityX, float entityY, float entityZ, World* world) : enti
 }
 
 void Entity::SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID) {
-	entityModel = assetManager.GetEntityModel(modelID);
+	entityModel = *assetManager.GetEntityModel(modelID);
 	entityTexture = assetManager.GetTextureAtlas(atlasID);
 	entityTextureAtlasData = assetManager.GetTextureAtlasData(textureID);
 
@@ -27,16 +28,18 @@ void Entity::SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID,
     };
 
 	std::vector<GLfloat> newVertices;
-	newVertices.reserve((entityModel->vertices.size() / 3) * 5);
-	for (int vertex = 0, latestTextureCoordinate = 0; vertex < entityModel->vertices.size(); vertex += 3, latestTextureCoordinate += 2) {
-		newVertices.push_back(entityModel->vertices[vertex]);
-		newVertices.push_back(entityModel->vertices[vertex + 1]);
-		newVertices.push_back(entityModel->vertices[vertex + 2]);
+	newVertices.reserve((entityModel.vertices.size() / 3) * 5);
+	for (int vertex = 0, latestTextureCoordinate = 0; vertex < entityModel.vertices.size(); vertex += 3, latestTextureCoordinate += 2) {
+		newVertices.push_back(entityModel.vertices[vertex] + entityData.position.x);
+		newVertices.push_back(entityModel.vertices[vertex + 1] + entityData.position.y);
+		newVertices.push_back(entityModel.vertices[vertex + 2] + entityData.position.z);
 		newVertices.push_back(textureCoordinates[latestTextureCoordinate]);
 		newVertices.push_back(textureCoordinates[latestTextureCoordinate + 1]);
 	}
 
-	entityModel->vertices = std::move(newVertices);
+	entityData.position = glm::vec3(0);
+
+	entityModel.vertices = std::move(newVertices);
 
 	vertexBufferObject.SetupBuffer();
 	vertexArrayObject.SetupArrayObject();
@@ -68,6 +71,8 @@ void Entity::DamageEntity(float damage) {
 }
 
 void Entity::Update() {
+	entityData.orientation.y += 75.0f * Globals::GetInstance().deltaTime;
+
 	glm::ivec3 oldGlobalChunkPosition = entityData.globalChunkPosition;
 	entityData.globalChunkPosition = glm::ivec3(
 		Physics::FloorDiv(entityData.position.x, chunkSize),
@@ -97,21 +102,23 @@ void Entity::Render() {
     
     vertexArrayObject.Bind();
     vertexBufferObject.Bind();
-    vertexBufferObject.SetBufferData(sizeof(GLfloat) * entityModel->vertices.size(), entityModel->vertices.data());
+    vertexBufferObject.SetBufferData(sizeof(GLfloat) * entityModel.vertices.size(), entityModel.vertices.data());
     vertexArrayObject.LinkAttribute(vertexBufferObject, 0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)0);
 	vertexArrayObject.LinkAttribute(vertexBufferObject, 1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (void*)(3 * sizeof(GLfloat)));
     indexBufferObject.Bind();
-    indexBufferObject.SetBufferData(sizeof(GLuint) * entityModel->indices.size(), entityModel->indices.data());
+    indexBufferObject.SetBufferData(sizeof(GLuint) * entityModel.indices.size(), entityModel.indices.data());
     
     vertexArrayObject.Bind();
     vertexBufferObject.Bind();
     indexBufferObject.Bind();
     
     glm::mat4 modelMatrix = glm::mat4(1.0f);
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(entityData.position.x, entityData.position.y, entityData.position.z));
+    modelMatrix = glm::translate(modelMatrix, entityData.position);
+	glm::quat rotationQuaternion = glm::quat(glm::radians(entityData.orientation));
+	modelMatrix *= glm::mat4_cast(rotationQuaternion);
     shader->SetUniformMatrix4fv("modelMatrix", modelMatrix);
     
-    GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(entityModel->indices.size()), GL_UNSIGNED_INT, 0));
+    GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(entityModel.indices.size()), GL_UNSIGNED_INT, 0));
 }
 
 std::string Entity::CreateUUID() {

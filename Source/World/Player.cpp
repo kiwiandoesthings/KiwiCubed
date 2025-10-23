@@ -59,7 +59,7 @@ void Player::Setup() {
 	auto inventoryUI = std::make_unique<UIScreen>("ui/inventory");
 	int containerX = (globalWindow.GetWidth() / 2) - 576;
 	int containerY = (globalWindow.GetHeight() / 2) - 192;
-	inventoryUI->AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), "event/blank", AssetStringID{"kiwicubed", "inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
+	inventoryUI->AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), "event/blank", AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
 	UI::GetInstance().AddScreen(std::move(inventoryUI).release());
 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
@@ -114,7 +114,7 @@ void Player::Update() {
 		EntityData oldEntityData = entityData;
 		QueryInputs();
 		QueryMouseInputs();
-		Entity::Update();
+		//Entity::Update();
 		entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
 		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
         if (entityData.isGrounded) {
@@ -261,6 +261,11 @@ void Player::MouseButtonCallback(int button) {
 	if (rayHit.hit) {
 		if (button == 0) {
 			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
+			BlockType* blockType = BlockManager::GetInstance().GetBlockType(block.blockID);
+			EventManager::GetInstance().TriggerEvent("event/player_mined_block", 
+				std::make_pair("chunkPosition",chunkPosition), 
+				std::make_pair("blockPosition", blockPosition),
+				std::make_pair("blockType", blockType));
 			entityData.inventory.AddItem(InventorySlot{*BlockManager::GetInstance().GetStringID(block.GetBlockID()), 1});
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
@@ -357,22 +362,23 @@ void Player::MouseButtonCallback(int button) {
 			bool emptyBlock = chunkHandler->GetChunk(placingChunkPosition.x, placingChunkPosition.y, placingChunkPosition.z, false)->GetBlock(placingBlockPosition.x, placingBlockPosition.y, placingBlockPosition.z).IsAir();
 			bool collidesEntity = Physics::CollideBlock(*this, FullBlockPosition{placingBlockPosition, placingChunkPosition}, false);
 			if (emptyBlock && !collidesEntity) {
+				EventManager::GetInstance().TriggerEvent("event/player_placed_block");
 				int usingSlotIndex = -1;
 				int newBlockID = 0;
 				for (int slotIndex = 0; slotIndex < 27; slotIndex++) {
 					AssetStringID slotStringID = AssetStringID{"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slotIndex)};
 					InventorySlot* slot = entityData.inventory.GetSlot(slotStringID);
-					if (slot->itemStringID.assetName != "air") {
-						InventorySlot newSlot = *slot;
-						newBlockID = BlockManager::GetInstance().GetNumericalID((*entityData.inventory.GetSlot(slotStringID)).itemStringID);
-						newSlot.itemCount--;
-						if (newSlot.itemCount == 0) {
-							newSlot.itemStringID = AssetStringID{"kiwicubed", "air"};
-						}
-						entityData.inventory.SetSlot(slotStringID, newSlot);
-						usingSlotIndex = slotIndex;
-						break;
+					if (slot->itemStringID.assetName == "block/air") {
+						continue;
 					}
+					InventorySlot newSlot = *slot;
+					newBlockID = *BlockManager::GetInstance().GetNumericalID((*entityData.inventory.GetSlot(slotStringID)).itemStringID);
+					newSlot.itemCount--;
+					if (newSlot.itemCount == 0) {
+						newSlot.itemStringID = AssetStringID{"kiwicubed", "block/air"};
+					}
+					entityData.inventory.SetSlot(slotStringID, newSlot);
+					usingSlotIndex = slotIndex;
 				}
 				if (usingSlotIndex == -1) {
 					return;

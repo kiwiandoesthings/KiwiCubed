@@ -130,7 +130,7 @@ void ChunkHandler::AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int 
         }
     }
     if (block.blockID == newBlockID) {
-        CRITICAL("Just replaced a block at chunk position {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "} and block position {" + std::to_string(blockX) + ", " + std::to_string(blockY) + ", " + std::to_string(blockZ) + "} with a new block that has an identical type. This should currently be impossible, please report a bug if you encounter this");
+        CRITICAL("Just replaced a block at chunk position {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "} and block position {" + std::to_string(blockX) + ", " + std::to_string(blockY) + ", " + std::to_string(blockZ) + "} with a new block that has an identical numerical id {" + std::to_string(newBlockID) + "}. This should currently be impossible, please report a bug if you encounter this, thanks");
         psnip_trap();
     }
     block.SetBlockID(newBlockID);
