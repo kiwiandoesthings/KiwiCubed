@@ -27,7 +27,7 @@ builddebug:
 	copy BuildDebug\\compile_commands.json compile_commands.json
 
 buildmods:
-    clang++ --target=wasm32 -O2 -nostdlib -Wl,--no-entry -Wl,--export-all -Wl,--allow-undefined Mods/kiwicubed/Scripts/mod.cpp -o Mods/kiwicubed/Scripts/mod.wasm -g
+    powershell.exe -ExecutionPolicy Bypass -File BuildMods.ps1
 
 setup:
 	meson setup BuildDebug --buildtype=debug -Dcpp_args=-DKIWI_DEBUG_MODE -Ddefault_library=static --vsenv
