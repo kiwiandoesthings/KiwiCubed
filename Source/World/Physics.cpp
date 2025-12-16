@@ -26,7 +26,6 @@ static void ApplyGravity(EntityData& newEntityData) {
 }
 
 static void ClipVelocity(EntityData& newEntityData, int axis) {
-	for (int axis = 0; axis < 3; axis++)
 	if (abs(newEntityData.velocity[axis]) > newEntityData.terminalVelocity) {
 		if (newEntityData.velocity[axis] > 0) {
 			newEntityData.velocity[axis] = newEntityData.terminalVelocity;

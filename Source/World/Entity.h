@@ -59,6 +59,8 @@ struct EntityData {
 	
 	bool isGrounded = false;
 	bool isJumping = false;
+
+	bool isPlayer = false;
 };
 
 struct EntityRenderData {

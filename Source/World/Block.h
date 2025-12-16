@@ -178,9 +178,9 @@ class BlockManager {
 class Block {
     public:
         // Don't need this, look at that one convo, remember chunk palettizing
-        unsigned short blockID;
-        unsigned char variant;
-        unsigned char blockState;
+        unsigned short blockID = 0;
+        unsigned char variant = 0;
+        unsigned char blockState = 0;
 
         Block() : blockID(1), variant(0) {}
         Block(unsigned short blockID, unsigned short variant) : blockID(blockID), variant(variant) {}

@@ -5,7 +5,8 @@ static std::map<std::string, std::string> LogColors() {
     static std::map<std::string, std::string> instance = {
 	    {"DEBUG", "\033[1;34m"},
 	    {"INFO", "\033[1;32m"},
-	    {"WARN", "\033[1;33m"},
+		{"EXTERNAL", "\033[1;38;5;226m"},
+	    {"WARN", "\033[1;38;5;214m"},
 	    {"ERROR", "\033[1;31m"},
 	    {"CRITICAL", "\033[1;41m"},
 	    {"RESET", "\033[0m"},
@@ -34,6 +35,7 @@ std::string LogLevelToString(LogLevel level) {
 	switch (level) {
 		case LogLevel::debug: return "DEBUG";
 		case LogLevel::info: return "INFO";
+		case LogLevel::external: return "EXTERNAL";
 		case LogLevel::warn: return "WARN";
 		case LogLevel::error: return "ERROR";
 		case LogLevel::critical: return "CRITICAL";

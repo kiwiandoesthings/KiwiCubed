@@ -1,4 +1,4 @@
-project('kiwicubed', 'cpp', default_options: ['cpp_std=c++20'])
+project('kiwicubed', ['c', 'cpp'], default_options: ['cpp_std=c++20'])
 
 # Stops KiwiCubed\subprojects\glm-1.0.1\glm\gtx\../gtx/transform.hpp(23): fatal error C1189
 add_project_arguments('-DGLM_ENABLE_EXPERIMENTAL', language: 'cpp')
@@ -14,17 +14,17 @@ if meson.get_compiler('cpp').get_id() == 'msvc'
     add_project_link_arguments('/DEBUG', language: 'cpp')
 endif
 
-rc_compiler = find_program('windres', required: true)
+rc_compiler = find_program('rc', required: true)
 
 app_icon = custom_target(
   'app_icon',
   input: 'Source/AppIcon.rc',
   output: 'AppIcon.res',
-  command: [rc_compiler, '@INPUT@', '-O', 'coff', '-o', '@OUTPUT@'],
+  command: [rc_compiler, '/nologo', '/fo', '@OUTPUT@', '@INPUT@'],
   build_by_default: true
 )
 
-freetype = dependency('freetype2', static: true, default_options: ['png=disabled'])
+freetype = dependency('freetype2', static: true, default_options: ['png=disabled', 'zlib=disabled'])
 
 executable(
   'kiwicubed', 
@@ -58,6 +58,7 @@ executable(
 
     # Other
     'Source/Events.cpp',
+    'Source/ExposedModAPI.cpp',
     'Source/Globals.cpp',
     'Source/Input.cpp',
     'Source/Main.cpp',
@@ -74,7 +75,7 @@ executable(
   ],
   include_directories: include_directories('Source', 'Source/GPUObjects', 'Source/World', 'Source/Rendering'),
   dependencies: [
-    dependency('kwport'),
+    dependency('kwport', static: true),
     dependency('klogger', static: true),
     dependency('json', static: true),
     dependency('glfw3', static: true),

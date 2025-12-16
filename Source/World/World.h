@@ -78,7 +78,7 @@ class World {
 		std::atomic<bool> shouldTick;
 		std::thread tickThread;
 		std::mutex tickThreadMutex;
-		int tickIntervalMs = 1000.0f / 19.9f;
+		int tickIntervalMs = 1000.0f / 20.0f;
 		unsigned int totalTicks = 0;
 		float tickDeltaTime = 0.0f;
 		float ticksPerSecond = 0.0f;
@@ -94,7 +94,7 @@ class World {
 		std::unordered_set<std::tuple<int, int, int>, TripleHash> chunkMeshingSet;
 		std::queue<glm::ivec3> chunkUnloadingQueue;
 		std::queue<std::function<void()>> tickTaskQueue;
-		unsigned short playerChunkGenerationRadiusHorizontal = 8;
+		unsigned short playerChunkGenerationRadiusHorizontal = 4;
 		unsigned short playerChunkGenerationRadiusVertical = 3;
 
 		ThreadPool chunkGenerationThreads = ThreadPool(4);

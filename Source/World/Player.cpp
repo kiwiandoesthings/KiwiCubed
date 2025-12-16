@@ -46,6 +46,8 @@ Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(0, 
 		entityData.applyGravity = true;
 	}
 
+	entityData.isPlayer = true;
+
 	protectedEntityData.UUID = CreateUUID();
 
 	chunkHandler = &world->GetChunkHandler();
@@ -114,7 +116,7 @@ void Player::Update() {
 		EntityData oldEntityData = entityData;
 		QueryInputs();
 		QueryMouseInputs();
-		//Entity::Update();
+		Entity::Update();
 		entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
 		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
         if (entityData.isGrounded) {

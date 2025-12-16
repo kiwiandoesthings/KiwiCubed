@@ -76,9 +76,6 @@ void Entity::Update() {
 	entityRenderData.oldPositionOffset = entityRenderData.positionOffset;
 	entityRenderData.oldOrientationOffset = entityRenderData.orientationOffset;
 
-	entityData.orientation.y += 150.0f * Globals::GetInstance().deltaTime;
-	entityRenderData.positionOffset.y = sin(world->GetTotalTicks() / 3.0f) * 0.025;
-
 	glm::ivec3 oldGlobalChunkPosition = entityData.globalChunkPosition;
 	entityData.globalChunkPosition = glm::ivec3(
 		Physics::FloorDiv(entityData.position.x, chunkSize),
@@ -94,6 +91,13 @@ void Entity::Update() {
 	if (oldGlobalChunkPosition != entityData.globalChunkPosition) {
 		entityData.currentChunkPtr = world->GetChunkHandler().GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
 	}
+
+	if (entityData.isPlayer) {
+		return;
+	}
+
+	entityData.orientation.y += 150.0f * Globals::GetInstance().deltaTime;
+	entityRenderData.positionOffset.y = sin(world->GetTotalTicks() / 3.0f) * 0.025;
 
 	return;
 }

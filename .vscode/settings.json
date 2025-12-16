@@ -2,4 +2,7 @@
     "mesonbuild.configureOnOpen": false,
     "cmake.ignoreCMakeListsMissing": true,
     "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
+    "files.associations": {
+        "xstring": "cpp"
+    },
 }

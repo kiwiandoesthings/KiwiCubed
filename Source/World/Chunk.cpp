@@ -100,6 +100,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
                 float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
 	            int height = blockY + (chunkY * chunkSize);
                 int reach = density * 16 + 30;
+
                 if (!(height < reach)) {
                     block.blockID = 0;
 		            block.variant = 0;
@@ -109,7 +110,6 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
                 if (height + 4 < reach) {
                     block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/stone"});
 		            block.variant = rand() % GetCachedVariantCount(block.blockID);
-                    block.variant = 0;
                 } else if (height + 1 < reach) {
                     block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/dirt"});
 		            block.variant = 0;
@@ -294,7 +294,12 @@ bool Chunk::GenerateMesh(const bool remesh) {
                     }
 
                     for (unsigned int iterator = 0; iterator < facesToAdd.size(); ++iterator) {
-                        const TextureAtlasData& atlasData = blockType.metaTextures[facesToAdd[iterator]].atlasData[variant];
+                        const std::vector<TextureAtlasData>& atlasDatas = blockType.metaTextures[facesToAdd[iterator]].atlasData;
+                        int usableVariant = variant;
+                        if (variant >= atlasDatas.size()) {
+                            usableVariant = variant % atlasDatas.size();
+                        }
+                        const TextureAtlasData& atlasData = atlasDatas[usableVariant];
 		                GLuint vertexOffset = static_cast<GLuint>(facesToAdd.at(iterator)) * 20;
 		                GLuint baseIndex = static_cast<GLuint>(vertices.size() / 5);
 

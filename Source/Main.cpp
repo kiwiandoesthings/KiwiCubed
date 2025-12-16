@@ -65,6 +65,9 @@ bool debugMode;
 
 // This main function is getting out of hand
 // yes but hands are in pocket so is it still in the pocket or is it out of pocket? - Astra
+
+// TODO: main function needs SERIOUS reorganization, and stuff needs restructuring because game loading is very order-dependent, and if this keeps
+// up, its gonna become order-dependent in impossible ways so that should be redone asap really
 int main() {
 	OVERRIDE_LOG_NAME("Initialization");
 	// Make it so on laptops, it will request the dGPU if possible, without this, you have to force it to use the dGPU
@@ -181,15 +184,17 @@ int main() {
 	uiAtlas.TextureUnit(uiShaderProgram, "tex0");
 	assetManager.RegisterTextureAtlas({"kiwicubed", "ui_atlas"}, uiAtlas);
 
-	ModHandler modHandler = ModHandler();
-	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.SetupTextureAtlasData(), "Failed to setup texture atlas data, exiting", -1);
-
 	// Setup debug renderer
 	Renderer renderer = Renderer();
 	DebugRenderer debugRenderer = DebugRenderer();
 
 	// Create a singleplayer instance
 	SingleplayerHandler singleplayerHandler = SingleplayerHandler(debugRenderer);
+
+	// Mods
+	ModHandler& modHandler = ModHandler::GetInstance();
+	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.SetupTextureAtlasData(), "Failed to setup texture atlas data, exiting", -1);
+	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.LoadModScripts(), "Failed to load mod scripts, exiting", -1);
 
 	// "temporary" setup of certain events in main
 	EventManager& eventManager = EventManager::GetInstance();

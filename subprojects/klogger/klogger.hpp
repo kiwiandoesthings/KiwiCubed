@@ -11,6 +11,7 @@
 enum class LogLevel { 
 	debug,
 	info,
+	external,
 	warn,
 	error,
 	critical,
@@ -27,6 +28,7 @@ void Log(LogLevel level, const std::string& message, const bool debugMode, const
 
 #define DEBUG(message, debugMode) Log(LogLevel::debug, message, debugMode, std::source_location::current())
 #define INFO(message) Log(LogLevel::info, message, false, std::source_location::current())
+#define EXT(message) Log(LogLevel::external, message, false, std::source_location::current())
 #define WARN(message) Log(LogLevel::warn, message, false, std::source_location::current())
 #define ERR(message) Log(LogLevel::error, message, false, std::source_location::current())
 #define CRITICAL(message) Log(LogLevel::critical, message, false, std::source_location::current())
