@@ -16,7 +16,7 @@
 #include "ExposedModAPI.h"
 
 
-using json = nlohmann::json;
+using orderedJson = nlohmann::ordered_json;
 
 
 struct AssetStringID {

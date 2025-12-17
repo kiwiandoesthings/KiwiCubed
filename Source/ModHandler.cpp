@@ -52,7 +52,7 @@ bool ModHandler::SetupTextureAtlasData() {
                 return false;
             }
 
-            json jsonData;
+            orderedJson jsonData;
             file >> jsonData;
 
             std::string name = jsonData["mod_title"];
@@ -89,7 +89,7 @@ bool ModHandler::SetupTextureAtlasData() {
                         if (filePath.extension() == ".json") {
                             std::ifstream file(filePath);
 
-                            json jsonData;
+                            orderedJson jsonData;
 
                             file >> jsonData;
 
@@ -162,7 +162,7 @@ bool ModHandler::SetupTextureAtlasData() {
                         if (filePath.filename() == "blocks.json") {
                             std::ifstream file(filePath);
 
-                            json jsonData;
+                            orderedJson jsonData;
 
                             file >> jsonData;
 
@@ -268,7 +268,7 @@ bool ModHandler::SetupTextureAtlasData() {
                         if (filePath.extension() == ".json") {
                             std::ifstream file(filePath);
 
-                            json jsonData;
+                            orderedJson jsonData;
 
                             file >> jsonData;
 
@@ -332,7 +332,7 @@ bool ModHandler::SetupTextureAtlasData() {
                         if (filePath.extension() == ".json") {
                             std::ifstream file(filePath);
 
-                            json jsonData;
+                            orderedJson jsonData;
 
                             file >> jsonData;
 

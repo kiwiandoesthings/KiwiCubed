@@ -541,6 +541,7 @@ void Chunk::Delete() {
     debugVisualizationVertices.clear();
     debugVisualizationIndices.clear();
 
+    totalChunks--;
 }
 
 Chunk::~Chunk() {

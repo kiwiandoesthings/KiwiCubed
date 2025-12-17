@@ -19,6 +19,9 @@
 #include "ThreadPool.h"
 
 
+using orderedJson = nlohmann::ordered_json;
+
+
 class Chunk;
 class SingleplayerHandler;
 

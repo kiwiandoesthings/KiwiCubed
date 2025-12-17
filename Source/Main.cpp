@@ -47,7 +47,7 @@
 #include "Window.h"
 
 
-using json = nlohmann::json;
+using orderedJson = nlohmann::ordered_json;
 
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -79,12 +79,13 @@ int main() {
 	setenv("DRI_PRIME", "1", 1);
 	#endif
 
-	std::ifstream file("init_config.json");
+	std::ifstream configFile("init_config.json");
 
-	LOG_CHECK_RETURN_CRITICAL(file.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file, exiting", -1);
+	LOG_CHECK_RETURN_CRITICAL(configFile.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file, exiting", -1);
 
-	json jsonData;
-	file >> jsonData;
+	orderedJson jsonData;
+	configFile >> jsonData;
+	configFile.close();
 	
 	projectVersion = jsonData["project_version"].get<std::string>();
 	windowWidth = jsonData["init_settings"]["window_width"];
@@ -96,7 +97,7 @@ int main() {
 
 	INFO("Running KiwiCubed version {" + projectVersion + "}");
 	if (Globals::GetInstance().debugMode) {
-		INFO("Running a debug KiwiCubed build", true);
+		INFO("Running a debug KiwiCubed build");
 	}
 
 	// Initialize GLFW
@@ -214,6 +215,15 @@ int main() {
 		if (player.fov > 120) {
 			player.fov = 30;
 		}
+
+		jsonData["game_settings"]["fov"] = player.fov;
+		std::ofstream configWrite("init_config.json");
+		if (!configWrite.is_open()) {
+			CRITICAL("Could not open the JSON config file, aborting");
+			psnip_trap();
+		}
+		configWrite << jsonData.dump(1, '\t');
+		configWrite.close();
 	});
 
 	UI& ui = UI::GetInstance();

@@ -27,6 +27,16 @@ World::World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, S
 void World::Setup() {
     player.Setup();
 
+    std::ifstream configFile("init_config.json");
+    if (!configFile.is_open()) {
+        CRITICAL("Could not open the JSON config file, aborting");
+		psnip_trap();
+    }
+    orderedJson jsonData;
+    configFile >> jsonData;
+
+    player.fov = jsonData["game_settings"]["fov"];
+
     for (int chunkX = 2; chunkX < worldSizeHorizontal - 2; chunkX++) {
         for (int chunkZ = 2; chunkZ < worldSizeHorizontal - 2; chunkZ++) {
             for (int chunkY = worldSizeHorizontal; chunkY > 0; chunkY--) {

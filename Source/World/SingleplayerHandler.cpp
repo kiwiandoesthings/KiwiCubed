@@ -45,13 +45,11 @@ void SingleplayerHandler::StartSingleplayerWorld(DebugRenderer& debugRenderer) {
 }
 
 void SingleplayerHandler::EndSingleplayerWorld() {
-	OVERRIDE_LOG_NAME("Singleplayer Handler");
-	isLoadedIntoSingleplayerWorld = false;
-	singleplayerWorld->Delete();
-	INFO("Exiting singleplayer world");
+	shouldUnloadWorld = true;
 }
 
 void SingleplayerHandler::Update() {
+	OVERRIDE_LOG_NAME("Singleplayer Handler");
 	if (shouldUnloadWorld) {
 		EventManager& eventManager = EventManager::GetInstance();
 		singleplayerWorld->Delete();
@@ -61,6 +59,7 @@ void SingleplayerHandler::Update() {
 		eventManager.DeregisterEvent("event/unload_world");
 		eventManager.DeregisterEvent("event/player_moved_chunk");
 		shouldUnloadWorld = false;
+		INFO("Exiting singleplayer world");
 	}
 }
 

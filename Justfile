@@ -37,3 +37,4 @@ setup:
 clean:
 	meson setup --reconfigure BuildRelease
 	meson setup --reconfigure BuildDebug
+	powershell.exe -ExecutionPolicy Bypass -File CleanMods.ps1
