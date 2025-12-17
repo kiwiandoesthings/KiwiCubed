@@ -19,7 +19,7 @@
 #include "ThreadPool.h"
 
 
-using orderedJson = nlohmann::ordered_json;
+using OrderedJSON = nlohmann::ordered_json;
 
 
 class Chunk;

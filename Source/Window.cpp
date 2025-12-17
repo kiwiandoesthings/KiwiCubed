@@ -45,7 +45,7 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
 	if (!window) {
-		ERR("Failed to create GLFW window");
+		CRITICAL("Failed to create GLFW window");
 		glfwTerminate();
 	} else {
 		INFO("Successfully created GLFW window");

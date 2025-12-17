@@ -32,10 +32,10 @@ void World::Setup() {
         CRITICAL("Could not open the JSON config file, aborting");
 		psnip_trap();
     }
-    orderedJson jsonData;
-    configFile >> jsonData;
+    OrderedJSON configJSON;
+    configFile >> configJSON;
 
-    player.fov = jsonData["game_settings"]["fov"];
+    player.fov = configJSON["init_settings"]["fov"];
 
     for (int chunkX = 2; chunkX < worldSizeHorizontal - 2; chunkX++) {
         for (int chunkZ = 2; chunkZ < worldSizeHorizontal - 2; chunkZ++) {

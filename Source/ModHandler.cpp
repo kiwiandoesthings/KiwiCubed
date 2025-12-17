@@ -52,16 +52,16 @@ bool ModHandler::SetupTextureAtlasData() {
                 return false;
             }
 
-            orderedJson jsonData;
-            file >> jsonData;
+            OrderedJSON configJSON;
+            file >> configJSON;
 
-            std::string name = jsonData["mod_title"];
-            std::string version = jsonData["mod_version"];
-            std::string authors = jsonData["mod_authors"];
-            std::string builtForVersion = jsonData["built_for_game_version"];
-            std::string modNamespace = jsonData["namespace"];
+            std::string name = configJSON["mod_title"];
+            std::string version = configJSON["mod_version"];
+            std::string authors = configJSON["mod_authors"];
+            std::string builtForVersion = configJSON["built_for_game_version"];
+            std::string modNamespace = configJSON["namespace"];
 
-            if (builtForVersion != Globals::GetInstance().gameVersion) {
+            if (builtForVersion != Globals::GetInstance().projectVersion) {
                 WARN("Mod below is built for different game version than currently running!");
             }
 
@@ -89,11 +89,11 @@ bool ModHandler::SetupTextureAtlasData() {
                         if (filePath.extension() == ".json") {
                             std::ifstream file(filePath);
 
-                            orderedJson jsonData;
+                            OrderedJSON configJSON;
 
-                            file >> jsonData;
+                            file >> configJSON;
 
-                            for (const auto& texture : jsonData["textures"]) {
+                            for (const auto& texture : configJSON["textures"]) {
                                 std::string id = texture["id"];
                                 unsigned short variant = texture["variant"];
                                 unsigned char xPosition = texture["xPosition"];
@@ -162,11 +162,11 @@ bool ModHandler::SetupTextureAtlasData() {
                         if (filePath.filename() == "blocks.json") {
                             std::ifstream file(filePath);
 
-                            orderedJson jsonData;
+                            OrderedJSON configJSON;
 
-                            file >> jsonData;
+                            file >> configJSON;
 
-                            for (const auto& block : jsonData["blocks"]) {
+                            for (const auto& block : configJSON["blocks"]) {
                                 std::string id = block["blockID"];
                                 std::string front = block["texture_front"];
                                 std::string back = block["texture_back"];
@@ -268,11 +268,11 @@ bool ModHandler::SetupTextureAtlasData() {
                         if (filePath.extension() == ".json") {
                             std::ifstream file(filePath);
 
-                            orderedJson jsonData;
+                            OrderedJSON configJSON;
 
-                            file >> jsonData;
+                            file >> configJSON;
 
-                            std::string id = jsonData["id"];
+                            std::string id = configJSON["id"];
 
                             size_t splitPosition = id.find(":");
 
@@ -292,13 +292,13 @@ bool ModHandler::SetupTextureAtlasData() {
                             std::vector<GLfloat> modelVertices;
                             std::vector<GLuint> modelIndices;
 
-                            for (const auto& vertex : jsonData["model"]["vertices"]) {
+                            for (const auto& vertex : configJSON["model"]["vertices"]) {
                                 for (const auto& coordinate : vertex) {
                                     modelVertices.push_back(coordinate);
                                 }
                             }
 
-                            for (const auto& index : jsonData["model"]["indices"]) {
+                            for (const auto& index : configJSON["model"]["indices"]) {
                                 modelIndices.push_back(index);
                             }
 
@@ -332,11 +332,11 @@ bool ModHandler::SetupTextureAtlasData() {
                         if (filePath.extension() == ".json") {
                             std::ifstream file(filePath);
 
-                            orderedJson jsonData;
+                            OrderedJSON configJSON;
 
-                            file >> jsonData;
+                            file >> configJSON;
 
-                            std::string id = jsonData["id"];
+                            std::string id = configJSON["id"];
 
                             size_t splitPosition = id.find(":");
 
@@ -353,8 +353,8 @@ bool ModHandler::SetupTextureAtlasData() {
 
                             AssetStringID entityStringID = AssetStringID{modID, assetID};
 
-                            std::string entityTextureID = jsonData["texture"];
-                            std::string entityModelID = jsonData["model"];
+                            std::string entityTextureID = configJSON["texture"];
+                            std::string entityModelID = configJSON["model"];
 
                             AssetStringID textureStructID = assetManager.StringToAssetStruct(entityTextureID, "texture");
                             AssetStringID modelStructID = assetManager.StringToAssetStruct(entityModelID, "model");

@@ -47,19 +47,13 @@
 #include "Window.h"
 
 
-using orderedJson = nlohmann::ordered_json;
+using OrderedJSON = nlohmann::ordered_json;
 
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void WindowFocusCallback(GLFWwindow* window, int focused);
 
 unsigned char bitness;
-
-std::string projectVersion;
-int windowWidth;
-int windowHeight;
-std::string windowTitle;
-std::string windowType;
 
 
 // This main function is getting out of hand
@@ -79,24 +73,10 @@ int main() {
 	setenv("DRI_PRIME", "1", 1);
 	#endif
 
-	std::ifstream configFile("init_config.json");
+	Globals& globals = Globals::GetInstance();
 
-	LOG_CHECK_RETURN_CRITICAL(configFile.is_open(), "Successfully opened the JSON config file", "Failed to open or find the JSON config file, exiting", -1);
-
-	orderedJson jsonData;
-	configFile >> jsonData;
-	configFile.close();
-	
-	projectVersion = jsonData["project_version"].get<std::string>();
-	windowWidth = jsonData["init_settings"]["window_width"];
-	windowHeight = jsonData["init_settings"]["window_height"];
-	windowTitle = jsonData["init_settings"]["window_title"].get<std::string>();
-	windowType = jsonData["init_settings"]["window_type"].get<std::string>();
-
-	Globals::GetInstance().gameVersion = projectVersion;
-
-	INFO("Running KiwiCubed version {" + projectVersion + "}");
-	if (Globals::GetInstance().debugMode) {
+	INFO("Running KiwiCubed version {" + globals.projectVersion + "}");
+	if (globals.debugMode) {
 		INFO("Running a debug KiwiCubed build");
 	}
 
@@ -105,7 +85,7 @@ int main() {
 
 	// Create a window
 	Window& globalWindow = Window::GetInstance();
-	globalWindow.CreateWindowInstance(windowWidth, windowHeight, std::string(windowTitle + projectVersion).c_str(), windowType.c_str());
+	globalWindow.CreateWindowInstance(globals.windowWidth, globals.windowHeight, std::string(globals.windowTitle + globals.projectVersion).c_str(), globals.windowType.c_str());
 
 	glfwSetWindowUserPointer(globalWindow.GetWindowInstance(), &globalWindow);
 	glfwSetFramebufferSizeCallback(globalWindow.GetWindowInstance(), FramebufferSizeCallback);
@@ -216,13 +196,15 @@ int main() {
 			player.fov = 30;
 		}
 
-		jsonData["game_settings"]["fov"] = player.fov;
+		OrderedJSON configJSON = globals.GetConfigJSON();
+
+		configJSON["init_settings"]["fov"] = player.fov;
 		std::ofstream configWrite("init_config.json");
 		if (!configWrite.is_open()) {
 			CRITICAL("Could not open the JSON config file, aborting");
 			psnip_trap();
 		}
-		configWrite << jsonData.dump(1, '\t');
+		configWrite << configJSON.dump(1, '\t');
 		configWrite.close();
 	});
 
@@ -250,8 +232,6 @@ int main() {
 	int frames = 0;
 	auto startTime = std::chrono::steady_clock::now();
 	double fps = 0.0f;
-	
-	Globals& globals = Globals::GetInstance();
 
 	// Main game loop
 	while (!glfwWindowShouldClose(globalWindow.GetWindowInstance())) {

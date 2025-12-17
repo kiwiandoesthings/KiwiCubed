@@ -1,14 +1,12 @@
 {
 	"project_version": "0.0.4pre-alpha",
 	"init_settings": {
-		"debug_mode": true,
-		"override_debug": false,
+		"window_width": 640,
 		"window_height": 480,
 		"window_title": "KiwiCubed Engine",
 		"window_type": "window_maximized",
-		"window_width": 640
-	},
-	"game_settings": {
-		"fov": 80.0
+		"debug_mode": false,
+		"override_debug": false,
+		"fov": 90.0
 	}
 }
