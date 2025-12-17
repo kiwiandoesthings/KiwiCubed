@@ -356,7 +356,7 @@ bool Chunk::GenerateMesh(const bool remesh) {
     std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
     int time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     if (Globals::GetInstance().debugMode) {
-        //INFO("Chunk meshing took " + std::to_string(time) + "us");
+        DEBUG("Chunk meshing took " + std::to_string(time) + "us", Globals::GetInstance().debugMode);
     }
 
     return true;

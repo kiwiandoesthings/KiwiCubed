@@ -33,6 +33,8 @@ class AssetManager {
         std::vector<TextureAtlasData>* GetTextureAtlasData(unsigned int numericalID);
         std::vector<TextureAtlasData>* GetTextureAtlasData(AssetStringID stringID);
 
+        AssetStringID StringToAssetStruct(std::string stringID, std::string assetPrefix);
+
     private:
         robin_hood::unordered_flat_map<AssetStringID, Texture> textureAtlases;
 

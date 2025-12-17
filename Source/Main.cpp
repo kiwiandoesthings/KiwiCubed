@@ -60,7 +60,6 @@ int windowWidth;
 int windowHeight;
 std::string windowTitle;
 std::string windowType;
-bool debugMode;
 
 
 // This main function is getting out of hand
@@ -92,11 +91,13 @@ int main() {
 	windowHeight = jsonData["init_settings"]["window_height"];
 	windowTitle = jsonData["init_settings"]["window_title"].get<std::string>();
 	windowType = jsonData["init_settings"]["window_type"].get<std::string>();
-	debugMode = jsonData["init_settings"]["debug_mode"];
 
 	Globals::GetInstance().gameVersion = projectVersion;
 
-	Globals::GetInstance().debugMode = debugMode;
+	INFO("Running KiwiCubed version {" + projectVersion + "}");
+	if (Globals::GetInstance().debugMode) {
+		INFO("Running a debug KiwiCubed build", true);
+	}
 
 	// Initialize GLFW
 	LOG_CHECK_RETURN_CRITICAL(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW, exiting", -1);

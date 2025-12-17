@@ -4,10 +4,9 @@
 		"window_width": 640,
 		"window_height": 480,
 		"window_title": "KiwiCubed Engine",
-
-		"_comment": "window_type can be: fullscreen, window_borderless, window_maximized, or window",
 		"window_type": "window_maximized",
-		
+
+		"override_debug": false,
 		"debug_mode": true
 	}
 }

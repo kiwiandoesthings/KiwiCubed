@@ -25,7 +25,7 @@ void AssetManager::RegisterTexture(MetaTexture texture) {
 
     latestTextureID++;
 
-    INFO("Successfully registered texture of with string ID of \"" + texture.stringID.CanonicalName() + "\" and numerical id of {" + std::to_string(latestTextureID - 1) + "} with: {" + std::to_string(texture.atlasData.size()) + "} variants");
+    INFO("Successfully registered texture of with string ID of \"" + texture.stringID.CanonicalName() + "\" and numerical ID of {" + std::to_string(latestTextureID - 1) + "} with: {" + std::to_string(texture.atlasData.size()) + "} variants");
 }
 
 void AssetManager::RegisterShaderProgram(AssetStringID stringID, Shader shaderProgram) {
@@ -48,7 +48,7 @@ Texture* AssetManager::GetTextureAtlas(AssetStringID atlasStringID) {
     if (iterator != textureAtlases.end()) {
         return &iterator->second;
     } else {
-        CRITICAL("Tried to get texture atlas with string id \"" + atlasStringID.CanonicalName() + "\" that did not exist, aborting");
+        CRITICAL("Tried to get texture atlas with string ID \"" + atlasStringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;
@@ -84,7 +84,7 @@ Shader* AssetManager::GetShaderProgram(AssetStringID stringID) {
     if (iterator != shaderPrograms.end()) {
         return &iterator->second;
     } else {
-        CRITICAL("Tried to get shader program with string id \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
+        CRITICAL("Tried to get shader program with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;
@@ -96,7 +96,7 @@ Model* AssetManager::GetEntityModel(AssetStringID stringID) {
     if (iterator != entityModels.end()) {
         return &iterator->second;
     } else {
-        CRITICAL("Tried to get entity model with string id \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
+        CRITICAL("Tried to get entity model with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
         psnip_trap();
     }
     return &iterator->second;
@@ -116,6 +116,28 @@ std::vector<TextureAtlasData>* AssetManager::GetTextureAtlasData(unsigned int nu
 
 std::vector<TextureAtlasData>* AssetManager::GetTextureAtlasData(AssetStringID stringID) {
     return GetTextureAtlasData(GetNumericalID(stringID));
+}
+
+// assetPrefix argument is for assets that prefix the second part of the ID, to differentiate between kiwicubed:block/dirt and kiwicubed:texture/dirt
+AssetStringID AssetManager::StringToAssetStruct(std::string stringID, std::string assetPrefix) {
+    std::string modName = "";
+    std::string assetName = "";
+
+    size_t splitPosition = stringID.find(":");
+    
+    if (splitPosition != std::string::npos) {
+        modName = stringID.substr(0, splitPosition);
+        if (assetPrefix == "") {
+            assetName = stringID.substr(splitPosition + 1);
+        } else {
+            assetName = assetPrefix + "/" + stringID.substr(splitPosition + 1);
+        }
+    } else {
+        CRITICAL("Tried to convert invalid full string ID \"" + stringID + "\" to an AssetStringID struct, aborting");
+        psnip_trap();
+    }
+
+    return AssetStringID{modName, assetName};
 }
 
 AssetManager::~AssetManager() {}

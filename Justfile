@@ -1,25 +1,26 @@
 set windows-shell := ['cmd', '/c']
 
 [unix]
-run: builddebug
+run: buildmods
+	just builddebug
 	BuildDebug/kiwicubed
 
 [unix]
-release: buildrelease
+release: buildmods
+	just buildrelease
 	BuildRelease/kiwicubed
 
 [windows]
-run: builddebug
-	just buildmods
+run: buildmods
+	just builddebug
 	BuildDebug\kiwicubed.exe
 
 [windows]
-release: buildrelease 
-	just buildmods
+release: buildmods
+	just buildrelease
 	BuildRelease\kiwicubed.exe
 
 buildrelease:
-	meson setup BuildRelease --buildtype=release -Ddefault_library=static --vsenv
 	meson compile -C BuildRelease
 
 builddebug:
@@ -31,6 +32,7 @@ buildmods:
 
 setup:
 	meson setup BuildDebug --buildtype=debug -Dcpp_args=-DKIWI_DEBUG_MODE -Ddefault_library=static --vsenv
+	meson setup BuildRelease --buildtype=release -Ddefault_library=static --vsenv
 
 clean:
 	meson setup --reconfigure BuildRelease

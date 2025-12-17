@@ -39,7 +39,7 @@ AssetStringID* BlockManager::GetStringID(unsigned short numericalID) {
     if (iterator != numericalIDsToStringIDs.end()) {
         return &iterator->second;
     }
-    CRITICAL("Tried to get block string id from numerical id of {" + std::to_string(numericalID) + "} that didn't exist, aborting");
+    CRITICAL("Tried to get block string ID from numerical ID of {" + std::to_string(numericalID) + "} that didn't exist, aborting");
     psnip_trap();
     return nullptr;
 }
@@ -50,7 +50,7 @@ unsigned short* BlockManager::GetNumericalID(AssetStringID blockStringID) {
     if (iterator != stringIDsToNumericalIDs.end()) {
         return &iterator->second;
     }
-    CRITICAL("Tried to get block numerical id from string id of \"" + blockStringID.CanonicalName() + "\" that didn't exist, aborting");
+    CRITICAL("Tried to get block numerical ID from string ID of \"" + blockStringID.CanonicalName() + "\" that didn't exist, aborting");
     psnip_trap();
     return nullptr;
 }
@@ -61,7 +61,7 @@ BlockType* BlockManager::GetBlockType(unsigned short numericalID) {
     if (iterator != numericalIDsToBlockTypes.end()) {
         return &iterator->second;
     }
-    CRITICAL("Tried to get block type with numerical id of {" + std::to_string(numericalID) + "} that didn't exist, aborting");
+    CRITICAL("Tried to get block type with numerical ID of {" + std::to_string(numericalID) + "} that didn't exist, aborting");
     psnip_trap();
     return nullptr;
 }
@@ -72,7 +72,7 @@ BlockType* BlockManager::GetBlockType(AssetStringID blockStringID) {
     if (iterator != stringIDsToBlockTypes.end()) {
         return &iterator->second;
     }
-    CRITICAL("Tried to get block type with string id of \"" + blockStringID.CanonicalName() + "\" that didn't exist, aborting");
+    CRITICAL("Tried to get block type with string ID of \"" + blockStringID.CanonicalName() + "\" that didn't exist, aborting");
     psnip_trap();
     return nullptr;
 }

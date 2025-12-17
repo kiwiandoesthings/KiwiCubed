@@ -1,5 +1,6 @@
 #include "ExposedModAPI.h"
 #include <iostream>
+#include "AssetManager.h"
 #include "Events.h"
 #include "ModHandler.h"
 
@@ -18,5 +19,10 @@ extern "C" {
             modHandler.CallWasmFunction(stringFunctionName);
             modHandler.SetCurrentlyProcessingEvent(nullptr);
         });
+    }
+
+    unsigned int KC_GetTextureNumericalID(const char* modName, const char* assetName) {
+        unsigned int id = assetManager.GetNumericalID(AssetStringID{std::string(modName), std::string(assetName)});
+        return id;
     }
 }

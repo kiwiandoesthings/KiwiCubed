@@ -19,6 +19,14 @@ m3ApiRawFunction(KC_AddEventToDo_WASM) {
     m3ApiSuccess();
 }
 
+m3ApiRawFunction(KC_GetTextureNumericalID_WASM) {
+    m3ApiReturnType(unsigned int);
+    m3ApiGetArgMem(const char*, modName);
+    m3ApiGetArgMem(const char*, assetName);
+    unsigned int id = KC_GetTextureNumericalID(modName, assetName);
+    m3ApiReturn(id);
+}
+
 
 ModHandler& ModHandler::GetInstance() {
     static ModHandler instance;
@@ -102,7 +110,7 @@ bool ModHandler::SetupTextureAtlasData() {
                                     modID = id.substr(0, splitPosition);
                                     assetID = "texture/" + id.substr(splitPosition + 1);
                                 } else {
-                                    WARN("Tried to register texture with invalid string id \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
+                                    WARN("Tried to register texture with invalid string ID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
                                     continue;
                                 }
 
@@ -123,6 +131,22 @@ bool ModHandler::SetupTextureAtlasData() {
             } catch (const std::filesystem::filesystem_error& error) {
                 ERR("Filesystem error: " + std::string(error.what()) + ", aborting");
                 return false;
+            }
+
+            for (const auto& blockTypeData : textureAtlasDataMap) {
+                unsigned short highestVariant = 0;
+                for (const auto& texture : blockTypeData.second) {
+                    if (texture.variant > highestVariant) {
+                        highestVariant = texture.variant;
+                    }
+                }
+
+                if (highestVariant > blockTypeData.second.size() - 1) {
+                    ERR("Tried to register texture with higher variant number than actual variants defined for block \"" + blockTypeData.first.CanonicalName() + ", aborting");
+                    return false;
+                }
+
+                assetManager.RegisterTexture(MetaTexture{{blockTypeData.first}, blockTypeData.second});
             }
 
             std::string blocks = modFolder + "/Resources/Blocks";
@@ -173,7 +197,7 @@ bool ModHandler::SetupTextureAtlasData() {
                                         modID = id.substr(0, splitPosition);
                                         textureID = "texture/" + id.substr(splitPosition + 1);
                                     } else {
-                                        WARN("Tried to register texture with invalid string id \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
+                                        WARN("Tried to register texture with invalid string ID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
                                         continue;
                                     }
 
@@ -189,7 +213,7 @@ bool ModHandler::SetupTextureAtlasData() {
                                     modID = id.substr(0, splitPosition);
                                     assetID = "block/" + id.substr(splitPosition + 1);
                                 } else {
-                                    WARN("Tried to register block with invalid string id \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
+                                    WARN("Tried to register block with invalid string ID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
                                     continue;
                                 }
 
@@ -204,6 +228,31 @@ bool ModHandler::SetupTextureAtlasData() {
             } catch (const std::filesystem::filesystem_error& error) {
                 ERR("Filesystem error: " + std::string(error.what()) + ", aborting");
                 return false;
+            }
+
+            for (const auto& block : blockTextureMap) {
+                std::vector<AssetStringID> textureIDs = block.second;
+        
+                std::vector<unsigned char> faceTextureIDs;
+                std::vector<MetaTexture> textureAtlasDatas;
+
+                for (const auto& stringID : block.second) {
+                    auto iterator = textureAtlasDataMap.find(stringID);
+                    if (iterator == textureAtlasDataMap.end()) {
+                        ERR("Tried to get string ID for texture with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
+                        return false;
+                    }
+                    textureAtlasDatas.push_back(MetaTexture{iterator->first, iterator->second});
+                
+                    for (MetaTexture atlasDefinition : textureAtlasDatas) {
+                        if (iterator->first == atlasDefinition.stringID) {
+                            faceTextureIDs.push_back(std::distance(textureAtlasDatas.begin(), std::find(textureAtlasDatas.begin(), textureAtlasDatas.end(), atlasDefinition)));
+                            break;
+                        }
+                    }
+                }
+            
+                BlockManager::GetInstance().RegisterBlockType(BlockType{block.first, textureAtlasDatas, faceTextureIDs});
             }
 
             std::string modModels = modFolder + "/Resources/Models";
@@ -234,7 +283,7 @@ bool ModHandler::SetupTextureAtlasData() {
                                 modID = id.substr(0, splitPosition);
                                 assetID = "model/" + id.substr(splitPosition + 1);
                             } else {
-                                WARN("Tried to register entity model with invalid string id \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
+                                WARN("Tried to register entity model with invalid string ID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
                                 continue;
                             }
 
@@ -262,11 +311,61 @@ bool ModHandler::SetupTextureAtlasData() {
                             };
 
                             assetManager.RegisterEntityModel(entityModel);
+                        }
+                    }
+                }
+            } catch (const std::filesystem::filesystem_error& error) {
+                ERR("Filesystem error: " + std::string(error.what()) + ", aborting");
+                return false;
+            }
+
+            std::string modEntities = modFolder + "/Resources/Entities";
+            
+            try {
+                if (!std::filesystem::exists(modModels) || !std::filesystem::is_directory(modEntities)) {
+                    ERR("Could not find mod's entities folder");
+                    return false;
+                }
+                for (const auto& entry : std::filesystem::directory_iterator(modEntities)) {
+                    if (std::filesystem::is_regular_file(entry.status())) {
+                        auto filePath = entry.path();
+                        if (filePath.extension() == ".json") {
+                            std::ifstream file(filePath);
+
+                            json jsonData;
+
+                            file >> jsonData;
+
+                            std::string id = jsonData["id"];
+
+                            size_t splitPosition = id.find(":");
+
+                            std::string modID = "";
+                            std::string assetID = "";
+
+                            if (splitPosition != std::string::npos) {
+                                modID = id.substr(0, splitPosition);
+                                assetID = "entity/" + id.substr(splitPosition + 1);
+                            } else {
+                                WARN("Tried to register entity with invalid string ID \"" + id + "\" in file: " + filePath.generic_string() + "\", skipping");
+                                continue;
+                            }
+
+                            AssetStringID entityStringID = AssetStringID{modID, assetID};
+
+                            std::string entityTextureID = jsonData["texture"];
+                            std::string entityModelID = jsonData["model"];
+
+                            AssetStringID textureStructID = assetManager.StringToAssetStruct(entityTextureID, "texture");
+                            AssetStringID modelStructID = assetManager.StringToAssetStruct(entityModelID, "model");
+
+                            std::vector<TextureAtlasData>* entityTextureData = assetManager.GetTextureAtlasData(textureStructID);
+                            Model* entityModel = assetManager.GetEntityModel(modelStructID);
 
                             EntityManager::GetInstance().RegisterEntity(EntityType{
-                                AssetStringID{"kiwicubed", "entity/" + id.substr(splitPosition + 1)},
-                                entityModel,
-                                MetaTexture{}
+                                entityStringID,
+                                MetaEntityModel{modelStructID, *entityModel},
+                                MetaTexture{textureStructID, *entityTextureData}
                             });
                         }
                     }
@@ -300,47 +399,6 @@ bool ModHandler::SetupTextureAtlasData() {
         }
     }
 
-    for (const auto& blockTypeData : textureAtlasDataMap) {
-        unsigned short highestVariant = 0;
-        for (const auto& texture : blockTypeData.second) {
-            if (texture.variant > highestVariant) {
-                highestVariant = texture.variant;
-            }
-        }
-
-        if (highestVariant > blockTypeData.second.size() - 1) {
-            ERR("Tried to register texture with higher variant number than actual variants defined for block \"" + blockTypeData.first.CanonicalName() + ", aborting");
-            return false;
-        }
-
-        assetManager.RegisterTexture(MetaTexture{{blockTypeData.first}, blockTypeData.second});
-    }
-
-    for (const auto& block : blockTextureMap) {
-        std::vector<AssetStringID> textureIDs = block.second;
-
-        std::vector<unsigned char> faceTextureIDs;
-        std::vector<MetaTexture> textureAtlasDatas;
-        
-        for (const auto& stringID : block.second) {
-            auto iterator = textureAtlasDataMap.find(stringID);
-            if (iterator == textureAtlasDataMap.end()) {
-                ERR("Tried to get string ID for texture with string ID \"" + stringID.CanonicalName() + "\" that did not exist, aborting");
-                return false;
-            }
-            textureAtlasDatas.push_back(MetaTexture{iterator->first, iterator->second});
-
-            for (MetaTexture atlasDefinition : textureAtlasDatas) {
-                if (iterator->first == atlasDefinition.stringID) {
-                    faceTextureIDs.push_back(std::distance(textureAtlasDatas.begin(), std::find(textureAtlasDatas.begin(), textureAtlasDatas.end(), atlasDefinition)));
-                    break;
-                }
-            }
-        }
-
-        BlockManager::GetInstance().RegisterBlockType(BlockType{block.first, textureAtlasDatas, faceTextureIDs});
-    }
-
     INFO("Loading mods took " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count()) + "us");
 
     return true;
@@ -365,6 +423,7 @@ bool ModHandler::LoadModScripts() {
 
         m3_LinkRawFunction(modModule, "env", "KC_Log", "v(*)", &KC_Log_WASM);
         m3_LinkRawFunction(modModule, "env", "KC_AddEventToDo", "v(**)", &KC_AddEventToDo_WASM);
+        m3_LinkRawFunction(modModule, "env", "KC_GetTextureNumericalID", "i(**)", &KC_GetTextureNumericalID_WASM);
         
         IM3Function entrypoint;
         if (m3_FindFunction(&entrypoint, modRuntime, "Initialize")) {
