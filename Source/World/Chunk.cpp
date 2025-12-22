@@ -99,7 +99,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
                 Block& block = GetBlock(blockX, blockY, blockZ);
                 float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
 	            int height = blockY + (chunkY * chunkSize);
-                int reach = density * 16 + 30;
+                int reach = static_cast<int>(density * 16) + 30;
 
                 if (!(height < reach)) {
                     block.blockID = 0;

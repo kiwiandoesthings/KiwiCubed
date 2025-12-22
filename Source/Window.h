@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <debug-trap.h>
 
 #include <chrono>
 #include <cstring>
@@ -11,14 +12,19 @@
 #include <thread>
 
 #include "Input.h"
-#include "UI.h"
+
+
+struct GLFWCallbacks {
+	GLFWframebuffersizefun framebufferSize;
+	GLFWwindowfocusfun windowFocus;
+};
 
 
 class Window {
 	public:
 		static Window& GetInstance();
 
-		GLFWwindow* CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType);
+		GLFWwindow* CreateGLFWWindow(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType, GLFWCallbacks callbacks);
 
 		void Setup();
 
@@ -37,7 +43,7 @@ class Window {
 		void SetFocused(bool focus);
 		bool GetFocused() const;
 
-		GLFWwindow* GetWindowInstance();
+		GLFWwindow* GetGLFWWindow();
 
 		void Delete();
 
@@ -52,7 +58,7 @@ class Window {
         Window(const Window&) = delete;
         Window& operator=(const Window&) = delete;
 		
-		GLFWwindow* window;
+		GLFWwindow* glfwWindow;
 		InputHandler inputHandler = InputHandler("Window");
 
 		bool isFocused;

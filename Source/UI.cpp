@@ -3,7 +3,7 @@
 #include "TextRenderer.h"
 
 
-UI::UI() : uiShaderProgram(nullptr) {}
+UI::UI() : uiShaderProgram(uiShaderProgram), uiAtlas(uiAtlas) {}
 UI::~UI() = default;
 
 UI& UI::GetInstance() {
@@ -11,7 +11,7 @@ UI& UI::GetInstance() {
     return instance;
 }
 
-void UI::Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer) {
+void UI::Setup(Shader shaderProgram, Texture atlas, TextRenderer* textRenderer) {
     OVERRIDE_LOG_NAME("UI Setup");
     if (!renderComponentsSetup) {
         vertexBufferObject.SetupBuffer();
@@ -29,7 +29,7 @@ void UI::Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer
     uiTextRenderer = textRenderer;
     window = &Window::GetInstance();
 
-    inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
+    inputHandler.SetupCallbacks(Window::GetInstance().GetGLFWWindow());
     inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, [&](int button){
         if (currentScreen == nullptr) {
             return;
@@ -82,27 +82,30 @@ void UI::Render() {
         return;
     }
 
-    uiAtlas->SetActive();
-    uiAtlas->Bind();
+    uiAtlas.SetActive();
+    uiAtlas.Bind();
     stackedScreens.top()->Render();
 }
 
-void UI::AddScreen(UIScreen* screen) {
-    uiScreens.emplace_back(screen);
+void UI::AddScreen(UIScreen screen) {
+    uiScreens.push_back(std::make_unique<UIScreen>(std::move(screen)));
 }
 
-void UI::SetCurrentScreen(UIScreen* screen) {
-    stackedScreens.push(screen);
-    currentScreen = screen;
+void UI::SetCurrentScreen(const std::string screenName) {
+    UIScreen* uiScreen = GetScreen(screenName);
+    stackedScreens.push(uiScreen);
+    currentScreen = uiScreen;
 }
 
 UIScreen* UI::GetScreen(const std::string& screenName) {
+    OVERRIDE_LOG_NAME("UI");
     for (int iterator = 0; iterator < uiScreens.size(); ++iterator) {
         if (uiScreens[iterator]->screenName == screenName) {
-            return uiScreens[iterator];
+            return uiScreens[iterator].get();
         }
     }
-    return nullptr;
+    CRITICAL("Tried to get UIScreen with name \"" + screenName + "\" that did not exist");
+    psnip_trap();
 }
 
 UIScreen* UI::GetCurrentScreen() {
@@ -132,7 +135,7 @@ void UI::Delete() {
     OVERRIDE_LOG_NAME("UI");
     INFO("Deleting screens");
     for (int iterator = 0; iterator < uiScreens.size(); ++iterator) {
-        uiScreens[iterator]->Delete();
+        uiScreens[iterator].get()->Delete();
     }
     uiScreens.clear();
 }
@@ -143,8 +146,8 @@ UIScreen::UIScreen(std::string screenName) : screenName(screenName) {
     std::string realName = screenName.substr(3);
 
     EventManager::GetInstance().RegisterEvent("ui/move_screen_" + realName);
-    EventManager::GetInstance().AddEventToDo("ui/move_screen_" + realName, [&](Event& event) {
-        UI::GetInstance().SetCurrentScreen(this);
+    EventManager::GetInstance().AddEventToDo("ui/move_screen_" + realName, [=](Event& event) {
+        UI::GetInstance().SetCurrentScreen(screenName);
     });
 
     INFO("Created screen \"" + screenName + "\"");

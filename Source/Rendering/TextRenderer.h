@@ -5,10 +5,10 @@
 #include <map>
 
 #include <ft2build.h>
-#include "freetype/freetype.h"
 #include FT_FREETYPE_H
 #include <glm/glm.hpp>
 
+#include "AssetManager.h"
 #include "Renderer.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -25,20 +25,21 @@ struct Character {
 
 class TextRenderer {
     public:
-        TextRenderer(FT_Library& freeType, FT_Face& fontFace, Shader& textShader);
+        TextRenderer();
         ~TextRenderer();
 
+        void Setup(FT_Library freeType, FT_Face fontFace, AssetStringID textShader);
         void RenderText(const std::string& text, float xPosition, float yPosition, float scale, glm::vec3 textColor);
 
         glm::vec2 MeasureText(const std::string& text, float scale);
 
     private:
-        FT_Library& freeType;
-        FT_Face& fontFace;
+        FT_Library freeType;
+        FT_Face fontFace;
 
         std::map<char, Character> characters;
 
-        Shader& textShader;
+        Shader* textShader;
 
         VertexArrayObject vertexArrayObject;
         VertexBufferObject vertexBufferObject;

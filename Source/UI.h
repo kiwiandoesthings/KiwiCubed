@@ -11,13 +11,13 @@
 #include "Input.h"
 #include "Renderer.h"
 #include "Shader.h"
+#include "TextRenderer.h"
 #include "Texture.h"
 #include "VertexArrayObject.h"
 #include "VertexBufferObject.h"
 #include "Window.h"
 
 
-class TextRenderer;
 class UIScreen;
 class UIElement;
 
@@ -27,11 +27,11 @@ class UI {
         static UI& GetInstance();
         void Delete();
 
-        void Setup(Shader* shaderProgram, Texture* atlas, TextRenderer* textRenderer);
+        void Setup(Shader shaderProgram, Texture atlas, TextRenderer* textRenderer);
         void Render();
 
-        void AddScreen(UIScreen* screen);
-        void SetCurrentScreen(UIScreen* screen);
+        void AddScreen(UIScreen screen);
+        void SetCurrentScreen(const std::string screenName);
 
         UIScreen* GetScreen(const std::string& screenName);
         UIScreen* GetCurrentScreen();
@@ -42,8 +42,8 @@ class UI {
 
         InputHandler& GetInputHandler();
 
-        Shader* uiShaderProgram;
-        Texture* uiAtlas;
+        Shader uiShaderProgram;
+        Texture uiAtlas;
         TextRenderer* uiTextRenderer;
         Window* window;
 
@@ -60,7 +60,7 @@ class UI {
 
         bool renderComponentsSetup = false;
 
-        std::vector<UIScreen*> uiScreens;
+        std::vector<std::unique_ptr<UIScreen>> uiScreens;
         UIScreen* currentScreen;
         bool screenVisible = true;
 

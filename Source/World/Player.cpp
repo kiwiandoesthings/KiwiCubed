@@ -32,7 +32,7 @@ Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(0, 
 
 	entityData.inventory = Inventory(slotStringIDs);
 
-	inputHandler.SetupCallbacks(Window::GetInstance().GetWindowInstance());
+	inputHandler.SetupCallbacks(Window::GetInstance().GetGLFWWindow());
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 
@@ -58,11 +58,11 @@ void Player::Setup() {
 	camera = std::make_shared<Camera>();
 
 	Window& globalWindow = Window::GetInstance();
-	auto inventoryUI = std::make_unique<UIScreen>("ui/inventory");
+	UIScreen inventoryUI = UIScreen("ui/inventory");
 	int containerX = (globalWindow.GetWidth() / 2) - 576;
 	int containerY = (globalWindow.GetHeight() / 2) - 192;
-	inventoryUI->AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), "event/blank", AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
-	UI::GetInstance().AddScreen(std::move(inventoryUI).release());
+	inventoryUI.AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), "event/blank", AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
+	UI::GetInstance().AddScreen(std::move(inventoryUI));
 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
 		if (playerData.gameMode == SURVIVAL) {
@@ -162,7 +162,7 @@ void Player::Update() {
 				UIImage::Render(glm::vec2(slotX, slotY), glm::vec2(96, 96), atlasData[slotIndex], atlas);
 				int itemCount = inventory->GetSlot({"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slotIndex)})->itemCount;
 				if (itemCount > 0) {
-					UI::GetInstance().uiTextRenderer->RenderText(std::to_string(itemCount), slotX, slotY, 1, glm::vec3(1, 1, 1));
+					UI::GetInstance().uiTextRenderer->RenderText(std::to_string(itemCount), static_cast<float>(slotX), static_cast<float>(slotY), 1, glm::vec3(1, 1, 1));
 				}
 				slotIndex++;
 			}
@@ -409,7 +409,7 @@ void Player::QueryMouseInputs() {
 	double mouseX;
 	double mouseY;
 
-	glfwGetCursorPos(window.GetWindowInstance(), &mouseX, &mouseY);
+	glfwGetCursorPos(window.GetGLFWWindow(), &mouseX, &mouseY);
 
 	if (!(mouseX == oldMouseX && mouseY == oldMouseY)) {
 		// Get the amount to rotate for the frame
@@ -434,7 +434,7 @@ void Player::QueryMouseInputs() {
 	}
 
 	// We don't want anyone to be able to move the mouse off the screen, that would be very very very bad and horrible and would make the game absolutely unplayable
-	glfwSetCursorPos(window.GetWindowInstance(), (static_cast<float>(window.GetWidth()) / 2.0f), (static_cast<float>(window.GetHeight()) / 2.0f));
+	glfwSetCursorPos(window.GetGLFWWindow(), (static_cast<float>(window.GetWidth()) / 2.0f), (static_cast<float>(window.GetHeight()) / 2.0f));
 
 	oldMouseX = mouseX;
 	oldMouseY = mouseY;

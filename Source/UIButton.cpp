@@ -23,10 +23,10 @@ void UIButton::Render() {
 
     UI& ui = UI::GetInstance();
 
-    ui.uiAtlas->SetActive();
-    ui.uiAtlas->Bind();
+    ui.uiAtlas.SetActive();
+    ui.uiAtlas.Bind();
 
-    int atlasSize = ui.uiAtlas->atlasSize.x;
+    int atlasSize = static_cast<int>(ui.uiAtlas.atlasSize.x);
 
     GLfloat vertices[] = {
         // Positions      // Texture Coordinates
@@ -41,7 +41,7 @@ void UIButton::Render() {
 	    2, 3, 0,
     };
 
-    ui.uiShaderProgram->Bind();
+    ui.uiShaderProgram.Bind();
 
     ui.vertexArrayObject.Bind();
     ui.vertexBufferObject.Bind();
@@ -60,7 +60,7 @@ void UIButton::Render() {
     glm::vec2 ndcSize = PixelsToNDC(size) + glm::vec2(1, 1);
     modelMatrix = glm::translate(modelMatrix, glm::vec3(ndcPosition.x, ndcPosition.y, 0.0f));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(ndcSize.x, ndcSize.y, 1.0f));
-    ui.uiShaderProgram->SetUniformMatrix4fv("modelMatrix", modelMatrix);
+    ui.uiShaderProgram.SetUniformMatrix4fv("modelMatrix", modelMatrix);
 
     GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sizeof(indices)), GL_UNSIGNED_INT, 0));
 

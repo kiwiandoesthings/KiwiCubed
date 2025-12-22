@@ -5,23 +5,27 @@
 
 #include "DebugRenderer.h"
 #include "Physics.h"
+#include "UI.h"
 #include "World.h"
 
 
 class SingleplayerHandler {
 	public:
-		std::unique_ptr<World> singleplayerWorld = nullptr;
-		bool isLoadedIntoSingleplayerWorld = false;
+		SingleplayerHandler();
 		
-		SingleplayerHandler(DebugRenderer& debugRenderer);
-		
+		void Setup(DebugRenderer& debugRenderer);
 		void StartSingleplayerWorld(DebugRenderer& debugRenderer);
 		void EndSingleplayerWorld();
 
 		void Update();
 
+		World* GetWorld();
+		bool IsLoadedIntoSingleplayerWorld();
+
 		void Delete();
 	
 	private:
+		std::unique_ptr<World> singleplayerWorld = nullptr;
+		bool isLoadedIntoSingleplayerWorld = false;
 		bool shouldUnloadWorld = false;
 };

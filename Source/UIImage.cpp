@@ -10,7 +10,7 @@ UIImage::UIImage(glm::vec2 position, glm::vec2 size, std::string eventToTrigger,
 void UIImage::Render(glm::vec2 position, glm::vec2 size, TextureAtlasData atlasData, Texture* atlas) {
     atlas->SetActive();
     atlas->Bind();
-    int atlasSize = atlas->atlasSize.x;
+    int atlasSize = static_cast<int>(atlas->atlasSize.x);
 
     GLfloat vertices[] = {
         // Positions      // Texture Coordinates
@@ -27,7 +27,7 @@ void UIImage::Render(glm::vec2 position, glm::vec2 size, TextureAtlasData atlasD
 
     UI& ui = UI::GetInstance();
 
-    ui.uiShaderProgram->Bind();
+    ui.uiShaderProgram.Bind();
 
     ui.vertexArrayObject.Bind();
     ui.vertexBufferObject.Bind();
@@ -46,7 +46,7 @@ void UIImage::Render(glm::vec2 position, glm::vec2 size, TextureAtlasData atlasD
     glm::vec2 ndcSize = PixelsToNDC(size) + glm::vec2(1, 1);
     modelMatrix = glm::translate(modelMatrix, glm::vec3(ndcPosition.x, ndcPosition.y, 0.0f));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(ndcSize.x, ndcSize.y, 1.0f));
-    ui.uiShaderProgram->SetUniformMatrix4fv("modelMatrix", modelMatrix);
+    ui.uiShaderProgram.SetUniformMatrix4fv("modelMatrix", modelMatrix);
     
     GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sizeof(indices)), GL_UNSIGNED_INT, 0));
 }
@@ -57,7 +57,7 @@ void UIImage::Render() {
     Texture* textureAtlas = assetManager.GetTextureAtlas(textureAtlasStringID);
     textureAtlas->SetActive();
     textureAtlas->Bind();
-    int atlasSize = textureAtlas->atlasSize.x;
+    int atlasSize = static_cast<int>(textureAtlas->atlasSize.x);
     
     GLfloat vertices[] = {
         // Positions      // Texture Coordinates
@@ -74,7 +74,7 @@ void UIImage::Render() {
 
     UI& ui = UI::GetInstance();
 
-    ui.uiShaderProgram->Bind();
+    ui.uiShaderProgram.Bind();
     
     ui.vertexArrayObject.Bind();
     ui.vertexBufferObject.Bind();
@@ -93,7 +93,7 @@ void UIImage::Render() {
     glm::vec2 ndcSize = PixelsToNDC(size) + glm::vec2(1, 1);
     modelMatrix = glm::translate(modelMatrix, glm::vec3(ndcPosition.x, ndcPosition.y, 0.0f));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(ndcSize.x, ndcSize.y, 1.0f));
-    ui.uiShaderProgram->SetUniformMatrix4fv("modelMatrix", modelMatrix);
+    ui.uiShaderProgram.SetUniformMatrix4fv("modelMatrix", modelMatrix);
     
     GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sizeof(indices)), GL_UNSIGNED_INT, 0));
 }

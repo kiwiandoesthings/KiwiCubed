@@ -20,6 +20,7 @@ class Globals {
         // Code globals
         float deltaTime = 0.0f;
         unsigned long long frameCount = 0;
+        unsigned char bitness = 0;
         #ifdef KIWI_DEBUG_MODE
         bool debugMode = true;
         #else
@@ -28,8 +29,8 @@ class Globals {
         
         // Config file globals (all at default values)
         const std::string projectVersion = "0.0.4pre-alpha";
-        unsigned int windowWidth = 1;
-        unsigned int windowHeight = 1;
+        int windowWidth = 1;
+        int windowHeight = 1;
         std::string windowTitle = "";
         std::string windowType = "";
         bool debugModeConfig = false;

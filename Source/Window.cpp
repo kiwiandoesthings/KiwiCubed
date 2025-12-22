@@ -12,8 +12,8 @@ Window& Window::GetInstance() {
     return instance;
 }
 
-GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType) {
-	OVERRIDE_LOG_NAME("Initialization");
+GLFWwindow* Window::CreateGLFWWindow(int windowWidth, int windowHeight, const char* windowTitle, const char* windowType, GLFWCallbacks callbacks) {
+	OVERRIDE_LOG_NAME("Window");
 	Window::windowWidth = windowWidth;
 	Window::windowHeight = windowHeight;
 	Window::windowTitle = windowTitle;
@@ -22,18 +22,18 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
 	if (strcmp(windowType, "fullscreen") == 0) {
-		window = glfwCreateWindow(mode->width, mode->height, windowTitle, monitor, nullptr);
+		glfwWindow = glfwCreateWindow(mode->width, mode->height, windowTitle, monitor, nullptr);
 	}
 	else if (strcmp(windowType, "window_borderless") == 0) {
 		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-		window = glfwCreateWindow(mode->width, mode->height, windowTitle, nullptr, nullptr);
+		glfwWindow = glfwCreateWindow(mode->width, mode->height, windowTitle, nullptr, nullptr);
 	}
 	else if (strcmp(windowType, "window_maximized") == 0) {
-		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
-		glfwMaximizeWindow(window);
+		glfwWindow = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
+		glfwMaximizeWindow(glfwWindow);
 	}
 	else if (strcmp(windowType, "window") == 0) {
-		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
+		glfwWindow = glfwCreateWindow(windowWidth, windowHeight, windowTitle, nullptr, nullptr);
 	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -43,8 +43,11 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 	glfwWindowHint(GL_CONTEXT_PROFILE_MASK, 24);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	glfwSetWindowUserPointer(glfwWindow, this);
+	glfwSetFramebufferSizeCallback(glfwWindow, callbacks.framebufferSize);
+	glfwSetWindowFocusCallback(glfwWindow, callbacks.windowFocus);
 
-	if (!window) {
+	if (!glfwWindow) {
 		CRITICAL("Failed to create GLFW window");
 		glfwTerminate();
 	} else {
@@ -54,7 +57,7 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 	int newWindowWidth;
 	int newWindowHeight;
 
-	glfwGetWindowSize(window, &newWindowWidth, &newWindowHeight);
+	glfwGetWindowSize(glfwWindow, &newWindowWidth, &newWindowHeight);
 
 	GLFWimage processIcon;
 	processIcon.pixels = stbi_load("Assets/kiwi_exe_64x.png", &processIcon.width, &processIcon.height, 0, 4);
@@ -63,31 +66,31 @@ GLFWwindow* Window::CreateWindowInstance(int windowWidth, int windowHeight, cons
 		psnip_trap();
 	}
 
-	glfwSetWindowIcon(window, 1, &processIcon);
+	glfwSetWindowIcon(glfwWindow, 1, &processIcon);
 	stbi_image_free(processIcon.pixels);
 	
 	Window::windowWidth = newWindowWidth;
 	Window::windowHeight = newWindowHeight;
 	
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(glfwWindow);
 	glfwSwapInterval(1);
 
-	return window;
+	return glfwWindow;
 }
 
 void Window::Setup() {
-	inputHandler.SetupCallbacks(window);
+	inputHandler.SetupCallbacks(glfwWindow);
 }
 
 void Window::QueryInputs() {
 	if (!isFocused) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		cursorLocked = false;
 		return;
 	}
 	if (isFocused) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(glfwWindow, GLFW_RAW_MOUSE_MOTION, GLFW_CURSOR_HIDDEN);
 		cursorLocked = true;
 	}
 }
@@ -110,12 +113,12 @@ const char* Window::GetTitle() const {
 }
 
 void Window::SetTitle(const char* newTitle) {
-	glfwSetWindowTitle(window, newTitle);
+	glfwSetWindowTitle(glfwWindow, newTitle);
 	windowTitle = newTitle;
 }
 
 void Window::SetTitle(std::string newTitle) {
-	glfwSetWindowTitle(window, newTitle.c_str());
+	glfwSetWindowTitle(glfwWindow, newTitle.c_str());
 	windowTitle = newTitle.c_str();
 }
 
@@ -123,7 +126,7 @@ void Window::SetFocused(bool focus) {
 	isFocused = focus;
 
 	if (isFocused) {
-		glfwSetCursorPos(window, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
+		glfwSetCursorPos(glfwWindow, static_cast<float>(windowWidth) / 2, static_cast<float>(windowHeight) / 2);
 	}
 }
 
@@ -131,11 +134,13 @@ bool Window::GetFocused() const {
 	return isFocused;
 }
 
-GLFWwindow* Window::GetWindowInstance() {
-	return window;
+GLFWwindow* Window::GetGLFWWindow() {
+	return glfwWindow;
 }
 
 void Window::Delete() {
-	glfwDestroyWindow(window);
+	OVERRIDE_LOG_NAME("Window");
+	glfwDestroyWindow(glfwWindow);
 	glfwTerminate();
+	INFO("Terminated window and GLFW");
 }

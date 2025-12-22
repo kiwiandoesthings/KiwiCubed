@@ -81,7 +81,7 @@ class World {
 		std::atomic<bool> shouldTick;
 		std::thread tickThread;
 		std::mutex tickThreadMutex;
-		int tickIntervalMs = 1000.0f / 20.0f;
+		int tickIntervalMs = 1000 / 20;
 		unsigned int totalTicks = 0;
 		float tickDeltaTime = 0.0f;
 		float ticksPerSecond = 0.0f;

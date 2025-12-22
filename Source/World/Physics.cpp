@@ -152,15 +152,15 @@ bool Physics::ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chu
 		for (int blockY = static_cast<int>(std::floor(minCorner.y)) - 1; blockY <= static_cast<int>(std::ceil(maxCorner.y)) + 1; ++blockY) {
 			for (int blockZ = static_cast<int>(std::floor(minCorner.z)) - 1; blockZ <= static_cast<int>(std::ceil(maxCorner.z)) + 1; ++blockZ) {
 				glm::ivec3 chunkPosition = glm::ivec3(
-					FloorDiv(blockX, chunkSize),
-					FloorDiv(blockY, chunkSize),
-					FloorDiv(blockZ, chunkSize)
+					FloorDiv(static_cast<float>(blockX), chunkSize),
+					FloorDiv(static_cast<float>(blockY), chunkSize),
+					FloorDiv(static_cast<float>(blockZ), chunkSize)
 				);
 
 				glm::ivec3 blockPosition = glm::ivec3(
-					PositiveModulo(blockX, chunkSize),
-					PositiveModulo(blockY, chunkSize),
-					PositiveModulo(blockZ, chunkSize)
+					PositiveModulo(static_cast<float>(blockX), chunkSize),
+					PositiveModulo(static_cast<float>(blockY), chunkSize),
+					PositiveModulo(static_cast<float>(blockZ), chunkSize)
 				);
 
 				if (chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z).blockID != 0) {
@@ -225,13 +225,13 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 	BlockRayHit rayHit = BlockRayHit{false};
 
 	for (int i = 0; i < maxDistance; ++i) {
-		glm::ivec3 localBlockPos = glm::ivec3(PositiveModulo(currentBlock.x, chunkSize), PositiveModulo(currentBlock.y, chunkSize), PositiveModulo(currentBlock.z, chunkSize));
+		glm::ivec3 localBlockPos = glm::ivec3(PositiveModulo(static_cast<float>(currentBlock.x), chunkSize), PositiveModulo(static_cast<float>(currentBlock.y), chunkSize), PositiveModulo(static_cast<float>(currentBlock.z), chunkSize));
 
 		Chunk* chunk = chunkHandler.GetChunk(currentChunk.x, currentChunk.y, currentChunk.z, false);
 		if (chunk->isGenerated) {
 			Block& block = chunk->GetBlock(localBlockPos.x, localBlockPos.y, localBlockPos.z);
 			if (!block.IsAir()) {
-				blockHitPosition = glm::ivec3(PositiveModulo(currentBlock.x, chunkSize), PositiveModulo(currentBlock.y, chunkSize), PositiveModulo(currentBlock.z, chunkSize));
+				blockHitPosition = glm::ivec3(PositiveModulo(static_cast<float>(currentBlock.x), chunkSize), PositiveModulo(static_cast<float>(currentBlock.y), chunkSize), PositiveModulo(static_cast<float>(currentBlock.z), chunkSize));
 				chunkHitPosition = currentChunk;
 				isHit = true;
 				rayHit.hit = true;
@@ -277,7 +277,7 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 		}
 	}
 
-	blockHitPosition = glm::ivec3(PositiveModulo(currentBlock.x, chunkSize), PositiveModulo(currentBlock.y, chunkSize), PositiveModulo(currentBlock.z, chunkSize));
+	blockHitPosition = glm::ivec3(PositiveModulo(static_cast<float>(currentBlock.x), chunkSize), PositiveModulo(static_cast<float>(currentBlock.y), chunkSize), PositiveModulo(static_cast<float>(currentBlock.z), chunkSize));
 	chunkHitPosition = currentChunk;
 	isHit = false;
 	return rayHit;

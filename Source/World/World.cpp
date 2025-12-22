@@ -54,7 +54,7 @@ void World::Setup() {
                     for (unsigned int z = 0; z < chunkSize; ++z) {
                         int level = chunk->GetHeightmapLevelAt(glm::vec2(x, z));
                         if (level != -1) {
-                            player.SetPosition((chunk->chunkX * chunkSize) + x, (chunk->chunkY * chunkSize) + level + 3, (chunk->chunkZ * chunkSize) + z);
+                            player.SetPosition(static_cast<float>((chunk->chunkX * chunkSize) + x), static_cast<float>((chunk->chunkY * chunkSize) + level + 3), static_cast<float>((chunk->chunkZ * chunkSize) + z));
                             return;
                         }
                     }
@@ -69,6 +69,9 @@ void World::Render(Shader shaderProgram) {
         return;
     }
 
+    if (!Globals::GetInstance().debugMode) {
+        GLCall(glEnable(GL_CULL_FACE));
+    }
     shaderProgram.Bind();
     for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
         auto& chunk = iterator->second;
@@ -81,6 +84,7 @@ void World::Render(Shader shaderProgram) {
     for (int iterator = 0; iterator < entities.size(); iterator++) {
         entities[iterator].get()->Render();
     }
+    GLCall(glDisable(GL_CULL_FACE));
 }
 
 void World::GenerateWorld() {
@@ -116,8 +120,6 @@ void World::GenerateWorld() {
         auto& chunk = it->second;
         chunk->SetupRenderComponents();
     }
-
-    singleplayerHandler->isLoadedIntoSingleplayerWorld = true;
 }
 
 void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool updateCallerChunk, Chunk* callerChunk) {

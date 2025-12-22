@@ -2,16 +2,28 @@
 #include "Events.h"
 #include <cstddef>
 
-SingleplayerHandler::SingleplayerHandler(DebugRenderer& debugRenderer) : singleplayerWorld(nullptr), isLoadedIntoSingleplayerWorld(false) {
+SingleplayerHandler::SingleplayerHandler() : singleplayerWorld(nullptr), isLoadedIntoSingleplayerWorld(false) {
+}
+
+void SingleplayerHandler::Setup(DebugRenderer& debugRenderer) {
 	EventManager& eventManager = EventManager::GetInstance();
+
+	SingleplayerHandler* self = this;
 	eventManager.RegisterEvent("event/generate_world");
-	eventManager.AddEventToDo("event/generate_world", [&](Event& event) {
-		singleplayerWorld = std::make_unique<World>(5, 3, this);
-		isLoadedIntoSingleplayerWorld = true;
-		StartSingleplayerWorld(debugRenderer);
-		singleplayerWorld->GenerateWorld();
-		singleplayerWorld->Setup();
-		debugRenderer.SetupBuffers(singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerWorld->GetChunkOrigins());
+	eventManager.AddEventToDo("event/generate_world", [self, &debugRenderer](Event& event) {
+		OVERRIDE_LOG_NAME("Singleplayer Handler");
+		if (self->singleplayerWorld != nullptr) {
+			CRITICAL("Tried to generate already generated world, aborting");
+			psnip_trap();
+		}
+
+		self->singleplayerWorld = std::make_unique<World>(5, 3, self);
+		self->isLoadedIntoSingleplayerWorld = true;
+		self->StartSingleplayerWorld(debugRenderer);
+		self->singleplayerWorld->GenerateWorld();
+		self->singleplayerWorld->Setup();
+		self->isLoadedIntoSingleplayerWorld = true;
+		debugRenderer.SetupBuffers(self->singleplayerWorld->GetChunkDebugVisualizationVertices(), self->singleplayerWorld->GetChunkDebugVisualizationIndices(), self->singleplayerWorld->GetChunkOrigins());
 
 		if (UI::GetInstance().GetCurrentScreenName() == "ui/main_menu") {
 			UI::GetInstance().DisableUI();
@@ -46,6 +58,7 @@ void SingleplayerHandler::StartSingleplayerWorld(DebugRenderer& debugRenderer) {
 
 void SingleplayerHandler::EndSingleplayerWorld() {
 	shouldUnloadWorld = true;
+	Update();
 }
 
 void SingleplayerHandler::Update() {
@@ -61,6 +74,14 @@ void SingleplayerHandler::Update() {
 		shouldUnloadWorld = false;
 		INFO("Exiting singleplayer world");
 	}
+}
+
+World* SingleplayerHandler::GetWorld() {
+	return singleplayerWorld.get();
+}
+
+bool SingleplayerHandler::IsLoadedIntoSingleplayerWorld() {
+	return isLoadedIntoSingleplayerWorld;
 }
 
 void SingleplayerHandler::Delete() {

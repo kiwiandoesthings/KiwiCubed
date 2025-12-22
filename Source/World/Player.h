@@ -12,6 +12,7 @@
 #include "Entity.h"
 #include "Events.h"
 #include "TextRenderer.h"
+#include "UI.h"
 
 
 enum GameMode {

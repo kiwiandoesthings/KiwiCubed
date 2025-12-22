@@ -18,7 +18,7 @@ void Entity::SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID,
 	entityTextureAtlasData = assetManager.GetTextureAtlasData(textureID);
 
 	TextureAtlasData atlasData = (*entityTextureAtlasData)[0];
-	int atlasSize = entityTexture->atlasSize.x;
+	int atlasSize = static_cast<int>(entityTexture->atlasSize.x);
 
 	GLfloat textureCoordinates[] = {
     	static_cast<GLfloat>(atlasData.xPosition) / atlasSize, static_cast<GLfloat>(atlasData.yPosition) / atlasSize,

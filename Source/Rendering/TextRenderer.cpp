@@ -1,7 +1,14 @@
 #include "TextRenderer.h"
 
 
-TextRenderer::TextRenderer(FT_Library& freeType, FT_Face& fontFace, Shader& textShader) : freeType(freeType), fontFace(fontFace), textShader(textShader) {
+TextRenderer::TextRenderer() : freeType(nullptr), fontFace(nullptr), textShader(nullptr) {
+}
+
+void TextRenderer::Setup(FT_Library freeType, FT_Face fontFace, AssetStringID textShader) {
+    TextRenderer::freeType = freeType;
+    TextRenderer::fontFace = fontFace;
+    TextRenderer::textShader = assetManager.GetShaderProgram(textShader);
+
     vertexArrayObject.SetupArrayObject();
     vertexBufferObject.SetupBuffer();
     indexBufferObject.SetupBuffer();
@@ -40,16 +47,9 @@ TextRenderer::TextRenderer(FT_Library& freeType, FT_Face& fontFace, Shader& text
 	}
 }
 
-TextRenderer::~TextRenderer() {
-    characters.clear();
-
-    FT_Done_Face(fontFace);
-	FT_Done_FreeType(freeType);
-}
-
 void TextRenderer::RenderText(const std::string& text, float xPosition, float yPosition, float scale, glm::vec3 textColor) {
-    textShader.Bind();
-    textShader.SetUniform3fv("textColor", textColor /  glm::vec3(255));
+    textShader->Bind();
+    textShader->SetUniform3fv("textColor", textColor /  glm::vec3(255));
 
     GLCall(glActiveTexture(GL_TEXTURE0));
     vertexArrayObject.Bind();
@@ -62,7 +62,7 @@ void TextRenderer::RenderText(const std::string& text, float xPosition, float yP
         glm::vec2 characterSize = PixelsToNDC(glm::vec2(character.size.x * scale, character.size.y * scale)) + glm::vec2(1, 1);
         modelMatrix = glm::translate(modelMatrix, glm::vec3(characterPosition.x, characterPosition.y, -1.0f));
         modelMatrix = glm::scale(modelMatrix, glm::vec3(characterSize.x, characterSize.y, 1.0f));
-        textShader.SetUniformMatrix4fv("modelMatrix", modelMatrix);
+        textShader->SetUniformMatrix4fv("modelMatrix", modelMatrix);
 
         GLfloat vertices[] = {
             // Positions      // Texture Coordinates
@@ -103,7 +103,7 @@ glm::vec2 TextRenderer::MeasureText(const std::string& text, float scale) {
 
         totalLength += (character.advance >> 6) * scale;
         if (character.size.y > maxHeight) {
-            maxHeight = character.size.y;
+            maxHeight = static_cast<float>(character.size.y);
         }
     }
 
@@ -112,4 +112,11 @@ glm::vec2 TextRenderer::MeasureText(const std::string& text, float scale) {
 
 glm::vec2 TextRenderer::PixelsToNDC(glm::vec2 pixelPosition) {
     return glm::vec2((pixelPosition.x / Window::GetInstance().GetWidth()) * 2 - 1, (pixelPosition.y / Window::GetInstance().GetHeight()) * 2 - 1);
+}
+
+TextRenderer::~TextRenderer() {
+    characters.clear();
+
+    FT_Done_Face(fontFace);
+	FT_Done_FreeType(freeType);
 }
