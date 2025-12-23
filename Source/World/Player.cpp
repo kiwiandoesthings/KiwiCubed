@@ -22,7 +22,7 @@ Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(0, 
 	
 	entityData.name = "Player";
 	
-	entityData.physicsBoundingBox = PhysicsBoundingBox(glm::vec3(-0.3f, -1.62f, -0.3f), glm::vec3(0.3f, 0.18f, 0.3f));
+	entityData.physicsBoundingBox = BoundingBox(glm::vec3(-0.3f, -1.62f, -0.3f), glm::vec3(0.3f, 0.18f, 0.3f));
 
 	std::vector<AssetStringID> slotStringIDs;
 	slotStringIDs.reserve(27);
@@ -36,7 +36,7 @@ Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(0, 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 
-	playerData.gameMode = SURVIVAL;
+	playerData.gameMode = CREATIVE;
 
 	if (playerData.gameMode == CREATIVE) {
 		entityData.applyCollision = false;
@@ -100,7 +100,7 @@ void Player::Setup() {
 	}));
 
 	entityData.currentChunkPtr = chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
-	if (entityData.currentChunkPtr->id == 0) {
+	if (!entityData.currentChunkPtr->IsReal()) {
 		entityData.currentChunkPtr = nullptr;
 	}
 }
@@ -133,7 +133,7 @@ void Player::Update() {
 				std::make_pair("entity", this), 
 				std::make_pair("chunkHandler", chunkHandler));
 			entityData.currentChunkPtr = chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
-			if (entityData.currentChunkPtr->id == 0) {
+			if (!entityData.currentChunkPtr->IsReal()) {
 				entityData.currentChunkPtr = nullptr;
 			}
 		}
@@ -168,6 +168,8 @@ void Player::Update() {
 			}
 		}
 	});
+
+	std::cout << entityData.currentChunkPtr->GetHeightmapLevelAt(glm::vec2(entityData.localChunkPosition.x, entityData.localChunkPosition.z)) << std::endl;
 }
 
 void Player::QueryInputs() {

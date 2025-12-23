@@ -124,20 +124,13 @@ KiwiCubedEngine::KiwiCubedEngine() {
 	eventManager.RegisterEvent("event/settings/change_fov");
 	eventManager.AddEventToDo("event/settings/change_fov", [&](Event& event) {
 		OVERRIDE_LOG_NAME("Settings");
-		if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
-			INFO("Cannot change world settings while not loaded into world");
-			return;
-		}
-
-		Player& player = singleplayerHandler.GetWorld()->GetPlayer();
-		player.fov += 10;
-		if (player.fov > 120) {
-			player.fov = 30;
-		}
-
 		OrderedJSON configJSON = globals.GetConfigJSON();
 
-		configJSON["init_settings"]["fov"] = player.fov;
+		globals.fov += 10;
+		if (globals.fov > 120) {
+			globals.fov = 30;
+		}
+		configJSON["init_settings"]["fov"] = globals.fov;
 		std::ofstream configWrite("init_config.json");
 		if (!configWrite.is_open()) {
 			CRITICAL("Could not open the JSON config file, aborting");
@@ -145,6 +138,13 @@ KiwiCubedEngine::KiwiCubedEngine() {
 		}
 		configWrite << configJSON.dump(1, '\t');
 		configWrite.close();
+
+		if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
+			return;
+		}
+
+		Player& player = singleplayerHandler.GetWorld()->GetPlayer();
+		player.fov = globals.fov;
 	});
 
 	ui.Setup(*uiShaderProgram, uiAtlas, &textRenderer);

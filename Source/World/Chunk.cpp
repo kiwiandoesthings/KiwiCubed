@@ -11,6 +11,9 @@ Chunk::Chunk(int chunkX, int chunkY, int chunkZ, ChunkHandler& chunkHandler) : c
     totalChunks++;
 }
 
+bool Chunk::IsReal() {
+    return isRealChunk;
+}
 
 // Currently just sets up the VBO, VAO, and IBO
 void Chunk::SetupRenderComponents() {
@@ -41,11 +44,6 @@ void Chunk::AllocateChunk() {
     	0, 1, 2,
     	0, 2, 3
 	};
-
-    heightmap.bitsPerColumn = static_cast<int>(std::ceil(std::log2(chunkSize)));
-    heightmap.columnCount = chunkSize * chunkSize;
-    heightmap.heightmap.resize(((heightmap.columnCount * heightmap.bitsPerColumn) + 63) / 64, 0);
-    heightmap.heightmapMask.resize((heightmap.columnCount + 63) / 4, 0);
 
     isAllocated = true;
     generationStatus = 1;
@@ -362,51 +360,35 @@ bool Chunk::GenerateMesh(const bool remesh) {
     return true;
 }
 
-bool Chunk::GenerateHeightmap() {
+void Chunk::GenerateHeightmap() {
     OVERRIDE_LOG_NAME("Chunk Heightmap Generation");
     if (!isGenerated) {
         WARN("Tried to generate heightmap for ungenerated chunk {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
     }
-
-    int fullColumns = 0;
 
     for (int blockX = 0; blockX < chunkSize; blockX++) {
         for (int blockZ = 0; blockZ < chunkSize; blockZ++) {
             bool foundLevel = false;
             for (int blockY = chunkSize - 1; blockY >= 0 && foundLevel == false; blockY--) {
                 if (!GetBlock(blockX, blockY, blockZ).IsAir()) {
-                    int bitStart = (blockX + (blockZ * chunkSize)) * heightmap.bitsPerColumn;
-                    int longIndex = bitStart / 64;
-                    int bitOffset = bitStart % 64;
-
-                    int maskLongIndex = (blockX + (blockZ * chunkSize)) / 64;
-                    int maskBitIndex = (blockX + (blockZ * chunkSize)) % 64;
-
-                    uint64_t mask = ((1ULL << heightmap.bitsPerColumn) - 1) << bitOffset;
-                    heightmap.heightmap[longIndex] &= ~mask;
-                    heightmap.heightmap[longIndex] |= (uint64_t(blockY) << bitOffset);
-
-                    if (bitOffset + heightmap.bitsPerColumn > 64) {
-                        int bitsInNext = bitOffset + heightmap.bitsPerColumn - 64;
-                        heightmap.heightmap[longIndex + 1] &= ~((1ULL << bitsInNext) - 1);
-                        heightmap.heightmap[longIndex + 1] |= uint64_t(blockY) >> (heightmap.bitsPerColumn - bitsInNext);
-                    }
-
-                    bool fullColumn = (blockY == chunkSize - 1);
-                    if (fullColumn) {
-                        heightmap.heightmapMask[maskLongIndex] |= (1ULL << maskBitIndex);
-                        fullColumns++;
+                    if (blockY == chunkSize - 1) {
+                        heightmap.heightmap[blockX][blockZ] = 0;
+                        heightmap.heightmapMask[blockX][blockZ] = true;
                     } else {
-                        heightmap.heightmapMask[maskLongIndex] &= ~(1ULL << maskBitIndex);
+                        heightmap.heightmap[blockX][blockZ] = blockY + 1;
+                        heightmap.heightmapMask[blockX][blockZ] = false;
                     }
 
                     foundLevel = true;
                 }
             }
+
+            if (!foundLevel) {
+                heightmap.heightmap[blockX][blockZ] = 0;
+                heightmap.heightmapMask[blockX][blockZ] = false;
+            }
         }
     }
-
-    return fullColumns == chunkSize * chunkSize;
 }
 
 void Chunk::Render() {
@@ -422,6 +404,8 @@ void Chunk::SetPosition(int newChunkX, int newChunkY, int newChunkZ) {
     chunkX = newChunkX;
     chunkY = newChunkY;
     chunkZ = newChunkZ;
+
+    isRealChunk = true;
 }
 
 int Chunk::GetTotalBlocks() const {
@@ -452,30 +436,11 @@ int Chunk::GetHeightmapLevelAt(glm::ivec2 position) {
         return -1;
     }
 
-    int index = position.x + (position.y * chunkSize);
-
-    int maskLongIndex = index / 64;
-    int maskBitIndex = index % 64;
-
-    int full = (heightmap.heightmapMask[maskLongIndex] >> maskBitIndex) & 1ULL;
-
-    if (full) {
-        return -1;
+    if (heightmap.heightmapMask[position.x][position.y]) {
+        return 0;
+    } else {
+        return heightmap.heightmap[position.x][position.y];
     }
-
-    int bitStart = index * heightmap.bitsPerColumn;
-    int longIndex = bitStart / 64;
-    int bitOffset = bitStart % 64;
-
-    uint64_t value = (heightmap.heightmap[longIndex] >> bitOffset);
-    if (bitOffset + heightmap.bitsPerColumn > 64) {
-        int bitsInNext = bitOffset + heightmap.bitsPerColumn - 64;
-        value |= heightmap.heightmap[longIndex + 1] << (heightmap.bitsPerColumn - bitsInNext);
-    }
-
-    return static_cast<int>(value & ((1ULL << heightmap.bitsPerColumn) - 1));
-
-    return -1;
 }
 
 std::vector<GLfloat>& Chunk::GetVertices() {
@@ -522,7 +487,7 @@ bool Chunk::IsFull() {
 }
 
 void Chunk::DisplayImGui() {
-    ImGui::Text("Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %d, Indices: %d, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB, ID: %d", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, static_cast<int>(vertices.size()), static_cast<int>(indices.size()), vertexBufferObject.vertexBufferObjectID, vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID, static_cast<int>(static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) / 1024.0), id);
+    ImGui::Text("Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %d, Indices: %d, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, static_cast<int>(vertices.size()), static_cast<int>(indices.size()), vertexBufferObject.vertexBufferObjectID, vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID, static_cast<int>(static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) / 1024.0));
 }
 
 void Chunk::Delete() {
@@ -540,10 +505,9 @@ void Chunk::Delete() {
 
     debugVisualizationVertices.clear();
     debugVisualizationIndices.clear();
-
-    totalChunks--;
 }
 
 Chunk::~Chunk() {
     Delete();
+    totalChunks--;
 }

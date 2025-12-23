@@ -34,15 +34,10 @@ class World;
 
 
 struct ChunkHeightmap {
-    std::vector<uint64_t> heightmap;
-    std::vector<uint64_t> heightmapMask;
-
-    int bitsPerColumn;
-    int columnCount;
-
-    int maskBitsPerColumns;
-    int maskColumncount;
+    unsigned char heightmap[chunkSize][chunkSize];
+    bool heightmapMask[chunkSize][chunkSize];
 };
+
 
 // I don't even kind of know what is happening here
 // Seriously what the hell
@@ -51,43 +46,6 @@ struct TripleHash {
     std::size_t operator() (const std::tuple<T1, T2, T3>& tuple) const {
         return std::hash<T1>()(std::get<0>(tuple)) ^ std::hash<T2>()(std::get<1>(tuple)) ^ std::hash<T3>()(std::get<2>(tuple));
     }
-};
-
-
-class ObservableInt {
-    private:
-        unsigned short value;
-
-    public:
-        ObservableInt(int value = 0) : value(value) {}
-
-        ObservableInt& operator=(int newValue) {
-            return AssignValue(newValue, __FILE__, __LINE__);
-        }
-
-        ObservableInt& AssignValue(int newValue, const char* file, int line) {
-            if (value != newValue) {
-                int oldValue = value;
-                value = newValue;
-                OnValueChanged(oldValue, file, line);
-            }
-            return *this;
-        }
-
-        void OnValueChanged(int oldValue, const char* file, int line) {
-            OVERRIDE_LOG_NAME("Observable Int");
-            const char* filename = strrchr(file, '/');
-            if (!filename) {
-                filename = strrchr(file, '\\');
-            }
-            filename = filename ? filename + 1 : file;
-
-            INFO("Value changed from " + std::to_string(oldValue) + " to " + std::to_string(value) + " at " + filename + ":" + std::to_string(line));
-        }
-
-        int GetValue() const {
-            return value;
-        }
 };
 
 
@@ -110,7 +68,6 @@ class Chunk {
         bool shouldGenerate = true;
         bool shouldDelete = false;
         unsigned int totalMemoryUsage;
-        unsigned int id = 0;
         ChunkHandler& chunkHandler;
 
         Chunk(int chunkX, int chunkY, int chunkZ, ChunkHandler& chunkHandler);
@@ -121,11 +78,12 @@ class Chunk {
         Chunk(Chunk&& other) noexcept;
         Chunk& operator=(Chunk&& other) noexcept;
 
+        bool IsReal();
         void SetupRenderComponents();
         void AllocateChunk();
         bool GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerChunk, bool debug);
         bool GenerateMesh(const bool remesh);
-        bool GenerateHeightmap();
+        void GenerateHeightmap();
         void Render();
 
         inline Block& GetBlock(const unsigned char blockX, const unsigned char blockY, const unsigned char blockZ) {
@@ -157,7 +115,8 @@ class Chunk {
         void Delete();
     
     private:
-        const int debugVertexScale = 1;
+        bool isRealChunk = false;
+        int debugVertexScale = 1;
 
         Renderer renderer;
 
@@ -199,6 +158,9 @@ class ChunkHandler {
 
         void AddBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, unsigned short newBlockID);
         void RemoveBlock(int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ);
+
+        static int MakeUniqueIDFromVec3(int x, int y, int z);
+        static int MakeUniqueIDFromVec2(int x, int y);
 
     private:
         World& world;

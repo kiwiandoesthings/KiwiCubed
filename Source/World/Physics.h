@@ -14,23 +14,19 @@ class Entity;
 struct EntityData;
 
 
-struct PhysicsBoundingBox {
+struct BoundingBox {
 	glm::vec3 corner1;
 	glm::vec3 corner2;
+
+	float width;
+	float height;
+	float length;
 
 	glm::vec3 Midpoint(const glm::vec3 position) const {
 		return glm::vec3((corner1.x + corner2.x) / 2,(corner1.y + corner2.y) / 2, (corner1.z + corner2.z) / 2);
 	}
 
-	PhysicsBoundingBox(glm::vec3 corner1, glm::vec3 corner2) : corner1(corner1), corner2(corner2) {}
-};
-
-// For the future
-struct InteractionBoundingBox {
-	glm::vec3 corner1;
-	glm::vec3 corner2;
-
-	InteractionBoundingBox(glm::vec3 corner1, glm::vec3 corner2) : corner1(corner1), corner2(corner2) {}
+	BoundingBox(glm::vec3 corner1, glm::vec3 corner2) : corner1(corner1), corner2(corner2), width(abs(corner1.x - corner2.x)), height(abs(corner1.y - corner2.y)), length(abs(corner1.z - corner2.z)) {}
 };
 
 struct FullBlockPosition {

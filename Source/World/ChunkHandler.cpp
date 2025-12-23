@@ -29,7 +29,7 @@ Chunk* ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotF
         return chunk->second.get();
     }
     else {
-        //INFO("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        DEBUG("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
         if (addIfNotFound) {
             Chunk* chunk = AddChunkUnlocked(chunkX, chunkY, chunkZ);
             return chunk;
@@ -147,7 +147,7 @@ Chunk* ChunkHandler::GetChunkUnlocked(int chunkX, int chunkY, int chunkZ, bool a
         return chunk->second.get();
     }
     else {
-        //INFO("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
+        DEBUG("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
         if (addIfNotFound) {
             Chunk* chunk = AddChunkUnlocked(chunkX, chunkY, chunkZ);
             return chunk;
@@ -164,12 +164,32 @@ Chunk* ChunkHandler::AddChunkUnlocked(int chunkX, int chunkY, int chunkZ) {
         chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
         chunk->second->SetPosition(chunkX, chunkY, chunkZ);
         chunk->second->AllocateChunk();
-        chunk->second->id = Chunk::totalChunks;
 
         return chunk->second.get();
     } else {
         return nullptr;
     }
+}
+
+int ChunkHandler::MakeUniqueIDFromVec3(int x, int y, int z) {
+    return MakeUniqueIDFromVec2(MakeUniqueIDFromVec2(x, y), z);
+}
+
+int ChunkHandler::MakeUniqueIDFromVec2(int x, int y) {
+    int a = 0;
+    if (x >= 0) {
+        a = x * 2;
+    } else {
+        a = (x * -2) - 1;
+    }
+    int b = 0;
+    if (y >= 0) {
+        b = y * 2;
+    } else {
+        b = (y * -2) - 1;
+    }
+
+    return ((a + b) * (a + b + 1) / 2) + b;
 }
 
 void ChunkHandler::Delete() {

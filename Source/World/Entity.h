@@ -41,8 +41,8 @@ struct EntityData {
 
 	float terminalVelocity = 100.0f;
 
-	PhysicsBoundingBox physicsBoundingBox = PhysicsBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	InteractionBoundingBox interactionBoundingBox = InteractionBoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	BoundingBox physicsBoundingBox = BoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	BoundingBox interactionBoundingBox = BoundingBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	std::string name = "";
 

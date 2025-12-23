@@ -37,9 +37,20 @@ void World::Setup() {
 
     player.fov = configJSON["init_settings"]["fov"];
 
+    bool foundPosition = false;
     for (int chunkX = 2; chunkX < worldSizeHorizontal - 2; chunkX++) {
+        if (foundPosition) {
+             continue;
+        }
         for (int chunkZ = 2; chunkZ < worldSizeHorizontal - 2; chunkZ++) {
-            for (int chunkY = worldSizeHorizontal; chunkY > 0; chunkY--) {
+            if (foundPosition) {
+                continue;
+            }
+            for (int chunkY = worldSizeHorizontal; chunkY >= 0; chunkY--) {
+                if (foundPosition) {
+                    continue;
+                }
+
                 Chunk* chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
 
                 if (chunk == nullptr) {
@@ -53,14 +64,18 @@ void World::Setup() {
                 for (unsigned int x = 0; x < chunkSize; ++x) {
                     for (unsigned int z = 0; z < chunkSize; ++z) {
                         int level = chunk->GetHeightmapLevelAt(glm::vec2(x, z));
-                        if (level != -1) {
-                            player.SetPosition(static_cast<float>((chunk->chunkX * chunkSize) + x), static_cast<float>((chunk->chunkY * chunkSize) + level + 3), static_cast<float>((chunk->chunkZ * chunkSize) + z));
-                            return;
+                        if (level != 0) {
+                            player.SetPosition(static_cast<float>((chunk->chunkX * chunkSize) + x), static_cast<float>((chunk->chunkY * chunkSize) + level - player.GetEntityData().physicsBoundingBox.corner1.y) + 1, static_cast<float>((chunk->chunkZ * chunkSize) + z));
+                            foundPosition = true;
                         }
                     }
                 }
             }
         }
+    }
+
+    if (!foundPosition) {
+        WARN("Could not find suitable position to spawn player");
     }
 }
 
@@ -333,7 +348,7 @@ void World::Update() {
         glm::ivec3 chunkPosition = chunkUnloadingQueueCopy.front();
         Chunk* chunk = chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
         chunkUnloadingQueueCopy.pop();
-        if (chunk->id == 0) {
+        if (!chunk->IsReal()) {
             WARN("Trying to unload already unloaded chunk at position {" + std::to_string(chunkPosition.x) + ", " + std::to_string(chunkPosition.y) + ", " + std::to_string(chunkPosition.z) + "}, aborting");
             return;
         }
@@ -391,7 +406,7 @@ void World::DisplayImGui(unsigned int option) {
 			static_cast<int>(player.GetEntityData().localChunkPosition.x), 
 			static_cast<int>(player.GetEntityData().localChunkPosition.y),
 			static_cast<int>(player.GetEntityData().localChunkPosition.z));
-		ImGui::Text("Current chunk generation status and blocks %d, %d, %d",
+		ImGui::Text("Current chunk generation status and blocks %d, %d",
 			GetChunk(
 				player.GetEntityData().globalChunkPosition.x,
 				player.GetEntityData().globalChunkPosition.y,
@@ -399,11 +414,7 @@ void World::DisplayImGui(unsigned int option) {
 			GetChunk(
 				player.GetEntityData().globalChunkPosition.x,
 				player.GetEntityData().globalChunkPosition.y,
-				player.GetEntityData().globalChunkPosition.z)->GetTotalBlocks(),
-			GetChunk(
-				player.GetEntityData().globalChunkPosition.x,
-				player.GetEntityData().globalChunkPosition.y,
-				player.GetEntityData().globalChunkPosition.z)->id);
+				player.GetEntityData().globalChunkPosition.z)->GetTotalBlocks());
     }
 
     if (option == 1) {
