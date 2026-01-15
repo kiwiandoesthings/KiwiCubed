@@ -34,7 +34,7 @@ ModHandler& ModHandler::GetInstance() {
 }
 
 
-bool ModHandler::SetupTextureAtlasData() {
+bool ModHandler::LoadModData() {
     OVERRIDE_LOG_NAME("Mod Loading");
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
 
@@ -52,14 +52,14 @@ bool ModHandler::SetupTextureAtlasData() {
                 return false;
             }
 
-            OrderedJSON configJSON;
-            file >> configJSON;
+            OrderedJSON modJSON;
+            file >> modJSON;
 
-            std::string name = configJSON["mod_title"];
-            std::string version = configJSON["mod_version"];
-            std::string authors = configJSON["mod_authors"];
-            std::string builtForVersion = configJSON["built_for_game_version"];
-            std::string modNamespace = configJSON["namespace"];
+            std::string name = modJSON["mod_title"];
+            std::string version = modJSON["mod_version"];
+            std::string authors = modJSON["mod_authors"];
+            std::string builtForVersion = modJSON["built_for_game_version"];
+            std::string modNamespace = modJSON["namespace"];
 
             if (builtForVersion != Globals::GetInstance().projectVersion) {
                 WARN("Mod below is built for different game version than currently running!");
@@ -362,11 +362,22 @@ bool ModHandler::SetupTextureAtlasData() {
                             std::vector<TextureAtlasData>* entityTextureData = assetManager.GetTextureAtlasData(textureStructID);
                             Model* entityModel = assetManager.GetEntityModel(modelStructID);
 
-                            EntityManager::GetInstance().RegisterEntity(EntityType{
+                            std::unordered_map<std::string, std::string> eventsToCallbacks;
+                            std::vector<std::string> callbacks;
+
+                            for (const auto& [event, callback] : configJSON["eventCallbacks"].items()) {
+                                eventsToCallbacks.insert({event, callback});
+                                callbacks.push_back(callback);
+                            }
+
+                            entityManager.RegisterEntityType(EntityType{
                                 entityStringID,
+                                eventsToCallbacks,
                                 MetaEntityModel{modelStructID, *entityModel},
                                 MetaTexture{textureStructID, *entityTextureData}
                             });
+
+                            modToEntityCallbacks.insert({modNamespace, callbacks});
                         }
                     }
                 }
@@ -423,12 +434,24 @@ bool ModHandler::LoadModScripts() {
 
         m3_LinkRawFunction(modModule, "env", "KC_Log", "v(*)", &KC_Log_WASM);
         m3_LinkRawFunction(modModule, "env", "KC_AddEventToDo", "v(**)", &KC_AddEventToDo_WASM);
+        //m3_LinkRawFunction(modModule, "env", "KC_GetEventData", )
         m3_LinkRawFunction(modModule, "env", "KC_GetTextureNumericalID", "i(**)", &KC_GetTextureNumericalID_WASM);
         
         IM3Function entrypoint;
         if (m3_FindFunction(&entrypoint, modRuntime, "Initialize")) {
             ERR("Could not find entrypoint (Initialize) function in mod with namespace \"" + modNamespace + "\", aborting");
             return false;
+        }
+
+        auto entityCallbacks = modToEntityCallbacks.find(modNamespace);
+        if (entityCallbacks != modToEntityCallbacks.end()) {
+            for (std::string callback : entityCallbacks->second) {
+                IM3Function callbackFunction;
+                if (m3_FindFunction(&callbackFunction, modRuntime, callback.c_str())) {
+                    ERR("Could not find entity-registered callback function \"" + callback + "\" in mod with namespace \"" + modNamespace + "\"");
+                    return false;
+                }
+            }
         }
 
         m3_CallV(entrypoint);

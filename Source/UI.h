@@ -32,6 +32,7 @@ class UI {
 
         void AddScreen(UIScreen screen);
         void SetCurrentScreen(const std::string screenName);
+        void MoveScreenBack();
 
         UIScreen* GetScreen(const std::string& screenName);
         UIScreen* GetCurrentScreen();
@@ -96,11 +97,10 @@ class UIScreen {
 
 class UIElement {
     public:
-        UIElement(glm::vec2 position, glm::vec2 scale, std::string eventToTrigger);
+        UIElement(glm::vec2 position, glm::vec2 scale, std::function<void()> functionToTrigger);
         virtual ~UIElement();
         
         static glm::vec2 PixelsToNDC(glm::vec2 pixelPosition);
-        static float PositionToNDC(float number);
 
         virtual void Render();
 
@@ -116,8 +116,6 @@ class UIElement {
         glm::ivec2* GetScale();
         glm::vec2* GetSize();
 
-        std::string* GetEventTrigger();
-
         bool GetSelected();
         virtual void SetSelected(bool selected);
 
@@ -126,7 +124,7 @@ class UIElement {
         glm::vec2 position = glm::vec2(0, 0);
         glm::ivec2 scale = glm::ivec2(1, 1);
         glm::vec2 size = glm::vec2(512, 128);
-        std::string eventToTrigger = "";
+        std::function<void()> functionToTrigger = nullptr;
         bool tabSelected = false;
         bool hoverSelected = false;
 
@@ -136,7 +134,7 @@ class UIElement {
 
 class UIButton : public UIElement {
     public:
-        UIButton(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, std::string elementLabel);
+        UIButton(glm::vec2 position, glm::vec2 size, std::function<void()> functionToTrigger, std::string elementLabel);
         
         void Render() override;
 
@@ -157,7 +155,7 @@ class UIButton : public UIElement {
 
 class UIImage : public UIElement {
     public:
-        UIImage(glm::vec2 position, glm::vec2 size, std::string eventToTrigger, AssetStringID imageStringID, AssetStringID textureAtlasStringID);
+        UIImage(glm::vec2 position, glm::vec2 size, std::function<void()> functionToTrigger, AssetStringID imageStringID, AssetStringID textureAtlasStringID);
 
         static void Render(glm::vec2 position, glm::vec2 size, TextureAtlasData atlasData, Texture* atlas);
         void Render() override;

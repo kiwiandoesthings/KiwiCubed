@@ -5,7 +5,9 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void WindowFocusCallback(GLFWwindow* window, int focused);
 
 
-KiwiCubedEngine::KiwiCubedEngine() {
+KiwiCubedEngine::KiwiCubedEngine() {}
+
+int KiwiCubedEngine::StartEngine() {
 	OVERRIDE_LOG_NAME("Initialization");
     INFO("Running KiwiCubed version {" + globals.projectVersion + "}");
 	if (globals.debugMode) {
@@ -13,12 +15,7 @@ KiwiCubedEngine::KiwiCubedEngine() {
 	}
 
 	// Initialize GLFW
-    if (glfwInit()) {
-        INFO("Successfully initialized GLFW");
-    } else {
-        CRITICAL("Failed to initialize GLFW, aborting");
-        psnip_trap();
-    }
+	LOG_CHECK_RETURN_CRITICAL(glfwInit(), "Successfully initialized GLFW", "Failed to initialize GLFW, aborting", -1);
 
 	// Create a window
 	GLFWCallbacks callbacks = GLFWCallbacks{
@@ -28,12 +25,7 @@ KiwiCubedEngine::KiwiCubedEngine() {
 	glfwWindow = globalWindow.CreateGLFWWindow(globals.windowWidth, globals.windowHeight, std::string(globals.windowTitle + globals.projectVersion).c_str(), globals.windowType.c_str(), callbacks);
 
     // Initialize glad
-    if(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        INFO("Successfully initialized GLAD");
-    } else {
-        CRITICAL("Failed to initialize GLAD, exiting");
-        psnip_trap();
-    }
+	LOG_CHECK_RETURN_CRITICAL(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Successfully initialized GLAD", "Failed to initialize GLAD, aborting", -1);
 
 	// Setup ImGui
 	IMGUI_CHECKVERSION();
@@ -74,9 +66,9 @@ KiwiCubedEngine::KiwiCubedEngine() {
 
 	// Initialize FreeType
 	FT_Library ft;
-    LOG_CHECK_CRITICAL(!FT_Init_FreeType(&ft), "Successfully initialized FreeType", "Failed to initialize FreeType, exiting");
+    LOG_CHECK_RETURN_CRITICAL(!FT_Init_FreeType(&ft), "Successfully initialized FreeType", "Failed to initialize FreeType, exiting", -1);
     FT_Face face;
-    LOG_CHECK_CRITICAL(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf, exiting");
+    LOG_CHECK_RETURN_CRITICAL(!FT_New_Face(ft, "Mods/kiwicubed/Resources/Fonts/PixiFont.ttf", 0, &face), "Successfully loaded font PixiFont.ttf", "Failed to load font PixiFont.ttf, exiting", -1);
     FT_Set_Pixel_Sizes(face, 0, 32);
 
 	std::unique_ptr<Shader> textShader = std::make_unique<Shader>("Mods/kiwicubed/Resources/Shaders/Text_Vertex.vert", "Mods/kiwicubed/Resources/Shaders/Text_Fragment.frag");
@@ -113,8 +105,8 @@ KiwiCubedEngine::KiwiCubedEngine() {
 	singleplayerHandler.Setup(debugRenderer);
 
 	// Mods
-	LOG_CHECK_BAD_CRITICAL(modHandler.SetupTextureAtlasData(), "Failed to setup texture atlas data, exiting");
-	LOG_CHECK_BAD_CRITICAL(modHandler.LoadModScripts(), "Failed to load mod scripts, exiting");
+	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.LoadModData(), "Failed to load mod data, exiting", -1);
+	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.LoadModScripts(), "Failed to load mod scripts, exiting", -1);
 
 	// "temporary" setup of certain events in main
 	eventManager.RegisterEvent("event/close_game");
@@ -149,21 +141,37 @@ KiwiCubedEngine::KiwiCubedEngine() {
 
 	ui.Setup(*uiShaderProgram, uiAtlas, &textRenderer);
 	UIScreen mainMenuUI = UIScreen("ui/main_menu");
-	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/generate_world", "Create World"));
-	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
-	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "event/close_game", "Exit"));
+	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), [&]() {
+		eventManager.TriggerEvent("event/generate_world");
+	}, "Create World"));
+	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
+		ui.SetCurrentScreen("ui/settings");
+	}, "Settings"));
+	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), [&]() {
+		eventManager.TriggerEvent("event/close_game");
+	}, "Exit"));
 	ui.AddScreen(std::move(mainMenuUI));
 	ui.SetCurrentScreen("ui/main_menu");
 
 	UIScreen settingsUI = UIScreen("ui/settings");
-	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/settings/change_fov", "Change FOV"));
-	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "event/back_ui", "Back"));
+	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), [&]() {
+		eventManager.TriggerEvent("event/settings/change_fov");
+	}, "Change FOV"));
+	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
+		ui.MoveScreenBack();
+	}, "Back"));
 	ui.AddScreen(std::move(settingsUI));
 
 	UIScreen gamePauseUI = UIScreen("ui/game_pause");
-	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "event/disable_ui", "Resume game"));
-	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "ui/move_screen_settings", "Settings"));
-	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "event/unload_world", "Quit Game"));
+	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), [&]() {
+		ui.DisableUI();
+	}, "Resume game"));
+	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
+		ui.SetCurrentScreen("ui/settings");
+	}, "Settings"));
+	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), [&]() {
+		eventManager.TriggerEvent("event/unload_world");
+	}, "Quit Game"));
 	ui.AddScreen(std::move(gamePauseUI));
 }
 
@@ -191,14 +199,20 @@ bool KiwiCubedEngine::RunGameLoop() {
 			startTime = endTime;
 		}
 
-		//if (std::cin.rdbuf()->in_avail() > 0) {
-		//	std::string input;
-		//	std::getline(std::cin, input);
-		//
-		//	eventManager.TriggerEvent(input);
-		//}
+		static char input[256] = {};
 
 		ImGui::Begin("Debug");
+		ImGui::InputText(
+		    "##console",
+		    input,
+		    sizeof(input),
+		    ImGuiInputTextFlags_EnterReturnsTrue
+		);
+
+		if (ImGui::IsItemDeactivatedAfterEdit()) {
+		    eventManager.TriggerEvent(input);
+		    input[0] = '\0';
+		}
 		ImGui::Text("Total frames: %d", frames);
 		ImGui::Text("FPS: %.2f", fps);
 		ImGui::Text("DeltaTime: %.6f", globals.deltaTime);

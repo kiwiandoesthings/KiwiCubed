@@ -14,6 +14,7 @@
 #include <glm/gtx/extend.hpp>
 
 #include "ChunkHandler.h"
+#include "EntityManager.h"
 #include "Player.h"
 #include "Shader.h"
 #include "ThreadPool.h"
@@ -108,7 +109,6 @@ class World {
 		unsigned int worldSizeHorizontal;
 		unsigned int worldSizeVertical;
 		Player player = Player(0, 0, 0, this);
-		std::vector<std::unique_ptr<Entity>> entities;
 		ChunkHandler chunkHandler;
 		SingleplayerHandler* singleplayerHandler;
 
@@ -117,7 +117,6 @@ class World {
 		std::vector<GLfloat> chunkDebugVisualizationVertices;
 		std::vector<GLuint> chunkDebugVisualizationIndices;
 		std::vector<glm::ivec3> chunkDebugVisualizationColors;
-
 		std::vector<glm::vec4> chunkOrigins;
 
 		// Batch rendering later..?

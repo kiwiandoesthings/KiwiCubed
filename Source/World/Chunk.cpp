@@ -54,12 +54,10 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
     if (isGenerated) {
         //CRITICAL("Trying to generate blocks after they had already been generated, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
         //psnip_trap();
-        return false;
     }
     if (!isAllocated) {
         CRITICAL("Trying to generate blocks for unallocated chunk, aborting. (This should never happen, report a bug if you encounter this, thanks) {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}");
         psnip_trap();
-        return false;
     }
 
     std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();

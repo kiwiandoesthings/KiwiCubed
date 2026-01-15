@@ -23,6 +23,15 @@
 #include "AssetManager.h"
 
 
+enum BlockEventType {
+	BLOCK_MINED,
+	BLOCK_PLACED,
+	BLOCK_REPLACED,
+	BLOCK_INTERACTED,
+	BLOCK_TICK_UPDATE,
+	BLOCK_NEIGHBOR_UPDATE
+};
+
 enum FaceDirection {
     FRONT,
     BACK,

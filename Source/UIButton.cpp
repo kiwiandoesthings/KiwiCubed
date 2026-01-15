@@ -1,7 +1,7 @@
 #include "UI.h"
 #include "TextRenderer.h"
 
-UIButton::UIButton(glm::vec2 position, glm::vec2 scale, std::string eventToTrigger, std::string elementLabel) : UIElement(position, scale, eventToTrigger), elementLabel(elementLabel) {
+UIButton::UIButton(glm::vec2 position, glm::vec2 scale, std::function<void()> functionToTrigger, std::string elementLabel) : UIElement(position, scale, functionToTrigger), elementLabel(elementLabel) {
     UIButton::size = glm::vec2(512, 128) * glm::vec2(scale.x, scale.y);
     image = MetaTexture{{"kiwicubed", "texure/button"}, *assetManager.GetTextureAtlasData({"kiwicubed", "texture/button"})};
 }
@@ -72,11 +72,11 @@ void UIButton::Render() {
 }
 
 bool UIButton::OnClick() {
-    if (!GetHovered() || eventToTrigger == "") {
+    if (!GetHovered() || functionToTrigger == nullptr) {
         return false;
     }
 
-    EventManager::GetInstance().TriggerEvent(eventToTrigger);
+    Trigger();
     return true;
 }
 
@@ -86,4 +86,8 @@ void UIButton::OnHover() {
 
 void UIButton::SetSelected(bool selected) {
     tabSelected = selected;
+}
+
+std::string* UIButton::GetElementLabel() {
+    return &elementLabel;
 }

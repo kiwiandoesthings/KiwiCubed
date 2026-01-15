@@ -63,6 +63,12 @@ public:
         }
     }
 
+    void RegisterCallbackOnMouseButtons(std::vector<int> mouseButtons, KeyCallback callback) {
+        for (int button : mouseButtons) {
+            RegisterMouseButtonCallback(button, callback);
+        }
+    }
+
     unsigned int RegisterKeyCallback(int key, KeyCallback callback) {
         OVERRIDE_LOG_NAME("Input Handler");
         keyCallbacks[key].push_back(KeyCallbackWrapper{callback, latestID + 1, instanceID});

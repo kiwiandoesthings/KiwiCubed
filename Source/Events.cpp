@@ -5,6 +5,10 @@ EventManager& EventManager::GetInstance() {
     return instance;
 }
 
+bool EventManager::RegisterEventToEntityType(EventType eventType) {
+	
+}
+
 void EventManager::RegisterEvent(const std::string& eventName) {
     OVERRIDE_LOG_NAME("Events");
     if (eventMap.find(eventName) != eventMap.end()) {
@@ -65,15 +69,17 @@ void EventManager::Delete() {
     }
 }
 
-void Event::SetData(const std::string& key, std::any data) {
-    eventData[key] = std::move(data);
+void Event::SetData(void* newEventData, size_t newEventDataSize) {
+    eventData = newEventData;
+	eventDataSize = newEventDataSize;
 }
 
 void Event::TriggerEvent() {
     for (auto& todo : eventToDo) {
         todo(*this);
     }
-    eventData.clear();
+    eventData = nullptr;
+	eventDataSize = 0;
 }
 
 void Event::AddToDo(std::function<void(Event&)> todo) {

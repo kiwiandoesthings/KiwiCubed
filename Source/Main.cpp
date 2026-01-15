@@ -69,7 +69,7 @@ int main() {
 	#endif
 
 	KiwiCubedEngine kiwiCubed;
-	OVERRIDE_LOG_NAME("Game Loop");
+	LOG_CHECK_CRITICAL(kiwiCubed.StartEngine() != 0, "Successfully initialized KiwiCubed Engine", "Error returned while initializing KiwiCubed Engine", -1);
 	LOG_CHECK_RETURN_BAD_CRITICAL(kiwiCubed.RunGameLoop(), "Error returned while running game loop, aborting", -1);
 
 	return 0;

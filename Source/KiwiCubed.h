@@ -21,6 +21,7 @@ class KiwiCubedEngine {
     public:
         KiwiCubedEngine();
 
+        int StartEngine();
         bool RunGameLoop();
         void Exit();
 

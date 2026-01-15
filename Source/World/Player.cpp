@@ -36,7 +36,7 @@ Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(0, 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_LEFT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterMouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, std::bind(&Player::MouseButtonCallback, this, std::placeholders::_1)));
 
-	playerData.gameMode = CREATIVE;
+	playerData.gameMode = SURVIVAL;
 
 	if (playerData.gameMode == CREATIVE) {
 		entityData.applyCollision = false;
@@ -61,7 +61,7 @@ void Player::Setup() {
 	UIScreen inventoryUI = UIScreen("ui/inventory");
 	int containerX = (globalWindow.GetWidth() / 2) - 576;
 	int containerY = (globalWindow.GetHeight() / 2) - 192;
-	inventoryUI.AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), "event/blank", AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
+	//inventoryUI.AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), [&](){}, AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
 	UI::GetInstance().AddScreen(std::move(inventoryUI));
 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
@@ -81,17 +81,17 @@ void Player::Setup() {
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int key) {
 		UI& ui = UI::GetInstance();
 		if (ui.IsDisabled()) {
-			eventManager.TriggerEvent("ui/move_screen_game_pause");
+			ui.SetCurrentScreen("ui/game_pause");
 			Window::GetInstance().SetFocused(false);
 		} else {
-			eventManager.TriggerEvent("event/back_ui");
+			UI::GetInstance().MoveScreenBack();
 		}
 	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_E, [&](int key) {
 		if (!inInterface) {
-			EventManager::GetInstance().TriggerEvent("ui/move_screen_inventory");
+			UI::GetInstance().SetCurrentScreen("ui/inventory");
 		} else {
-			EventManager::GetInstance().TriggerEvent("event/back_ui");
+			UI::GetInstance().MoveScreenBack();
 		}
 		inInterface = !inInterface;
 	}));
@@ -169,7 +169,7 @@ void Player::Update() {
 		}
 	});
 
-	std::cout << entityData.currentChunkPtr->GetHeightmapLevelAt(glm::vec2(entityData.localChunkPosition.x, entityData.localChunkPosition.z)) << std::endl;
+	//std::cout << entityData.currentChunkPtr->GetHeightmapLevelAt(glm::vec2(entityData.localChunkPosition.x, entityData.localChunkPosition.z)) << std::endl;
 }
 
 void Player::QueryInputs() {
@@ -305,7 +305,7 @@ void Player::MouseButtonCallback(int button) {
 				case LEFT:
 					if (blockPosition.x - 1 < 0) {
 						placingBlockPosition.x = chunkSize - 1;
-						placingChunkPosition -= 1;
+						placingChunkPosition.x -= 1;
 						remesh = true;
 					} else {
 						placingBlockPosition.x -= 1;
@@ -315,7 +315,7 @@ void Player::MouseButtonCallback(int button) {
 				case RIGHT:
 					if (blockPosition.x + 1 == chunkSize - 1) {
 						placingBlockPosition.x = 0;
-						placingChunkPosition += 1;
+						placingChunkPosition.x += 1;
 						remesh = true;
 					} else {
 						placingBlockPosition.x += 1;
@@ -325,7 +325,7 @@ void Player::MouseButtonCallback(int button) {
 				case BOTTOM:
 					if (blockPosition.y - 1 < 0) {
 						placingBlockPosition.y = chunkSize - 1;
-						placingChunkPosition -= 1;
+						placingChunkPosition.y -= 1;
 						remesh = true;
 					} else {
 						placingBlockPosition.y -= 1;
@@ -335,7 +335,7 @@ void Player::MouseButtonCallback(int button) {
 				case TOP:
 					if (blockPosition.y + 1 == chunkSize - 1) {
 						placingBlockPosition.y = 0;
-						placingChunkPosition += 1;
+						placingChunkPosition.y += 1;
 						remesh = true;
 					} else {
 						placingBlockPosition.y += 1;
@@ -345,7 +345,7 @@ void Player::MouseButtonCallback(int button) {
 				case BACK:
 					if (blockPosition.z - 1 < 0) {
 						placingBlockPosition.z = chunkSize - 1;
-						placingChunkPosition -= 1;
+						placingChunkPosition.z -= 1;
 						remesh = true;
 					} else {
 						placingBlockPosition.z -= 1;
@@ -355,7 +355,7 @@ void Player::MouseButtonCallback(int button) {
 				case FRONT:
 					if (blockPosition.z + 1 == chunkSize - 1) {
 						placingBlockPosition.z = 0;
-						placingChunkPosition += 1;
+						placingChunkPosition.z += 1;
 						remesh = true;
 					} else {
 						placingBlockPosition.z += 1;
@@ -383,6 +383,7 @@ void Player::MouseButtonCallback(int button) {
 					}
 					entityData.inventory.SetSlot(slotStringID, newSlot);
 					usingSlotIndex = slotIndex;
+					break;
 				}
 				if (usingSlotIndex == -1) {
 					return;

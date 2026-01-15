@@ -17,6 +17,7 @@ class World;
 
 struct EntityType {
 	AssetStringID entityStringID;
+	std::unordered_map<std::string, std::string> eventsToCallbacks;
 
 	MetaEntityModel metaModel;
 	MetaTexture metaTexture;

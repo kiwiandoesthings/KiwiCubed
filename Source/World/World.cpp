@@ -20,8 +20,14 @@ World::World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, S
     
     isWorldAllocated = true;
 
-	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    // World noise presets? This would be called 'spires' keeping as default for now because I don't want to forget settings
 	noise.SetSeed(static_cast<unsigned int>(std::time(nullptr)));
+	noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+    noise.SetFractalOctaves(5);
+    noise.SetFractalLacunarity(2);
+    noise.SetFractalGain(0.5f);
+    noise.SetFractalWeightedStrength(5.0f);
 }
 
 void World::Setup() {
@@ -94,12 +100,12 @@ void World::Render(Shader shaderProgram) {
             chunk->Render();
         }
     }
+    GLCall(glDisable(GL_CULL_FACE));
 
     assetManager.GetShaderProgram({"kiwicubed", "entity_shader"})->Bind();
-    for (int iterator = 0; iterator < entities.size(); iterator++) {
-        entities[iterator].get()->Render();
-    }
-    GLCall(glDisable(GL_CULL_FACE));
+    EntityManager::GetInstance().ForEachEntity([](Entity& entity) {
+        entity.Render();
+    });
 }
 
 void World::GenerateWorld() {
@@ -295,17 +301,16 @@ float World::GetPartialTicks() {
 }
 
 void World::SpawnItemFromBlock(glm::ivec3 chunkPosition, glm::ivec3 blockPosition, BlockType* blockType) {
-    entities.push_back(std::make_unique<Entity>(blockPosition.x + (chunkPosition.x * chunkSize) + 0.5, blockPosition.y + (chunkPosition.y * chunkSize) + 0.15, blockPosition.z + (chunkPosition.z * chunkSize) + 0.5, this));
-    Entity* entity = entities[entities.size() - 1].get();
-    entity->SetupRenderComponents(AssetStringID{"kiwicubed", "model/dropped_item"}, AssetStringID{"kiwicubed", "terrain_atlas"}, blockType->metaTextures[0].stringID);
+    //entities.push_back(std::make_unique<Entity>(blockPosition.x + (chunkPosition.x * chunkSize) + 0.5, blockPosition.y + (chunkPosition.y * chunkSize) + 0.15, blockPosition.z + (chunkPosition.z * chunkSize) + 0.5, this));
+    //Entity* entity = entities[entities.size() - 1].get();
+    //entity->SetupRenderComponents(AssetStringID{"kiwicubed", "model/dropped_item"}, AssetStringID{"kiwicubed", "terrain_atlas"}, blockType->metaTextures[0].stringID);
+    
 }
 
 void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
 
-    for (int iterator = 0; iterator < entities.size(); iterator++) {
-        entities[iterator]->Update();
-    }
+    EntityManager::GetInstance().EmitEvent("worldUpdate");
 
     std::vector<glm::ivec3> chunkGenerationQueueCopy;
     std::vector<glm::ivec3> chunkMeshingQueueCopy;

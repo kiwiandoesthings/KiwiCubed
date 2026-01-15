@@ -10,6 +10,10 @@ extern "C" {
     void KC_Log(const char* message);
     void KC_AddEventToDo(const char* eventName, const char* functionName);
     unsigned int KC_GetTextureNumericalID(const char* modName, const char* assetName);
+
+    void UpdateItemEntity() {
+        KC_Log("Item entity update");
+    }
     
     void PlayerMinedBlock() {
         KC_Log("Player mined a block");

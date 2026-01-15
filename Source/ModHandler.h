@@ -55,7 +55,7 @@ class ModHandler {
         static ModHandler& GetInstance();
         void Delete();
 
-        bool SetupTextureAtlasData(); 
+        bool LoadModData(); 
         bool LoadModScripts();
         bool RunModEntrypoints();
 
@@ -71,6 +71,7 @@ class ModHandler {
 
         std::vector<std::string> modNamespaces;
         std::unordered_map<std::string, std::string> modNamespacesToScripts;
+        std::unordered_map<std::string, std::vector<std::string>> modToEntityCallbacks;
         IM3Environment modEnvironment = m3_NewEnvironment();
         IM3Runtime modRuntime = m3_NewRuntime(modEnvironment, 512 * 1024, nullptr);
         std::vector<std::vector<uint8_t>> wasmModBuffers;

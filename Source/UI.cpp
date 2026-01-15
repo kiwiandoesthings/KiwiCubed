@@ -51,29 +51,10 @@ void UI::Setup(Shader shaderProgram, Texture atlas, TextRenderer* textRenderer) 
         }
     });
     inputHandler.RegisterKeyCallback(GLFW_KEY_ENTER, [&](int key) {
-        currentScreen->uiElements[currentScreen->GetTabIndex()]->Trigger();
-    });
-
-    EventManager& eventManager = EventManager::GetInstance();
-    eventManager.RegisterEvent("event/disable_ui");
-    eventManager.AddEventToDo("event/disable_ui", [&](Event& event) {
-        DisableUI();
-    });
-    eventManager.RegisterEvent("event/back_ui");
-    eventManager.AddEventToDo("event/back_ui", [&](Event& event) {
-        if (currentScreen == nullptr) {
+        if (currentScreen->GetTabIndex() == -1) {
             return;
         }
-        
-        if (!stackedScreens.empty()) {
-            stackedScreens.pop();
-            if (!stackedScreens.empty()) {
-                currentScreen = stackedScreens.top();
-            } else {
-                currentScreen = nullptr;
-                window->SetFocused(true);
-            }
-        }
+        currentScreen->uiElements[currentScreen->GetTabIndex()]->Trigger();
     });
 }
 
@@ -97,6 +78,22 @@ void UI::SetCurrentScreen(const std::string screenName) {
     currentScreen = uiScreen;
 }
 
+void UI::MoveScreenBack() {
+    if (currentScreen == nullptr) {
+        return;
+    }
+    
+    if (!stackedScreens.empty()) {
+        stackedScreens.pop();
+        if (!stackedScreens.empty()) {
+            currentScreen = stackedScreens.top();
+        } else {
+            currentScreen = nullptr;
+            window->SetFocused(true);
+        }
+    }
+}
+
 UIScreen* UI::GetScreen(const std::string& screenName) {
     OVERRIDE_LOG_NAME("UI");
     for (int iterator = 0; iterator < uiScreens.size(); ++iterator) {
@@ -106,6 +103,7 @@ UIScreen* UI::GetScreen(const std::string& screenName) {
     }
     CRITICAL("Tried to get UIScreen with name \"" + screenName + "\" that did not exist");
     psnip_trap();
+    return nullptr;
 }
 
 UIScreen* UI::GetCurrentScreen() {
@@ -144,12 +142,6 @@ UIScreen::UIScreen(std::string screenName) : screenName(screenName) {
     OVERRIDE_LOG_NAME("UI Initialization");
 
     std::string realName = screenName.substr(3);
-
-    EventManager::GetInstance().RegisterEvent("ui/move_screen_" + realName);
-    EventManager::GetInstance().AddEventToDo("ui/move_screen_" + realName, [=](Event& event) {
-        UI::GetInstance().SetCurrentScreen(screenName);
-    });
-
     INFO("Created screen \"" + screenName + "\"");
 }
 
@@ -204,7 +196,7 @@ glm::vec2 UIElement::PixelsToNDC(glm::vec2 pixelPosition) {
     return glm::vec2((pixelPosition.x / Window::GetInstance().GetWidth()) * 2 - 1, (pixelPosition.y / Window::GetInstance().GetHeight()) * 2 - 1);
 }
 
-UIElement::UIElement(glm::vec2 position, glm::vec2 scale, std::string eventToTrigger) : position(position), scale(scale), eventToTrigger(eventToTrigger) {
+UIElement::UIElement(glm::vec2 position, glm::vec2 scale, std::function<void()> functionToTrigger) : position(position), scale(scale), functionToTrigger(functionToTrigger) {
     return;
 }
 
@@ -213,24 +205,20 @@ void UIElement::Render() {
 }
 
 void UIElement::Trigger() {
-    EventManager::GetInstance().TriggerEvent(eventToTrigger);
+    functionToTrigger();
 }
 
 bool UIElement::OnClick() {
-    if (!GetHovered() || eventToTrigger == "") {
+    if (!GetHovered() || functionToTrigger == nullptr) {
         return false;
     }
 
-    EventManager::GetInstance().TriggerEvent(eventToTrigger);
+    Trigger();
     return true;
 }
 
 void UIElement::OnHover() {
     return;
-}
-
-std::string* UIElement::GetEventTrigger() {
-    return &eventToTrigger;
 }
 
 bool UIElement::GetVisible() {

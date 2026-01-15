@@ -10,6 +10,26 @@
 #include <vector>
 #include <memory>
 
+#include "EventDefinitions.h"
+
+
+enum EventType {
+    // Meta events
+    EVENT_META_WINDOW_MINIMIZE,
+    EVENT_META_WINDOW_MAXIMIZE,
+    EVENT_META_WINDOW_RESIZE,
+    // World events
+    //  Important events
+    EVENT_WORLD_TICK,
+    //  Player events
+    EVENT_WORLD_PLAYER_BLOCK_EVENT,
+    EVENT_WORLD_PLAYER_MOVE,
+	//  Entity events
+	EVENT_WORLD_ENTITY_BLOCK_EVENT,
+	//  Generic events
+    EVENT_WORLD_GENERIC_BLOCK_EVENT,
+};
+
 
 class Event {
     public:
@@ -18,34 +38,14 @@ class Event {
         Event(const std::string& eventName) : eventName(eventName) {}
         ~Event() = default;
     
-        void SetData(const std::string& key, std::any data);
-    
-        template<typename T>
-        T* GetData(const std::string& key) {
-            OVERRIDE_LOG_NAME("Events");
-            auto data = eventData.find(key);
-            if (data != eventData.end()) {
-                return std::any_cast<T>(&data->second);
-            } else {
-                WARN("Tried to get non-existent event data \"" + key + "\"");
-                return nullptr;
-            }
-        }
-    
-        template<typename T>
-        const T* GetDataConst(const std::string& key) const {
-            auto data = eventData.find(key);
-            if (data != eventData.end()) {
-                return std::any_cast<T>(&data->second);
-            }
-            return nullptr;
-        }
+        void SetData(void* newEventData, size_t newEventDataSize);
     
         void TriggerEvent();
         void AddToDo(std::function<void(Event&)> todo);
     
     private:
-        std::unordered_map<std::string, std::any> eventData;
+        void* eventData = nullptr;
+		size_t eventDataSize = 0;
         std::vector<std::function<void(Event&)>> eventToDo;
 };
 
@@ -55,6 +55,7 @@ class EventManager {
         static EventManager& GetInstance();
         void Delete();
 
+		//bool RegisterEventToEntityType(EventType eventType)
         void RegisterEvent(const std::string& eventName);
         std::unordered_map<std::string, Event*>::iterator DeregisterEvent(const std::string& eventName);
 
