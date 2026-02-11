@@ -26,6 +26,7 @@ class Globals {
         #else
         bool debugMode = false;
         #endif
+		bool validateConfig = true;
         
         // Config file globals (all at default values)
         const std::string projectVersion = "0.0.4pre-alpha";

@@ -17,7 +17,7 @@ void EventManager::RegisterEvent(const std::string& eventName) {
     }
 
     auto event = std::make_unique<Event>(eventName);
-    Event* eventPtr = event.get(); // store raw pointer in map
+    Event* eventPtr = event.get();
     eventMap[eventName] = eventPtr;
     registeredEvents.push_back(std::move(event));
     INFO("Successfully registered event \"" + eventName + "\"");

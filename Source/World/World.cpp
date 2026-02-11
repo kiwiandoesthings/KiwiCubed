@@ -102,7 +102,7 @@ void World::Render(Shader shaderProgram) {
     }
     GLCall(glDisable(GL_CULL_FACE));
 
-    assetManager.GetShaderProgram({"kiwicubed", "entity_shader"})->Bind();
+    assetManager.GetShaderProgram(AssetStringID{"kiwicubed", "entity_shader"})->Bind();
     EntityManager::GetInstance().ForEachEntity([](Entity& entity) {
         entity.Render();
     });

@@ -25,6 +25,8 @@ class KiwiCubedEngine {
         bool RunGameLoop();
         void Exit();
 
+		Globals& GetGlobals();
+
     private:
         // Singletons
         EventManager& eventManager = EventManager::GetInstance();

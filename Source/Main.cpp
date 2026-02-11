@@ -19,7 +19,7 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
+#include <iostream> 	
 #include <string>
 #include <time.h>
 
@@ -56,7 +56,7 @@ unsigned char bitness;
 
 // TODO: stuff needs restructuring because game loading is very order-dependent, and if this keeps
 // up, its gonna become order-dependent in impossible ways so that should be redone asap really
-int main() {
+int main(int argc, char* argv[]) {
 	OVERRIDE_LOG_NAME("Initialization");
 	// Make it so on laptops, it will request the dGPU if possible, without this, you have to force it to use the dGPU
 	#ifdef __linux__
@@ -69,6 +69,12 @@ int main() {
 	#endif
 
 	KiwiCubedEngine kiwiCubed;
+	for (int iterator = 0; iterator < argc; iterator++) {
+		if (argv[iterator] == "-novalidate") {
+			INFO("Configuration validation disabled for this session");
+			kiwiCubed.GetGlobals().validateConfig = false;
+		}
+	}
 	LOG_CHECK_CRITICAL(kiwiCubed.StartEngine() != 0, "Successfully initialized KiwiCubed Engine", "Error returned while initializing KiwiCubed Engine", -1);
 	LOG_CHECK_RETURN_BAD_CRITICAL(kiwiCubed.RunGameLoop(), "Error returned while running game loop, aborting", -1);
 

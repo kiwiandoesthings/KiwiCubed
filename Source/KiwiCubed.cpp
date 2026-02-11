@@ -299,6 +299,10 @@ void KiwiCubedEngine::Exit() {
 
 }
 
+Globals& KiwiCubedEngine::GetGlobals() {
+	return globals;
+}
+
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	OVERRIDE_LOG_NAME("GLFW Callback / Framebuffer Size");

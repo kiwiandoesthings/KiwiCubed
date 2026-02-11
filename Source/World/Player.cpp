@@ -14,7 +14,7 @@ const char* gameModeStrings[] = {
 };
 
 
-Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(0, 0, 0, world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
+Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(playerX, playerY, playerZ, world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
 	entityData.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
@@ -61,7 +61,7 @@ void Player::Setup() {
 	UIScreen inventoryUI = UIScreen("ui/inventory");
 	int containerX = (globalWindow.GetWidth() / 2) - 576;
 	int containerY = (globalWindow.GetHeight() / 2) - 192;
-	//inventoryUI.AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), [&](){}, AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
+	inventoryUI.AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), [&](){}, AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
 	UI::GetInstance().AddScreen(std::move(inventoryUI));
 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {

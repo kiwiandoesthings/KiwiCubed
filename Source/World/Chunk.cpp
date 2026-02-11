@@ -175,7 +175,7 @@ bool Chunk::GenerateMesh(const bool remesh) {
     std::vector<FaceDirection> facesToAdd;
     facesToAdd.reserve(6);
 
-    std::unordered_map<unsigned char, BlockType> textureAtlasDataCache;
+    robin_hood::unordered_flat_map<unsigned char, BlockType> textureAtlasDataCache;
 
     auto GetCachedBlockType = [&](const unsigned char numericalID) -> const BlockType& {
         auto iterator = textureAtlasDataCache.find(numericalID);
