@@ -198,23 +198,21 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool
     }
 }
 
-void World::RecalculateChunksToLoad(Event event, unsigned short horizontalRadius, unsigned short verticalRadius) {
+void World::RecalculateChunksToLoad(EventData& eventData, unsigned short horizontalRadius, unsigned short verticalRadius) {
     if (horizontalRadius == 0) {
         horizontalRadius = playerChunkGenerationRadiusHorizontal;
     }
     if (verticalRadius == 0) {
         verticalRadius = playerChunkGenerationRadiusVertical;
     }
-    auto* playerChunkPosition = event.GetData<glm::ivec3>("globalChunkPosition");
-    if (playerChunkPosition == nullptr) {
-        return;
-    }
+	WorldPlayerMove moveEvent = *static_cast<WorldPlayerMove*>(eventData.data);
+	glm::vec3 playerChunkPosition = glm::vec3(static_cast<int>(moveEvent.newPlayerX) % 32, static_cast<int>(moveEvent.newPlayerY) % 32, static_cast<int>(moveEvent.newPlayerZ) % 32);
 
     std::lock_guard<std::mutex> lock(ChunkQueueMutex);
     {
-        for (int chunkX = playerChunkPosition->x - horizontalRadius; chunkX < playerChunkPosition->x + horizontalRadius; ++chunkX) {
-            for (int chunkY = playerChunkPosition->y - verticalRadius; chunkY < playerChunkPosition->y + verticalRadius; ++chunkY) {
-                for (int chunkZ = playerChunkPosition->z - horizontalRadius; chunkZ < playerChunkPosition->z + horizontalRadius; ++chunkZ) {
+        for (int chunkX = static_cast<int>(playerChunkPosition.x) - horizontalRadius; chunkX < playerChunkPosition.x + horizontalRadius; ++chunkX) {
+            for (int chunkY = static_cast<int>(playerChunkPosition.y) - verticalRadius; chunkY < playerChunkPosition.y + verticalRadius; ++chunkY) {
+                for (int chunkZ = static_cast<int>(playerChunkPosition.z) - horizontalRadius; chunkZ < playerChunkPosition.z + horizontalRadius; ++chunkZ) {
                     std::tuple<int, int, int> chunkPosition = {chunkX, chunkY, chunkZ};
                     Chunk* chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
                     if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk->GetMeshable(chunkHandler) && chunk->generationStatus != 3) {
@@ -310,7 +308,9 @@ void World::SpawnItemFromBlock(glm::ivec3 chunkPosition, glm::ivec3 blockPositio
 void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
 
-    EntityManager::GetInstance().EmitEvent("worldUpdate");
+	WorldTickEvent tickEvent = WorldTickEvent{totalTicks};
+	EventData eventData = EventData{&tickEvent, sizeof(tickEvent)};
+	EventManager::GetInstance().TriggerEvent(EVENT_WORLD_TICK, eventData);
 
     std::vector<glm::ivec3> chunkGenerationQueueCopy;
     std::vector<glm::ivec3> chunkMeshingQueueCopy;
@@ -387,7 +387,7 @@ void World::DisplayImGui(unsigned int option) {
         EntityData playerData = player.GetEntityData();
 
 		ImGui::Text("Player name: %s", player.GetEntityData().name.c_str());
-        ImGui::Text("Player UUID: %s", player.GetProtectedEntityData().UUID.c_str());
+        ImGui::Text("Player AUID: %d", player.GetProtectedEntityData().AUID);
         ImGui::Text("Player gamemode: %s", player.GetGameModeString().c_str());
 		ImGui::Text("Player health: %d", static_cast<int>(player.GetEntityStats().health));
 		ImGui::Text("Player position: %.2f, %.2f, %.2f",

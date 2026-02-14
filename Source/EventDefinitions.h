@@ -1,5 +1,5 @@
-#include "Block.h"
-#include "Player.h"
+#pragma once
+
 
 
 struct MetaWindowResizeEvent {
@@ -8,20 +8,20 @@ struct MetaWindowResizeEvent {
 };
 
 struct WorldTickEvent {
-	int tickNumber;
+	unsigned long long tickNumber;
 };
 
 struct WorldPlayerBlockEvent {
 	BlockEventType blockEventType;
-	Player* player;
+	unsigned long long playerAUID;
 	int chunkX;
 	int chunkY;
 	int chunkZ;
 	int blockX;
 	int blockY;
 	int blockZ;
-	BlockType* oldBlock;
-	BlockType* newBlock;
+	const char* oldBlockStringID;
+	const char* newBlockStringID;
 };
 
 struct WorldPlayerMove {
@@ -41,15 +41,15 @@ struct WorldPlayerMove {
 
 struct WorldEntityBlockEvent {
 	BlockEventType blockEventType;
-	Entity* entity;
+	unsigned long long entityAUID;
 	int chunkX;
 	int chunkY;
 	int chunkZ;
 	int blockX;
 	int blockY;
 	int blockZ;
-	BlockType* oldBlock;
-	BlockType* newBlock;
+	const char* oldBlockStringID;
+	const char* newBlockStringID;
 };
 
 struct WorldGenericBlockEvent {
@@ -60,6 +60,6 @@ struct WorldGenericBlockEvent {
 	int blockX;
 	int blockY;
 	int blockZ;
-	BlockType* oldBlock;
-	BlockType* newBlock;
+	const char* oldBlockStringID;
+	const char* newBlockStringID;
 };

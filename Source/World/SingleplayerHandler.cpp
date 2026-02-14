@@ -2,55 +2,41 @@
 #include "Events.h"
 #include <cstddef>
 
-SingleplayerHandler::SingleplayerHandler() : singleplayerWorld(nullptr), isLoadedIntoSingleplayerWorld(false) {
+SingleplayerHandler::SingleplayerHandler(DebugRenderer& debugRenderer) : singleplayerWorld(nullptr), isLoadedIntoSingleplayerWorld(false), debugRenderer(debugRenderer) {
 }
 
-void SingleplayerHandler::Setup(DebugRenderer& debugRenderer) {
-	EventManager& eventManager = EventManager::GetInstance();
-
-	SingleplayerHandler* self = this;
-	eventManager.RegisterEvent("event/generate_world");
-	eventManager.AddEventToDo("event/generate_world", [self, &debugRenderer](Event& event) {
-		OVERRIDE_LOG_NAME("Singleplayer Handler");
-		if (self->singleplayerWorld != nullptr) {
-			CRITICAL("Tried to generate already generated world, aborting");
-			psnip_trap();
-		}
-
-		self->singleplayerWorld = std::make_unique<World>(5, 3, self);
-		self->isLoadedIntoSingleplayerWorld = true;
-		self->StartSingleplayerWorld(debugRenderer);
-		self->singleplayerWorld->GenerateWorld();
-		self->singleplayerWorld->Setup();
-		self->isLoadedIntoSingleplayerWorld = true;
-		debugRenderer.SetupBuffers(self->singleplayerWorld->GetChunkDebugVisualizationVertices(), self->singleplayerWorld->GetChunkDebugVisualizationIndices(), self->singleplayerWorld->GetChunkOrigins());
-
-		if (UI::GetInstance().GetCurrentScreenName() == "ui/main_menu") {
-			UI::GetInstance().DisableUI();
-		}
-	});
+void SingleplayerHandler::Setup() {
 }
 
-void SingleplayerHandler::StartSingleplayerWorld(DebugRenderer& debugRenderer) {
+void SingleplayerHandler::StartSingleplayerWorld() {
+	OVERRIDE_LOG_NAME("Singleplayer Handler");
+	if (singleplayerWorld != nullptr) {
+		CRITICAL("Tried to generate already generated world, aborting");
+		psnip_trap();
+	}
+
+	singleplayerWorld = std::make_unique<World>(5, 3, this);
+	isLoadedIntoSingleplayerWorld = true;
+	singleplayerWorld->GenerateWorld();
+	singleplayerWorld->Setup();
+	isLoadedIntoSingleplayerWorld = true;
+	debugRenderer.SetupBuffers(singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerWorld->GetChunkOrigins());
+
+	if (UI::GetInstance().GetCurrentScreenName() == "ui/main_menu") {
+		UI::GetInstance().DisableUI();
+	}
+
 	Physics::Initialize();
 
 	EventManager& eventManager = EventManager::GetInstance();
-	eventManager.RegisterEvent("event/unload_world");
-	eventManager.AddEventToDo("event/unload_world", [&](Event& event) {
-		shouldUnloadWorld = true;
-	});
-	eventManager.RegisterEvent("event/player_moved_chunk");
-	eventManager.AddEventToDo("event/player_moved_chunk", [&](Event& event) {
-		singleplayerWorld->QueueTickTask([=, this] {
-			singleplayerWorld->RecalculateChunksToLoad(event);
+	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_MOVE, [&](EventData& eventData) {
+		singleplayerWorld->QueueTickTask([&, this] {
+			singleplayerWorld->RecalculateChunksToLoad(eventData);
 		});
 	});
-	eventManager.RegisterEvent("event/player_mined_block");
-	eventManager.AddEventToDo("event/player_mined_block", [&](Event& event) {
-		auto* chunkPosition = event.GetData<glm::ivec3>("chunkPosition");
-		auto* blockPosition = event.GetData<glm::ivec3>("blockPosition");
-		auto* blockType = event.GetData<BlockType*>("blockType");
-		singleplayerWorld->SpawnItemFromBlock(*chunkPosition, *blockPosition, *blockType);
+	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_BLOCK_EVENT, [&](EventData& eventData) {
+		WorldPlayerBlockEvent* blockEvent = static_cast<WorldPlayerBlockEvent*>(eventData.data);
+		std::cout << blockEvent->blockX << std::endl;
 	});
 	
 	singleplayerWorld->StartTickThread();
@@ -68,9 +54,8 @@ void SingleplayerHandler::Update() {
 		singleplayerWorld->Delete();
 		singleplayerWorld.reset();
 		isLoadedIntoSingleplayerWorld = false;
-		eventManager.TriggerEvent("ui/move_screen_main_menu");
-		eventManager.DeregisterEvent("event/unload_world");
-		eventManager.DeregisterEvent("event/player_moved_chunk");
+		UI& ui = UI::GetInstance();
+		ui.SetCurrentScreen("ui/main_menu");
 		shouldUnloadWorld = false;
 		INFO("Exiting singleplayer world");
 	}

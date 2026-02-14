@@ -2,8 +2,36 @@
 
 #include "glad/glad.h"
 
-#include "ModHandler.h"
 
+struct AssetStringID {
+    std::string modName = "";
+    std::string assetName = "";
+
+    std::string CanonicalName() const {
+        return modName + ":" + assetName;
+    }
+
+    bool operator==(const AssetStringID& other) const {
+        return modName == other.modName && assetName == other.assetName;
+    }
+
+    bool operator<(const AssetStringID& other) const {
+        if (modName == other.modName) {
+            return assetName < other.assetName;
+        }
+        return modName < other.modName;
+    }
+
+    AssetStringID() : modName("kiwicubed"), assetName("air") {}
+    AssetStringID(std::string modName, std::string assetName) : modName(modName), assetName(assetName) {}
+};
+
+template <>
+struct std::hash<AssetStringID>{
+    std::size_t operator()(const AssetStringID& stringID) const {
+        return std::hash<std::string>()(stringID.CanonicalName());
+    }
+};
 
 struct TextureAtlasData {
     const unsigned short variant = 0;
@@ -37,4 +65,12 @@ struct MetaEntityModel {
     bool operator==(const MetaEntityModel& other) const {
         return stringID == other.stringID;
     }
+};
+
+struct EntityType {
+	AssetStringID entityStringID;
+	std::unordered_map<std::string, std::string> eventsToCallbacks;
+
+	MetaEntityModel metaModel;
+	MetaTexture metaTexture;
 };

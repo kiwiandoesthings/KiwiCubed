@@ -58,26 +58,3 @@ std::vector<Entity*> EntityManager::GetEntitesOfType(AssetStringID entityTypeStr
         return std::vector<Entity*>();
     }
 }
-
-void EntityManager::EmitEvent(std::string eventName) {
-    for (const auto& typesToEntities : entityTypesToEntities) {
-        EntityType* entityType = GetEntityType(typesToEntities.first);
-        
-        bool found = false;
-        std::string callback;
-        for (const auto& eventsToCallbacks : entityType->eventsToCallbacks) {
-            if (eventsToCallbacks.first == eventName) {
-                found = true;
-                callback = eventsToCallbacks.second;
-            }
-        }
-
-        if (!found) {
-            continue;
-        }
-
-        for (auto& entity : typesToEntities.second) {
-            
-        }
-    }
-}

@@ -4,6 +4,7 @@
 #include "AssetManager.h"
 #include "Block.h"
 #include "EntityManager.h"
+#include "Events.h"
 
 
 m3ApiRawFunction(KC_Log_WASM) {
@@ -12,11 +13,19 @@ m3ApiRawFunction(KC_Log_WASM) {
     m3ApiSuccess();
 }
 
-m3ApiRawFunction(KC_AddEventToDo_WASM) {
-    m3ApiGetArgMem(const char*, eventName);
-    m3ApiGetArgMem(const char*, functionName);
-    KC_AddEventToDo(eventName, functionName);
-    m3ApiSuccess();
+m3ApiRawFunction(KC_RegisterEventToEntityType_WASM) {
+	m3ApiGetArgMem(int, eventType);
+	m3ApiGetArgMem(const char*, modName);
+	m3ApiGetArgMem(const char*, assetName);
+	KC_RegisterEventToEntityType(eventType, modName, assetName);
+	m3ApiSuccess();
+}
+
+m3ApiRawFunction(KC_RegisterFunctionToEvent_WASM) {
+	m3ApiGetArgMem(int, eventType);
+	m3ApiGetArgMem(const char*, functionName);
+	KC_RegisterFunctionToEvent(eventType, functionName);
+	m3ApiSuccess();
 }
 
 m3ApiRawFunction(KC_GetTextureNumericalID_WASM) {
@@ -433,8 +442,6 @@ bool ModHandler::LoadModScripts() {
         m3_LoadModule(modRuntime, modModule);
 
         m3_LinkRawFunction(modModule, "env", "KC_Log", "v(*)", &KC_Log_WASM);
-        m3_LinkRawFunction(modModule, "env", "KC_AddEventToDo", "v(**)", &KC_AddEventToDo_WASM);
-        //m3_LinkRawFunction(modModule, "env", "KC_GetEventData", )
         m3_LinkRawFunction(modModule, "env", "KC_GetTextureNumericalID", "i(**)", &KC_GetTextureNumericalID_WASM);
         
         IM3Function entrypoint;
@@ -464,20 +471,20 @@ bool ModHandler::RunModEntrypoints() {
     return false;
 }
 
-void ModHandler::SetCurrentlyProcessingEvent(Event* event) {
-    currentlyProcessingEvent = event;
-}
-
-void ModHandler::CallWasmFunction(std::string functionName) {
+void ModHandler::CallWasmFunction(std::string functionName, const void* arguments[]) {
+	OVERRIDE_LOG_NAME("Mod Script Interop");
     IM3Function function;
     M3Result result = m3_FindFunction(&function, modRuntime, functionName.c_str());
+	if (m3_GetArgCount(function) != sizeof(arguments)) {
+		CRITICAL("Tried to call WASM function with wrong number of arguments");
+	}
     
     if (result) {
         ERR("Could not find function \"" + functionName + "\", error: " + std::string(result));
         return;
     }
 
-    result = m3_CallV(function);
+    result = m3_CallV(function, sizeof(arguments), arguments);
     
     if (result) {
         ERR("Error in function \"" + functionName + "\", error: " + std::string(result));

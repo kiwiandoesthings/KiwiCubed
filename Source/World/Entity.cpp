@@ -9,7 +9,7 @@ Entity::Entity(float entityX, float entityY, float entityZ, World* world) : enti
 	entityData.position.y = entityY;
 	entityData.position.z = entityZ;
 
-	protectedEntityData.UUID = CreateUUID().c_str();
+	protectedEntityData.AUID = CreateAUID();
 }
 
 void Entity::SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID) {
@@ -138,30 +138,18 @@ void Entity::Render() {
     GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(entityModel.indices.size()), GL_UNSIGNED_INT, 0));
 }
 
-std::string Entity::CreateUUID() {
-	std::array<uint8_t, 16> uuidBytes;
+unsigned long long Entity::CreateAUID() {
+	unsigned long long id = 0;
 
 	std::random_device random;
 	std::mt19937 gen(random());
-	std::uniform_int_distribution<unsigned int> dist(0, 255);
+	std::uniform_int_distribution<unsigned int> dist(0, 9);
 
-	for (auto &byte : uuidBytes) {
-		byte = dist(gen);
+	for (int iterator = 0; iterator < 64; iterator++) {
+		id += static_cast<uint64_t>(dist(gen) * pow(10, iterator));
 	}
 	
-	uuidBytes[6] = (uuidBytes[6] & 0x0F) | 0x40;
-	uuidBytes[8] = (uuidBytes[8] & 0x3F) | 0x80;
-
-	std::ostringstream stringStream;
-	stringStream << std::hex << std::setfill('0');
-	for (size_t i = 0; i < uuidBytes.size(); i++) {
-		stringStream << std::setw(2) << static_cast<unsigned int>(uuidBytes[i]);
-		if (i == 3 || i == 5 || i == 7 || i == 9) {
-			stringStream << "-";
-		}
-	}
-	
-	return stringStream.str();
+	return id;
 }
 
 void Entity::Delete() {

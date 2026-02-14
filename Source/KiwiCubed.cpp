@@ -62,7 +62,7 @@ int KiwiCubedEngine::StartEngine() {
 	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 	GLCall(glCullFace(GL_FRONT));
 
-	eventManager.RegisterEvent("event/blank");
+	//eventManager.RegisterEvent("event/blank");
 
 	// Initialize FreeType
 	FT_Library ft;
@@ -101,61 +101,61 @@ int KiwiCubedEngine::StartEngine() {
 	uiAtlas.TextureUnit(*uiShaderProgram, "tex0");
 	assetManager.RegisterTextureAtlas({"kiwicubed", "ui_atlas"}, uiAtlas);
 
-	// Create a singleplayer instance
-	singleplayerHandler.Setup(debugRenderer);
-
 	// Mods
 	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.LoadModData(), "Failed to load mod data, exiting", -1);
 	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.LoadModScripts(), "Failed to load mod scripts, exiting", -1);
 
 	// "temporary" setup of certain events in main
-	eventManager.RegisterEvent("event/close_game");
-	eventManager.AddEventToDo("event/close_game", [&](Event& event) {
-		glfwSetWindowShouldClose(glfwWindow, true);
-	});
-	eventManager.RegisterEvent("event/settings/change_fov");
-	eventManager.AddEventToDo("event/settings/change_fov", [&](Event& event) {
-		OVERRIDE_LOG_NAME("Settings");
-		OrderedJSON configJSON = globals.GetConfigJSON();
-
-		globals.fov += 10;
-		if (globals.fov > 120) {
-			globals.fov = 30;
-		}
-		configJSON["init_settings"]["fov"] = globals.fov;
-		std::ofstream configWrite("init_config.json");
-		if (!configWrite.is_open()) {
-			CRITICAL("Could not open the JSON config file, aborting");
-			psnip_trap();
-		}
-		configWrite << configJSON.dump(1, '\t');
-		configWrite.close();
-
-		if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
-			return;
-		}
-
-		Player& player = singleplayerHandler.GetWorld()->GetPlayer();
-		player.fov = globals.fov;
-	});
+	//eventManager.RegisterEvent("event/close_game");
+	//eventManager.AddEventToDo("event/close_game", [&](Event& event) {
+	//	glfwSetWindowShouldClose(glfwWindow, true);
+	//});
+	//eventManager.RegisterEvent("event/settings/change_fov");
+	//eventManager.AddEventToDo("event/settings/change_fov", [&](Event& event) {
+	//	OVERRIDE_LOG_NAME("Settings");
+	//	OrderedJSON configJSON = globals.GetConfigJSON();
+	//
+	//	globals.fov += 10;
+	//	if (globals.fov > 120) {
+	//		globals.fov = 30;
+	//	}
+	//	configJSON["init_settings"]["fov"] = globals.fov;
+	//	std::ofstream configWrite("init_config.json");
+	//	if (!configWrite.is_open()) {
+	//		CRITICAL("Could not open the JSON config file, aborting");
+	//		psnip_trap();
+	//	}
+	//	configWrite << configJSON.dump(1, '\t');
+	//	configWrite.close();
+	//
+	//	if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
+	//		return;
+	//	}
+	//
+	//	Player& player = singleplayerHandler.GetWorld()->GetPlayer();
+	//	player.fov = globals.fov;
+	//});
 
 	ui.Setup(*uiShaderProgram, uiAtlas, &textRenderer);
 	UIScreen mainMenuUI = UIScreen("ui/main_menu");
 	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), [&]() {
-		eventManager.TriggerEvent("event/generate_world");
+		//eventManager.TriggerEvent("event/generate_world");
+		if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
+			singleplayerHandler.StartSingleplayerWorld();
+		}
 	}, "Create World"));
 	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
 		ui.SetCurrentScreen("ui/settings");
 	}, "Settings"));
 	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), [&]() {
-		eventManager.TriggerEvent("event/close_game");
+		//eventManager.TriggerEvent("event/close_game");
 	}, "Exit"));
 	ui.AddScreen(std::move(mainMenuUI));
 	ui.SetCurrentScreen("ui/main_menu");
 
 	UIScreen settingsUI = UIScreen("ui/settings");
 	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), [&]() {
-		eventManager.TriggerEvent("event/settings/change_fov");
+		//eventManager.TriggerEvent("event/settings/change_fov");
 	}, "Change FOV"));
 	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
 		ui.MoveScreenBack();
@@ -170,9 +170,11 @@ int KiwiCubedEngine::StartEngine() {
 		ui.SetCurrentScreen("ui/settings");
 	}, "Settings"));
 	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), [&]() {
-		eventManager.TriggerEvent("event/unload_world");
+		//eventManager.TriggerEvent("event/unload_world");
 	}, "Quit Game"));
 	ui.AddScreen(std::move(gamePauseUI));
+
+	return 0;
 }
 
 bool KiwiCubedEngine::RunGameLoop() {
@@ -202,17 +204,6 @@ bool KiwiCubedEngine::RunGameLoop() {
 		static char input[256] = {};
 
 		ImGui::Begin("Debug");
-		ImGui::InputText(
-		    "##console",
-		    input,
-		    sizeof(input),
-		    ImGuiInputTextFlags_EnterReturnsTrue
-		);
-
-		if (ImGui::IsItemDeactivatedAfterEdit()) {
-		    eventManager.TriggerEvent(input);
-		    input[0] = '\0';
-		}
 		ImGui::Text("Total frames: %d", frames);
 		ImGui::Text("FPS: %.2f", fps);
 		ImGui::Text("DeltaTime: %.6f", globals.deltaTime);

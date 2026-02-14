@@ -38,7 +38,7 @@ class KiwiCubedEngine {
         // Other Members
         DebugRenderer debugRenderer = DebugRenderer();
         Renderer renderer = Renderer();
-        SingleplayerHandler singleplayerHandler = SingleplayerHandler();
+        SingleplayerHandler singleplayerHandler = SingleplayerHandler(debugRenderer);
         TextRenderer textRenderer = TextRenderer();
 
         // Temporary

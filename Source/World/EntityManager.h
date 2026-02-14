@@ -2,7 +2,6 @@
 
 #include "AssetManager.h"
 #include "Entity.h"
-#include "ModHandler.h"
 
 
 class EntityManager {
@@ -25,8 +24,6 @@ class EntityManager {
                 function(*entity.get());
             } 
         }
-
-        void EmitEvent(std::string eventName);
 
     private:
         ~EntityManager() = default;

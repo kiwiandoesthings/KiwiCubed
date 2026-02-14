@@ -2,16 +2,6 @@
 
 
 DebugRenderer::DebugRenderer() {
-	EventManager& eventManager = EventManager::GetInstance();
-	eventManager.RegisterEvent("event/toggle_debug");
-	eventManager.AddEventToDo("event/toggle_debug", [&](Event& event) {
-		if (enabled) {
-			Disable();
-		} else {
-			Enable();
-		}
-	});
-
 	if (Globals::GetInstance().debugMode) {
 		Enable();
 	}

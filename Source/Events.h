@@ -10,7 +10,11 @@
 #include <vector>
 #include <memory>
 
+#include "EntityManager.h"
 #include "EventDefinitions.h"
+
+
+const inline unsigned long long VerificationNumber = 0x4B49574943554245ULL;
 
 
 enum EventType {
@@ -26,27 +30,18 @@ enum EventType {
     EVENT_WORLD_PLAYER_MOVE,
 	//  Entity events
 	EVENT_WORLD_ENTITY_BLOCK_EVENT,
+	EVENT_WORLD_ENTITY_HURT_EVENT,
+	EVENT_WORLD_ENTITY_ATTACK_EVENT,
 	//  Generic events
     EVENT_WORLD_GENERIC_BLOCK_EVENT,
 };
 
+struct EventData {
+	void* data;
+	size_t dataSize;
+	unsigned long long verification = VerificationNumber;
 
-class Event {
-    public:
-        std::string eventName;
-    
-        Event(const std::string& eventName) : eventName(eventName) {}
-        ~Event() = default;
-    
-        void SetData(void* newEventData, size_t newEventDataSize);
-    
-        void TriggerEvent();
-        void AddToDo(std::function<void(Event&)> todo);
-    
-    private:
-        void* eventData = nullptr;
-		size_t eventDataSize = 0;
-        std::vector<std::function<void(Event&)>> eventToDo;
+	EventData(void* data, size_t dataSize) : data(data), dataSize(dataSize) {}
 };
 
 
@@ -55,24 +50,10 @@ class EventManager {
         static EventManager& GetInstance();
         void Delete();
 
-		//bool RegisterEventToEntityType(EventType eventType)
-        void RegisterEvent(const std::string& eventName);
-        std::unordered_map<std::string, Event*>::iterator DeregisterEvent(const std::string& eventName);
+		bool RegisterEventToEntityType(EventType eventType, AssetStringID entityTypeString);
+		void RegisterFunctionToEvent(EventType eventType, std::function<void(EventData&)> callback);
 
-        template<typename... KVs>
-        void TriggerEvent(const std::string& eventName, KVs&&... kvs) {
-            OVERRIDE_LOG_NAME("Events");
-            auto it = eventMap.find(eventName);
-            if (it != eventMap.end()) {
-                Event* eventPtr = it->second;
-                (eventPtr->SetData(std::forward<KVs>(kvs).first, std::forward<KVs>(kvs).second), ...);
-                eventPtr->TriggerEvent();
-            } else {
-                WARN("Tried to trigger non-existent event \"" + eventName + "\"");
-            }
-        }
-
-        void AddEventToDo(const std::string& eventName, std::function<void(Event&)> eventTodo);
+        bool TriggerEvent(EventType eventType, EventData eventData);
 
     private:
         EventManager() = default;
@@ -81,6 +62,8 @@ class EventManager {
         EventManager(const EventManager&) = delete;
         EventManager& operator=(const EventManager&) = delete;
 
-        std::vector<std::unique_ptr<Event>> registeredEvents;
-        std::unordered_map<std::string, Event*> eventMap;
+		std::unordered_map<EventType, std::vector<AssetStringID>> eventsToEntityTypes;
+		std::unordered_map<EventType, std::vector<std::function<void(EventData&)>>> eventsToFunctions;
+
+		std::vector<uint8_t> eventDatas;
 };

@@ -14,7 +14,7 @@ const char* gameModeStrings[] = {
 };
 
 
-Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(playerX, playerY, playerZ, world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
+Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(static_cast<float>(playerX), static_cast<float>(playerY), static_cast<float>(playerZ), world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
 	entityData.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
@@ -48,7 +48,7 @@ Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(pla
 
 	entityData.isPlayer = true;
 
-	protectedEntityData.UUID = CreateUUID();
+	protectedEntityData.AUID = CreateAUID();
 
 	chunkHandler = &world->GetChunkHandler();
 }
@@ -76,7 +76,7 @@ void Player::Setup() {
 		}
 	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F3, [&](int key) {
-		eventManager.TriggerEvent("event/toggle_debug");
+		Globals::GetInstance().debugMode = true;
 	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int key) {
 		UI& ui = UI::GetInstance();
@@ -128,10 +128,9 @@ void Player::Update() {
 		}
 		
 		if (oldEntityData.globalChunkPosition != entityData.globalChunkPosition) {
-			EventManager::GetInstance().TriggerEvent("event/player_moved_chunk", 
-				std::make_pair("globalChunkPosition", entityData.globalChunkPosition), 
-				std::make_pair("entity", this), 
-				std::make_pair("chunkHandler", chunkHandler));
+			WorldPlayerMove moveEvent = WorldPlayerMove(oldEntityData.position.x, oldEntityData.position.y, oldEntityData.position.z, oldEntityData.orientation.y, oldEntityData.orientation.x, oldEntityData.orientation.z, entityData.position.x, entityData.position.y, entityData.position.z, entityData.orientation.y, entityData.orientation.x, entityData.orientation.z);
+			EventData eventData = EventData(&moveEvent, sizeof(moveEvent));
+			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_MOVE, eventData);
 			entityData.currentChunkPtr = chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
 			if (!entityData.currentChunkPtr->IsReal()) {
 				entityData.currentChunkPtr = nullptr;
@@ -148,7 +147,7 @@ void Player::Update() {
 		BlockType* blockType = BlockManager::GetInstance().GetBlockType(entityData.inventory.GetSlot(AssetStringID{"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slot)})->itemStringID);
 		atlasData.push_back(blockType->metaTextures[0].atlasData[0]);
 	}
-	Texture* atlas = assetManager.GetTextureAtlas({"kiwicubed", "terrain_atlas"});
+	Texture* atlas = assetManager.GetTextureAtlas(AssetStringID{"kiwicubed", "terrain_atlas"});
 	Inventory* inventory = &entityData.inventory;
 	inventoryUI->ClearCustomRenderCommands();
 	inventoryUI->AddCustomRenderCommand([=]() {
@@ -266,10 +265,9 @@ void Player::MouseButtonCallback(int button) {
 		if (button == 0) {
 			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
 			BlockType* blockType = BlockManager::GetInstance().GetBlockType(block.blockID);
-			EventManager::GetInstance().TriggerEvent("event/player_mined_block", 
-				std::make_pair("chunkPosition",chunkPosition), 
-				std::make_pair("blockPosition", blockPosition),
-				std::make_pair("blockType", blockType));
+			WorldPlayerBlockEvent blockEvent = WorldPlayerBlockEvent(BLOCK_MINED, protectedEntityData.AUID, chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z, blockType->blockStringID.CanonicalName().c_str(), "kiwicubed:air");
+			EventData eventData = EventData{&blockEvent, sizeof(blockEvent)};
+			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_BLOCK_EVENT, eventData);
 			entityData.inventory.AddItem(InventorySlot{*BlockManager::GetInstance().GetStringID(block.GetBlockID()), 1});
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
@@ -366,7 +364,7 @@ void Player::MouseButtonCallback(int button) {
 			bool emptyBlock = chunkHandler->GetChunk(placingChunkPosition.x, placingChunkPosition.y, placingChunkPosition.z, false)->GetBlock(placingBlockPosition.x, placingBlockPosition.y, placingBlockPosition.z).IsAir();
 			bool collidesEntity = Physics::CollideBlock(*this, FullBlockPosition{placingBlockPosition, placingChunkPosition}, false);
 			if (emptyBlock && !collidesEntity) {
-				EventManager::GetInstance().TriggerEvent("event/player_placed_block");
+				//EventManager::GetInstance().TriggerEvent("event/player_placed_block");
 				int usingSlotIndex = -1;
 				int newBlockID = 0;
 				for (int slotIndex = 0; slotIndex < 27; slotIndex++) {

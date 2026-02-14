@@ -15,14 +15,6 @@
 class World;
 
 
-struct EntityType {
-	AssetStringID entityStringID;
-	std::unordered_map<std::string, std::string> eventsToCallbacks;
-
-	MetaEntityModel metaModel;
-	MetaTexture metaTexture;
-};
-
 struct EntityStats {
 	float health;
 	unsigned int armor;
@@ -78,7 +70,7 @@ struct EntityRenderData {
 
 struct ProtectedEntityData {
 	// For use later (most likely for multiplayer)
-	std::string UUID = "";
+	unsigned long long AUID = 0;
 };
 
 
@@ -107,7 +99,7 @@ class Entity {
 	
 		virtual void Render();
 
-		std::string CreateUUID();
+		unsigned long long CreateAUID();
 	
 		virtual void Delete();
 		

@@ -45,7 +45,7 @@ class World {
 		void GenerateWorld();
 		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool updateCallerChunk, Chunk* callerChunk);
 
-		void RecalculateChunksToLoad(Event event, unsigned short horizontalRadius = 0, unsigned short verticalRadius = 0);
+		void RecalculateChunksToLoad(EventData& eventData, unsigned short horizontalRadius = 0, unsigned short verticalRadius = 0);
         void QueueMesh(glm::ivec3 chunkPosition, bool remesh);
 		void QueueTickTask(std::function<void()> task);
 		void UpdateFrameTime(std::chrono::steady_clock::time_point newFrameTime);
@@ -83,7 +83,7 @@ class World {
 		std::thread tickThread;
 		std::mutex tickThreadMutex;
 		int tickIntervalMs = 1000 / 20;
-		unsigned int totalTicks = 0;
+		unsigned long long totalTicks = 0;
 		float tickDeltaTime = 0.0f;
 		float ticksPerSecond = 0.0f;
 		float tickAccumulator = 0.0f;

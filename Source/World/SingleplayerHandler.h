@@ -11,10 +11,10 @@
 
 class SingleplayerHandler {
 	public:
-		SingleplayerHandler();
+		SingleplayerHandler(DebugRenderer& debugRenderer);
 		
-		void Setup(DebugRenderer& debugRenderer);
-		void StartSingleplayerWorld(DebugRenderer& debugRenderer);
+		void Setup();
+		void StartSingleplayerWorld();
 		void EndSingleplayerWorld();
 
 		void Update();
@@ -26,6 +26,7 @@ class SingleplayerHandler {
 	
 	private:
 		std::unique_ptr<World> singleplayerWorld = nullptr;
+		DebugRenderer& debugRenderer;
 		bool isLoadedIntoSingleplayerWorld = false;
 		bool shouldUnloadWorld = false;
 };

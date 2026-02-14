@@ -5,83 +5,82 @@ EventManager& EventManager::GetInstance() {
     return instance;
 }
 
-bool EventManager::RegisterEventToEntityType(EventType eventType) {
-	
+bool EventManager::RegisterEventToEntityType(EventType eventType, AssetStringID entityTypeString) {
+	OVERRIDE_LOG_NAME("Events");
+    if (eventsToEntityTypes.find(eventType) != eventsToEntityTypes.end()) {
+		std::vector<AssetStringID> entityTypeStrings = eventsToEntityTypes.find(eventType)->second;
+		entityTypeStrings.push_back(entityTypeString);
+		for (int iterator = 0; iterator < entityTypeStrings.size(); iterator++) {
+			if (entityTypeStrings[iterator].CanonicalName() == entityTypeString.CanonicalName()) {
+				ERR("Tried to register the same event to the same entity type twice");
+				return false;
+			}
+		}
+        eventsToEntityTypes[eventType] = entityTypeStrings;
+        return true;
+    }
+
+	std::vector<AssetStringID> entityTypeStrings;
+	entityTypeStrings.push_back(entityTypeString);
+	eventsToEntityTypes[eventType] = entityTypeStrings;
+	return true;
 }
 
-void EventManager::RegisterEvent(const std::string& eventName) {
+void EventManager::RegisterFunctionToEvent(EventType eventType, std::function<void(EventData&)> callback) {
     OVERRIDE_LOG_NAME("Events");
-    if (eventMap.find(eventName) != eventMap.end()) {
-        WARN("Tried to register event \"" + eventName + "\" twice, aborting");
+    if (eventsToFunctions.find(eventType) == eventsToFunctions.end()) {
+		std::vector<std::function<void(EventData&)>> functions;
+		functions.push_back(callback);
+        eventsToFunctions[eventType] = functions;
         return;
     }
 
-    auto event = std::make_unique<Event>(eventName);
-    Event* eventPtr = event.get();
-    eventMap[eventName] = eventPtr;
-    registeredEvents.push_back(std::move(event));
-    INFO("Successfully registered event \"" + eventName + "\"");
+	eventsToFunctions.find(eventType)->second.push_back(callback);
+	eventsToFunctions[eventType] = eventsToFunctions.find(eventType)->second;
 }
 
-std::unordered_map<std::string, Event*>::iterator EventManager::DeregisterEvent(const std::string& eventName) {
-    OVERRIDE_LOG_NAME("Events");
-    if (eventName == "event/blank") {
-        return eventMap.end();
-    }
-    auto iterator = eventMap.find(eventName);
-    if (iterator == eventMap.end()) {
-        WARN("Tried to deregister non-existent event \"" + eventName + "\", aborting");
-        return eventMap.end();
-    }
+bool EventManager::TriggerEvent(EventType eventType, EventData eventData) {
+	OVERRIDE_LOG_NAME("Event Manager");
 
-    std::string eventNameCopy = eventName;
+	eventDatas.resize(eventData.dataSize);
+    memcpy(eventDatas.data(), eventData.data, eventData.dataSize);
 
-    registeredEvents.erase(
-        std::remove_if(
-            registeredEvents.begin(),
-            registeredEvents.end(),
-            [&eventName](const std::unique_ptr<Event>& event) { return event->eventName == eventName; }
-        ),
-        registeredEvents.end()
-    );
+    EventData copiedData(eventDatas.data(), eventDatas.size());
 
-    INFO("Successfully deregistered event \"" + eventNameCopy + "\"");
-    return eventMap.erase(iterator);
-}
+	ModHandler& modHandler = ModHandler::GetInstance();
+	const void* arguments[] = {copiedData.data};
 
-void EventManager::AddEventToDo(const std::string& eventName, std::function<void(Event&)> eventTodo) {
-    OVERRIDE_LOG_NAME("Events");
-    auto it = eventMap.find(eventName);
-    if (it != eventMap.end()) {
-        it->second->AddToDo(std::move(eventTodo));
-    } else {
-        WARN("Tried to add a todo to non-existent event \"" + eventName + "\"");
-    }
+	bool foundEntity = false;
+	auto entityTypes = eventsToEntityTypes.find(eventType);
+	if (entityTypes != eventsToEntityTypes.end()) {
+		foundEntity = true;
+		std::vector<std::vector<Entity*>> entities;
+
+		for (int iterator = 0; iterator < entityTypes->second.size(); iterator++) {
+			entities.push_back(EntityManager::GetInstance().GetEntitesOfType(entityTypes->second[iterator]));
+		}
+
+		for (int iterator = 0; iterator < entities.size(); iterator++) {
+			modHandler.CallWasmFunction("GetEvent", arguments);
+		}
+	}
+
+	bool foundFunction = false;
+	auto functions = eventsToFunctions.find(eventType);
+	if (functions != eventsToFunctions.end()) {
+		foundFunction = true;
+		
+		for (int iterator = 0; iterator < functions->second.size(); iterator++) {
+			functions->second[iterator](copiedData);
+		}
+	}
+
+	if (!foundEntity && !foundFunction) {
+		//WARN("Triggered event with no connected callbacks!");
+	}
+	return foundEntity || foundFunction;
 }
 
 void EventManager::Delete() {
     OVERRIDE_LOG_NAME("Events");
-
-    std::unordered_map<std::string, Event*> eventMapCopy = eventMap;
-
-    for (auto iterator = eventMapCopy.begin(); iterator != eventMapCopy.end(); iterator++) {
-        DeregisterEvent(iterator->second->eventName);
-    }
-}
-
-void Event::SetData(void* newEventData, size_t newEventDataSize) {
-    eventData = newEventData;
-	eventDataSize = newEventDataSize;
-}
-
-void Event::TriggerEvent() {
-    for (auto& todo : eventToDo) {
-        todo(*this);
-    }
-    eventData = nullptr;
-	eventDataSize = 0;
-}
-
-void Event::AddToDo(std::function<void(Event&)> todo) {
-    eventToDo.emplace_back(std::move(todo));
 }
