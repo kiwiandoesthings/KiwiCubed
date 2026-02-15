@@ -265,9 +265,9 @@ void Player::MouseButtonCallback(int button) {
 		if (button == 0) {
 			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
 			BlockType* blockType = BlockManager::GetInstance().GetBlockType(block.blockID);
-			WorldPlayerBlockEvent blockEvent = WorldPlayerBlockEvent(BLOCK_MINED, protectedEntityData.AUID, chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z, blockType->blockStringID.CanonicalName().c_str(), "kiwicubed:air");
+			WorldPlayerBlockEvent blockEvent = WorldPlayerBlockEvent(BLOCK_MINED, protectedEntityData.AUID, chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z, blockType->blockStringID, AssetStringID{"kiwicubed", "block/air"});
 			EventData eventData = EventData{&blockEvent, sizeof(blockEvent)};
-			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_BLOCK_EVENT, eventData);
+			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_BLOCK, eventData);
 			entityData.inventory.AddItem(InventorySlot{*BlockManager::GetInstance().GetStringID(block.GetBlockID()), 1});
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AssetDefinitions.h"
 
 
 struct MetaWindowResizeEvent {
@@ -20,8 +21,8 @@ struct WorldPlayerBlockEvent {
 	int blockX;
 	int blockY;
 	int blockZ;
-	const char* oldBlockStringID;
-	const char* newBlockStringID;
+	AssetStringID oldBlockStringID;
+	AssetStringID newBlockStringID;
 };
 
 struct WorldPlayerMove {
@@ -48,8 +49,8 @@ struct WorldEntityBlockEvent {
 	int blockX;
 	int blockY;
 	int blockZ;
-	const char* oldBlockStringID;
-	const char* newBlockStringID;
+	AssetStringID oldBlockStringID;
+	AssetStringID newBlockStringID;
 };
 
 struct WorldGenericBlockEvent {
@@ -60,6 +61,6 @@ struct WorldGenericBlockEvent {
 	int blockX;
 	int blockY;
 	int blockZ;
-	const char* oldBlockStringID;
-	const char* newBlockStringID;
+	AssetStringID oldBlockStringID;
+	AssetStringID newBlockStringID;
 };

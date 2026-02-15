@@ -21,14 +21,6 @@ struct EntityStats {
 };
 
 struct EntityData {
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 orientation = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 upDirection = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	glm::ivec3 globalChunkPosition = glm::ivec3(0, 0, 0);
-	glm::ivec3 localChunkPosition = glm::ivec3(0, 0, 0);
-
 	// Used so physics and other systems don't have to constantly re-find the entity's current chunk
 	Chunk* currentChunkPtr = nullptr;
 
@@ -56,6 +48,16 @@ struct EntityData {
 	bool isPlayer = false;
 };
 
+struct EntityTransform {
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 orientation = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 upDirection = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 velocity = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	glm::ivec3 globalChunkPosition = glm::ivec3(0, 0, 0);
+	glm::ivec3 localChunkPosition = glm::ivec3(0, 0, 0);
+};
+
 struct EntityRenderData {
 	glm::vec3 oldPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 oldOrientation = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -78,6 +80,7 @@ class Entity {
 	protected:
 		EntityStats entityStats;
 		EntityData entityData;
+		EntityTransform entityTransform;
 		EntityRenderData entityRenderData;
 		ProtectedEntityData protectedEntityData;
 

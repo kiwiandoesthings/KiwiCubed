@@ -34,7 +34,7 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 			singleplayerWorld->RecalculateChunksToLoad(eventData);
 		});
 	});
-	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_BLOCK_EVENT, [&](EventData& eventData) {
+	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_BLOCK, [&](EventData& eventData) {
 		WorldPlayerBlockEvent* blockEvent = static_cast<WorldPlayerBlockEvent*>(eventData.data);
 		std::cout << blockEvent->blockX << std::endl;
 	});

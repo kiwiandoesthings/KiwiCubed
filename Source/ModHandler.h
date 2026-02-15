@@ -7,12 +7,10 @@
 #include <fstream>
 #include <iostream>
 
+#include <angelscript.h>
 #include <nlohmann/json.hpp>
 #include <robin_hood.h>
-#include <wasm3.h>
-#include <m3_env.h>
-
-#include "ExposedModAPI.h"
+#include <scriptstdstring.h>
 
 
 using OrderedJSON = nlohmann::ordered_json;
@@ -27,7 +25,7 @@ class ModHandler {
         bool LoadModScripts();
         bool RunModEntrypoints();
 
-        void CallWasmFunction(std::string functionName, const void* arguments[]);
+		void CallModFunction(const std::string& moduleName, const std::string& functionName, const std::vector<void*>& arguments, const std::vector<int>& argumentTypes);
 
     private:
         ModHandler() = default;
@@ -39,9 +37,11 @@ class ModHandler {
         std::vector<std::string> modNamespaces;
         std::unordered_map<std::string, std::string> modNamespacesToScripts;
         std::unordered_map<std::string, std::vector<std::string>> modToEntityCallbacks;
-        IM3Environment modEnvironment = m3_NewEnvironment();
-        IM3Runtime modRuntime = m3_NewRuntime(modEnvironment, 512 * 1024, nullptr);
-        std::vector<std::vector<uint8_t>> wasmModBuffers;
 
-        static std::vector<uint8_t> LoadFile(std::string path);
+		asIScriptEngine* engine = nullptr;
+		std::unordered_map<std::string, asIScriptModule*> modNamespacesToModules;
+
+		static std::string LoadFile(std::string path);
+		static void ModError(const asSMessageInfo* messageInfo, void* parameter);
+		static void ModLog(const std::string& message);
 };

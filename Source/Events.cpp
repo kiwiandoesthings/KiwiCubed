@@ -1,29 +1,29 @@
 #include "Events.h"
 
+
+std::unordered_map<EventType, std::vector<AssetStringID>> EventManager::eventsToEntityTypes;
+std::unordered_map<EventType, std::vector<std::function<void(EventData&)>>> EventManager::eventsToFunctions;
+std::vector<uint8_t> EventManager::eventDatas;
+
+
 EventManager& EventManager::GetInstance() {
     static EventManager instance;
     return instance;
 }
 
-bool EventManager::RegisterEventToEntityType(EventType eventType, AssetStringID entityTypeString) {
+bool EventManager::RegisterEventToEntityType(EventType eventType, const AssetStringID& entityTypeString) {
 	OVERRIDE_LOG_NAME("Events");
-    if (eventsToEntityTypes.find(eventType) != eventsToEntityTypes.end()) {
-		std::vector<AssetStringID> entityTypeStrings = eventsToEntityTypes.find(eventType)->second;
-		entityTypeStrings.push_back(entityTypeString);
-		for (int iterator = 0; iterator < entityTypeStrings.size(); iterator++) {
-			if (entityTypeStrings[iterator].CanonicalName() == entityTypeString.CanonicalName()) {
-				ERR("Tried to register the same event to the same entity type twice");
-				return false;
-			}
+	std::vector<AssetStringID>& entityTypeStrings = eventsToEntityTypes[eventType];
+	for (int iterator = 0; iterator < entityTypeStrings.size(); iterator++) {
+		if (entityTypeStrings[iterator].CanonicalName() == entityTypeString.CanonicalName()) {
+			ERR("Tried to register the same event to the same entity type twice");
+			return false;
 		}
-        eventsToEntityTypes[eventType] = entityTypeStrings;
-        return true;
-    }
-
-	std::vector<AssetStringID> entityTypeStrings;
+	}
 	entityTypeStrings.push_back(entityTypeString);
-	eventsToEntityTypes[eventType] = entityTypeStrings;
-	return true;
+
+	INFO("Successfully registered event with numerical ID {" + std::to_string(static_cast<int>(eventType)) + "} to entity type with string ID \"" + entityTypeString.CanonicalName() + "\"");
+    return true;
 }
 
 void EventManager::RegisterFunctionToEvent(EventType eventType, std::function<void(EventData&)> callback) {
@@ -39,16 +39,11 @@ void EventManager::RegisterFunctionToEvent(EventType eventType, std::function<vo
 	eventsToFunctions[eventType] = eventsToFunctions.find(eventType)->second;
 }
 
-bool EventManager::TriggerEvent(EventType eventType, EventData eventData) {
+bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) {
 	OVERRIDE_LOG_NAME("Event Manager");
 
-	eventDatas.resize(eventData.dataSize);
-    memcpy(eventDatas.data(), eventData.data, eventData.dataSize);
-
-    EventData copiedData(eventDatas.data(), eventDatas.size());
-
 	ModHandler& modHandler = ModHandler::GetInstance();
-	const void* arguments[] = {copiedData.data};
+	const void* arguments[] = {eventData.data};
 
 	bool foundEntity = false;
 	auto entityTypes = eventsToEntityTypes.find(eventType);
@@ -61,7 +56,14 @@ bool EventManager::TriggerEvent(EventType eventType, EventData eventData) {
 		}
 
 		for (int iterator = 0; iterator < entities.size(); iterator++) {
-			modHandler.CallWasmFunction("GetEvent", arguments);
+			std::string functionName = "Get" + eventTypeStrings[eventType];
+
+			if (eventType == EVENT_WORLD_PLAYER_BLOCK) {
+				WorldPlayerBlockEvent* event = static_cast<WorldPlayerBlockEvent*>(eventData.data);
+				std::vector<void*> arguments = {event};
+				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT};
+				modHandler.CallModFunction("kiwicubed", functionName, arguments, argumentTypes);
+			}
 		}
 	}
 
@@ -71,7 +73,7 @@ bool EventManager::TriggerEvent(EventType eventType, EventData eventData) {
 		foundFunction = true;
 		
 		for (int iterator = 0; iterator < functions->second.size(); iterator++) {
-			functions->second[iterator](copiedData);
+			functions->second[iterator](const_cast<EventData&>(eventData));
 		}
 	}
 

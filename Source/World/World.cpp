@@ -205,14 +205,14 @@ void World::RecalculateChunksToLoad(EventData& eventData, unsigned short horizon
     if (verticalRadius == 0) {
         verticalRadius = playerChunkGenerationRadiusVertical;
     }
-	WorldPlayerMove moveEvent = *static_cast<WorldPlayerMove*>(eventData.data);
-	glm::vec3 playerChunkPosition = glm::vec3(static_cast<int>(moveEvent.newPlayerX) % 32, static_cast<int>(moveEvent.newPlayerY) % 32, static_cast<int>(moveEvent.newPlayerZ) % 32);
-
+	//WorldPlayerMove moveEvent = *static_cast<WorldPlayerMove*>(eventData.data);
+	//glm::vec3 playerChunkPosition = glm::vec3(static_cast<int>(moveEvent.newPlayerX) % 32, static_cast<int>(moveEvent.newPlayerY) % 32, static_cast<int>(moveEvent.newPlayerZ) % 32);
+	glm::ivec3 playerChunkPosition = glm::vec3(0, 0, 0);
     std::lock_guard<std::mutex> lock(ChunkQueueMutex);
     {
-        for (int chunkX = static_cast<int>(playerChunkPosition.x) - horizontalRadius; chunkX < playerChunkPosition.x + horizontalRadius; ++chunkX) {
-            for (int chunkY = static_cast<int>(playerChunkPosition.y) - verticalRadius; chunkY < playerChunkPosition.y + verticalRadius; ++chunkY) {
-                for (int chunkZ = static_cast<int>(playerChunkPosition.z) - horizontalRadius; chunkZ < playerChunkPosition.z + horizontalRadius; ++chunkZ) {
+        for (int chunkX = playerChunkPosition.x - horizontalRadius; chunkX < playerChunkPosition.x + horizontalRadius; ++chunkX) {
+            for (int chunkY = playerChunkPosition.y - verticalRadius; chunkY < playerChunkPosition.y + verticalRadius; ++chunkY) {
+                for (int chunkZ = playerChunkPosition.z - horizontalRadius; chunkZ < playerChunkPosition.z + horizontalRadius; ++chunkZ) {
                     std::tuple<int, int, int> chunkPosition = {chunkX, chunkY, chunkZ};
                     Chunk* chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
                     if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk->GetMeshable(chunkHandler) && chunk->generationStatus != 3) {

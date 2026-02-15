@@ -10,6 +10,8 @@
 #include <vector>
 #include <memory>
 
+#include <angelscript.h>
+
 #include "EntityManager.h"
 #include "EventDefinitions.h"
 
@@ -26,14 +28,27 @@ enum EventType {
     //  Important events
     EVENT_WORLD_TICK,
     //  Player events
-    EVENT_WORLD_PLAYER_BLOCK_EVENT,
+    EVENT_WORLD_PLAYER_BLOCK,
     EVENT_WORLD_PLAYER_MOVE,
 	//  Entity events
-	EVENT_WORLD_ENTITY_BLOCK_EVENT,
-	EVENT_WORLD_ENTITY_HURT_EVENT,
-	EVENT_WORLD_ENTITY_ATTACK_EVENT,
+	EVENT_WORLD_ENTITY_BLOCK,
+	EVENT_WORLD_ENTITY_HURT,
+	EVENT_WORLD_ENTITY_ATTACK,
 	//  Generic events
-    EVENT_WORLD_GENERIC_BLOCK_EVENT,
+    EVENT_WORLD_GENERIC_BLOCK,
+};
+
+const std::string eventTypeStrings[10] = {
+	"EventMetaWindowMinimize",
+	"EventMetaWindowMaximize",
+	"EventMetaWindowResize",
+	"EventWorldTick",
+	"EventWorldPlayerBlock",
+	"EventWorldPlayerMove",
+	"EventWorldEntityBlock",
+	"EventWorldEntityHurt",
+	"EventWorldEntityAttack",
+	"EventWorldGenericBlock"
 };
 
 struct EventData {
@@ -50,10 +65,10 @@ class EventManager {
         static EventManager& GetInstance();
         void Delete();
 
-		bool RegisterEventToEntityType(EventType eventType, AssetStringID entityTypeString);
-		void RegisterFunctionToEvent(EventType eventType, std::function<void(EventData&)> callback);
+		static bool RegisterEventToEntityType(EventType eventType, const AssetStringID& entityTypeString);
+		static void RegisterFunctionToEvent(EventType eventType, std::function<void(EventData&)> callback);
 
-        bool TriggerEvent(EventType eventType, EventData eventData);
+        static bool TriggerEvent(EventType eventType, const EventData eventData);
 
     private:
         EventManager() = default;
@@ -62,8 +77,8 @@ class EventManager {
         EventManager(const EventManager&) = delete;
         EventManager& operator=(const EventManager&) = delete;
 
-		std::unordered_map<EventType, std::vector<AssetStringID>> eventsToEntityTypes;
-		std::unordered_map<EventType, std::vector<std::function<void(EventData&)>>> eventsToFunctions;
+		static std::unordered_map<EventType, std::vector<AssetStringID>> eventsToEntityTypes;
+		static std::unordered_map<EventType, std::vector<std::function<void(EventData&)>>> eventsToFunctions;
 
-		std::vector<uint8_t> eventDatas;
+		static std::vector<uint8_t> eventDatas;
 };

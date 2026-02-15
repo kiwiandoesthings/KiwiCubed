@@ -21,7 +21,7 @@ extern "C" {
         EventManager::GetInstance().RegisterFunctionToEvent(static_cast<EventType>(eventType), [stringFunctionName](EventData& eventData) {
             ModHandler& modHandler = ModHandler::GetInstance();
 			const void* arguments[] = {eventData.data};
-            modHandler.CallWasmFunction(stringFunctionName, arguments);
+            //modHandler.CallWasmFunction(stringFunctionName, arguments);
         });
     }
 

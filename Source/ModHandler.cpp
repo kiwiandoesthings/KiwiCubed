@@ -5,36 +5,37 @@
 #include "Block.h"
 #include "EntityManager.h"
 #include "Events.h"
+#include "GenerateAngelScriptLanguageData.cpp"
 
 
-m3ApiRawFunction(KC_Log_WASM) {
-    m3ApiGetArgMem(const char*, message);
-    KC_Log(message);
-    m3ApiSuccess();
-}
-
-m3ApiRawFunction(KC_RegisterEventToEntityType_WASM) {
-	m3ApiGetArgMem(int, eventType);
-	m3ApiGetArgMem(const char*, modName);
-	m3ApiGetArgMem(const char*, assetName);
-	KC_RegisterEventToEntityType(eventType, modName, assetName);
-	m3ApiSuccess();
-}
-
-m3ApiRawFunction(KC_RegisterFunctionToEvent_WASM) {
-	m3ApiGetArgMem(int, eventType);
-	m3ApiGetArgMem(const char*, functionName);
-	KC_RegisterFunctionToEvent(eventType, functionName);
-	m3ApiSuccess();
-}
-
-m3ApiRawFunction(KC_GetTextureNumericalID_WASM) {
-    m3ApiReturnType(unsigned int);
-    m3ApiGetArgMem(const char*, modName);
-    m3ApiGetArgMem(const char*, assetName);
-    unsigned int id = KC_GetTextureNumericalID(modName, assetName);
-    m3ApiReturn(id);
-}
+//m3ApiRawFunction(KC_Log_WASM) {
+//    m3ApiGetArgMem(const char*, message);
+//    KC_Log(message);
+//    m3ApiSuccess();
+//}
+//
+//m3ApiRawFunction(KC_RegisterEventToEntityType_WASM) {
+//	m3ApiGetArgMem(int, eventType);
+//	m3ApiGetArgMem(const char*, modName);
+//	m3ApiGetArgMem(const char*, assetName);
+//	KC_RegisterEventToEntityType(eventType, modName, assetName);
+//	m3ApiSuccess();
+//}
+//
+//m3ApiRawFunction(KC_RegisterFunctionToEvent_WASM) {
+//	m3ApiGetArgMem(int, eventType);
+//	m3ApiGetArgMem(const char*, functionName);
+//	KC_RegisterFunctionToEvent(eventType, functionName);
+//	m3ApiSuccess();
+//}
+//
+//m3ApiRawFunction(KC_GetTextureNumericalID_WASM) {
+//    m3ApiReturnType(unsigned int);
+//    m3ApiGetArgMem(const char*, modName);
+//    m3ApiGetArgMem(const char*, assetName);
+//    unsigned int id = KC_GetTextureNumericalID(modName, assetName);
+//    m3ApiReturn(id);
+//}
 
 
 ModHandler& ModHandler::GetInstance() {
@@ -406,7 +407,7 @@ bool ModHandler::LoadModData() {
                 for (const auto& entry : std::filesystem::directory_iterator(modScripts)) {
                     if (std::filesystem::is_regular_file(entry.status())) {
                         auto filePath = entry.path();
-                        if (filePath.extension() == ".wasm") {
+                        if (filePath.extension() == ".as") {
                             scriptPath = filePath.generic_string();
                             modNamespacesToScripts.insert(std::make_pair(modNamespace, scriptPath));
                         }
@@ -425,88 +426,190 @@ bool ModHandler::LoadModData() {
 }
 
 bool ModHandler::LoadModScripts() {
-    OVERRIDE_LOG_NAME("Mod Script Loading");
+    OVERRIDE_LOG_NAME("Mod Scripting Environment Initialization");
+	engine = asCreateScriptEngine();
+	RegisterStdString(engine);
+	int result = engine->SetMessageCallback(asFUNCTION(ModError), &std::cout, asCALL_CDECL);
+	if (result < 0) {
+		ERR("Failed to set message callback");
+		return false;
+	}
+
+	// Types
+	//  AssetStringID
+	engine->RegisterObjectType("AssetStringID", sizeof(AssetStringID), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+	engine->RegisterObjectBehaviour("AssetStringID", asBEHAVE_CONSTRUCT, "void f(const string &in, const string &in)", asFUNCTION(+[](const std::string& modName, const std::string& assetName, void* memory){
+		new(memory) AssetStringID(modName, assetName);
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("AssetStringID", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory){
+		 reinterpret_cast<AssetStringID*>(memory)->~AssetStringID();
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("AssetStringID", "string CanonicalName() const", asMETHOD(AssetStringID, CanonicalName), asCALL_THISCALL);
+	engine->RegisterObjectProperty("AssetStringID", "string modName", offsetof(AssetStringID, modName));
+	engine->RegisterObjectProperty("AssetStringID", "string assetName", offsetof(AssetStringID, assetName));
+	//  EventType
+	engine->RegisterEnum("EventType");
+	engine->RegisterEnumValue("EventType", "EVENT_META_WINDOW_MINIMIZE", EventType::EVENT_META_WINDOW_MINIMIZE);
+	engine->RegisterEnumValue("EventType", "EVENT_META_WINDOW_MAXIMIZE", EventType::EVENT_META_WINDOW_MAXIMIZE);
+	engine->RegisterEnumValue("EventType", "EVENT_META_WINDOW_RESIZE", EventType::EVENT_META_WINDOW_RESIZE);
+	engine->RegisterEnumValue("EventType", "EVENT_WORLD_TICK", EventType::EVENT_WORLD_TICK);
+	engine->RegisterEnumValue("EventType", "EVENT_WORLD_PLAYER_BLOCK", EventType::EVENT_WORLD_PLAYER_BLOCK);
+	engine->RegisterEnumValue("EventType", "EVENT_WORLD_PLAYER_MOVE", EventType::EVENT_WORLD_PLAYER_MOVE);
+	engine->RegisterEnumValue("EventType", "EVENT_WORLD_ENTITY_BLOCK", EventType::EVENT_WORLD_ENTITY_BLOCK);
+	engine->RegisterEnumValue("EventType", "EVENT_WORLD_ENTITY_HURT", EventType::EVENT_WORLD_ENTITY_HURT);
+	engine->RegisterEnumValue("EventType", "EVENT_WORLD_ENTITY_ATTACK", EventType::EVENT_WORLD_ENTITY_ATTACK);
+	engine->RegisterEnumValue("EventType", "EVENT_WORLD_GENERIC_BLOCK", EventType::EVENT_WORLD_GENERIC_BLOCK);
+	//  BlockEventType
+	engine->RegisterEnum("BlockEventType");
+	engine->RegisterEnumValue("BlockEventType", "BLOCK_MINED", BlockEventType::BLOCK_MINED);
+	engine->RegisterEnumValue("BlockEventType", "BLOCK_PLACED", BlockEventType::BLOCK_PLACED);
+	engine->RegisterEnumValue("BlockEventType", "BLOCK_REPLACED", BlockEventType::BLOCK_REPLACED);
+	engine->RegisterEnumValue("BlockEventType", "BLOCK_INTERACTED", BlockEventType::BLOCK_INTERACTED);
+	engine->RegisterEnumValue("BlockEventType", "BLOCK_TICK_UPDATE", BlockEventType::BLOCK_TICK_UPDATE);
+	engine->RegisterEnumValue("BlockEventType", "BLOCK_NEIGHBOR_UPDATE", BlockEventType::BLOCK_NEIGHBOR_UPDATE);
+	//  EventData
+	engine->RegisterObjectType("EventWorldPlayerBlock", sizeof(WorldPlayerBlockEvent), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+	engine->RegisterObjectBehaviour("EventWorldPlayerBlock", asBEHAVE_CONSTRUCT, "void f(const BlockEventType &in, const uint64 &in, const int &in, const int &in, const int &in, const int &in, const int &in, const AssetStringID &in, const AssetStringID &in)", asFUNCTION(+[](BlockEventType blockEventType, unsigned long long playerAUID, int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, AssetStringID oldBlockStringID, AssetStringID newBlockStringID, void* memory){
+		new(memory) WorldPlayerBlockEvent(blockEventType, playerAUID, chunkX, chunkY, chunkZ, blockX, blockY, blockZ, oldBlockStringID, newBlockStringID);
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("EventWorldPlayerBlock", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory) {
+		reinterpret_cast<WorldPlayerBlockEvent*>(memory)->~WorldPlayerBlockEvent();
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "BlockEventType blockEventType", offsetof(WorldPlayerBlockEvent, blockEventType));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "uint64 playerAUID", offsetof(WorldPlayerBlockEvent, playerAUID));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkX", offsetof(WorldPlayerBlockEvent, chunkX));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkY", offsetof(WorldPlayerBlockEvent, chunkY));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkZ", offsetof(WorldPlayerBlockEvent, chunkZ));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockX", offsetof(WorldPlayerBlockEvent, blockX));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockY", offsetof(WorldPlayerBlockEvent, blockY));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockZ", offsetof(WorldPlayerBlockEvent, blockZ));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID oldBlockStringID", offsetof(WorldPlayerBlockEvent, oldBlockStringID));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID newBlockStringID", offsetof(WorldPlayerBlockEvent, newBlockStringID));
+
+	// Functions
+	engine->RegisterGlobalFunction("void Log(const string &in)", asFUNCTION(ModLog), asCALL_CDECL);
+	engine->RegisterGlobalFunction("bool RegisterEventToEntityType(EventType, const AssetStringID &in)", asFUNCTION(EventManager::RegisterEventToEntityType), asCALL_CDECL);
+
+	//GenerateScriptPredefined(engine, "Github Repos/kiwicubed/Mods/Scripts/as.predefined");
+
+	OVERRIDE_LOG_NAME("Mod Script Loading");
     for (auto iterator = modNamespacesToScripts.begin(); iterator != modNamespacesToScripts.end(); iterator++) {
         std::string modNamespace = iterator->first;
         std::string modScript = iterator->second;
-        
-        wasmModBuffers.push_back(LoadFile(modScript));
-        auto& wasm = wasmModBuffers.back();
 
-        IM3Module modModule;
-        if (m3_ParseModule(modEnvironment, &modModule, wasm.data(), wasm.size())) {
-            ERR("Could not parse wasm from mod with namespace \"" + modNamespace + "\", aborting");
-            return false;
-        }
+		asIScriptModule* module = engine->GetModule(modNamespace.c_str(), asGM_ALWAYS_CREATE);
+		modNamespacesToModules.insert({modNamespace, module});
+		std::string script = LoadFile(modScript);
+		int scriptAddResult = module->AddScriptSection(modScript.c_str(), script.c_str(), script.size());
+		if (scriptAddResult < 0) {
+			ERR("Failed to add script to AngelScript module in mod with namespace \"" + modNamespace + "\"");
+			return false;
+		}
+		int moduleBuildResult = module->Build();
+		if (moduleBuildResult < 0) {
+			ERR("Failed to build mod module in mod with namespace \"" + modNamespace + "\"");
+			return false;
+		}
 
-        m3_LoadModule(modRuntime, modModule);
-
-        m3_LinkRawFunction(modModule, "env", "KC_Log", "v(*)", &KC_Log_WASM);
-        m3_LinkRawFunction(modModule, "env", "KC_GetTextureNumericalID", "i(**)", &KC_GetTextureNumericalID_WASM);
-        
-        IM3Function entrypoint;
-        if (m3_FindFunction(&entrypoint, modRuntime, "Initialize")) {
-            ERR("Could not find entrypoint (Initialize) function in mod with namespace \"" + modNamespace + "\", aborting");
-            return false;
-        }
-
-        auto entityCallbacks = modToEntityCallbacks.find(modNamespace);
-        if (entityCallbacks != modToEntityCallbacks.end()) {
-            for (std::string callback : entityCallbacks->second) {
-                IM3Function callbackFunction;
-                if (m3_FindFunction(&callbackFunction, modRuntime, callback.c_str())) {
-                    ERR("Could not find entity-registered callback function \"" + callback + "\" in mod with namespace \"" + modNamespace + "\"");
-                    return false;
-                }
-            }
-        }
-
-        m3_CallV(entrypoint);
+		asIScriptFunction* function = module->GetFunctionByDecl("void Initialize()");
+		if (!function) {
+			ERR("Failed to find \"Initialize\" function in mod with namespace \"" + modNamespace + "\"");
+			return false;
+		}
     }
 
     return true;
 }
 
 bool ModHandler::RunModEntrypoints() {
-    return false;
-}
+	OVERRIDE_LOG_NAME("Mod Entrypoint Execution");
+	for (auto iterator = modNamespacesToModules.begin(); iterator != modNamespacesToModules.end(); iterator++) {
+		std::string modNamespace = iterator->first;
+		asIScriptModule* module = iterator->second;
 
-void ModHandler::CallWasmFunction(std::string functionName, const void* arguments[]) {
-	OVERRIDE_LOG_NAME("Mod Script Interop");
-    IM3Function function;
-    M3Result result = m3_FindFunction(&function, modRuntime, functionName.c_str());
-	if (m3_GetArgCount(function) != sizeof(arguments)) {
-		CRITICAL("Tried to call WASM function with wrong number of arguments");
+		asIScriptFunction* entrypoint = module->GetFunctionByName("Initialize");
+		if (!entrypoint) {
+			ERR("Failed to find \"Initialize\" function in mod with namespace \"" + modNamespace + "\", this should happen under any circumstances, please report a bug");
+			return false;
+		}
+		asIScriptContext* context = engine->CreateContext();
+		context->Prepare(entrypoint);
+		int result = context->Execute();
+		if (result != asEXECUTION_FINISHED) {
+			ERR("Initialization in mod with namespace \"" + modNamespace + "\" failed");
+			return false;
+		}
+		context->Release();
 	}
-    
-    if (result) {
-        ERR("Could not find function \"" + functionName + "\", error: " + std::string(result));
-        return;
-    }
 
-    result = m3_CallV(function, sizeof(arguments), arguments);
-    
-    if (result) {
-        ERR("Error in function \"" + functionName + "\", error: " + std::string(result));
-        
-        M3ErrorInfo info;
-        m3_GetErrorInfo(modRuntime, &info);
-        if (info.message) {
-            ERR("There is more error: " + std::string(info.message));
-        }
-    }
+    return true;
 }
 
-std::vector<uint8_t> ModHandler::LoadFile(std::string path) {
-    std::ifstream file(path.c_str(), std::ios::binary);
+void ModHandler::CallModFunction(const std::string& moduleName, const std::string& functionName, const std::vector<void*>& arguments, const std::vector<int>& argumentTypes) {
+	OVERRIDE_LOG_NAME("Mod Script Execution");
+	asIScriptModule* module = modNamespacesToModules.find("kiwicubed")->second;
+	// TODO: valid module checking
+	asIScriptFunction* function = module->GetFunctionByName(functionName.c_str());
+	if (!function) {
+		CRITICAL("Tried to call function \"" + functionName + "\" in module from namespace \"" + moduleName + "\" that didn't exist, aborting");
+		psnip_trap();
+	}
 
-    return std::vector<uint8_t>(
-        std::istreambuf_iterator<char>(file),
-        std::istreambuf_iterator<char>()
-    );
+	asIScriptContext* context = engine->CreateContext();
+	context->Prepare(function);
+
+	for (unsigned int iterator = 0; iterator < arguments.size(); iterator++) {
+		int type = argumentTypes[iterator];
+		void* argument = arguments[iterator];
+
+		if (type == asTYPEID_APPOBJECT) {
+			context->SetArgObject(iterator, argument);
+		} else if (type == asTYPEID_INT32) {
+			context->SetArgDWord(iterator, *reinterpret_cast<int32_t*>(argument));
+		} else if (type == asTYPEID_UINT64)  {
+			context->SetArgQWord(iterator, *reinterpret_cast<uint64_t*>(argument));
+		} else {
+			WARN("Tried to call function with unsupported argument type: {" + std::to_string(type) + "}, aborting");
+			return;
+		}
+	}
+
+	int result = context->Execute();
+	if (result != asEXECUTION_FINISHED) {
+		if (result == asEXECUTION_EXCEPTION) {
+			asIScriptFunction* exceptionFunction = context->GetExceptionFunction();
+
+			const char* module = exceptionFunction->GetModuleName();
+			int line = context->GetExceptionLineNumber();
+			const char* description = context->GetExceptionString();
+
+			CRITICAL("Error occured while calling function \"" + functionName + "\" in module \"" + std::string(module) + "\" from namespace\"" + moduleName + "\" at line {" + std::to_string(line) + "} with description \"" + std::string(description) + "\"");
+		} else {
+			CRITICAL("Error occured while calling function \"" + functionName + "\" in module from namespace \"" + moduleName + "\" with result enum of {" + std::to_string(result) + "}, aborting");
+		}
+		psnip_trap();
+	}
+}
+
+std::string ModHandler::LoadFile(std::string path) {
+	std::ifstream file(path);
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	return buffer.str();
+}
+
+void ModHandler::ModError(const asSMessageInfo* messageInfo, void* parameter) {
+	std::ostream* out = reinterpret_cast<std::ostream*>(parameter);
+	*out << messageInfo->section << " (" << messageInfo->row << ", " << messageInfo->col << ") : "
+         << messageInfo->message << std::endl;
+}
+
+void ModHandler::ModLog(const std::string& message) {
+	OVERRIDE_LOG_NAME("Mod script");
+	EXT(message);
 }
 
 void ModHandler::Delete() {
-    m3_FreeRuntime(modRuntime);
-    m3_FreeEnvironment(modEnvironment);
+    //m3_FreeRuntime(modRuntime);
+    //m3_FreeEnvironment(modEnvironment);
 }

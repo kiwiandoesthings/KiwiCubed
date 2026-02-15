@@ -17,44 +17,44 @@ void Physics::Initialize() {
 	blockCollisionQueue.reserve(3 * 3 * 3);
 }
 
-static void ApplyGravity(EntityData& newEntityData) {
+static void ApplyGravity(EntityTransform& newTransform) {
 	//Globals& globals = Globals::GetInstance();
 	float gravityPerSecond = 9.81f;
 	// makeshift deltatime until render thread is set up. first frame after creating world,
 	// deltatime is super high and you get like -60 velocity in 1 frame
-    newEntityData.velocity.y -= gravityPerSecond * (60.0 / 1000.0);
+    newTransform.velocity.y -= gravityPerSecond * (60.0 / 1000.0);
 }
 
-static void ClipVelocity(EntityData& newEntityData, int axis) {
-	if (abs(newEntityData.velocity[axis]) > newEntityData.terminalVelocity) {
-		if (newEntityData.velocity[axis] > 0) {
-			newEntityData.velocity[axis] = newEntityData.terminalVelocity;
+static void ClipVelocity(EntityTransform& newTransform, EntityData& entityData, int axis) {
+	if (abs(newTransform.velocity[axis]) > entityData.terminalVelocity) {
+		if (newTransform.velocity[axis] > 0) {
+			newTransform.velocity[axis] =  entityData.terminalVelocity;
 		} else {
-			newEntityData.velocity[axis] = -newEntityData.terminalVelocity;
+			newTransform.velocity[axis] = - entityData.terminalVelocity;
 		}
 	}
 }
 
-bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHandler& chunkHandler) {
+bool Physics::CollideAxis(unsigned char axis, EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler) {
 	{
 		std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
-		if (newEntityData.currentChunkPtr == nullptr || !newEntityData.currentChunkPtr->isGenerated) {
+		if (entityData.currentChunkPtr == nullptr || !entityData.currentChunkPtr->isGenerated) {
 			return false;
 		}
 	}
 
- 	glm::vec3 min1 = glm::vec3(newEntityData.physicsBoundingBox.corner1.x + newEntityData.position.x, newEntityData.physicsBoundingBox.corner1.y + newEntityData.position.y, newEntityData.physicsBoundingBox.corner1.z + newEntityData.position.z);
-	glm::vec3 max1 = glm::vec3(newEntityData.physicsBoundingBox.corner2.x + newEntityData.position.x, newEntityData.physicsBoundingBox.corner2.y + newEntityData.position.y, newEntityData.physicsBoundingBox.corner2.z + newEntityData.position.z);
+ 	glm::vec3 min1 = glm::vec3(entityData.physicsBoundingBox.corner1.x + newTransform.position.x, entityData.physicsBoundingBox.corner1.y + newTransform.position.y, entityData.physicsBoundingBox.corner1.z + newTransform.position.z);
+	glm::vec3 max1 = glm::vec3(entityData.physicsBoundingBox.corner2.x + newTransform.position.x, entityData.physicsBoundingBox.corner2.y + newTransform.position.y, entityData.physicsBoundingBox.corner2.z + newTransform.position.z);
 	for (auto& blockPosition : blockCollisionQueue) {
 		Chunk* targetChunk = nullptr;
-		if (blockPosition.chunkPosition.x != newEntityData.globalChunkPosition.x || blockPosition.chunkPosition.y != newEntityData.globalChunkPosition.y || blockPosition.chunkPosition.z != newEntityData.globalChunkPosition.z) {
+		if (blockPosition.chunkPosition.x != newTransform.globalChunkPosition.x || blockPosition.chunkPosition.y != newTransform.globalChunkPosition.y || blockPosition.chunkPosition.z != newTransform.globalChunkPosition.z) {
 			std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
 			targetChunk = chunkHandler.GetChunkUnlocked(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
 			if (!targetChunk->isGenerated) {
 				continue;
 			}
 		} else {
-			targetChunk = newEntityData.currentChunkPtr;
+			targetChunk = entityData.currentChunkPtr;
 		}
 		Block block;
 		{
@@ -75,9 +75,9 @@ bool Physics::CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHa
 			if (isColliding) {
 				float collision = min1[axis] - min2[axis];
 				if (collision < 0) {
-					newEntityData.position[axis] = min2[axis] - newEntityData.physicsBoundingBox.corner2[axis];
+					newTransform.position[axis] = min2[axis] - entityData.physicsBoundingBox.corner2[axis];
 				} else {
-					newEntityData.position[axis] = max2[axis] - newEntityData.physicsBoundingBox.corner1[axis];
+					newTransform.position[axis] = max2[axis] - entityData.physicsBoundingBox.corner1[axis];
 				}
 				newEntityData.velocity[axis] = 0;
 				return true;

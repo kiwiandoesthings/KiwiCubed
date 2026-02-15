@@ -104,6 +104,7 @@ int KiwiCubedEngine::StartEngine() {
 	// Mods
 	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.LoadModData(), "Failed to load mod data, exiting", -1);
 	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.LoadModScripts(), "Failed to load mod scripts, exiting", -1);
+	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.RunModEntrypoints(), "Failed to run mod entrypoints, exiting", -1);
 
 	// "temporary" setup of certain events in main
 	//eventManager.RegisterEvent("event/close_game");

@@ -4,10 +4,10 @@
 #include "ModHandler.h"
 #include "World.h"
 
-Entity::Entity(float entityX, float entityY, float entityZ, World* world) : entityStats(EntityStats()), entityData(EntityData()), world(world) {
-	entityData.position.x = entityX;
-	entityData.position.y = entityY;
-	entityData.position.z = entityZ;
+Entity::Entity(float entityX, float entityY, float entityZ, World* world) : entityStats(EntityStats()), entityData(EntityData()), entityTransform(EntityTransform()), world(world) {
+	entityTransform.position.x = entityX;
+	entityTransform.position.y = entityY;
+	entityTransform.position.z = entityZ;
 
 	protectedEntityData.AUID = CreateAUID();
 }
@@ -69,34 +69,34 @@ void Entity::DamageEntity(float damage) {
 }
 
 void Entity::Update() {
-	entityRenderData.oldPosition = entityData.position;
-	entityRenderData.oldOrientation = entityData.orientation;
-	entityRenderData.oldUpDirection = entityData.upDirection;
-	entityRenderData.oldVelocity = entityData.velocity;
+	entityRenderData.oldPosition = entityTransform.position;
+	entityRenderData.oldOrientation = entityTransform.orientation;
+	entityRenderData.oldUpDirection = entityTransform.upDirection;
+	entityRenderData.oldVelocity = entityTransform.velocity;
 	entityRenderData.oldPositionOffset = entityRenderData.positionOffset;
 	entityRenderData.oldOrientationOffset = entityRenderData.orientationOffset;
 
-	glm::ivec3 oldGlobalChunkPosition = entityData.globalChunkPosition;
-	entityData.globalChunkPosition = glm::ivec3(
-		Physics::FloorDiv(entityData.position.x, chunkSize),
-		Physics::FloorDiv(entityData.position.y, chunkSize),
-		Physics::FloorDiv(entityData.position.z, chunkSize)
+	glm::ivec3 oldGlobalChunkPosition = entityTransform.globalChunkPosition;
+	entityTransform.globalChunkPosition = glm::ivec3(
+		Physics::FloorDiv(entityTransform.position.x, chunkSize),
+		Physics::FloorDiv(entityTransform.position.y, chunkSize),
+		Physics::FloorDiv(entityTransform.position.z, chunkSize)
 	);
-	entityData.localChunkPosition = glm::ivec3(
-		Physics::PositiveModulo(entityData.position.x, chunkSize), 
-		Physics::PositiveModulo(entityData.position.y, chunkSize), 
-		Physics::PositiveModulo(entityData.position.z, chunkSize)
+	entityTransform.localChunkPosition = glm::ivec3(
+		Physics::PositiveModulo(entityTransform.position.x, chunkSize), 
+		Physics::PositiveModulo(entityTransform.position.y, chunkSize), 
+		Physics::PositiveModulo(entityTransform.position.z, chunkSize)
 	);
 
-	if (oldGlobalChunkPosition != entityData.globalChunkPosition) {
-		entityData.currentChunkPtr = world->GetChunkHandler().GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+	if (oldGlobalChunkPosition != entityTransform.globalChunkPosition) {
+		entityData.currentChunkPtr = world->GetChunkHandler().GetChunk(entityTransform.globalChunkPosition.x, entityTransform.globalChunkPosition.y, entityTransform.globalChunkPosition.z, false);
 	}
 
 	if (entityData.isPlayer) {
 		return;
 	}
 
-	entityData.orientation.y += 150.0f * Globals::GetInstance().deltaTime;
+	entityTransform.orientation.y += 150.0f * Globals::GetInstance().deltaTime;
 	entityRenderData.positionOffset.y = sin(world->GetTotalTicks() / 3.0f) * 0.025;
 
 	return;
@@ -124,8 +124,8 @@ void Entity::Render() {
     
     glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-	glm::vec3 interpolatedPosition = entityRenderData.oldPosition + (entityData.position - entityRenderData.oldPosition) * world->GetPartialTicks();
-	glm::vec3 interpolatedOrientation = entityRenderData.oldOrientation + (entityData.orientation - entityRenderData.oldOrientation) * world->GetPartialTicks();
+	glm::vec3 interpolatedPosition = entityRenderData.oldPosition + (entityTransform.position - entityRenderData.oldPosition) * world->GetPartialTicks();
+	glm::vec3 interpolatedOrientation = entityRenderData.oldOrientation + (entityTransform.orientation - entityRenderData.oldOrientation) * world->GetPartialTicks();
 	glm::vec3 interpolatedPositionOffset = entityRenderData.oldPositionOffset + (entityRenderData.positionOffset - entityRenderData.oldPositionOffset) * world->GetPartialTicks();
 	glm::vec3 interpolatedOrientationOffset = entityRenderData.oldOrientationOffset + (entityRenderData.orientationOffset - entityRenderData.oldOrientationOffset) * world->GetPartialTicks();
 

@@ -81,9 +81,9 @@ class Physics {
     	Physics(const Physics&) = delete;
     	Physics& operator=(const Physics&) = delete;
 
-		static bool CollideAxis(unsigned char axis, EntityData& newEntityData, ChunkHandler& chunkHandler);
-		static float CollideAxisFloat(unsigned char axis, EntityData& newEntityData, ChunkHandler& chunkHandler);
-		static bool ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chunkHandler);
+		static bool CollideAxis(unsigned char axis, EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler);
+		static float CollideAxisFloat(unsigned char axis, EntityTransform& newEntityData, EntityData& entityData, ChunkHandler& chunkHandler);
+		static bool ApplyTerrainCollision(EntityTransform& newEntityData, ChunkHandler& chunkHandler);
 
 		static std::vector<FullBlockPosition> blockCollisionQueue;
 };

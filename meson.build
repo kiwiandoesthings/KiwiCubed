@@ -63,6 +63,7 @@ executable(
     'Source/AssetManager.cpp',
     'Source/Events.cpp',
     'Source/ExposedModAPI.cpp',
+	'Source/GenerateAngelScriptLanguageData.cpp',
     'Source/Globals.cpp',
     'Source/Input.cpp',
     'Source/KiwiCubed.cpp',
@@ -87,6 +88,7 @@ executable(
     dependency('glm', static: true),
     dependency('glad-gl', static: true),
     dependency('fmt', static: true),
+	dependency('angelscript', static: true),
     freetype
   ],
 )
