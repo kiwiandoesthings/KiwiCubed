@@ -3,16 +3,16 @@
 #include "AssetDefinitions.h"
 
 
-struct MetaWindowResizeEvent {
+struct EventMetaWindowResize {
 	int newWidth;
 	int newHeight;
 };
 
-struct WorldTickEvent {
+struct EventWorldTick {
 	unsigned long long tickNumber;
 };
 
-struct WorldPlayerBlockEvent {
+struct EventWorldPlayerBlock {
 	BlockEventType blockEventType;
 	unsigned long long playerAUID;
 	int chunkX;
@@ -25,7 +25,7 @@ struct WorldPlayerBlockEvent {
 	AssetStringID newBlockStringID;
 };
 
-struct WorldPlayerMove {
+struct EventWorldPlayerMove {
 	float oldPlayerX;
 	float oldPlayerY;
 	float oldPlayerZ;
@@ -40,7 +40,7 @@ struct WorldPlayerMove {
 	float newPlayerRoll;
 };
 
-struct WorldEntityBlockEvent {
+struct EventWorldEntityBlock {
 	BlockEventType blockEventType;
 	unsigned long long entityAUID;
 	int chunkX;
@@ -53,7 +53,7 @@ struct WorldEntityBlockEvent {
 	AssetStringID newBlockStringID;
 };
 
-struct WorldGenericBlockEvent {
+struct EventWorldGenericBlock {
 	BlockEventType blockEventType;
 	int chunkX;
 	int chunkY;

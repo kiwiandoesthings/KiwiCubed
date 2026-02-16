@@ -468,23 +468,23 @@ bool ModHandler::LoadModScripts() {
 	engine->RegisterEnumValue("BlockEventType", "BLOCK_TICK_UPDATE", BlockEventType::BLOCK_TICK_UPDATE);
 	engine->RegisterEnumValue("BlockEventType", "BLOCK_NEIGHBOR_UPDATE", BlockEventType::BLOCK_NEIGHBOR_UPDATE);
 	//  EventData
-	engine->RegisterObjectType("EventWorldPlayerBlock", sizeof(WorldPlayerBlockEvent), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+	engine->RegisterObjectType("EventWorldPlayerBlock", sizeof(EventWorldPlayerBlock), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
 	engine->RegisterObjectBehaviour("EventWorldPlayerBlock", asBEHAVE_CONSTRUCT, "void f(const BlockEventType &in, const uint64 &in, const int &in, const int &in, const int &in, const int &in, const int &in, const AssetStringID &in, const AssetStringID &in)", asFUNCTION(+[](BlockEventType blockEventType, unsigned long long playerAUID, int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, AssetStringID oldBlockStringID, AssetStringID newBlockStringID, void* memory){
-		new(memory) WorldPlayerBlockEvent(blockEventType, playerAUID, chunkX, chunkY, chunkZ, blockX, blockY, blockZ, oldBlockStringID, newBlockStringID);
+		new(memory) EventWorldPlayerBlock(blockEventType, playerAUID, chunkX, chunkY, chunkZ, blockX, blockY, blockZ, oldBlockStringID, newBlockStringID);
 	}), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("EventWorldPlayerBlock", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory) {
-		reinterpret_cast<WorldPlayerBlockEvent*>(memory)->~WorldPlayerBlockEvent();
+		reinterpret_cast<EventWorldPlayerBlock*>(memory)->~EventWorldPlayerBlock();
 	}), asCALL_CDECL_OBJLAST);
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "BlockEventType blockEventType", offsetof(WorldPlayerBlockEvent, blockEventType));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "uint64 playerAUID", offsetof(WorldPlayerBlockEvent, playerAUID));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkX", offsetof(WorldPlayerBlockEvent, chunkX));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkY", offsetof(WorldPlayerBlockEvent, chunkY));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkZ", offsetof(WorldPlayerBlockEvent, chunkZ));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockX", offsetof(WorldPlayerBlockEvent, blockX));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockY", offsetof(WorldPlayerBlockEvent, blockY));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockZ", offsetof(WorldPlayerBlockEvent, blockZ));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID oldBlockStringID", offsetof(WorldPlayerBlockEvent, oldBlockStringID));
-	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID newBlockStringID", offsetof(WorldPlayerBlockEvent, newBlockStringID));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "BlockEventType blockEventType", offsetof(EventWorldPlayerBlock, blockEventType));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "uint64 playerAUID", offsetof(EventWorldPlayerBlock, playerAUID));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkX", offsetof(EventWorldPlayerBlock, chunkX));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkY", offsetof(EventWorldPlayerBlock, chunkY));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int chunkZ", offsetof(EventWorldPlayerBlock, chunkZ));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockX", offsetof(EventWorldPlayerBlock, blockX));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockY", offsetof(EventWorldPlayerBlock, blockY));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockZ", offsetof(EventWorldPlayerBlock, blockZ));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID oldBlockStringID", offsetof(EventWorldPlayerBlock, oldBlockStringID));
+	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID newBlockStringID", offsetof(EventWorldPlayerBlock, newBlockStringID));
 
 	// Functions
 	engine->RegisterGlobalFunction("void Log(const string &in)", asFUNCTION(ModLog), asCALL_CDECL);

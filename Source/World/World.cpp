@@ -199,15 +199,14 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool
 }
 
 void World::RecalculateChunksToLoad(EventData& eventData, unsigned short horizontalRadius, unsigned short verticalRadius) {
+	EventWorldPlayerMove* moveEvent = static_cast<EventWorldPlayerMove*>(eventData.data);
     if (horizontalRadius == 0) {
         horizontalRadius = playerChunkGenerationRadiusHorizontal;
     }
     if (verticalRadius == 0) {
         verticalRadius = playerChunkGenerationRadiusVertical;
     }
-	//WorldPlayerMove moveEvent = *static_cast<WorldPlayerMove*>(eventData.data);
-	//glm::vec3 playerChunkPosition = glm::vec3(static_cast<int>(moveEvent.newPlayerX) % 32, static_cast<int>(moveEvent.newPlayerY) % 32, static_cast<int>(moveEvent.newPlayerZ) % 32);
-	glm::ivec3 playerChunkPosition = glm::vec3(0, 0, 0);
+	glm::ivec3 playerChunkPosition = glm::ivec3(static_cast<int>(moveEvent->newPlayerX) % 32, static_cast<int>(moveEvent->newPlayerY) % 32, static_cast<int>(moveEvent->newPlayerZ) % 32);
     std::lock_guard<std::mutex> lock(ChunkQueueMutex);
     {
         for (int chunkX = playerChunkPosition.x - horizontalRadius; chunkX < playerChunkPosition.x + horizontalRadius; ++chunkX) {
@@ -233,7 +232,7 @@ void World::RecalculateChunksToLoad(EventData& eventData, unsigned short horizon
         }
         
         // this is bad code probably. maybe remove unload-needing chunks from gen/mesh queues in below loop instead of separate loops
-        glm::ivec3 playerPosition = player.GetEntityData().globalChunkPosition;
+        glm::ivec3 playerPosition = player.GetEntityTransform().globalChunkPosition;
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); iterator++) {
             auto& chunk = iterator->second;
             int distanceX = playerPosition.x - chunk->chunkX - 1;
@@ -308,7 +307,7 @@ void World::SpawnItemFromBlock(glm::ivec3 chunkPosition, glm::ivec3 blockPositio
 void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
 
-	WorldTickEvent tickEvent = WorldTickEvent{totalTicks};
+	EventWorldTick tickEvent = EventWorldTick{totalTicks};
 	EventData eventData = EventData{&tickEvent, sizeof(tickEvent)};
 	EventManager::GetInstance().TriggerEvent(EVENT_WORLD_TICK, eventData);
 
@@ -385,41 +384,42 @@ void World::Update() {
 void World::DisplayImGui(unsigned int option) {
     if (option == 0) {
         EntityData playerData = player.GetEntityData();
+		EntityTransform playerTransform = player.GetEntityTransform();
 
 		ImGui::Text("Player name: %s", player.GetEntityData().name.c_str());
         ImGui::Text("Player AUID: %d", player.GetProtectedEntityData().AUID);
         ImGui::Text("Player gamemode: %s", player.GetGameModeString().c_str());
 		ImGui::Text("Player health: %d", static_cast<int>(player.GetEntityStats().health));
 		ImGui::Text("Player position: %.2f, %.2f, %.2f",
-			playerData.position.x,
-			playerData.position.y,
-			playerData.position.z);
+			playerTransform.position.x,
+			playerTransform.position.y,
+			playerTransform.position.z);
 		ImGui::Text("Player orientation: %.2f, %.2f, %.2f", 
-			playerData.orientation.x,
-			playerData.orientation.y, 
-			playerData.orientation.z);
+			playerTransform.orientation.x,
+			playerTransform.orientation.y, 
+			playerTransform.orientation.z);
 		ImGui::Text("Player velocity: %.2f, %.2f, %.2f",
-			player.GetEntityData().velocity.x,
-			player.GetEntityData().velocity.y,
-			player.GetEntityData().velocity.z);
+			playerTransform.velocity.x,
+			playerTransform.velocity.y,
+			playerTransform.velocity.z);
         ImGui::Text("Player grounded and jumping state: %d, %d", player.GetEntityData().isGrounded, player.GetEntityData().isJumping);
 		ImGui::Text("Global chunk position: %d, %d, %d", 
-			static_cast<int>(player.GetEntityData().globalChunkPosition.x), 
-			static_cast<int>(player.GetEntityData().globalChunkPosition.y),
-			static_cast<int>(player.GetEntityData().globalChunkPosition.z));
+			static_cast<int>(playerTransform.globalChunkPosition.x), 
+			static_cast<int>(playerTransform.globalChunkPosition.y),
+			static_cast<int>(playerTransform.globalChunkPosition.z));
 		ImGui::Text("Local chunk position: %d, %d, %d", 
-			static_cast<int>(player.GetEntityData().localChunkPosition.x), 
-			static_cast<int>(player.GetEntityData().localChunkPosition.y),
-			static_cast<int>(player.GetEntityData().localChunkPosition.z));
+			static_cast<int>(playerTransform.localChunkPosition.x), 
+			static_cast<int>(playerTransform.localChunkPosition.y),
+			static_cast<int>(playerTransform.localChunkPosition.z));
 		ImGui::Text("Current chunk generation status and blocks %d, %d",
 			GetChunk(
-				player.GetEntityData().globalChunkPosition.x,
-				player.GetEntityData().globalChunkPosition.y,
-				player.GetEntityData().globalChunkPosition.z)->generationStatus,
+				playerTransform.globalChunkPosition.x,
+				playerTransform.globalChunkPosition.y,
+				playerTransform.globalChunkPosition.z)->generationStatus,
 			GetChunk(
-				player.GetEntityData().globalChunkPosition.x,
-				player.GetEntityData().globalChunkPosition.y,
-				player.GetEntityData().globalChunkPosition.z)->GetTotalBlocks());
+				playerTransform.globalChunkPosition.x,
+				playerTransform.globalChunkPosition.y,
+				playerTransform.globalChunkPosition.z)->GetTotalBlocks());
     }
 
     if (option == 1) {

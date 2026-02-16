@@ -15,7 +15,7 @@ const char* gameModeStrings[] = {
 
 
 Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(static_cast<float>(playerX), static_cast<float>(playerY), static_cast<float>(playerZ), world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
-	entityData.position = glm::vec3(playerX, playerY, playerZ);
+	entityTransform.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
 	entityStats.armor = 0;
@@ -99,7 +99,7 @@ void Player::Setup() {
 		entityStats.health += static_cast<float>(offset);
 	}));
 
-	entityData.currentChunkPtr = chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+	entityData.currentChunkPtr = chunkHandler->GetChunk(entityTransform.globalChunkPosition.x, entityTransform.globalChunkPosition.y, entityTransform.globalChunkPosition.z, false);
 	if (!entityData.currentChunkPtr->IsReal()) {
 		entityData.currentChunkPtr = nullptr;
 	}
@@ -113,7 +113,7 @@ void Player::Update() {
 	}
 
 	if (camera->GetWindow().GetFocused()) {
-		EntityData oldEntityData = entityData;
+		EntityTransform oldEntityTransform = entityTransform;
 		QueryInputs();
 		QueryMouseInputs();
 		Entity::Update();
@@ -127,11 +127,11 @@ void Player::Update() {
 			entityData.isJumping = false;
 		}
 		
-		if (oldEntityData.globalChunkPosition != entityData.globalChunkPosition) {
-			WorldPlayerMove moveEvent = WorldPlayerMove(oldEntityData.position.x, oldEntityData.position.y, oldEntityData.position.z, oldEntityData.orientation.y, oldEntityData.orientation.x, oldEntityData.orientation.z, entityData.position.x, entityData.position.y, entityData.position.z, entityData.orientation.y, entityData.orientation.x, entityData.orientation.z);
+		if (oldEntityTransform.globalChunkPosition != entityTransform.globalChunkPosition) {
+			EventWorldPlayerMove moveEvent = EventWorldPlayerMove(oldEntityTransform.position.x, oldEntityTransform.position.y, oldEntityTransform.position.z, oldEntityTransform.orientation.y, oldEntityTransform.orientation.x, oldEntityTransform.orientation.z, entityTransform.position.x, entityTransform.position.y, entityTransform.position.z, entityTransform.orientation.y, entityTransform.orientation.x, entityTransform.orientation.z);
 			EventData eventData = EventData(&moveEvent, sizeof(moveEvent));
 			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_MOVE, eventData);
-			entityData.currentChunkPtr = chunkHandler->GetChunk(entityData.globalChunkPosition.x, entityData.globalChunkPosition.y, entityData.globalChunkPosition.z, false);
+			entityData.currentChunkPtr = chunkHandler->GetChunk(entityTransform.globalChunkPosition.x, entityTransform.globalChunkPosition.y, entityTransform.globalChunkPosition.z, false);
 			if (!entityData.currentChunkPtr->IsReal()) {
 				entityData.currentChunkPtr = nullptr;
 			}
@@ -185,11 +185,11 @@ void Player::QueryInputs() {
 	if (playerData.gameMode == CREATIVE) {
 		speed *= 3;
 
-		glm::vec3 forward = entityData.orientation;
+		glm::vec3 forward = entityTransform.orientation;
 		forward.y = 0;
 		forward = glm::normalize(forward);
-		glm::vec3 right = glm::normalize(glm::cross(forward, entityData.upDirection));
-		glm::vec3 up = glm::normalize(entityData.upDirection);
+		glm::vec3 right = glm::normalize(glm::cross(forward, entityTransform.upDirection));
+		glm::vec3 up = glm::normalize(entityTransform.upDirection);
 
 		if (inputHandler.GetKeyState(GLFW_KEY_W)) {
 			movementVector += forward;
@@ -214,10 +214,10 @@ void Player::QueryInputs() {
 			movementVector = glm::normalize(movementVector) * speed;
 		}
 	} else {
-		glm::vec3 forward = entityData.orientation;
+		glm::vec3 forward = entityTransform.orientation;
 		forward.y = 0;
 		forward = glm::normalize(forward);
-		glm::vec3 right = glm::normalize(glm::cross(forward, entityData.upDirection));
+		glm::vec3 right = glm::normalize(glm::cross(forward, entityTransform.upDirection));
 
 		if (inputHandler.GetKeyState(GLFW_KEY_W) && !inInterface) {
 			movementVector += forward;
@@ -244,11 +244,11 @@ void Player::QueryInputs() {
 		if (shouldJump) {
 			movementVector.y = sqrt(8 * 9.81f * entityData.jumpHeight);
 		} else {
-			movementVector.y = entityData.velocity.y;
+			movementVector.y = entityTransform.velocity.y;
 		}
 	}
 
-	entityData.velocity = movementVector;
+	entityTransform.velocity = movementVector;
 }
 
 void Player::MouseButtonCallback(int button) {
@@ -260,12 +260,12 @@ void Player::MouseButtonCallback(int button) {
 	glm::ivec3 chunkPosition = glm::ivec3(-1, -1, -1);
 	glm::ivec3 blockPosition = glm::ivec3(-1, -1, -1);
 	bool hit = 0;
-	BlockRayHit rayHit = Physics::RaycastWorld(entityData.position, entityData.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit);
+	BlockRayHit rayHit = Physics::RaycastWorld(entityTransform.position, entityTransform.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit);
 	if (rayHit.hit) {
 		if (button == 0) {
 			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
 			BlockType* blockType = BlockManager::GetInstance().GetBlockType(block.blockID);
-			WorldPlayerBlockEvent blockEvent = WorldPlayerBlockEvent(BLOCK_MINED, protectedEntityData.AUID, chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z, blockType->blockStringID, AssetStringID{"kiwicubed", "block/air"});
+			EventWorldPlayerBlock blockEvent = EventWorldPlayerBlock(BLOCK_MINED, protectedEntityData.AUID, chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z, blockType->blockStringID, AssetStringID{"kiwicubed", "block/air"});
 			EventData eventData = EventData{&blockEvent, sizeof(blockEvent)};
 			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_BLOCK, eventData);
 			entityData.inventory.AddItem(InventorySlot{*BlockManager::GetInstance().GetStringID(block.GetBlockID()), 1});
@@ -431,7 +431,7 @@ void Player::QueryMouseInputs() {
 		facing.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 		facing.y = sin(glm::radians(-pitch));
 		facing.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-		entityData.orientation = glm::normalize(facing);
+		entityTransform.orientation = glm::normalize(facing);
 	}
 
 	// We don't want anyone to be able to move the mouse off the screen, that would be very very very bad and horrible and would make the game absolutely unplayable
@@ -447,12 +447,12 @@ void Player::SetPosition(float newPlayerX, float newPlayerY, float newPlayerZ) {
 		WARN("Trying to update player without a camera, aborting");
 		return;
 	}
-	entityData.position = glm::vec3(newPlayerX, newPlayerY, newPlayerZ);
-	camera->UpdateMatrix(80.0f, 0.1f, 1000.0f, entityData.position, entityData.orientation, entityData.upDirection);
+	entityTransform.position = glm::vec3(newPlayerX, newPlayerY, newPlayerZ);
+	camera->UpdateMatrix(80.0f, 0.1f, 1000.0f, entityTransform.position, entityTransform.orientation, entityTransform.upDirection);
 }
 
 glm::vec3 Player::GetPosition() const {
-	return glm::vec3(entityData.position.x, entityData.position.y, entityData.position.z);
+	return glm::vec3(entityTransform.position.x, entityTransform.position.y, entityTransform.position.z);
 }
 
 GameMode Player::GetGameMode() const {
@@ -468,7 +468,7 @@ void Player::UpdateCameraMatrix(Shader& shader) {
 	if (!camera) {
 		WARN("Trying to update camera matrix without a camera, aborting");
 	}
-	camera->UpdateMatrix(fov, 0.1f, 1000.0f, entityData.position, entityData.orientation, entityData.upDirection);
+	camera->UpdateMatrix(fov, 0.1f, 1000.0f, entityTransform.position, entityTransform.orientation, entityTransform.upDirection);
 	camera->SetCameraMatrix(shader);
 }
 

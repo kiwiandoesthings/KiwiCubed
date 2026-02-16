@@ -12,6 +12,7 @@
 
 class Entity;
 struct EntityData;
+struct EntityTransform;
 
 
 struct BoundingBox {
@@ -83,7 +84,7 @@ class Physics {
 
 		static bool CollideAxis(unsigned char axis, EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler);
 		static float CollideAxisFloat(unsigned char axis, EntityTransform& newEntityData, EntityData& entityData, ChunkHandler& chunkHandler);
-		static bool ApplyTerrainCollision(EntityTransform& newEntityData, ChunkHandler& chunkHandler);
+		static bool ApplyTerrainCollision(EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler);
 
 		static std::vector<FullBlockPosition> blockCollisionQueue;
 };

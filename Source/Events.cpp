@@ -59,7 +59,7 @@ bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) 
 			std::string functionName = "Get" + eventTypeStrings[eventType];
 
 			if (eventType == EVENT_WORLD_PLAYER_BLOCK) {
-				WorldPlayerBlockEvent* event = static_cast<WorldPlayerBlockEvent*>(eventData.data);
+				EventWorldPlayerBlock* event = static_cast<EventWorldPlayerBlock*>(eventData.data);
 				std::vector<void*> arguments = {event};
 				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT};
 				modHandler.CallModFunction("kiwicubed", functionName, arguments, argumentTypes);

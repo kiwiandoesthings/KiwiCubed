@@ -52,6 +52,10 @@ EntityData Entity::GetEntityData() const {
 	return entityData;
 }
 
+EntityTransform Entity::GetEntityTransform() const {
+	return entityTransform;
+}
+
 ProtectedEntityData Entity::GetProtectedEntityData() const {
 	return protectedEntityData;
 }
@@ -62,6 +66,10 @@ void Entity::SetEntityStats(EntityStats newEntityStats) {
 
 void Entity::SetEntityData(EntityData newEntityData) {
 	entityData = newEntityData;
+}
+
+void Entity::SetEntityTransform(EntityTransform newEntityTransform) {
+	entityTransform = newEntityTransform;
 }
 
 void Entity::DamageEntity(float damage) {

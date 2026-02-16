@@ -30,12 +30,13 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 
 	EventManager& eventManager = EventManager::GetInstance();
 	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_MOVE, [&](EventData& eventData) {
+		EventData eventDataCopy = eventData;
 		singleplayerWorld->QueueTickTask([&, this] {
-			singleplayerWorld->RecalculateChunksToLoad(eventData);
+			singleplayerWorld->RecalculateChunksToLoad(eventDataCopy);
 		});
 	});
 	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_BLOCK, [&](EventData& eventData) {
-		WorldPlayerBlockEvent* blockEvent = static_cast<WorldPlayerBlockEvent*>(eventData.data);
+		EventWorldPlayerBlock* blockEvent = static_cast<EventWorldPlayerBlock*>(eventData.data);
 		std::cout << blockEvent->blockX << std::endl;
 	});
 	

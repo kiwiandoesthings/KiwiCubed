@@ -79,7 +79,7 @@ bool Physics::CollideAxis(unsigned char axis, EntityTransform& newTransform, Ent
 				} else {
 					newTransform.position[axis] = max2[axis] - entityData.physicsBoundingBox.corner1[axis];
 				}
-				newEntityData.velocity[axis] = 0;
+				newTransform.velocity[axis] = 0;
 				return true;
 			}
 		}
@@ -87,26 +87,26 @@ bool Physics::CollideAxis(unsigned char axis, EntityTransform& newTransform, Ent
 	return false;
 }
 
-float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, ChunkHandler& chunkHandler) {
+float Physics::CollideAxisFloat(unsigned char axis, EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler) {
 	{
 		std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
-		if (newEntityData.currentChunkPtr == nullptr || !newEntityData.currentChunkPtr->isGenerated) {
+		if (entityData.currentChunkPtr == nullptr || !entityData.currentChunkPtr->isGenerated) {
 			return 0.0f;
 		}
 	}
 
-	glm::vec3 min1 = glm::vec3(newEntityData.physicsBoundingBox.corner1.x + newEntityData.position.x, newEntityData.physicsBoundingBox.corner1.y + newEntityData.position.y, newEntityData.physicsBoundingBox.corner1.z + newEntityData.position.z);
-	glm::vec3 max1 = glm::vec3(newEntityData.physicsBoundingBox.corner2.x + newEntityData.position.x, newEntityData.physicsBoundingBox.corner2.y + newEntityData.position.y, newEntityData.physicsBoundingBox.corner2.z + newEntityData.position.z);
+	glm::vec3 min1 = glm::vec3(entityData.physicsBoundingBox.corner1.x + newTransform.position.x, entityData.physicsBoundingBox.corner1.y + newTransform.position.y, entityData.physicsBoundingBox.corner1.z + newTransform.position.z);
+	glm::vec3 max1 = glm::vec3(entityData.physicsBoundingBox.corner2.x + newTransform.position.x, entityData.physicsBoundingBox.corner2.y + newTransform.position.y, entityData.physicsBoundingBox.corner2.z + newTransform.position.z);
 	for (auto& blockPosition : blockCollisionQueue) {
 		Chunk* targetChunk = nullptr;
-		if (blockPosition.chunkPosition.x != newEntityData.globalChunkPosition.x || blockPosition.chunkPosition.y != newEntityData.globalChunkPosition.y || blockPosition.chunkPosition.z != newEntityData.globalChunkPosition.z) {
+		if (blockPosition.chunkPosition.x != newTransform.globalChunkPosition.x || blockPosition.chunkPosition.y != newTransform.globalChunkPosition.y || blockPosition.chunkPosition.z != newTransform.globalChunkPosition.z) {
 			std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
 			targetChunk = chunkHandler.GetChunkUnlocked(blockPosition.chunkPosition.x, blockPosition.chunkPosition.y, blockPosition.chunkPosition.z, false);
 			if (!targetChunk->isGenerated) {
 				continue;
 			}
 		} else {
-			targetChunk = newEntityData.currentChunkPtr;
+			targetChunk = entityData.currentChunkPtr;
 		}
 
 		Block block;
@@ -128,11 +128,11 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 			if (isColliding) {
 				float collision = min1[axis] - min2[axis];
 				if (collision < 0) {
-					newEntityData.position[axis] = min2[axis] - newEntityData.physicsBoundingBox.corner2[axis];
+					newTransform.position[axis] = min2[axis] - entityData.physicsBoundingBox.corner2[axis];
 				} else {
-					newEntityData.position[axis] = max2[axis] - newEntityData.physicsBoundingBox.corner1[axis];
+					newTransform.position[axis] = max2[axis] - entityData.physicsBoundingBox.corner1[axis];
 				}
-				newEntityData.velocity[axis] = 0;
+				newTransform.velocity[axis] = 0;
 				return collision;
 			}
 		}
@@ -140,13 +140,13 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityData& newEntityData, C
 	return 0.0f;
 }
 
-bool Physics::ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chunkHandler) {
+bool Physics::ApplyTerrainCollision(EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler) {
 	Globals& globals = Globals::GetInstance();
 
 	blockCollisionQueue.clear();
 
-	glm::vec3 minCorner = glm::min(newEntityData.physicsBoundingBox.corner1 + newEntityData.position, newEntityData.physicsBoundingBox.corner2 + newEntityData.position);
-	glm::vec3 maxCorner = glm::max(newEntityData.physicsBoundingBox.corner1 + newEntityData.position, newEntityData.physicsBoundingBox.corner2 + newEntityData.position);
+	glm::vec3 minCorner = glm::min(entityData.physicsBoundingBox.corner1 + newTransform.position, entityData.physicsBoundingBox.corner2 + newTransform.position);
+	glm::vec3 maxCorner = glm::max(entityData.physicsBoundingBox.corner1 + newTransform.position, entityData.physicsBoundingBox.corner2 + newTransform.position);
 
 	for (int blockX = static_cast<int>(std::floor(minCorner.x)) - 1; blockX <= static_cast<int>(std::ceil(maxCorner.x)) + 1; ++blockX) {
 		for (int blockY = static_cast<int>(std::floor(minCorner.y)) - 1; blockY <= static_cast<int>(std::ceil(maxCorner.y)) + 1; ++blockY) {
@@ -170,14 +170,14 @@ bool Physics::ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chu
 		}
 	}
 
-	newEntityData.position.x += newEntityData.velocity.x * globals.deltaTime;
-	bool xAxis = CollideAxis(0, newEntityData, chunkHandler);
-	newEntityData.position.y += newEntityData.velocity.y * globals.deltaTime;
-	float yAxis = CollideAxisFloat(1, newEntityData, chunkHandler);
-	newEntityData.position.z += newEntityData.velocity.z * globals.deltaTime;
-	bool zAxis = CollideAxis(2, newEntityData, chunkHandler);
+	newTransform.position.x += newTransform.velocity.x * globals.deltaTime;
+	bool xAxis = CollideAxis(0, newTransform, entityData, chunkHandler);
+	newTransform.position.y += newTransform.velocity.y * globals.deltaTime;
+	float yAxis = CollideAxisFloat(1, newTransform, entityData, chunkHandler);
+	newTransform.position.z += newTransform.velocity.z * globals.deltaTime;
+	bool zAxis = CollideAxis(2, newTransform, entityData, chunkHandler);
 
-	newEntityData.isGrounded = (yAxis > 0);
+	entityData.isGrounded = (yAxis > 0);
 
 	if (xAxis || yAxis != 0 || zAxis) {
 		return true;
@@ -189,26 +189,28 @@ bool Physics::ApplyTerrainCollision(EntityData& newEntityData, ChunkHandler& chu
 bool Physics::ApplyPhysics(Entity& entity, ChunkHandler& chunkHandler, bool applyGravity, bool applyCollision) {
 	Globals& globals = Globals::GetInstance();
 	EntityData newEntityData = entity.GetEntityData();
+	EntityTransform newTransform = entity.GetEntityTransform();
 
 	bool grounded = false;
 
-	ClipVelocity(newEntityData, 0); 
-	ClipVelocity(newEntityData, 1); 
-	ClipVelocity(newEntityData, 2);
+	ClipVelocity(newTransform, newEntityData, 0); 
+	ClipVelocity(newTransform, newEntityData, 1); 
+	ClipVelocity(newTransform, newEntityData, 2);
 
 	if (applyGravity) {
-		ApplyGravity(newEntityData);
-		ClipVelocity(newEntityData, 1);
+		ApplyGravity(newTransform);
+		ClipVelocity(newTransform, newEntityData, 1);
 	}
 	if (applyCollision) {
-		ApplyTerrainCollision(newEntityData, chunkHandler);
+		ApplyTerrainCollision(newTransform, newEntityData, chunkHandler);
 	} else {
-		newEntityData.position.x += newEntityData.velocity.x * globals.deltaTime;
-		newEntityData.position.y += newEntityData.velocity.y * globals.deltaTime;
-		newEntityData.position.z += newEntityData.velocity.z * globals.deltaTime;
+		newTransform.position.x += newTransform.velocity.x * globals.deltaTime;
+		newTransform.position.y += newTransform.velocity.y * globals.deltaTime;
+		newTransform.position.z += newTransform.velocity.z * globals.deltaTime;
 	}
 
 	entity.SetEntityData(newEntityData);
+	entity.SetEntityTransform(newTransform);
 	return grounded;
 }
 
@@ -285,15 +287,17 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 
 bool Physics::GetGrounded(Entity& entity, ChunkHandler& chunkHandler) {
 	EntityData newEntityData = entity.GetEntityData();
-	return CollideAxisFloat(1, newEntityData, chunkHandler) > 0;
+	EntityTransform newTransform = entity.GetEntityTransform();
+	return CollideAxisFloat(1, newTransform,newEntityData, chunkHandler) > 0;
 }
 
 bool Physics::CollideBlock(Entity &entity, FullBlockPosition fullBlockPosition, bool resolveCollision) {
 	EntityData newEntityData = entity.GetEntityData();
+	EntityTransform newTransform = entity.GetEntityTransform();
 
 	for (int axis = 0; axis < 3; axis++) {
-		glm::vec3 min1 = glm::vec3(newEntityData.physicsBoundingBox.corner1.x + newEntityData.position.x, newEntityData.physicsBoundingBox.corner1.y + newEntityData.position.y, newEntityData.physicsBoundingBox.corner1.z + newEntityData.position.z);
-		glm::vec3 max1 = glm::vec3(newEntityData.physicsBoundingBox.corner2.x + newEntityData.position.x, newEntityData.physicsBoundingBox.corner2.y + newEntityData.position.y, newEntityData.physicsBoundingBox.corner2.z + newEntityData.position.z);
+		glm::vec3 min1 = glm::vec3(newEntityData.physicsBoundingBox.corner1.x + newTransform.position.x, newEntityData.physicsBoundingBox.corner1.y + newTransform.position.y, newEntityData.physicsBoundingBox.corner1.z + newTransform.position.z);
+		glm::vec3 max1 = glm::vec3(newEntityData.physicsBoundingBox.corner2.x + newTransform.position.x, newEntityData.physicsBoundingBox.corner2.y + newTransform.position.y, newEntityData.physicsBoundingBox.corner2.z + newTransform.position.z);
 		glm::vec3 min2 = glm::vec3(fullBlockPosition.blockPosition.x + (fullBlockPosition.chunkPosition.x * chunkSize), fullBlockPosition.blockPosition.y + (fullBlockPosition.chunkPosition.y * chunkSize), fullBlockPosition.blockPosition.z + (fullBlockPosition.chunkPosition.z * chunkSize));
 		glm::vec3 max2 = min2 + glm::vec3(1.0f);
 
@@ -308,11 +312,11 @@ bool Physics::CollideBlock(Entity &entity, FullBlockPosition fullBlockPosition, 
 			}
 			float collision = min1[axis] - min2[axis];
 			if (collision < 0) {
-				newEntityData.position[axis] = min2[axis] - newEntityData.physicsBoundingBox.corner2[axis];
+				newTransform.position[axis] = min2[axis] - newEntityData.physicsBoundingBox.corner2[axis];
 			} else {
-				newEntityData.position[axis] = max2[axis] - newEntityData.physicsBoundingBox.corner1[axis];
+				newTransform.position[axis] = max2[axis] - newEntityData.physicsBoundingBox.corner1[axis];
 			}
-			newEntityData.velocity[axis] = 0;
+			newTransform.velocity[axis] = 0;
 			return true;
 		}
 	}

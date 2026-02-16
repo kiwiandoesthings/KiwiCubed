@@ -89,12 +89,14 @@ class Entity {
 
 		void SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID);
 	
-		virtual EntityStats GetEntityStats() const;
-		virtual EntityData GetEntityData() const;
-		virtual ProtectedEntityData GetProtectedEntityData() const;
+		EntityStats GetEntityStats() const;
+		EntityData GetEntityData() const;
+		EntityTransform GetEntityTransform() const;
+		ProtectedEntityData GetProtectedEntityData() const;
 	
-		virtual void SetEntityStats(EntityStats newEntityStats);
-		virtual void SetEntityData(EntityData newEntityData);
+		void SetEntityStats(EntityStats newEntityStats);
+		void SetEntityData(EntityData newEntityData);
+		void SetEntityTransform(EntityTransform newEntityTransform);
 	
 		virtual void DamageEntity(float damage);
 
