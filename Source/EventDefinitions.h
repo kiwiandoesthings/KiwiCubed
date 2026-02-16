@@ -26,6 +26,7 @@ struct EventWorldPlayerBlock {
 };
 
 struct EventWorldPlayerMove {
+	unsigned long long playerAUID;
 	float oldPlayerX;
 	float oldPlayerY;
 	float oldPlayerZ;
@@ -51,6 +52,15 @@ struct EventWorldEntityBlock {
 	int blockZ;
 	AssetStringID oldBlockStringID;
 	AssetStringID newBlockStringID;
+};
+
+struct EventWorldEntityHurt {
+	unsigned long long damagedAUID;
+};
+
+struct EventWorldEntityAttack {
+	unsigned long long attackerAUID;
+	unsigned long long attackedAUID;
 };
 
 struct EventWorldGenericBlock {

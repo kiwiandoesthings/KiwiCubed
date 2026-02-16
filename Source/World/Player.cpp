@@ -76,7 +76,7 @@ void Player::Setup() {
 		}
 	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F3, [&](int key) {
-		Globals::GetInstance().debugMode = true;
+		Globals::GetInstance().debugMode = !Globals::GetInstance().debugMode;
 	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_ESCAPE, [&](int key) {
 		UI& ui = UI::GetInstance();
@@ -128,8 +128,8 @@ void Player::Update() {
 		}
 		
 		if (oldEntityTransform.globalChunkPosition != entityTransform.globalChunkPosition) {
-			EventWorldPlayerMove moveEvent = EventWorldPlayerMove(oldEntityTransform.position.x, oldEntityTransform.position.y, oldEntityTransform.position.z, oldEntityTransform.orientation.y, oldEntityTransform.orientation.x, oldEntityTransform.orientation.z, entityTransform.position.x, entityTransform.position.y, entityTransform.position.z, entityTransform.orientation.y, entityTransform.orientation.x, entityTransform.orientation.z);
-			EventData eventData = EventData(&moveEvent, sizeof(moveEvent));
+			EventWorldPlayerMove moveEvent = EventWorldPlayerMove(protectedEntityData.AUID, oldEntityTransform.position.x, oldEntityTransform.position.y, oldEntityTransform.position.z, oldEntityTransform.orientation.y, oldEntityTransform.orientation.x, oldEntityTransform.orientation.z, entityTransform.position.x, entityTransform.position.y, entityTransform.position.z, entityTransform.orientation.y, entityTransform.orientation.x, entityTransform.orientation.z);
+			EventData eventData = EventData(EVENT_WORLD_PLAYER_MOVE, &moveEvent, sizeof(moveEvent));
 			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_MOVE, eventData);
 			entityData.currentChunkPtr = chunkHandler->GetChunk(entityTransform.globalChunkPosition.x, entityTransform.globalChunkPosition.y, entityTransform.globalChunkPosition.z, false);
 			if (!entityData.currentChunkPtr->IsReal()) {
@@ -266,7 +266,7 @@ void Player::MouseButtonCallback(int button) {
 			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
 			BlockType* blockType = BlockManager::GetInstance().GetBlockType(block.blockID);
 			EventWorldPlayerBlock blockEvent = EventWorldPlayerBlock(BLOCK_MINED, protectedEntityData.AUID, chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z, blockType->blockStringID, AssetStringID{"kiwicubed", "block/air"});
-			EventData eventData = EventData{&blockEvent, sizeof(blockEvent)};
+			EventData eventData = EventData{EVENT_WORLD_PLAYER_BLOCK, &blockEvent, sizeof(blockEvent)};
 			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_BLOCK, eventData);
 			entityData.inventory.AddItem(InventorySlot{*BlockManager::GetInstance().GetStringID(block.GetBlockID()), 1});
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
@@ -370,7 +370,7 @@ void Player::MouseButtonCallback(int button) {
 				for (int slotIndex = 0; slotIndex < 27; slotIndex++) {
 					AssetStringID slotStringID = AssetStringID{"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slotIndex)};
 					InventorySlot* slot = entityData.inventory.GetSlot(slotStringID);
-					if (slot->itemStringID.assetName == "block/air") {
+					if (slot->itemStringID.AssetName() == "block/air") {
 						continue;
 					}
 					InventorySlot newSlot = *slot;

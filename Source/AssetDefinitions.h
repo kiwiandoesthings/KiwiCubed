@@ -2,28 +2,46 @@
 
 #include "glad/glad.h"
 
+#include <string>
+
 
 struct AssetStringID {
-    std::string modName = "";
-    std::string assetName = "";
+    char modName[64] = "";
+    char assetName[96] = "";
 
     std::string CanonicalName() const {
-        return modName + ":" + assetName;
+        return std::string(modName) + ":" + std::string(assetName);
     }
 
+	std::string ModName() const {
+		return std::string(modName);
+	}
+
+	std::string AssetName() const {
+		return std::string(assetName);
+	}
+
     bool operator==(const AssetStringID& other) const {
-        return modName == other.modName && assetName == other.assetName;
+        return std::strcmp(modName, other.modName) == 0 && std::strcmp(assetName, other.assetName) == 0;
     }
 
     bool operator<(const AssetStringID& other) const {
-        if (modName == other.modName) {
-            return assetName < other.assetName;
+		int modComparison = std::strcmp(modName, other.modName);
+        if (modComparison == 0) {
+            return std::strcmp(assetName, other.assetName) < 0;
         }
-        return modName < other.modName;
+        return modComparison < 0;
     }
 
     AssetStringID() : modName("kiwicubed"), assetName("air") {}
-    AssetStringID(std::string modName, std::string assetName) : modName(modName), assetName(assetName) {}
+	AssetStringID(const std::string& modName, const std::string& assetName) {
+		std::strncpy(this->modName, modName.c_str(), sizeof(this->modName) - 1);
+		std::strncpy(this->assetName, assetName.c_str(), sizeof(this->assetName) - 1);
+	}
+    AssetStringID(const char* modName, const char* assetName) {
+		std::strncpy(this->modName, modName, sizeof(this->modName) - 1);
+		std::strncpy(this->assetName, assetName, sizeof(this->assetName) - 1);
+	}
 };
 
 template <>

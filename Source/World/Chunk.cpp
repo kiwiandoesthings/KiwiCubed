@@ -15,6 +15,18 @@ bool Chunk::IsReal() {
     return isRealChunk;
 }
 
+unsigned char Chunk::GetGenerationStatus() {
+	if (isMeshed) {
+		return 3;
+	} else if (isGenerated) {
+		return 2;
+	} else if (isAllocated) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 // Currently just sets up the VBO, VAO, and IBO
 void Chunk::SetupRenderComponents() {
     OVERRIDE_LOG_NAME("Chunk Render Components Setup");
@@ -46,7 +58,6 @@ void Chunk::AllocateChunk() {
 	};
 
     isAllocated = true;
-    generationStatus = 1;
 }
 
 bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerChunk, bool debug) {
@@ -124,7 +135,6 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
     }
 
     isGenerated = true;
-    generationStatus = 2;
     IsEmpty();
     IsFull();
     GenerateHeightmap();
@@ -346,7 +356,6 @@ bool Chunk::GenerateMesh(const bool remesh) {
     }
 
     isMeshed = true;
-    generationStatus = 3;
     shouldRender = true;
 
     std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
@@ -485,7 +494,7 @@ bool Chunk::IsFull() {
 }
 
 void Chunk::DisplayImGui() {
-    ImGui::Text("Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %d, Indices: %d, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB", chunkX, chunkY, chunkZ, generationStatus, totalBlocks, static_cast<int>(vertices.size()), static_cast<int>(indices.size()), vertexBufferObject.vertexBufferObjectID, vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID, static_cast<int>(static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) / 1024.0));
+    ImGui::Text("Chunk position: {%d, %d, %d}, GS: %d, Blocks: %d, Vertices: %d, Indices: %d, VBO: %d, VAO: %d, IBO %d, Memory usage: %d KB", chunkX, chunkY, chunkZ, GetGenerationStatus(), totalBlocks, static_cast<int>(vertices.size()), static_cast<int>(indices.size()), vertexBufferObject.vertexBufferObjectID, vertexArrayObject.vertexArrayObjectID, indexBufferObject.indexBufferObjectID, static_cast<int>(static_cast<float>((sizeof(Block) * totalBlocks) + (sizeof(Vertex) * vertices.size()) + (sizeof(GLuint) * indices.size())) / 1024.0));
 }
 
 void Chunk::Delete() {

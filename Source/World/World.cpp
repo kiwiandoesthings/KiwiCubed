@@ -28,6 +28,8 @@ World::World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, S
     noise.SetFractalLacunarity(2);
     noise.SetFractalGain(0.5f);
     noise.SetFractalWeightedStrength(5.0f);
+
+	EntityManager::GetInstance().Setup(this);
 }
 
 void World::Setup() {
@@ -198,15 +200,15 @@ void World::GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool
     }
 }
 
-void World::RecalculateChunksToLoad(EventData& eventData, unsigned short horizontalRadius, unsigned short verticalRadius) {
-	EventWorldPlayerMove* moveEvent = static_cast<EventWorldPlayerMove*>(eventData.data);
+void World::RecalculateChunksToLoad(const EventData& eventData, unsigned short horizontalRadius, unsigned short verticalRadius) {
+	const EventWorldPlayerMove* moveEvent = eventData.GetDataStruct<EventWorldPlayerMove>();
     if (horizontalRadius == 0) {
         horizontalRadius = playerChunkGenerationRadiusHorizontal;
     }
     if (verticalRadius == 0) {
         verticalRadius = playerChunkGenerationRadiusVertical;
     }
-	glm::ivec3 playerChunkPosition = glm::ivec3(static_cast<int>(moveEvent->newPlayerX) % 32, static_cast<int>(moveEvent->newPlayerY) % 32, static_cast<int>(moveEvent->newPlayerZ) % 32);
+	glm::ivec3 playerChunkPosition = glm::ivec3(static_cast<int>(moveEvent->newPlayerX / 32), static_cast<int>(moveEvent->newPlayerY / 32), static_cast<int>(moveEvent->newPlayerZ / 32));
     std::lock_guard<std::mutex> lock(ChunkQueueMutex);
     {
         for (int chunkX = playerChunkPosition.x - horizontalRadius; chunkX < playerChunkPosition.x + horizontalRadius; ++chunkX) {
@@ -214,7 +216,7 @@ void World::RecalculateChunksToLoad(EventData& eventData, unsigned short horizon
                 for (int chunkZ = playerChunkPosition.z - horizontalRadius; chunkZ < playerChunkPosition.z + horizontalRadius; ++chunkZ) {
                     std::tuple<int, int, int> chunkPosition = {chunkX, chunkY, chunkZ};
                     Chunk* chunk = chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
-                    if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk->GetMeshable(chunkHandler) && chunk->generationStatus != 3) {
+                    if (chunkHandler.GetChunkExists(chunkX, chunkY, chunkZ) && chunk->GetMeshable(chunkHandler) && chunk->GetGenerationStatus() != 3) {
                         if (chunkMeshingSet.find(chunkPosition) != chunkMeshingSet.end()) {
                             continue;
                         }
@@ -308,7 +310,7 @@ void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
 
 	EventWorldTick tickEvent = EventWorldTick{totalTicks};
-	EventData eventData = EventData{&tickEvent, sizeof(tickEvent)};
+	EventData eventData = EventData{EVENT_WORLD_TICK, &tickEvent, sizeof(tickEvent)};
 	EventManager::GetInstance().TriggerEvent(EVENT_WORLD_TICK, eventData);
 
     std::vector<glm::ivec3> chunkGenerationQueueCopy;
@@ -415,7 +417,7 @@ void World::DisplayImGui(unsigned int option) {
 			GetChunk(
 				playerTransform.globalChunkPosition.x,
 				playerTransform.globalChunkPosition.y,
-				playerTransform.globalChunkPosition.z)->generationStatus,
+				playerTransform.globalChunkPosition.z)->GetGenerationStatus(),
 			GetChunk(
 				playerTransform.globalChunkPosition.x,
 				playerTransform.globalChunkPosition.y,
@@ -475,7 +477,7 @@ Chunk* World::GetChunk(int chunkX, int chunkY, int chunkZ) {
     return chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
 }
 
-Entity* World::GetEntity(std::string uuid) {
+Entity* World::GetEntity(unsigned long long entityAUID) {
     // Later
     return nullptr;
 }
@@ -509,7 +511,7 @@ std::vector<glm::vec4>& World::GetChunkOrigins() {
     std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
     for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
         auto& chunk = iterator->second;
-        chunkOrigins.emplace_back(glm::vec4(chunk->chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunk->chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunk->chunkZ * chunkSize + static_cast<int>(chunkSize / 2), chunk->generationStatus));
+        chunkOrigins.emplace_back(glm::vec4(chunk->chunkX * chunkSize + static_cast<int>(chunkSize / 2), chunk->chunkY * chunkSize + static_cast<int>(chunkSize / 2), chunk->chunkZ * chunkSize + static_cast<int>(chunkSize / 2), chunk->GetGenerationStatus()));
     }
     return chunkOrigins;
 }

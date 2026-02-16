@@ -15,7 +15,7 @@ Inventory::Inventory(std::vector<AssetStringID> slotStringIDs) {
 bool Inventory::AddItem(InventorySlot newItemSlot) {
     for (auto iterator = inventorySlots.begin(); iterator != inventorySlots.end(); iterator++) {
         InventorySlot& itemSlot = iterator->second;
-        if (itemSlot.itemStringID.assetName == "block/air") {
+        if (itemSlot.itemStringID.AssetName() == "block/air") {
             itemSlot.itemStringID = newItemSlot.itemStringID;
             itemSlot.itemCount++;
             return true;

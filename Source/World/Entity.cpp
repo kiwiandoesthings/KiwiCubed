@@ -9,6 +9,13 @@ Entity::Entity(float entityX, float entityY, float entityZ, World* world) : enti
 	entityTransform.position.y = entityY;
 	entityTransform.position.z = entityZ;
 
+    entityRenderData.oldPosition = entityTransform.position;
+    entityRenderData.oldOrientation = entityTransform.orientation;
+	entityRenderData.oldUpDirection = entityTransform.upDirection;
+	entityRenderData.oldVelocity = entityTransform.velocity;
+    entityRenderData.oldPositionOffset = entityRenderData.positionOffset;
+    entityRenderData.oldOrientationOffset = entityRenderData.orientationOffset;
+
 	protectedEntityData.AUID = CreateAUID();
 }
 
@@ -99,13 +106,6 @@ void Entity::Update() {
 	if (oldGlobalChunkPosition != entityTransform.globalChunkPosition) {
 		entityData.currentChunkPtr = world->GetChunkHandler().GetChunk(entityTransform.globalChunkPosition.x, entityTransform.globalChunkPosition.y, entityTransform.globalChunkPosition.z, false);
 	}
-
-	if (entityData.isPlayer) {
-		return;
-	}
-
-	entityTransform.orientation.y += 150.0f * Globals::GetInstance().deltaTime;
-	entityRenderData.positionOffset.y = sin(world->GetTotalTicks() / 3.0f) * 0.025;
 
 	return;
 }

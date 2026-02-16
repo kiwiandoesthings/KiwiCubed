@@ -11,6 +11,10 @@ EntityManager::EntityManager() {
     return;
 }
 
+void EntityManager::Setup(World* world) {
+	this->world = world;
+}
+
 void EntityManager::RegisterEntityType(EntityType entityType) {
     OVERRIDE_LOG_NAME("Entity Manager");
     stringIDsToEntityTypes.insert({entityType.entityStringID, entityType});
@@ -29,32 +33,33 @@ EntityType* EntityManager::GetEntityType(AssetStringID entityTypeString) {
     return nullptr;
 }
 
-void EntityManager::SpawnEntity(AssetStringID entityTypeString, glm::vec3 position) {
+siv::id EntityManager::SpawnEntity(AssetStringID entityTypeString, AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID, glm::vec3 position) {
     EntityType* entityType = GetEntityType(entityTypeString);
+
+	siv::id entityID = entities.emplace_back(position.x, position.y, position.z, world);
+	entityTypesToEntities[entityTypeString].push_back(entityID);
+
+	entities[entityID].SetupRenderComponents(modelID, atlasID, textureID);
+
+	std::cout << "created entity with type " << entityTypeString.CanonicalName() << std::endl;
+
+	return entityID;
 }
 
-std::vector<Entity*> EntityManager::GetAllEntities() const {
-    std::vector<Entity*> existentEntities;
-    for (auto& entity : entities) {
-        if (entity) {
-            existentEntities.push_back(entity.get());
-        }
-    }
-    return existentEntities;
+siv::vector<Entity> EntityManager::GetAllEntities() const {
+    return entities;
 }
 
-std::vector<Entity*> EntityManager::GetEntitesOfType(AssetStringID entityTypeString) const {
-    std::vector<Entity*> existentEntities;
+std::vector<siv::id> EntityManager::GetEntitesOfType(AssetStringID entityTypeString) const {
+    std::vector<siv::id> existentEntities;
     auto entitiesOfType = entityTypesToEntities.find(entityTypeString);
     if (entitiesOfType != entityTypesToEntities.end()) {
         existentEntities.reserve(entitiesOfType->second.size());
         for (auto& index : entitiesOfType->second) {
-            if (entities[index]) {
-                existentEntities.push_back(entities[index].get());
-            }
+            existentEntities.push_back(index);
         }
         return existentEntities;
     } else {
-        return std::vector<Entity*>();
+        return std::vector<siv::id>();
     }
 }

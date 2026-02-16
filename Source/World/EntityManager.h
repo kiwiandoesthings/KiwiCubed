@@ -1,5 +1,7 @@
 #pragma once
 
+#include <index_vector.hpp>
+
 #include "AssetManager.h"
 #include "Entity.h"
 
@@ -8,20 +10,22 @@ class EntityManager {
     public:
         static EntityManager& GetInstance();
 
-        EntityManager();
+		EntityManager();
+		
+        void Setup(World* world);
 
         void RegisterEntityType(EntityType entityType);
         EntityType* GetEntityType(AssetStringID entityStringID);
 
-        void SpawnEntity(AssetStringID entityTypeString, glm::vec3 position);
+        siv::id SpawnEntity(AssetStringID entityTypeString, AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID, glm::vec3 position);
 
-        std::vector<Entity*> GetAllEntities() const;
-        std::vector<Entity*> GetEntitesOfType(AssetStringID entityTypeString) const;
+        siv::vector<Entity> GetAllEntities() const;
+        std::vector<siv::id> GetEntitesOfType(AssetStringID entityTypeString) const;
 
         template<typename Function>
         void ForEachEntity(Function&& function) {
             for (auto& entity : entities) {
-                function(*entity.get());
+                function(entity);
             } 
         }
 
@@ -31,9 +35,11 @@ class EntityManager {
         EntityManager(const EntityManager&) = delete;
         EntityManager& operator=(const EntityManager&) = delete;
 
+		World* world = nullptr;
+
         std::unordered_map<AssetStringID, EntityType> stringIDsToEntityTypes;
-        std::vector<std::unique_ptr<Entity>> entities;
-        std::unordered_map<AssetStringID, std::vector<int>> entityTypesToEntities;
+		siv::vector<Entity> entities;
+        std::unordered_map<AssetStringID, std::vector<siv::id>> entityTypesToEntities;
 };
 
 inline EntityManager& entityManager = EntityManager::GetInstance();

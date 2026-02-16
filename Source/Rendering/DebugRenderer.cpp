@@ -49,6 +49,15 @@ void DebugRenderer::SetupBuffers(const std::vector<GLfloat>& chunkDebugVertices,
 }
 
 void DebugRenderer::UpdateBuffers(const std::vector<GLfloat>& chunkDebugVertices, const std::vector<GLuint>& chunkDebugIndices, const std::vector<glm::vec4>& chunkOrigins) {
+	if (Globals::GetInstance().debugMode) {
+		Enable();
+	} else {
+		Disable();
+	}
+	if (!enabled) {
+		return;
+	}
+	
 	// Chunk debug buffers
 
 	DebugRenderer::chunkOrigins = chunkOrigins;

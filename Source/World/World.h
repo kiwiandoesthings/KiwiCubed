@@ -45,7 +45,7 @@ class World {
 		void GenerateWorld();
 		void GenerateChunk(int chunkX, int chunkY, int chunkZ, Chunk* chunk, bool updateCallerChunk, Chunk* callerChunk);
 
-		void RecalculateChunksToLoad(EventData& eventData, unsigned short horizontalRadius = 0, unsigned short verticalRadius = 0);
+		void RecalculateChunksToLoad(const EventData& eventData, unsigned short horizontalRadius = 0, unsigned short verticalRadius = 0);
         void QueueMesh(glm::ivec3 chunkPosition, bool remesh);
 		void QueueTickTask(std::function<void()> task);
 		void UpdateFrameTime(std::chrono::steady_clock::time_point newFrameTime);
@@ -60,7 +60,7 @@ class World {
 
 		ChunkHandler& GetChunkHandler();
 		Chunk* GetChunk(int chunkX, int chunkY, int chunkZ);
-		Entity* GetEntity(std::string uuid);
+		Entity* GetEntity(unsigned long long entityAUID);
 
 		//temporary - merge into GetEntity
 		Player& GetPlayer();

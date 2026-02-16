@@ -3,6 +3,7 @@
 
 std::unordered_map<EventType, std::vector<AssetStringID>> EventManager::eventsToEntityTypes;
 std::unordered_map<EventType, std::vector<std::function<void(EventData&)>>> EventManager::eventsToFunctions;
+std::unordered_map<EventType, std::vector<std::string>> EventManager::eventsToScripts;
 std::vector<uint8_t> EventManager::eventDatas;
 
 
@@ -12,7 +13,7 @@ EventManager& EventManager::GetInstance() {
 }
 
 bool EventManager::RegisterEventToEntityType(EventType eventType, const AssetStringID& entityTypeString) {
-	OVERRIDE_LOG_NAME("Events");
+	OVERRIDE_LOG_NAME("Event Manager");
 	std::vector<AssetStringID>& entityTypeStrings = eventsToEntityTypes[eventType];
 	for (int iterator = 0; iterator < entityTypeStrings.size(); iterator++) {
 		if (entityTypeStrings[iterator].CanonicalName() == entityTypeString.CanonicalName()) {
@@ -26,8 +27,8 @@ bool EventManager::RegisterEventToEntityType(EventType eventType, const AssetStr
     return true;
 }
 
-void EventManager::RegisterFunctionToEvent(EventType eventType, std::function<void(EventData&)> callback) {
-    OVERRIDE_LOG_NAME("Events");
+void EventManager::RegisterFunctionToEvent(EventType eventType, std::function<void(const EventData&)> callback) {
+    OVERRIDE_LOG_NAME("Event Manager");
     if (eventsToFunctions.find(eventType) == eventsToFunctions.end()) {
 		std::vector<std::function<void(EventData&)>> functions;
 		functions.push_back(callback);
@@ -39,8 +40,17 @@ void EventManager::RegisterFunctionToEvent(EventType eventType, std::function<vo
 	eventsToFunctions[eventType] = eventsToFunctions.find(eventType)->second;
 }
 
+void EventManager::RegisterScriptToEvent(EventType eventType, const std::string& moduleName) {
+	eventsToScripts[eventType].push_back(moduleName);
+}
+
 bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) {
-	OVERRIDE_LOG_NAME("Event Manager");
+	OVERRIDE_LOG_NAME("Event Triggering");
+
+	if (eventData.verification != VerificationNumber) {
+		ERR("EventData was corruped somewhere, verification number did not match");
+		psnip_trap();
+	}
 
 	ModHandler& modHandler = ModHandler::GetInstance();
 	const void* arguments[] = {eventData.data};
@@ -49,14 +59,18 @@ bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) 
 	auto entityTypes = eventsToEntityTypes.find(eventType);
 	if (entityTypes != eventsToEntityTypes.end()) {
 		foundEntity = true;
-		std::vector<std::vector<Entity*>> entities;
+		std::vector<siv::id> entities;
 
-		for (int iterator = 0; iterator < entityTypes->second.size(); iterator++) {
-			entities.push_back(EntityManager::GetInstance().GetEntitesOfType(entityTypes->second[iterator]));
+		for (int type = 0; type < entityTypes->second.size(); type++) {
+			std::vector<siv::id> entitiesOfType;
+			entitiesOfType = EntityManager::GetInstance().GetEntitesOfType(entityTypes->second[type]);
+			for (int entity = 0; entity < entitiesOfType.size(); entity++) {
+				entities.push_back(entitiesOfType[entity]);
+			}
 		}
 
 		for (int iterator = 0; iterator < entities.size(); iterator++) {
-			std::string functionName = "Get" + eventTypeStrings[eventType];
+			std::string functionName = "EntityGet" + eventTypeStrings[eventType];
 
 			if (eventType == EVENT_WORLD_PLAYER_BLOCK) {
 				EventWorldPlayerBlock* event = static_cast<EventWorldPlayerBlock*>(eventData.data);
@@ -77,7 +91,24 @@ bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) 
 		}
 	}
 
-	if (!foundEntity && !foundFunction) {
+	bool foundScript = false;
+	auto scripts = eventsToScripts.find(eventType);
+	if (scripts != eventsToScripts.end()) {
+		foundScript = true;
+
+		for (int iterator = 0; iterator < scripts->second.size(); iterator++) {
+			std::string functionName = "Get" + eventTypeStrings[eventType];
+
+			if (eventType == EVENT_WORLD_PLAYER_BLOCK) {
+				EventWorldPlayerBlock* event = static_cast<EventWorldPlayerBlock*>(eventData.data);
+				std::vector<void*> arguments = {event};
+				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT};
+				modHandler.CallModFunction(scripts->second[iterator], functionName, arguments, argumentTypes);
+			}
+		}
+	}
+
+	if (!foundEntity && !foundFunction && !foundScript) {
 		//WARN("Triggered event with no connected callbacks!");
 	}
 	return foundEntity || foundFunction;

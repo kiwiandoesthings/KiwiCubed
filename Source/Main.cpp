@@ -66,6 +66,7 @@ int main(int argc, char* argv[]) {
 	setenv("DRI_PRIME", "1", 1);
 	#endif
 
+	std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
 	KiwiCubedEngine kiwiCubed;
 	for (int iterator = 0; iterator < argc; iterator++) {
 		if (argv[iterator] == "-novalidate") {
@@ -74,6 +75,9 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	LOG_CHECK_RETURN_CRITICAL(kiwiCubed.StartEngine() == 0, "Successfully initialized KiwiCubed Engine", "Error returned while initializing KiwiCubed Engine", -1);
+	std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
+    int time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	INFO("Took " + std::to_string(time) + " ms to initialize KiwiCubed Engine");
 	LOG_CHECK_RETURN_BAD_CRITICAL(kiwiCubed.RunGameLoop(), "Error returned while running game loop, aborting", -1);
 
 	return 0;

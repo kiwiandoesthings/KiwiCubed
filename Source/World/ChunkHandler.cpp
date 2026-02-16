@@ -97,7 +97,7 @@ void ChunkHandler::ForceGenerateAndMeshChunk(int chunkX, int chunkY, int chunkZ)
 
 void ChunkHandler::RemeshChunk(int chunkX, int chunkY, int chunkZ, bool updateNeighbors) {
     Chunk* chunk = GetChunk(chunkX, chunkY, chunkZ, false);
-    if (chunk->generationStatus < 2) {
+    if (chunk->GetGenerationStatus() < 2) {
         return;
     }
 

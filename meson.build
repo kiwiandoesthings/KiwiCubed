@@ -62,7 +62,6 @@ executable(
     # Other
     'Source/AssetManager.cpp',
     'Source/Events.cpp',
-    'Source/ExposedModAPI.cpp',
 	'Source/GenerateAngelScriptLanguageData.cpp',
     'Source/Globals.cpp',
     'Source/Input.cpp',

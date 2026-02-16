@@ -1,6 +1,5 @@
 #include "SingleplayerHandler.h"
 #include "Events.h"
-#include <cstddef>
 
 SingleplayerHandler::SingleplayerHandler(DebugRenderer& debugRenderer) : singleplayerWorld(nullptr), isLoadedIntoSingleplayerWorld(false), debugRenderer(debugRenderer) {
 }
@@ -29,15 +28,12 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 	Physics::Initialize();
 
 	EventManager& eventManager = EventManager::GetInstance();
-	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_MOVE, [&](EventData& eventData) {
-		EventData eventDataCopy = eventData;
-		singleplayerWorld->QueueTickTask([&, this] {
-			singleplayerWorld->RecalculateChunksToLoad(eventDataCopy);
+	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_MOVE, [=](const EventData& eventData) {
+		const EventData moveEventCopy = eventData;
+
+		singleplayerWorld->QueueTickTask([this, moveEventCopy]() -> void {
+    		singleplayerWorld->RecalculateChunksToLoad(moveEventCopy);
 		});
-	});
-	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_BLOCK, [&](EventData& eventData) {
-		EventWorldPlayerBlock* blockEvent = static_cast<EventWorldPlayerBlock*>(eventData.data);
-		std::cout << blockEvent->blockX << std::endl;
 	});
 	
 	singleplayerWorld->StartTickThread();

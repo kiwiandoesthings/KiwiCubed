@@ -62,7 +62,6 @@ class Chunk {
         bool isMeshed = false;
         bool isEmpty = true;
         bool isFull = false;
-        unsigned char generationStatus = 0;
         bool renderComponentsSetup = false;
         bool shouldRender = false;
         bool shouldGenerate = true;
@@ -79,6 +78,7 @@ class Chunk {
         Chunk& operator=(Chunk&& other) noexcept;
 
         bool IsReal();
+		unsigned char GetGenerationStatus();
         void SetupRenderComponents();
         void AllocateChunk();
         bool GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerChunk, bool debug);

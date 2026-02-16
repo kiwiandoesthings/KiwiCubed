@@ -8,35 +8,6 @@
 #include "GenerateAngelScriptLanguageData.cpp"
 
 
-//m3ApiRawFunction(KC_Log_WASM) {
-//    m3ApiGetArgMem(const char*, message);
-//    KC_Log(message);
-//    m3ApiSuccess();
-//}
-//
-//m3ApiRawFunction(KC_RegisterEventToEntityType_WASM) {
-//	m3ApiGetArgMem(int, eventType);
-//	m3ApiGetArgMem(const char*, modName);
-//	m3ApiGetArgMem(const char*, assetName);
-//	KC_RegisterEventToEntityType(eventType, modName, assetName);
-//	m3ApiSuccess();
-//}
-//
-//m3ApiRawFunction(KC_RegisterFunctionToEvent_WASM) {
-//	m3ApiGetArgMem(int, eventType);
-//	m3ApiGetArgMem(const char*, functionName);
-//	KC_RegisterFunctionToEvent(eventType, functionName);
-//	m3ApiSuccess();
-//}
-//
-//m3ApiRawFunction(KC_GetTextureNumericalID_WASM) {
-//    m3ApiReturnType(unsigned int);
-//    m3ApiGetArgMem(const char*, modName);
-//    m3ApiGetArgMem(const char*, assetName);
-//    unsigned int id = KC_GetTextureNumericalID(modName, assetName);
-//    m3ApiReturn(id);
-//}
-
 
 ModHandler& ModHandler::GetInstance() {
     static ModHandler instance;
@@ -438,11 +409,11 @@ bool ModHandler::LoadModScripts() {
 	// Types
 	//  AssetStringID
 	engine->RegisterObjectType("AssetStringID", sizeof(AssetStringID), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
-	engine->RegisterObjectBehaviour("AssetStringID", asBEHAVE_CONSTRUCT, "void f(const string &in, const string &in)", asFUNCTION(+[](const std::string& modName, const std::string& assetName, void* memory){
+	engine->RegisterObjectBehaviour("AssetStringID", asBEHAVE_CONSTRUCT, "void f(const string &in, const string &in)", asFUNCTION(+[](const std::string& modName, const std::string& assetName, void* memory) {
 		new(memory) AssetStringID(modName, assetName);
 	}), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("AssetStringID", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory){
-		 reinterpret_cast<AssetStringID*>(memory)->~AssetStringID();
+		reinterpret_cast<AssetStringID*>(memory)->~AssetStringID();
 	}), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("AssetStringID", "string CanonicalName() const", asMETHOD(AssetStringID, CanonicalName), asCALL_THISCALL);
 	engine->RegisterObjectProperty("AssetStringID", "string modName", offsetof(AssetStringID, modName));
@@ -469,7 +440,7 @@ bool ModHandler::LoadModScripts() {
 	engine->RegisterEnumValue("BlockEventType", "BLOCK_NEIGHBOR_UPDATE", BlockEventType::BLOCK_NEIGHBOR_UPDATE);
 	//  EventData
 	engine->RegisterObjectType("EventWorldPlayerBlock", sizeof(EventWorldPlayerBlock), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
-	engine->RegisterObjectBehaviour("EventWorldPlayerBlock", asBEHAVE_CONSTRUCT, "void f(const BlockEventType &in, const uint64 &in, const int &in, const int &in, const int &in, const int &in, const int &in, const AssetStringID &in, const AssetStringID &in)", asFUNCTION(+[](BlockEventType blockEventType, unsigned long long playerAUID, int chunkX, int chunkY, int chunkZ, int blockX, int blockY, int blockZ, AssetStringID oldBlockStringID, AssetStringID newBlockStringID, void* memory){
+	engine->RegisterObjectBehaviour("EventWorldPlayerBlock", asBEHAVE_CONSTRUCT, "void f(const BlockEventType &in, const uint64 &in, const int &in, const int &in, const int &in, const int &in, const int &in, const AssetStringID &in, const AssetStringID &in)", asFUNCTION(+[](const BlockEventType& blockEventType, const unsigned long long& playerAUID, const int& chunkX, const int& chunkY, const int& chunkZ, const int& blockX, const int& blockY, const int& blockZ, const AssetStringID& oldBlockStringID, const AssetStringID& newBlockStringID, void* memory){
 		new(memory) EventWorldPlayerBlock(blockEventType, playerAUID, chunkX, chunkY, chunkZ, blockX, blockY, blockZ, oldBlockStringID, newBlockStringID);
 	}), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("EventWorldPlayerBlock", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory) {
@@ -485,10 +456,59 @@ bool ModHandler::LoadModScripts() {
 	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockZ", offsetof(EventWorldPlayerBlock, blockZ));
 	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID oldBlockStringID", offsetof(EventWorldPlayerBlock, oldBlockStringID));
 	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID newBlockStringID", offsetof(EventWorldPlayerBlock, newBlockStringID));
+	//  Vec3
+	engine->RegisterObjectType("Vec3", sizeof(Vec3), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Vec3>());
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(+[](void* memory) {
+		new(memory) Vec3(0.0f, 0.0f, 0.0f);
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(const float &in, const float &in, const float &in)", asFUNCTION(+[](const float& x, const float& y, const float& z, void* memory) {
+		new(memory) Vec3(x, y, z);
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(const int &in, const int &in, const int &in)", asFUNCTION(+[](const int& x, const int& y, const int& z, void* memory) {
+		new(memory) Vec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory) {
+		reinterpret_cast<Vec3*>(memory)->~Vec3();
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opAdd(const Vec3 &in) const", asMETHODPR(Vec3, operator+, (Vec3&), Vec3), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opSub(const Vec3 &in) const", asMETHODPR(Vec3, operator-, (Vec3&), Vec3), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opMul(const Vec3 &in) const", asMETHODPR(Vec3, operator*, (Vec3&), Vec3), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opDiv(const Vec3 &in) const", asMETHODPR(Vec3, operator/, (Vec3&), Vec3), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "bool opEquals(const Vec3 &in) const", asMETHODPR(Vec3, operator==, (Vec3&), bool), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "Vec3 &opAssign(const Vec3 &in)", asMETHODPR(Vec3, operator=, (Vec3&), Vec3&), asCALL_THISCALL);
+	engine->RegisterObjectProperty("Vec3", "float x", offsetof(Vec3, x));
+	engine->RegisterObjectProperty("Vec3", "float y", offsetof(Vec3, y));
+	engine->RegisterObjectProperty("Vec3", "float z", offsetof(Vec3, z));
 
 	// Functions
 	engine->RegisterGlobalFunction("void Log(const string &in)", asFUNCTION(ModLog), asCALL_CDECL);
 	engine->RegisterGlobalFunction("bool RegisterEventToEntityType(EventType, const AssetStringID &in)", asFUNCTION(EventManager::RegisterEventToEntityType), asCALL_CDECL);
+	engine->RegisterGlobalFunction("void RegisterFunctionToEvent(const EventType& in)", asFUNCTION(+[](const EventType& eventType) {
+		asIScriptContext* context = asGetActiveContext();
+		EventManager::GetInstance().RegisterScriptToEvent(eventType, context->GetFunction()->GetModule()->GetName());
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("uint64 SpawnEntity(const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const float &in, const float &in, const float &in)", asFUNCTION(+[](const AssetStringID& entityType, const AssetStringID& entityModel, const AssetStringID& entityAtlas, const AssetStringID& entityTexture, const float& entityX, const float& entityY, const float& entityZ) {
+		return EntityManager::GetInstance().SpawnEntity(entityType, entityModel, entityAtlas, entityTexture, glm::vec3(entityX, entityY, entityZ));
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("AssetStringID GetBlockTextureAtFace(const AssetStringID& in, const int& in)", asFUNCTION(+[](const AssetStringID& blockStringID, const int& face) {
+		BlockType* blockType = BlockManager::GetInstance().GetBlockType(blockStringID);
+		int faceID = 0;
+		switch (face) {
+			case 0:
+				faceID = blockType->frontFaceID;
+			case 1:
+				faceID = blockType->backFaceID;
+			case 2:
+				faceID = blockType->leftFaceID;
+			case 3:
+				faceID = blockType->rightFaceID;
+			case 4:
+				faceID = blockType->topFaceID;
+			case 5:
+				faceID = blockType->bottomFaceID;
+		}
+		return blockType->metaTextures[faceID].stringID;
+	}), asCALL_CDECL);
 
 	//GenerateScriptPredefined(engine, "Github Repos/kiwicubed/Mods/Scripts/as.predefined");
 
@@ -589,6 +609,30 @@ void ModHandler::CallModFunction(const std::string& moduleName, const std::strin
 		}
 		psnip_trap();
 	}
+}
+
+void ModHandler::CallModFunction(asIScriptFunction* function) {
+	OVERRIDE_LOG_NAME("Mod Script Execution");
+	asIScriptContext* context = engine->CreateContext();
+	context->Prepare(function);
+
+	int result = context->Execute();
+	if (result != asEXECUTION_FINISHED) {
+		if (result == asEXECUTION_EXCEPTION) {
+			asIScriptFunction* exceptionFunction = context->GetExceptionFunction();
+
+			const char* module = exceptionFunction->GetModuleName();
+			int line = context->GetExceptionLineNumber();
+			const char* description = context->GetExceptionString();
+
+			CRITICAL("Error occured while calling function \"" + std::string(function->GetName()) + "\" in module \"" + std::string(module) + "\" at line {" + std::to_string(line) + "} with description \"" + std::string(description) + "\"");
+		} else {
+			CRITICAL("Error occured while calling function \"" + std::string(function->GetName()) + "\" with result enum of {" + std::to_string(result) + "}, aborting");
+		}
+		psnip_trap();
+	}
+
+	context->Release();
 }
 
 std::string ModHandler::LoadFile(std::string path) {
