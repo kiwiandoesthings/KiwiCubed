@@ -32,6 +32,3 @@ void EntityGetEventWorldTick(const EventWorldTick &in event, const uint64 id) {
 }
 
 dictionary itemOriginalY;
-
-//entityTransform.orientation.y += 150.0f * Globals::GetInstance().deltaTime;
-//entityRenderData.positionOffset.y = sin(world->GetTotalTicks() / 3.0f) * 0.025;
