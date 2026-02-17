@@ -10,6 +10,7 @@
 
 #include "Inventory.h"
 #include "Physics.h"
+#include "Utils.h"
 
 
 class World;
@@ -56,6 +57,38 @@ struct EntityTransform {
 
 	glm::ivec3 globalChunkPosition = glm::ivec3(0, 0, 0);
 	glm::ivec3 localChunkPosition = glm::ivec3(0, 0, 0);
+
+	Vec3 GetPosition() const {
+		return Vec3(position.x, position.y, position.z);
+	}
+	void SetPosition(const Vec3& vec) {
+		position = glm::vec3(vec.x, vec.y, vec.z);
+	}
+	Vec3 GetOrientation() const {
+		return Vec3(orientation.x, orientation.y, orientation.z);
+	}
+	void SetOrientation(const Vec3& vec) {
+		orientation = glm::vec3(vec.x, vec.y, vec.z);
+	}
+	Vec3 GetUpDirection() const {
+		return Vec3(upDirection.x, upDirection.y, upDirection.z);
+	}
+	void SetUpDirection(const Vec3& vec) {
+		upDirection = glm::vec3(vec.x, vec.y, vec.z);
+	}
+	Vec3 GetVelocity() const {
+		return Vec3(velocity.x, velocity.y, velocity.z);
+	}
+	void SetVelocity(const Vec3& vec) {
+		velocity = glm::vec3(vec.x, vec.y, vec.z);
+	}
+
+	Vec3 GetGlobalChunkPosition() const {
+		return Vec3(globalChunkPosition.x, globalChunkPosition.y, globalChunkPosition.z);
+	}
+	Vec3 GetLocalChunkPosition() const {
+		return Vec3(localChunkPosition.x, localChunkPosition.y, localChunkPosition.z);
+	}
 };
 
 struct EntityRenderData {

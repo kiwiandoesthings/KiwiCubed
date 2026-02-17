@@ -8,6 +8,17 @@
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
+            "program": "${workspaceFolder}/BuildDebug/kiwicubed.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+		{
+            "name": "(Windows) Launch Release",
+            "type": "cppvsdbg",
+            "request": "launch",
             "program": "${workspaceFolder}/BuildRelease/kiwicubed.exe",
             "args": [],
             "stopAtEntry": false,

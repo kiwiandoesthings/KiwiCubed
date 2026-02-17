@@ -1,3 +1,5 @@
+#pragma once
+
 struct Vec3 {
 	float x = 0.0f;
 	float y = 0.0f;
@@ -19,9 +21,12 @@ struct Vec3 {
 		return x == other.x && y == other.y && z == other.z;
 	}
 	Vec3& operator=(Vec3& other) {
-		Vec3 newVector(other.x, other.y, other.z);
-		return newVector;
+		x = other.x;
+    	y = other.y;
+    	z = other.z;
+   		return *this;
 	}
 
+	Vec3(int newX, int newY, int newZ) : x(static_cast<float>(newX)), y(static_cast<float>(newY)), z(static_cast<float>(newZ)) {}
 	Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 };

@@ -299,19 +299,20 @@ float World::GetPartialTicks() {
     return partialTicks;
 }
 
-void World::SpawnItemFromBlock(glm::ivec3 chunkPosition, glm::ivec3 blockPosition, BlockType* blockType) {
-    //entities.push_back(std::make_unique<Entity>(blockPosition.x + (chunkPosition.x * chunkSize) + 0.5, blockPosition.y + (chunkPosition.y * chunkSize) + 0.15, blockPosition.z + (chunkPosition.z * chunkSize) + 0.5, this));
-    //Entity* entity = entities[entities.size() - 1].get();
-    //entity->SetupRenderComponents(AssetStringID{"kiwicubed", "model/dropped_item"}, AssetStringID{"kiwicubed", "terrain_atlas"}, blockType->metaTextures[0].stringID);
-    
-}
-
 void World::Update() {
     OVERRIDE_LOG_NAME("World Updating");
 
 	EventWorldTick tickEvent = EventWorldTick{totalTicks};
-	EventData eventData = EventData{EVENT_WORLD_TICK, &tickEvent, sizeof(tickEvent)};
+	EventData eventData = EventData::GetEventData(tickEvent, EVENT_WORLD_TICK);
 	EventManager::GetInstance().TriggerEvent(EVENT_WORLD_TICK, eventData);
+
+	{
+		EntityManager& entityManager = EntityManager::GetInstance();
+		std::lock_guard<std::mutex> lock(entityManager.GetEntitiesMutex());
+		entityManager.ForEachEntity([](Entity& entity) {
+			entity.Update();
+		});
+	}
 
     std::vector<glm::ivec3> chunkGenerationQueueCopy;
     std::vector<glm::ivec3> chunkMeshingQueueCopy;
@@ -556,7 +557,7 @@ void World::Tick() {
 
     auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - lastTickTime).count();
-    if (totalTicks == 1) {
+    if (totalTicks % 20 == 1) {
         totalMemoryUsage = 0;
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
             auto& chunk = iterator->second;
@@ -567,8 +568,7 @@ void World::Tick() {
     Update();
 
     if (duration >= 1000.0f) {
-        ticksPerSecond = static_cast<float>(totalTicks) / (duration / 1000.0f);
-        totalTicks = 0;
+        ticksPerSecond = static_cast<float>(totalTicks % 20) / (duration / 1000.0f);
         lastTickTime = end_time;
     }
 

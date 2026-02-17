@@ -400,6 +400,9 @@ bool ModHandler::LoadModScripts() {
     OVERRIDE_LOG_NAME("Mod Scripting Environment Initialization");
 	engine = asCreateScriptEngine();
 	RegisterStdString(engine);
+	RegisterScriptArray(engine, true);
+	RegisterScriptDictionary(engine);
+	RegisterScriptMath(engine);
 	int result = engine->SetMessageCallback(asFUNCTION(ModError), &std::cout, asCALL_CDECL);
 	if (result < 0) {
 		ERR("Failed to set message callback");
@@ -438,8 +441,11 @@ bool ModHandler::LoadModScripts() {
 	engine->RegisterEnumValue("BlockEventType", "BLOCK_INTERACTED", BlockEventType::BLOCK_INTERACTED);
 	engine->RegisterEnumValue("BlockEventType", "BLOCK_TICK_UPDATE", BlockEventType::BLOCK_TICK_UPDATE);
 	engine->RegisterEnumValue("BlockEventType", "BLOCK_NEIGHBOR_UPDATE", BlockEventType::BLOCK_NEIGHBOR_UPDATE);
-	//  EventData
-	engine->RegisterObjectType("EventWorldPlayerBlock", sizeof(EventWorldPlayerBlock), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+	//  EventWorldTick
+	engine->RegisterObjectType("EventWorldTick", sizeof(EventWorldTick), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<EventWorldTick>());
+	engine->RegisterObjectProperty("EventWorldTick", "uint64 tickNumber", offsetof(EventWorldTick, tickNumber));
+	//  EventWorldPlayerBlock
+	engine->RegisterObjectType("EventWorldPlayerBlock", sizeof(EventWorldPlayerBlock), asOBJ_VALUE | asGetTypeTraits<EventWorldPlayerBlock>());
 	engine->RegisterObjectBehaviour("EventWorldPlayerBlock", asBEHAVE_CONSTRUCT, "void f(const BlockEventType &in, const uint64 &in, const int &in, const int &in, const int &in, const int &in, const int &in, const AssetStringID &in, const AssetStringID &in)", asFUNCTION(+[](const BlockEventType& blockEventType, const unsigned long long& playerAUID, const int& chunkX, const int& chunkY, const int& chunkZ, const int& blockX, const int& blockY, const int& blockZ, const AssetStringID& oldBlockStringID, const AssetStringID& newBlockStringID, void* memory){
 		new(memory) EventWorldPlayerBlock(blockEventType, playerAUID, chunkX, chunkY, chunkZ, blockX, blockY, blockZ, oldBlockStringID, newBlockStringID);
 	}), asCALL_CDECL_OBJLAST);
@@ -479,6 +485,44 @@ bool ModHandler::LoadModScripts() {
 	engine->RegisterObjectProperty("Vec3", "float x", offsetof(Vec3, x));
 	engine->RegisterObjectProperty("Vec3", "float y", offsetof(Vec3, y));
 	engine->RegisterObjectProperty("Vec3", "float z", offsetof(Vec3, z));
+	//  Chunk
+	engine->RegisterObjectType("Chunk", sizeof(Chunk), asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("Chunk", "int chunkX", offsetof(Chunk, chunkX));
+	engine->RegisterObjectProperty("Chunk", "int chunkY", offsetof(Chunk, chunkY));
+	engine->RegisterObjectProperty("Chunk", "int chunkZ", offsetof(Chunk, chunkZ));
+	engine->RegisterObjectMethod("Chunk", "uint8 GetGenerationStatus()", asMETHOD(Chunk, GetGenerationStatus), asCALL_THISCALL);
+	// EntityData
+	engine->RegisterObjectType("EntityData", sizeof(EntityData), asOBJ_VALUE | asGetTypeTraits<EntityData>());
+	engine->RegisterObjectBehaviour("EntityData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(+[](void* memory) {
+		new(memory) EntityData();
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("EntityData", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory) {
+		reinterpret_cast<EntityData*>(memory)->~EntityData();
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectProperty("EntityData", "Chunk@ currentChunkPtr", offsetof(EntityData, currentChunkPtr));
+	engine->RegisterObjectProperty("EntityData", "float terminalVelocity", offsetof(EntityData, terminalVelocity));
+	engine->RegisterObjectProperty("EntityData", "string name", offsetof(EntityData, name));
+	engine->RegisterObjectProperty("EntityData", "float moveSpeed", offsetof(EntityData, moveSpeed));
+	engine->RegisterObjectProperty("EntityData", "float jumpHeight", offsetof(EntityData, jumpHeight));
+	engine->RegisterObjectProperty("EntityData", "float walkModifier", offsetof(EntityData, walkModifier));
+	engine->RegisterObjectProperty("EntityData", "float jumpModifier", offsetof(EntityData, jumpModifier));
+	engine->RegisterObjectProperty("EntityData", "bool applyGravity", offsetof(EntityData, applyGravity));
+	engine->RegisterObjectProperty("EntityData", "bool applyCollision", offsetof(EntityData, applyCollision));
+	engine->RegisterObjectProperty("EntityData", "bool isGrounded", offsetof(EntityData, isGrounded));
+	engine->RegisterObjectProperty("EntityData", "bool isJumping", offsetof(EntityData, isJumping));
+	engine->RegisterObjectProperty("EntityData", "bool isPlayer", offsetof(EntityData, isPlayer));
+	//  EntityTransform
+	engine->RegisterObjectType("EntityTransform", sizeof(EntityTransform), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<EntityTransform>());
+	engine->RegisterObjectMethod("EntityTransform", "Vec3 GetPosition() const", asMETHOD(EntityTransform, GetPosition), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "void SetPosition(const Vec3 &in)", asMETHOD(EntityTransform, SetPosition), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "Vec3 GetOrientation() const", asMETHOD(EntityTransform, GetOrientation), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "void SetOrientation(const Vec3 &in)", asMETHOD(EntityTransform, SetOrientation), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "Vec3 GetUpDirection() const", asMETHOD(EntityTransform, GetUpDirection), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "void SetUpDirection(const Vec3 &in)", asMETHOD(EntityTransform, SetUpDirection), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "Vec3 GetVelocity() const", asMETHOD(EntityTransform, GetVelocity), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "void SetVelocity(const Vec3 &in)", asMETHOD(EntityTransform, SetVelocity), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "Vec3 GetGlobalChunkPosition() const", asMETHOD(EntityTransform, GetGlobalChunkPosition), asCALL_THISCALL);
+	engine->RegisterObjectMethod("EntityTransform", "Vec3 GetLocalChunkPosition() const", asMETHOD(EntityTransform, GetLocalChunkPosition), asCALL_THISCALL);
 
 	// Functions
 	engine->RegisterGlobalFunction("void Log(const string &in)", asFUNCTION(ModLog), asCALL_CDECL);
@@ -509,8 +553,14 @@ bool ModHandler::LoadModScripts() {
 		}
 		return blockType->metaTextures[faceID].stringID;
 	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("EntityTransform GetEntityTransform(const uint64 &in)", asFUNCTION(+[](const uint64_t& entityID) {
+		return EntityManager::GetInstance().GetEntity(entityID).GetEntityTransform();
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("void SetEntityTransform(const uint64 &in, const EntityTransform &in)", asFUNCTION(+[](const uint64_t& entityID, const EntityTransform& transform) {
+		EntityManager::GetInstance().GetEntity(entityID).SetEntityTransform(transform);
+	}), asCALL_CDECL);
 
-	//GenerateScriptPredefined(engine, "Github Repos/kiwicubed/Mods/Scripts/as.predefined");
+	//GenerateScriptPredefined(engine, "Github Repos/kiwicubed/Mods/kiwicubed/Scripts/as.predefined");
 
 	OVERRIDE_LOG_NAME("Mod Script Loading");
     for (auto iterator = modNamespacesToScripts.begin(); iterator != modNamespacesToScripts.end(); iterator++) {
@@ -570,13 +620,16 @@ void ModHandler::CallModFunction(const std::string& moduleName, const std::strin
 	asIScriptModule* module = modNamespacesToModules.find("kiwicubed")->second;
 	// TODO: valid module checking
 	asIScriptFunction* function = module->GetFunctionByName(functionName.c_str());
-	if (!function) {
+	if (!function || function == nullptr) {
 		CRITICAL("Tried to call function \"" + functionName + "\" in module from namespace \"" + moduleName + "\" that didn't exist, aborting");
 		psnip_trap();
 	}
 
 	asIScriptContext* context = engine->CreateContext();
-	context->Prepare(function);
+	int prepareResult = context->Prepare(function);
+	if (prepareResult != asSUCCESS) {
+		CRITICAL("Failed to prepare function \"" + functionName + "\" from module \"" + moduleName + "\", with result enum of {" + std::to_string(prepareResult) + "}");
+	}
 
 	for (unsigned int iterator = 0; iterator < arguments.size(); iterator++) {
 		int type = argumentTypes[iterator];
@@ -594,9 +647,9 @@ void ModHandler::CallModFunction(const std::string& moduleName, const std::strin
 		}
 	}
 
-	int result = context->Execute();
-	if (result != asEXECUTION_FINISHED) {
-		if (result == asEXECUTION_EXCEPTION) {
+	int executionResult = context->Execute();
+	if (executionResult != asEXECUTION_FINISHED) {
+		if (executionResult == asEXECUTION_EXCEPTION) {
 			asIScriptFunction* exceptionFunction = context->GetExceptionFunction();
 
 			const char* module = exceptionFunction->GetModuleName();
@@ -605,8 +658,9 @@ void ModHandler::CallModFunction(const std::string& moduleName, const std::strin
 
 			CRITICAL("Error occured while calling function \"" + functionName + "\" in module \"" + std::string(module) + "\" from namespace\"" + moduleName + "\" at line {" + std::to_string(line) + "} with description \"" + std::string(description) + "\"");
 		} else {
-			CRITICAL("Error occured while calling function \"" + functionName + "\" in module from namespace \"" + moduleName + "\" with result enum of {" + std::to_string(result) + "}, aborting");
+			CRITICAL("Error occured while calling function \"" + functionName + "\" in module from namespace \"" + moduleName + "\" with result enum of {" + std::to_string(executionResult) + "}, aborting");
 		}
+		context->Release();
 		psnip_trap();
 	}
 }

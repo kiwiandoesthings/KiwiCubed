@@ -52,8 +52,6 @@ class World {
 		unsigned int GetTotalTicks();
 		float GetPartialTicks();
 
-		void SpawnItemFromBlock(glm::ivec3 chunkPosition, glm::ivec3 blockPosition, BlockType* blockType);
-
 		void Update();
 
 		void DisplayImGui(unsigned int option);
@@ -98,8 +96,8 @@ class World {
 		std::unordered_set<std::tuple<int, int, int>, TripleHash> chunkMeshingSet;
 		std::queue<glm::ivec3> chunkUnloadingQueue;
 		std::queue<std::function<void()>> tickTaskQueue;
-		unsigned short playerChunkGenerationRadiusHorizontal = 4;
-		unsigned short playerChunkGenerationRadiusVertical = 3;
+		unsigned short playerChunkGenerationRadiusHorizontal = 1;
+		unsigned short playerChunkGenerationRadiusVertical = 1;
 
 		ThreadPool chunkGenerationThreads = ThreadPool(4);
 		FastNoiseLite noise;

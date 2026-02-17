@@ -88,6 +88,7 @@ executable(
     dependency('glad-gl', static: true),
     dependency('fmt', static: true),
 	dependency('angelscript', static: true),
+	dependency('openmp', static: true, required: true),
     freetype
   ],
 )

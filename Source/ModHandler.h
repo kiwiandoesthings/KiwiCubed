@@ -10,6 +10,9 @@
 #include <angelscript.h>
 #include <nlohmann/json.hpp>
 #include <robin_hood.h>
+#include <scriptarray.h>
+#include <scriptdictionary.h>
+#include <scriptmath.h>
 #include <scriptstdstring.h>
 
 #include "Utils.h"

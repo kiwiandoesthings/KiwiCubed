@@ -19,6 +19,7 @@ class EntityManager {
 
         siv::id SpawnEntity(AssetStringID entityTypeString, AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID, glm::vec3 position);
 
+		Entity& GetEntity(const uint64_t entityID);
         siv::vector<Entity> GetAllEntities() const;
         std::vector<siv::id> GetEntitesOfType(AssetStringID entityTypeString) const;
 
@@ -29,6 +30,8 @@ class EntityManager {
             } 
         }
 
+		std::mutex& GetEntitiesMutex();
+
     private:
         ~EntityManager() = default;
 
@@ -37,6 +40,7 @@ class EntityManager {
 
 		World* world = nullptr;
 
+		std::mutex entitiesMutex;
         std::unordered_map<AssetStringID, EntityType> stringIDsToEntityTypes;
 		siv::vector<Entity> entities;
         std::unordered_map<AssetStringID, std::vector<siv::id>> entityTypesToEntities;

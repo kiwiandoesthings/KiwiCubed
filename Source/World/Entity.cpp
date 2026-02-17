@@ -136,7 +136,7 @@ void Entity::Render() {
 	glm::vec3 interpolatedOrientation = entityRenderData.oldOrientation + (entityTransform.orientation - entityRenderData.oldOrientation) * world->GetPartialTicks();
 	glm::vec3 interpolatedPositionOffset = entityRenderData.oldPositionOffset + (entityRenderData.positionOffset - entityRenderData.oldPositionOffset) * world->GetPartialTicks();
 	glm::vec3 interpolatedOrientationOffset = entityRenderData.oldOrientationOffset + (entityRenderData.orientationOffset - entityRenderData.oldOrientationOffset) * world->GetPartialTicks();
-
+	
     modelMatrix = glm::translate(modelMatrix, interpolatedPosition);
 	modelMatrix = glm::translate(modelMatrix, interpolatedPositionOffset);
 	modelMatrix *= glm::mat4_cast(glm::quat(glm::radians(interpolatedOrientation)));
@@ -147,17 +147,11 @@ void Entity::Render() {
 }
 
 unsigned long long Entity::CreateAUID() {
-	unsigned long long id = 0;
-
 	std::random_device random;
-	std::mt19937 gen(random());
-	std::uniform_int_distribution<unsigned int> dist(0, 9);
-
-	for (int iterator = 0; iterator < 64; iterator++) {
-		id += static_cast<uint64_t>(dist(gen) * pow(10, iterator));
-	}
+	std::mt19937 generator(random());
+	std::uniform_int_distribution<unsigned long long> distribution;
 	
-	return id;
+	return distribution(generator);
 }
 
 void Entity::Delete() {

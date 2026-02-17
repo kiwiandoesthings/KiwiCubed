@@ -100,12 +100,16 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
         return variantCount;
     };
 
+	int baseX = chunkX * chunkSize;
+	int baseY = chunkY * chunkSize;
+	int baseZ = chunkZ * chunkSize;
+	
     for (int blockX = 0; blockX < chunkSize; ++blockX) {
         for (int blockY = 0; blockY < chunkSize; ++blockY) {
             for (int blockZ = 0; blockZ < chunkSize; ++blockZ) {
                 Block& block = GetBlock(blockX, blockY, blockZ);
-                float density = noise.GetNoise(static_cast<float>(blockX + (chunkX * chunkSize)), static_cast<float>(blockZ + (chunkZ * chunkSize)));
-	            int height = blockY + (chunkY * chunkSize);
+                float density = noise.GetNoise(static_cast<float>(blockX + baseX), static_cast<float>(blockZ + baseZ));
+	            int height = blockY + baseY;
                 int reach = static_cast<int>(density * 16) + 30;
 
                 if (!(height < reach)) {
@@ -116,7 +120,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
 
                 if (height + 4 < reach) {
                     block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/stone"});
-		            block.variant = rand() % GetCachedVariantCount(block.blockID);
+		            block.variant = (blockX * 73856093 ^ blockY * 19349663 ^ blockZ * 83492791) % GetCachedVariantCount(block.blockID);
                 } else if (height + 1 < reach) {
                     block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/dirt"});
 		            block.variant = 0;

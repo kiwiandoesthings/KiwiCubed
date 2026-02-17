@@ -72,10 +72,17 @@ bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) 
 		for (int iterator = 0; iterator < entities.size(); iterator++) {
 			std::string functionName = "EntityGet" + eventTypeStrings[eventType];
 
+			if (eventType == EVENT_WORLD_TICK) {
+				EventWorldTick* event = static_cast<EventWorldTick*>(eventData.data);
+				uint64_t entityId = static_cast<uint64_t>(entities[iterator]); 
+    			std::vector<void*> arguments = {event, &entityId};
+				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT, asTYPEID_UINT64};
+				modHandler.CallModFunction("kiwicubed", functionName, arguments, argumentTypes);
+			}
 			if (eventType == EVENT_WORLD_PLAYER_BLOCK) {
 				EventWorldPlayerBlock* event = static_cast<EventWorldPlayerBlock*>(eventData.data);
-				std::vector<void*> arguments = {event};
-				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT};
+				std::vector<void*> arguments = {event, &entities[iterator]};
+				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT, asTYPEID_UINT64};
 				modHandler.CallModFunction("kiwicubed", functionName, arguments, argumentTypes);
 			}
 		}
@@ -99,6 +106,12 @@ bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) 
 		for (int iterator = 0; iterator < scripts->second.size(); iterator++) {
 			std::string functionName = "Get" + eventTypeStrings[eventType];
 
+			if (eventType == EVENT_WORLD_TICK) {
+				EventWorldTick* event = static_cast<EventWorldTick*>(eventData.data);
+				std::vector<void*> arguments = {event};
+				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT};
+				modHandler.CallModFunction(scripts->second[iterator], functionName, arguments, argumentTypes);
+			}
 			if (eventType == EVENT_WORLD_PLAYER_BLOCK) {
 				EventWorldPlayerBlock* event = static_cast<EventWorldPlayerBlock*>(eventData.data);
 				std::vector<void*> arguments = {event};

@@ -14,7 +14,7 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 		psnip_trap();
 	}
 
-	singleplayerWorld = std::make_unique<World>(5, 3, this);
+	singleplayerWorld = std::make_unique<World>(2, 2, this);
 	isLoadedIntoSingleplayerWorld = true;
 	singleplayerWorld->GenerateWorld();
 	singleplayerWorld->Setup();

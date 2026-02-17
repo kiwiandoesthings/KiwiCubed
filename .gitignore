@@ -15,6 +15,3 @@
 
 # clangd vsc plugin cache
 .cache/*
-
-# Compiled objects (.wasm script files from vanilla mod)
-/Mods/kiwicubed/Scripts/*.wasm

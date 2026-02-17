@@ -46,6 +46,10 @@ siv::id EntityManager::SpawnEntity(AssetStringID entityTypeString, AssetStringID
 	return entityID;
 }
 
+Entity& EntityManager::GetEntity(const uint64_t entityID) {
+	return entities[entityID];
+}
+
 siv::vector<Entity> EntityManager::GetAllEntities() const {
     return entities;
 }
@@ -62,4 +66,8 @@ std::vector<siv::id> EntityManager::GetEntitesOfType(AssetStringID entityTypeStr
     } else {
         return std::vector<siv::id>();
     }
+}
+
+std::mutex& EntityManager::GetEntitiesMutex() {
+	return entitiesMutex;
 }
