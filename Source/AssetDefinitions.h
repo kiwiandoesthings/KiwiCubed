@@ -6,8 +6,8 @@
 
 
 struct AssetStringID {
-    char modName[64] = "";
-    char assetName[96] = "";
+    char modName[64] = "kiwicubed";
+    char assetName[96] = "invalid";
 
     std::string CanonicalName() const {
         return std::string(modName) + ":" + std::string(assetName);
@@ -24,7 +24,6 @@ struct AssetStringID {
     bool operator==(const AssetStringID& other) const {
         return std::strcmp(modName, other.modName) == 0 && std::strcmp(assetName, other.assetName) == 0;
     }
-
     bool operator<(const AssetStringID& other) const {
 		int modComparison = std::strcmp(modName, other.modName);
         if (modComparison == 0) {
@@ -91,4 +90,7 @@ struct EntityType {
 
 	MetaEntityModel metaModel;
 	MetaTexture metaTexture;
+
+	EntityType(AssetStringID typeStringID) : entityStringID(typeStringID) {}
+	EntityType(AssetStringID typeStringID, std::unordered_map<std::string, std::string> eventsToCallbacks, MetaEntityModel metaModel, MetaTexture metaTexture) : entityStringID(typeStringID), eventsToCallbacks(eventsToCallbacks), metaModel(metaModel), metaTexture(metaTexture) {}
 };

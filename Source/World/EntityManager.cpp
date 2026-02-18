@@ -33,29 +33,76 @@ EntityType* EntityManager::GetEntityType(AssetStringID entityTypeString) {
     return nullptr;
 }
 
-siv::id EntityManager::SpawnEntity(AssetStringID entityTypeString, AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID, glm::vec3 position) {
-    EntityType* entityType = GetEntityType(entityTypeString);
+siv::handle<Entity*> EntityManager::SpawnPlayer(glm::vec3 position) {
+	std::lock_guard<std::mutex> lock(entitiesMutex);
+	siv::id nextID = entities.getNextID();
+	Player* player = new Player(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z), world, nextID, GetEntityType(AssetStringID{"kiwicubed", "entity/player"}));
+	siv::id entityID = entities.emplace_back(player);
+	entityTypesToEntities[AssetStringID{"kiwicubed", "entity/player"}].push_back(entityID);
 
-	siv::id entityID = entities.emplace_back(position.x, position.y, position.z, world);
-	entityTypesToEntities[entityTypeString].push_back(entityID);
-
-	entities[entityID].SetupRenderComponents(modelID, atlasID, textureID);
-
-	std::cout << "created entity with type " << entityTypeString.CanonicalName() << std::endl;
-
-	return entityID;
+	return entities.createhandle(entityID);
 }
 
-Entity& EntityManager::GetEntity(const uint64_t entityID) {
+siv::handle<Entity*> EntityManager::SpawnEntity(AssetStringID entityTypeString, glm::vec3 position) {
+   	std::lock_guard<std::mutex> lock(entitiesMutex);
+	EntityType* entityType = GetEntityType(entityTypeString);
+
+	siv::id nextID = entities.getNextID();
+	Entity* entity = new Entity(position.x, position.y, position.z, world, nextID, entityType);
+	siv::id entityID = entities.emplace_back(entity);
+	entityTypesToEntities[entityTypeString].push_back(entityID);
+
+	return entities.createhandle(entityID);
+}
+
+siv::handle<Entity*> EntityManager::SpawnEntity(AssetStringID entityTypeString, AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID, glm::vec3 position) {
+    std::lock_guard<std::mutex> lock(entitiesMutex);
+	EntityType* entityType = GetEntityType(entityTypeString);
+
+	siv::id nextID = entities.getNextID();
+	Entity* entity = new Entity(position.x, position.y, position.z, world, nextID, entityType);
+	siv::id entityID = entities.emplace_back(entity);
+	entityTypesToEntities[entityTypeString].push_back(entityID);
+
+	entities[entityID]->SetupRenderComponents(modelID, atlasID, textureID);
+
+	return entities.createhandle(entityID);
+}
+
+siv::id EntityManager::RemoveEntity(siv::id entityID) {
+	std::lock_guard<std::mutex> lock(entitiesMutex);
+	if (!entities.isValidID(entityID)) {
+		CRITICAL("Tried to remove entity with id {" + std::to_string(entityID) + "} that didn't exist, aborting");
+		psnip_trap();
+	}
+	auto entitiesOfType = entityTypesToEntities.find(entities[entityID]->GetEntityType()->entityStringID);
+	if (entitiesOfType == entityTypesToEntities.end()) {
+		CRITICAL("Tried to remove entity with id {" + std::to_string(entityID) + "} that didn't exist, aborting (This should never happen, please report a bug)");
+		psnip_trap();
+	}
+	std::vector<uint64_t>& entityIDs = entitiesOfType->second;
+	size_t originalLength = entityIDs.size();
+	entityIDs.erase(std::remove(entityIDs.begin(), entityIDs.end(), entityID), entityIDs.end());
+	if (originalLength - 1 != entityIDs.size()) {
+		CRITICAL("Length mismatch after removing entityID from entityTypesToEntities vector, length after removing is {" + std::to_string(entityIDs.size()) + "} when it should have been {" + std::to_string(originalLength - 1) + "}");
+	}
+	entities.erase(entityID);
+	return entities.getNextID();
+}
+
+Entity* EntityManager::GetEntity(const uint64_t entityID) {
+	std::lock_guard<std::mutex> lock(entitiesMutex);
 	return entities[entityID];
 }
 
-siv::vector<Entity> EntityManager::GetAllEntities() const {
-    return entities;
+siv::vector<Entity*> EntityManager::GetAllEntities() {
+    std::lock_guard<std::mutex> lock(entitiesMutex);
+	return entities;
 }
 
-std::vector<siv::id> EntityManager::GetEntitesOfType(AssetStringID entityTypeString) const {
-    std::vector<siv::id> existentEntities;
+std::vector<siv::id> EntityManager::GetEntitesOfType(AssetStringID entityTypeString) {
+    std::lock_guard<std::mutex> lock(entitiesMutex);
+	std::vector<siv::id> existentEntities;
     auto entitiesOfType = entityTypesToEntities.find(entityTypeString);
     if (entitiesOfType != entityTypesToEntities.end()) {
         existentEntities.reserve(entitiesOfType->second.size());

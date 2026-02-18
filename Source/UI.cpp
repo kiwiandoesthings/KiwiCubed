@@ -111,6 +111,9 @@ UIScreen* UI::GetCurrentScreen() {
 }
 
 std::string UI::GetCurrentScreenName() {
+	if (currentScreen == nullptr) {
+		return "";
+	}
     return currentScreen->screenName;
 }
 

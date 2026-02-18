@@ -40,7 +40,7 @@ class Player : public Entity {
 		float speed = 0.004f;
 		float sensitivity = 100.0f;
 
-		Player(int playerX, int playerY, int playerZ, World* world);
+		Player(int playerX, int playerY, int playerZ, World* world, unsigned long long playerAUID, EntityType* type);
 	
 		void Setup();
 	
@@ -53,6 +53,7 @@ class Player : public Entity {
 		glm::vec3 GetPosition() const;
 
 		GameMode GetGameMode() const;
+		bool SetGameMode(GameMode gameMode);
 		std::string GetGameModeString() const;
 	
 		void UpdateCameraMatrix(Shader& shader);
@@ -62,11 +63,11 @@ class Player : public Entity {
 	private:
 		PlayerData playerData = PlayerData();
 		std::shared_ptr<Camera> camera;
+		glm::vec3 cameraOffset = glm::vec3(0.0f, 1.62f, 0.0f);
 		InputHandler inputHandler = InputHandler("Player");
 		std::vector<unsigned int> inputCallbackIDs;
 		World* world;
 		ChunkHandler* chunkHandler;
-		std::unordered_map<std::tuple<int, int, int>, Chunk, TripleHash> chunks;
 
 		float oldMouseX = 0;
 		float oldMouseY = 0;

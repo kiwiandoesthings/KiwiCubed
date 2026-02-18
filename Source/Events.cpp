@@ -48,7 +48,7 @@ bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) 
 	OVERRIDE_LOG_NAME("Event Triggering");
 
 	if (eventData.verification != VerificationNumber) {
-		ERR("EventData was corruped somewhere, verification number did not match");
+		CRITICAL("EventData was corruped somewhere, verification number did not match");
 		psnip_trap();
 	}
 
@@ -81,6 +81,12 @@ bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) 
 			}
 			if (eventType == EVENT_WORLD_PLAYER_BLOCK) {
 				EventWorldPlayerBlock* event = static_cast<EventWorldPlayerBlock*>(eventData.data);
+				std::vector<void*> arguments = {event, &entities[iterator]};
+				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT, asTYPEID_UINT64};
+				modHandler.CallModFunction("kiwicubed", functionName, arguments, argumentTypes);
+			}
+			if (eventType == EVENT_WORLD_PLAYER_MOVE) {
+				EventWorldPlayerMove* event = static_cast<EventWorldPlayerMove*>(eventData.data);
 				std::vector<void*> arguments = {event, &entities[iterator]};
 				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT, asTYPEID_UINT64};
 				modHandler.CallModFunction("kiwicubed", functionName, arguments, argumentTypes);
@@ -118,13 +124,19 @@ bool EventManager::TriggerEvent(EventType eventType, const EventData eventData) 
 				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT};
 				modHandler.CallModFunction(scripts->second[iterator], functionName, arguments, argumentTypes);
 			}
+			if (eventType == EVENT_WORLD_PLAYER_MOVE) {
+				EventWorldPlayerMove* event = static_cast<EventWorldPlayerMove*>(eventData.data);
+				std::vector<void*> arguments = {event};
+				std::vector<int> argumentTypes = {asTYPEID_APPOBJECT};
+				modHandler.CallModFunction(scripts->second[iterator], functionName, arguments, argumentTypes);
+			}
 		}
 	}
 
 	if (!foundEntity && !foundFunction && !foundScript) {
 		//WARN("Triggered event with no connected callbacks!");
 	}
-	return foundEntity || foundFunction;
+	return foundEntity || foundFunction || foundScript;
 }
 
 void EventManager::Delete() {

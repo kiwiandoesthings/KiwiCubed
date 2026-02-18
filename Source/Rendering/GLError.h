@@ -32,7 +32,7 @@ static bool GLLogCall(const char* function, const char* file, int line) {
             case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        INFO(error + " / " + std::to_string(errorCode) + " at line " + std::to_string(line) + " in function " + function + " in file " + file);
+        CRITICAL(error + " / " + std::to_string(errorCode) + " at line " + std::to_string(line) + " in function " + function + " in file " + file);
         hasError = true;
     }
     return !hasError;

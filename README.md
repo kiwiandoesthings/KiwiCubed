@@ -4,6 +4,7 @@
 This game / engine is focused on being extremely expandable, having easy and powerful modding support, being ultra performant, and having official tools for creating content and mods that anyone can use and get the hang of.
 
 Currently working on:
+- scripting support
 - Gameplay elements such as items and entities.
 - Survival gameplay elements
 

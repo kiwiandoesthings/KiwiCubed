@@ -415,12 +415,40 @@ bool ModHandler::LoadModScripts() {
 	engine->RegisterObjectBehaviour("AssetStringID", asBEHAVE_CONSTRUCT, "void f(const string &in, const string &in)", asFUNCTION(+[](const std::string& modName, const std::string& assetName, void* memory) {
 		new(memory) AssetStringID(modName, assetName);
 	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("AssetStringID", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(+[](void* memory) {
+		new(memory) AssetStringID("kiwicubed", "air");
+	}), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("AssetStringID", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory){
 		reinterpret_cast<AssetStringID*>(memory)->~AssetStringID();
 	}), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("AssetStringID", "string CanonicalName() const", asMETHOD(AssetStringID, CanonicalName), asCALL_THISCALL);
-	engine->RegisterObjectProperty("AssetStringID", "string modName", offsetof(AssetStringID, modName));
-	engine->RegisterObjectProperty("AssetStringID", "string assetName", offsetof(AssetStringID, assetName));
+	engine->RegisterObjectMethod("AssetStringID", "string ModName() const", asMETHOD(AssetStringID, ModName), asCALL_THISCALL);
+	engine->RegisterObjectMethod("AssetStringID", "string AssetName() const", asMETHOD(AssetStringID, AssetName), asCALL_THISCALL);
+	engine->RegisterObjectMethod("AssetStringID", "bool opEquals(const AssetStringID &in) const", asMETHODPR(AssetStringID, operator==, (const AssetStringID&) const, bool), asCALL_THISCALL);
+	engine->RegisterObjectMethod("AssetStringID", "AssetStringID &opAssign(const AssetStringID &in)", asMETHODPR(AssetStringID, operator=, (const AssetStringID&), AssetStringID&), asCALL_THISCALL);
+	//  Vec3
+	engine->RegisterObjectType("Vec3", sizeof(Vec3), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Vec3>());
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(+[](void* memory) {
+		new(memory) Vec3(0.0f, 0.0f, 0.0f);
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(const float &in, const float &in, const float &in)", asFUNCTION(+[](const float& x, const float& y, const float& z, void* memory) {
+		new(memory) Vec3(x, y, z);
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(const int &in, const int &in, const int &in)", asFUNCTION(+[](const int& x, const int& y, const int& z, void* memory) {
+		new(memory) Vec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory) {
+		reinterpret_cast<Vec3*>(memory)->~Vec3();
+	}), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opAdd(const Vec3 &in) const", asMETHODPR(Vec3, operator+, (Vec3&), Vec3), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opSub(const Vec3 &in) const", asMETHODPR(Vec3, operator-, (Vec3&), Vec3), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opMul(const Vec3 &in) const", asMETHODPR(Vec3, operator*, (Vec3&), Vec3), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opDiv(const Vec3 &in) const", asMETHODPR(Vec3, operator/, (Vec3&), Vec3), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "bool opEquals(const Vec3 &in) const", asMETHODPR(Vec3, operator==, (Vec3&), bool), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Vec3", "Vec3 &opAssign(const Vec3 &in)", asMETHODPR(Vec3, operator=, (Vec3&), Vec3&), asCALL_THISCALL);
+	engine->RegisterObjectProperty("Vec3", "float x", offsetof(Vec3, x));
+	engine->RegisterObjectProperty("Vec3", "float y", offsetof(Vec3, y));
+	engine->RegisterObjectProperty("Vec3", "float z", offsetof(Vec3, z));
 	//  EventType
 	engine->RegisterEnum("EventType");
 	engine->RegisterEnumValue("EventType", "EVENT_META_WINDOW_MINIMIZE", EventType::EVENT_META_WINDOW_MINIMIZE);
@@ -462,29 +490,21 @@ bool ModHandler::LoadModScripts() {
 	engine->RegisterObjectProperty("EventWorldPlayerBlock", "int blockZ", offsetof(EventWorldPlayerBlock, blockZ));
 	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID oldBlockStringID", offsetof(EventWorldPlayerBlock, oldBlockStringID));
 	engine->RegisterObjectProperty("EventWorldPlayerBlock", "AssetStringID newBlockStringID", offsetof(EventWorldPlayerBlock, newBlockStringID));
-	//  Vec3
-	engine->RegisterObjectType("Vec3", sizeof(Vec3), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Vec3>());
-	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(+[](void* memory) {
-		new(memory) Vec3(0.0f, 0.0f, 0.0f);
-	}), asCALL_CDECL_OBJLAST);
-	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(const float &in, const float &in, const float &in)", asFUNCTION(+[](const float& x, const float& y, const float& z, void* memory) {
-		new(memory) Vec3(x, y, z);
-	}), asCALL_CDECL_OBJLAST);
-	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(const int &in, const int &in, const int &in)", asFUNCTION(+[](const int& x, const int& y, const int& z, void* memory) {
-		new(memory) Vec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
-	}), asCALL_CDECL_OBJLAST);
-	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(+[](void* memory) {
-		reinterpret_cast<Vec3*>(memory)->~Vec3();
-	}), asCALL_CDECL_OBJLAST);
-	engine->RegisterObjectMethod("Vec3", "Vec3 opAdd(const Vec3 &in) const", asMETHODPR(Vec3, operator+, (Vec3&), Vec3), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Vec3", "Vec3 opSub(const Vec3 &in) const", asMETHODPR(Vec3, operator-, (Vec3&), Vec3), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Vec3", "Vec3 opMul(const Vec3 &in) const", asMETHODPR(Vec3, operator*, (Vec3&), Vec3), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Vec3", "Vec3 opDiv(const Vec3 &in) const", asMETHODPR(Vec3, operator/, (Vec3&), Vec3), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Vec3", "bool opEquals(const Vec3 &in) const", asMETHODPR(Vec3, operator==, (Vec3&), bool), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Vec3", "Vec3 &opAssign(const Vec3 &in)", asMETHODPR(Vec3, operator=, (Vec3&), Vec3&), asCALL_THISCALL);
-	engine->RegisterObjectProperty("Vec3", "float x", offsetof(Vec3, x));
-	engine->RegisterObjectProperty("Vec3", "float y", offsetof(Vec3, y));
-	engine->RegisterObjectProperty("Vec3", "float z", offsetof(Vec3, z));
+	//  EventWorldPlayerMove
+	engine->RegisterObjectType("EventWorldPlayerMove", sizeof(EventWorldPlayerMove), asOBJ_VALUE | asOBJ_POD);
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "uint64 playerAUID", offsetof(EventWorldPlayerMove, playerAUID));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float oldPlayerX", offsetof(EventWorldPlayerMove, oldPlayerX));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float oldPlayerY", offsetof(EventWorldPlayerMove, oldPlayerY));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float oldPlayerZ", offsetof(EventWorldPlayerMove, oldPlayerZ));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float oldPlayerYaw", offsetof(EventWorldPlayerMove, oldPlayerYaw));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float oldPlayerPitch", offsetof(EventWorldPlayerMove, oldPlayerPitch));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float oldPlayerRoll", offsetof(EventWorldPlayerMove, oldPlayerRoll));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float newPlayerX", offsetof(EventWorldPlayerMove, newPlayerX));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float newPlayerY", offsetof(EventWorldPlayerMove, newPlayerY));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float newPlayerZ", offsetof(EventWorldPlayerMove, newPlayerZ));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float newPlayerYaw", offsetof(EventWorldPlayerMove, newPlayerYaw));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float newPlayerPitch", offsetof(EventWorldPlayerMove, newPlayerPitch));
+	engine->RegisterObjectProperty("EventWorldPlayerMove", "float newPlayerRoll", offsetof(EventWorldPlayerMove, newPlayerRoll));
 	//  Chunk
 	engine->RegisterObjectType("Chunk", sizeof(Chunk), asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("Chunk", "int chunkX", offsetof(Chunk, chunkX));
@@ -531,8 +551,8 @@ bool ModHandler::LoadModScripts() {
 		asIScriptContext* context = asGetActiveContext();
 		EventManager::GetInstance().RegisterScriptToEvent(eventType, context->GetFunction()->GetModule()->GetName());
 	}), asCALL_CDECL);
-	engine->RegisterGlobalFunction("uint64 SpawnEntity(const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const float &in, const float &in, const float &in)", asFUNCTION(+[](const AssetStringID& entityType, const AssetStringID& entityModel, const AssetStringID& entityAtlas, const AssetStringID& entityTexture, const float& entityX, const float& entityY, const float& entityZ) {
-		return EntityManager::GetInstance().SpawnEntity(entityType, entityModel, entityAtlas, entityTexture, glm::vec3(entityX, entityY, entityZ));
+	engine->RegisterGlobalFunction("int SpawnEntity(const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const float &in, const float &in, const float &in)", asFUNCTION(+[](const AssetStringID& entityType, const AssetStringID& entityModel, const AssetStringID& entityAtlas, const AssetStringID& entityTexture, const float& entityX, const float& entityY, const float& entityZ) {
+		return static_cast<int>(EntityManager::GetInstance().SpawnEntity(entityType, entityModel, entityAtlas, entityTexture, glm::vec3(entityX, entityY, entityZ)).getID());
 	}), asCALL_CDECL);
 	engine->RegisterGlobalFunction("AssetStringID GetBlockTextureAtFace(const AssetStringID& in, const int& in)", asFUNCTION(+[](const AssetStringID& blockStringID, const int& face) {
 		BlockType* blockType = BlockManager::GetInstance().GetBlockType(blockStringID);
@@ -553,14 +573,25 @@ bool ModHandler::LoadModScripts() {
 		}
 		return blockType->metaTextures[faceID].stringID;
 	}), asCALL_CDECL);
-	engine->RegisterGlobalFunction("EntityTransform GetEntityTransform(const uint64 &in)", asFUNCTION(+[](const uint64_t& entityID) {
-		return EntityManager::GetInstance().GetEntity(entityID).GetEntityTransform();
+	engine->RegisterGlobalFunction("EntityTransform GetEntityTransform(const uint64 &in)", asFUNCTION(+[](const uint64_t& entityAUID) {
+		return EntityManager::GetInstance().GetEntity(entityAUID)->GetEntityTransform();
 	}), asCALL_CDECL);
-	engine->RegisterGlobalFunction("void SetEntityTransform(const uint64 &in, const EntityTransform &in)", asFUNCTION(+[](const uint64_t& entityID, const EntityTransform& transform) {
-		EntityManager::GetInstance().GetEntity(entityID).SetEntityTransform(transform);
+	engine->RegisterGlobalFunction("void SetEntityTransform(const uint64 &in, const EntityTransform &in)", asFUNCTION(+[](const uint64_t& entityAUID, const EntityTransform& transform) {
+		EntityManager::GetInstance().GetEntity(entityAUID)->SetEntityTransform(transform);
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("bool AddItem(const AssetStringID &in, const uint8 &in, const uint64 &in)", asFUNCTION(+[](const AssetStringID& itemStringID, const unsigned char& itemCount, const uint64_t& playerAUID) {
+		EntityManager& entityManager = EntityManager::GetInstance();
+		Entity* entity = entityManager.GetEntity(playerAUID);
+		EntityData entityData = entity->GetEntityData();
+		bool result = entityData.inventory.AddItem(InventorySlot{itemStringID, itemCount});
+		entity->SetEntityData(entityData);
+		return result;
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("void RemoveEntity(const uint64 &in)", asFUNCTION(+[](const uint64_t& entityAUID) {
+		EntityManager::GetInstance().RemoveEntity(entityAUID);
 	}), asCALL_CDECL);
 
-	//GenerateScriptPredefined(engine, "Github Repos/kiwicubed/Mods/kiwicubed/Scripts/as.predefined");
+	GenerateScriptPredefined(engine, "C:/Users/jonah/Downloads/Github Repos/kiwicubed/Mods/kiwicubed/Scripts/as.predefined");
 
 	OVERRIDE_LOG_NAME("Mod Script Loading");
     for (auto iterator = modNamespacesToScripts.begin(); iterator != modNamespacesToScripts.end(); iterator++) {
@@ -629,6 +660,7 @@ void ModHandler::CallModFunction(const std::string& moduleName, const std::strin
 	int prepareResult = context->Prepare(function);
 	if (prepareResult != asSUCCESS) {
 		CRITICAL("Failed to prepare function \"" + functionName + "\" from module \"" + moduleName + "\", with result enum of {" + std::to_string(prepareResult) + "}");
+		psnip_trap();
 	}
 
 	for (unsigned int iterator = 0; iterator < arguments.size(); iterator++) {

@@ -91,11 +91,11 @@ struct EventData {
 		OVERRIDE_LOG_NAME("Event Data");
 
 		if (verification != VerificationNumber) {
-			ERR("EventData was corruped somewhere, verification number did not match");
+			CRITICAL("EventData was corruped somewhere, verification number did not match");
 			psnip_trap();
 		}
 		if (sizeof(T) != dataSize) {
-			ERR("Tried to get data struct from EventData where data struct's size and EventData's dataSize were unequal");
+			CRITICAL("Tried to get data struct from EventData where data struct's size and EventData's dataSize were unequal");
 			psnip_trap();
 		}
 
@@ -138,9 +138,9 @@ struct EventData {
 			memcpy(this->data, data, dataSize);
 		} else {
 			if (!data) {
-				ERR("EventData created with invalid data pointer");
+				CRITICAL("EventData created with invalid data pointer");
 			} else {
-				ERR("EventData created with size of 0");
+				CRITICAL("EventData created with size of 0");
 			}
 			psnip_trap();
 		}

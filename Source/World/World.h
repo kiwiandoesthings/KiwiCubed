@@ -58,10 +58,8 @@ class World {
 
 		ChunkHandler& GetChunkHandler();
 		Chunk* GetChunk(int chunkX, int chunkY, int chunkZ);
-		Entity* GetEntity(unsigned long long entityAUID);
 
-		//temporary - merge into GetEntity
-		Player& GetPlayer();
+		Player* GetPlayer();
 
 		std::vector<float>& GetChunkDebugVisualizationVertices();
 		std::vector<GLuint>& GetChunkDebugVisualizationIndices();
@@ -96,8 +94,8 @@ class World {
 		std::unordered_set<std::tuple<int, int, int>, TripleHash> chunkMeshingSet;
 		std::queue<glm::ivec3> chunkUnloadingQueue;
 		std::queue<std::function<void()>> tickTaskQueue;
-		unsigned short playerChunkGenerationRadiusHorizontal = 1;
-		unsigned short playerChunkGenerationRadiusVertical = 1;
+		unsigned short playerChunkGenerationRadiusHorizontal = 5;
+		unsigned short playerChunkGenerationRadiusVertical = 2;
 
 		ThreadPool chunkGenerationThreads = ThreadPool(4);
 		FastNoiseLite noise;
@@ -106,7 +104,7 @@ class World {
 		bool isWorldGenerated = false;
 		unsigned int worldSizeHorizontal;
 		unsigned int worldSizeVertical;
-		Player player = Player(0, 0, 0, this);
+		Player* player = nullptr;
 		ChunkHandler chunkHandler;
 		SingleplayerHandler* singleplayerHandler;
 

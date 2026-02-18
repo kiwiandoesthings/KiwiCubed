@@ -1,0 +1,267 @@
+enum EventType {
+	EVENT_META_WINDOW_MINIMIZE,
+	EVENT_META_WINDOW_MAXIMIZE,
+	EVENT_META_WINDOW_RESIZE,
+	EVENT_WORLD_TICK,
+	EVENT_WORLD_PLAYER_BLOCK,
+	EVENT_WORLD_PLAYER_MOVE,
+	EVENT_WORLD_ENTITY_BLOCK,
+	EVENT_WORLD_ENTITY_HURT,
+	EVENT_WORLD_ENTITY_ATTACK,
+	EVENT_WORLD_GENERIC_BLOCK
+}
+enum BlockEventType {
+	BLOCK_MINED,
+	BLOCK_PLACED,
+	BLOCK_REPLACED,
+	BLOCK_INTERACTED,
+	BLOCK_TICK_UPDATE,
+	BLOCK_NEIGHBOR_UPDATE
+}
+class string{
+	~string();
+	string();
+	string(const string&in);
+	string& opAssign(const string&in);
+	string& opAddAssign(const string&in);
+	bool opEquals(const string&in) const;
+	int opCmp(const string&in) const;
+	string opAdd(const string&in) const;
+	uint length() const;
+	void resize(uint);
+	bool isEmpty() const;
+	uint8& opIndex(uint);
+	const uint8& opIndex(uint) const;
+	string& opAssign(double);
+	string& opAddAssign(double);
+	string opAdd(double) const;
+	string opAdd_r(double) const;
+	string& opAssign(float);
+	string& opAddAssign(float);
+	string opAdd(float) const;
+	string opAdd_r(float) const;
+	string& opAssign(int64);
+	string& opAddAssign(int64);
+	string opAdd(int64) const;
+	string opAdd_r(int64) const;
+	string& opAssign(uint64);
+	string& opAddAssign(uint64);
+	string opAdd(uint64) const;
+	string opAdd_r(uint64) const;
+	string& opAssign(bool);
+	string& opAddAssign(bool);
+	string opAdd(bool) const;
+	string opAdd_r(bool) const;
+	string substr(uint start = 0, int count = -1) const;
+	int findFirst(const string&in, uint start = 0) const;
+	int findFirstOf(const string&in, uint start = 0) const;
+	int findFirstNotOf(const string&in, uint start = 0) const;
+	int findLast(const string&in, int start = -1) const;
+	int findLastOf(const string&in, int start = -1) const;
+	int findLastNotOf(const string&in, int start = -1) const;
+	void insert(uint pos, const string&in other);
+	void erase(uint pos, int count = -1);
+	int regexFind(const string&in regex, uint start = 0, uint&out lengthOfMatch = void) const;
+}
+class array<T>{
+	T& opIndex(uint index);
+	const T& opIndex(uint index) const;
+	uint opForBegin() const;
+	bool opForEnd(uint) const;
+	uint opForNext(uint) const;
+	const T& opForValue0(uint index) const;
+	uint opForValue1(uint index) const;
+	T[]& opAssign(const T[]&in);
+	void insertAt(uint index, const T&in value);
+	void insertAt(uint index, const T[]&inout arr);
+	void insertLast(const T&in value);
+	void removeAt(uint index);
+	void removeLast();
+	void removeRange(uint start, uint count);
+	uint length() const;
+	void reserve(uint length);
+	void resize(uint length);
+	void sortAsc();
+	void sortAsc(uint startAt, uint count);
+	void sortDesc();
+	void sortDesc(uint startAt, uint count);
+	void reverse();
+	int find(const T&in value) const;
+	int find(uint startAt, const T&in value) const;
+	int findByRef(const T&in value) const;
+	int findByRef(uint startAt, const T&in value) const;
+	bool opEquals(const T[]&in) const;
+	bool isEmpty() const;
+	void sort(T[]::less&in, uint startAt = 0, uint count = uint(-1));
+	funcdef bool less(const T&in, const T&in);
+}
+class dictionaryValue{
+	~dictionaryValue();
+	dictionaryValue();
+	dictionaryValue& opAssign(const dictionaryValue&in);
+	dictionaryValue& opHndlAssign(const ?&in);
+	dictionaryValue& opHndlAssign(const dictionaryValue&in);
+	dictionaryValue& opAssign(const ?&in);
+	dictionaryValue& opAssign(double);
+	dictionaryValue& opAssign(int64);
+	void opCast(?&out);
+	void opConv(?&out);
+	int64 opConv();
+	double opConv();
+}
+class dictionary{
+	dictionary& opAssign(const dictionary&in);
+	void set(const string&in, const ?&in);
+	bool get(const string&in, ?&out) const;
+	void set(const string&in, const int64&in);
+	bool get(const string&in, int64&out) const;
+	void set(const string&in, const double&in);
+	bool get(const string&in, double&out) const;
+	bool exists(const string&in) const;
+	bool isEmpty() const;
+	uint getSize() const;
+	bool delete(const string&in);
+	void deleteAll();
+	string[]@ getKeys() const;
+	dictionaryValue& opIndex(const string&in);
+	const dictionaryValue& opIndex(const string&in) const;
+	dictionaryIter@ opForBegin() const;
+	bool opForEnd(dictionaryIter@) const;
+	dictionaryIter@ opForNext(dictionaryIter@) const;
+	const dictionaryValue& opForValue0(dictionaryIter@) const;
+	const string& opForValue1(dictionaryIter@) const;
+}
+class dictionaryIter{
+}
+class AssetStringID{
+	~AssetStringID();
+	AssetStringID(const string&in, const string&in);
+	AssetStringID();
+	string CanonicalName() const;
+	string ModName() const;
+	string AssetName() const;
+	bool opEquals(const AssetStringID&in) const;
+	AssetStringID& opAssign(const AssetStringID&in);
+}
+class Vec3{
+	~Vec3();
+	Vec3();
+	Vec3(const float&in, const float&in, const float&in);
+	Vec3(const int&in, const int&in, const int&in);
+	Vec3 opAdd(const Vec3&in) const;
+	Vec3 opSub(const Vec3&in) const;
+	Vec3 opMul(const Vec3&in) const;
+	Vec3 opDiv(const Vec3&in) const;
+	bool opEquals(const Vec3&in) const;
+	Vec3& opAssign(const Vec3&in);
+	float x;
+	float y;
+	float z;
+}
+class EventWorldTick{
+	uint64 tickNumber;
+}
+class EventWorldPlayerBlock{
+	~EventWorldPlayerBlock();
+	EventWorldPlayerBlock(const BlockEventType&in, const uint64&in, const int&in, const int&in, const int&in, const int&in, const int&in, const AssetStringID&in, const AssetStringID&in);
+	BlockEventType blockEventType;
+	uint64 playerAUID;
+	int chunkX;
+	int chunkY;
+	int chunkZ;
+	int blockX;
+	int blockY;
+	int blockZ;
+	AssetStringID oldBlockStringID;
+	AssetStringID newBlockStringID;
+}
+class EventWorldPlayerMove{
+	uint64 playerAUID;
+	float oldPlayerX;
+	float oldPlayerY;
+	float oldPlayerZ;
+	float oldPlayerYaw;
+	float oldPlayerPitch;
+	float oldPlayerRoll;
+	float newPlayerX;
+	float newPlayerY;
+	float newPlayerZ;
+	float newPlayerYaw;
+	float newPlayerPitch;
+	float newPlayerRoll;
+}
+class Chunk{
+	uint8 GetGenerationStatus();
+	int chunkX;
+	int chunkY;
+	int chunkZ;
+}
+class EntityData{
+	~EntityData();
+	EntityData();
+	Chunk@ currentChunkPtr;
+	float terminalVelocity;
+	string name;
+	float moveSpeed;
+	float jumpHeight;
+	float walkModifier;
+	float jumpModifier;
+	bool applyGravity;
+	bool applyCollision;
+	bool isGrounded;
+	bool isJumping;
+	bool isPlayer;
+}
+class EntityTransform{
+	Vec3 GetPosition() const;
+	void SetPosition(const Vec3&in);
+	Vec3 GetOrientation() const;
+	void SetOrientation(const Vec3&in);
+	Vec3 GetUpDirection() const;
+	void SetUpDirection(const Vec3&in);
+	Vec3 GetVelocity() const;
+	void SetVelocity(const Vec3&in);
+	Vec3 GetGlobalChunkPosition() const;
+	Vec3 GetLocalChunkPosition() const;
+}
+uint scan(const string&in str, ?&out...);
+string format(const string&in fmt, const ?&in...);
+string formatInt(int64 val, const string&in options = "", uint width = 0);
+string formatUInt(uint64 val, const string&in options = "", uint width = 0);
+string formatFloat(double val, const string&in options = "", uint width = 0, uint precision = 0);
+int64 parseInt(const string&in, uint base = 10, uint&out byteCount = 0);
+uint64 parseUInt(const string&in, uint base = 10, uint&out byteCount = 0);
+double parseFloat(const string&in, uint&out byteCount = 0);
+float fpFromIEEE(uint);
+uint fpToIEEE(float);
+double fpFromIEEE(uint64);
+uint64 fpToIEEE(double);
+bool closeTo(float, float, float = 0.00001f);
+bool closeTo(double, double, double = 0.0000000001);
+float cos(float);
+float sin(float);
+float tan(float);
+float acos(float);
+float asin(float);
+float atan(float);
+float atan2(float, float);
+float cosh(float);
+float sinh(float);
+float tanh(float);
+float log(float);
+float log10(float);
+float pow(float, float);
+float sqrt(float);
+float ceil(float);
+float abs(float);
+float floor(float);
+float fraction(float);
+void Log(const string&in);
+bool RegisterEventToEntityType(EventType, const AssetStringID&in);
+void RegisterFunctionToEvent(const EventType&in);
+int SpawnEntity(const AssetStringID&in, const AssetStringID&in, const AssetStringID&in, const AssetStringID&in, const float&in, const float&in, const float&in);
+AssetStringID GetBlockTextureAtFace(const AssetStringID&in, const int&in);
+EntityTransform GetEntityTransform(const uint64&in);
+void SetEntityTransform(const uint64&in, const EntityTransform&in);
+bool AddItem(const AssetStringID&in, const uint8&in, const uint64&in);
+void RemoveEntity(const uint64&in);

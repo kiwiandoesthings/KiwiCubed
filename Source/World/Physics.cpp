@@ -35,6 +35,35 @@ static void ClipVelocity(EntityTransform& newTransform, EntityData& entityData, 
 	}
 }
 
+void Physics::MakeCollisionQueue(const EntityData& entityData, const EntityTransform& entityTransform, ChunkHandler& chunkHandler) {
+	blockCollisionQueue.clear();
+
+	glm::vec3 minCorner = glm::min(entityData.physicsBoundingBox.corner1 + entityTransform.position, entityData.physicsBoundingBox.corner2 + entityTransform.position);
+	glm::vec3 maxCorner = glm::max(entityData.physicsBoundingBox.corner1 + entityTransform.position, entityData.physicsBoundingBox.corner2 + entityTransform.position);
+
+	for (int blockX = static_cast<int>(std::floor(minCorner.x)) - 1; blockX <= static_cast<int>(std::ceil(maxCorner.x)) + 1; ++blockX) {
+		for (int blockY = static_cast<int>(std::floor(minCorner.y)) - 1; blockY <= static_cast<int>(std::ceil(maxCorner.y)) + 1; ++blockY) {
+			for (int blockZ = static_cast<int>(std::floor(minCorner.z)) - 1; blockZ <= static_cast<int>(std::ceil(maxCorner.z)) + 1; ++blockZ) {
+				glm::ivec3 chunkPosition = glm::ivec3(
+					FloorDiv(static_cast<float>(blockX), chunkSize),
+					FloorDiv(static_cast<float>(blockY), chunkSize),
+					FloorDiv(static_cast<float>(blockZ), chunkSize)
+				);
+
+				glm::ivec3 blockPosition = glm::ivec3(
+					PositiveModulo(static_cast<float>(blockX), chunkSize),
+					PositiveModulo(static_cast<float>(blockY), chunkSize),
+					PositiveModulo(static_cast<float>(blockZ), chunkSize)
+				);
+
+				if (chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z).blockID != 0) {
+					blockCollisionQueue.emplace_back(FullBlockPosition(blockPosition, chunkPosition));
+				}
+			}
+		}
+	}
+}
+
 bool Physics::CollideAxis(unsigned char axis, EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler) {
 	{
 		std::lock_guard<std::mutex> lock(chunkHandler.ChunkMutex);
@@ -143,32 +172,7 @@ float Physics::CollideAxisFloat(unsigned char axis, EntityTransform& newTransfor
 bool Physics::ApplyTerrainCollision(EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler) {
 	Globals& globals = Globals::GetInstance();
 
-	blockCollisionQueue.clear();
-
-	glm::vec3 minCorner = glm::min(entityData.physicsBoundingBox.corner1 + newTransform.position, entityData.physicsBoundingBox.corner2 + newTransform.position);
-	glm::vec3 maxCorner = glm::max(entityData.physicsBoundingBox.corner1 + newTransform.position, entityData.physicsBoundingBox.corner2 + newTransform.position);
-
-	for (int blockX = static_cast<int>(std::floor(minCorner.x)) - 1; blockX <= static_cast<int>(std::ceil(maxCorner.x)) + 1; ++blockX) {
-		for (int blockY = static_cast<int>(std::floor(minCorner.y)) - 1; blockY <= static_cast<int>(std::ceil(maxCorner.y)) + 1; ++blockY) {
-			for (int blockZ = static_cast<int>(std::floor(minCorner.z)) - 1; blockZ <= static_cast<int>(std::ceil(maxCorner.z)) + 1; ++blockZ) {
-				glm::ivec3 chunkPosition = glm::ivec3(
-					FloorDiv(static_cast<float>(blockX), chunkSize),
-					FloorDiv(static_cast<float>(blockY), chunkSize),
-					FloorDiv(static_cast<float>(blockZ), chunkSize)
-				);
-
-				glm::ivec3 blockPosition = glm::ivec3(
-					PositiveModulo(static_cast<float>(blockX), chunkSize),
-					PositiveModulo(static_cast<float>(blockY), chunkSize),
-					PositiveModulo(static_cast<float>(blockZ), chunkSize)
-				);
-
-				if (chunkHandler.GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z).blockID != 0) {
-					blockCollisionQueue.emplace_back(FullBlockPosition(blockPosition, chunkPosition));
-				}
-			}
-		}
-	}
+	MakeCollisionQueue(entityData, newTransform, chunkHandler);
 
 	newTransform.position.x += newTransform.velocity.x * globals.deltaTime;
 	bool xAxis = CollideAxis(0, newTransform, entityData, chunkHandler);
@@ -228,7 +232,7 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 
 	for (int i = 0; i < maxDistance; ++i) {
 		glm::ivec3 localBlockPos = glm::ivec3(PositiveModulo(static_cast<float>(currentBlock.x), chunkSize), PositiveModulo(static_cast<float>(currentBlock.y), chunkSize), PositiveModulo(static_cast<float>(currentBlock.z), chunkSize));
-
+		
 		Chunk* chunk = chunkHandler.GetChunk(currentChunk.x, currentChunk.y, currentChunk.z, false);
 		if (chunk->isGenerated) {
 			Block& block = chunk->GetBlock(localBlockPos.x, localBlockPos.y, localBlockPos.z);
@@ -288,7 +292,8 @@ BlockRayHit Physics::RaycastWorld(const glm::vec3& origin, const glm::vec3& dire
 bool Physics::GetGrounded(Entity& entity, ChunkHandler& chunkHandler) {
 	EntityData newEntityData = entity.GetEntityData();
 	EntityTransform newTransform = entity.GetEntityTransform();
-	return CollideAxisFloat(1, newTransform,newEntityData, chunkHandler) > 0;
+	MakeCollisionQueue(newEntityData, newTransform, chunkHandler);
+	return CollideAxisFloat(1, newTransform, newEntityData, chunkHandler) > 0;
 }
 
 bool Physics::CollideBlock(Entity &entity, FullBlockPosition fullBlockPosition, bool resolveCollision) {

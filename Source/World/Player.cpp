@@ -14,7 +14,7 @@ const char* gameModeStrings[] = {
 };
 
 
-Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(static_cast<float>(playerX), static_cast<float>(playerY), static_cast<float>(playerZ), world), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
+Player::Player(int playerX, int playerY, int playerZ, World* world, unsigned long long playerAUID, EntityType* type) : Entity(static_cast<float>(playerX), static_cast<float>(playerY), static_cast<float>(playerZ), world, playerAUID, type), yaw(0), pitch(0), roll(0), width(640), height(480), world(world) {
 	entityTransform.position = glm::vec3(playerX, playerY, playerZ);
 	
 	entityStats.health = 20.0f;
@@ -22,7 +22,7 @@ Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(sta
 	
 	entityData.name = "Player";
 	
-	entityData.physicsBoundingBox = BoundingBox(glm::vec3(-0.3f, -1.62f, -0.3f), glm::vec3(0.3f, 0.18f, 0.3f));
+	entityData.physicsBoundingBox = BoundingBox(glm::vec3(-0.3f, 0.0f, -0.3f), glm::vec3(0.3f, 1.8f, 0.3f));
 
 	std::vector<AssetStringID> slotStringIDs;
 	slotStringIDs.reserve(27);
@@ -38,17 +38,11 @@ Player::Player(int playerX, int playerY, int playerZ, World* world) : Entity(sta
 
 	playerData.gameMode = SURVIVAL;
 
-	if (playerData.gameMode == CREATIVE) {
-		entityData.applyCollision = false;
-		entityData.applyGravity = false;
-	} else {
-		entityData.applyCollision = true;
-		entityData.applyGravity = true;
-	}
+	SetGameMode(playerData.gameMode);
 
 	entityData.isPlayer = true;
 
-	protectedEntityData.AUID = CreateAUID();
+	protectedEntityData.AUID = playerAUID;
 
 	chunkHandler = &world->GetChunkHandler();
 }
@@ -66,13 +60,9 @@ void Player::Setup() {
 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
 		if (playerData.gameMode == SURVIVAL) {
-			playerData.gameMode = CREATIVE;
-			entityData.applyGravity = false;
-			entityData.applyCollision = false;
+			SetGameMode(CREATIVE);
 		} else {
-			playerData.gameMode = SURVIVAL;
-			entityData.applyGravity = true;
-			entityData.applyCollision = true;
+			SetGameMode(SURVIVAL);
 		}
 	}));
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F3, [&](int key) {
@@ -128,23 +118,30 @@ void Player::Update() {
 		}
 		
 		if (oldEntityTransform.globalChunkPosition != entityTransform.globalChunkPosition) {
-			EventWorldPlayerMove moveEvent = EventWorldPlayerMove(protectedEntityData.AUID, oldEntityTransform.position.x, oldEntityTransform.position.y, oldEntityTransform.position.z, oldEntityTransform.orientation.y, oldEntityTransform.orientation.x, oldEntityTransform.orientation.z, entityTransform.position.x, entityTransform.position.y, entityTransform.position.z, entityTransform.orientation.y, entityTransform.orientation.x, entityTransform.orientation.z);
-			EventData eventData = EventData(EVENT_WORLD_PLAYER_MOVE, &moveEvent, sizeof(moveEvent));
-			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_MOVE, eventData);
 			entityData.currentChunkPtr = chunkHandler->GetChunk(entityTransform.globalChunkPosition.x, entityTransform.globalChunkPosition.y, entityTransform.globalChunkPosition.z, false);
 			if (!entityData.currentChunkPtr->IsReal()) {
 				entityData.currentChunkPtr = nullptr;
 			}
 		}
+
+		if (oldEntityTransform.position != entityTransform.position) {
+			EventWorldPlayerMove moveEvent = EventWorldPlayerMove(protectedEntityData.AUID, oldEntityTransform.position.x, oldEntityTransform.position.y, oldEntityTransform.position.z, oldEntityTransform.orientation.y, oldEntityTransform.orientation.x, oldEntityTransform.orientation.z, entityTransform.position.x, entityTransform.position.y, entityTransform.position.z, entityTransform.orientation.y, entityTransform.orientation.x, entityTransform.orientation.z);
+			EventData eventData = EventData(EVENT_WORLD_PLAYER_MOVE, &moveEvent, sizeof(moveEvent));
+			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_MOVE, eventData);
+		}
 	}
 
+	if (UI::GetInstance().GetCurrentScreenName() != "ui/inventory") {
+		return;
+	}
 	Window& globalWindow = Window::GetInstance();
 	glm::ivec2 windowSize = glm::ivec2(globalWindow.GetWidth(), globalWindow.GetHeight());
 	UIScreen* inventoryUI = UI::GetInstance().GetScreen("ui/inventory");
 	std::vector<TextureAtlasData> atlasData;
 	atlasData.reserve(9 * 3);
 	for (int slot = 0; slot < 27; slot++) {
-		BlockType* blockType = BlockManager::GetInstance().GetBlockType(entityData.inventory.GetSlot(AssetStringID{"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slot)})->itemStringID);
+		AssetStringID blockStringID = entityData.inventory.GetSlot(AssetStringID{"kiwicubed", "inventory_slot_" + fmt::format("{:02}", slot)})->itemStringID;
+		BlockType* blockType = BlockManager::GetInstance().GetBlockType(blockStringID);
 		atlasData.push_back(blockType->metaTextures[0].atlasData[0]);
 	}
 	Texture* atlas = assetManager.GetTextureAtlas(AssetStringID{"kiwicubed", "terrain_atlas"});
@@ -167,8 +164,6 @@ void Player::Update() {
 			}
 		}
 	});
-
-	//std::cout << entityData.currentChunkPtr->GetHeightmapLevelAt(glm::vec2(entityData.localChunkPosition.x, entityData.localChunkPosition.z)) << std::endl;
 }
 
 void Player::QueryInputs() {
@@ -259,8 +254,9 @@ void Player::MouseButtonCallback(int button) {
 
 	glm::ivec3 chunkPosition = glm::ivec3(-1, -1, -1);
 	glm::ivec3 blockPosition = glm::ivec3(-1, -1, -1);
+	glm::vec3 cameraPosition = entityTransform.position + cameraOffset;
 	bool hit = 0;
-	BlockRayHit rayHit = Physics::RaycastWorld(entityTransform.position, entityTransform.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit);
+	BlockRayHit rayHit = Physics::RaycastWorld(cameraPosition, entityTransform.orientation, 500, *chunkHandler, blockPosition, chunkPosition, hit);
 	if (rayHit.hit) {
 		if (button == 0) {
 			Block& block = chunkHandler->GetChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false)->GetBlock(blockPosition.x, blockPosition.y, blockPosition.z);
@@ -268,7 +264,6 @@ void Player::MouseButtonCallback(int button) {
 			EventWorldPlayerBlock blockEvent = EventWorldPlayerBlock(BLOCK_MINED, protectedEntityData.AUID, chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z, blockType->blockStringID, AssetStringID{"kiwicubed", "block/air"});
 			EventData eventData = EventData{EVENT_WORLD_PLAYER_BLOCK, &blockEvent, sizeof(blockEvent)};
 			EventManager::GetInstance().TriggerEvent(EVENT_WORLD_PLAYER_BLOCK, eventData);
-			entityData.inventory.AddItem(InventorySlot{*BlockManager::GetInstance().GetStringID(block.GetBlockID()), 1});
 			chunkHandler->RemoveBlock(chunkPosition.x, chunkPosition.y, chunkPosition.z, blockPosition.x, blockPosition.y, blockPosition.z);
 			if (blockPosition.x == 0 || blockPosition.x == chunkSize - 1 || blockPosition.y == 0 || blockPosition.y == chunkSize - 1 || blockPosition.z == 0 || blockPosition.z == chunkSize - 1) {
 				chunkHandler->RemeshChunk(chunkPosition.x, chunkPosition.y, chunkPosition.z, false);
@@ -459,6 +454,19 @@ GameMode Player::GetGameMode() const {
 	return playerData.gameMode;
 }
 
+bool Player::SetGameMode(GameMode gameMode) {
+	bool result = playerData.gameMode == gameMode;
+	playerData.gameMode = gameMode;
+	if (playerData.gameMode == CREATIVE) {
+		entityData.applyCollision = false;
+		entityData.applyGravity = false;
+	} else {
+		entityData.applyCollision = true;
+		entityData.applyGravity = true;
+	}
+	return result;
+}
+
 std::string Player::GetGameModeString() const {
 	return gameModeStrings[playerData.gameMode];
 }
@@ -468,7 +476,8 @@ void Player::UpdateCameraMatrix(Shader& shader) {
 	if (!camera) {
 		WARN("Trying to update camera matrix without a camera, aborting");
 	}
-	camera->UpdateMatrix(fov, 0.1f, 1000.0f, entityTransform.position, entityTransform.orientation, entityTransform.upDirection);
+	glm::vec3 cameraPosition = entityTransform.position + cameraOffset;
+	camera->UpdateMatrix(fov, 0.1f, 1000.0f, cameraPosition, entityTransform.orientation, entityTransform.upDirection);
 	camera->SetCameraMatrix(shader);
 }
 

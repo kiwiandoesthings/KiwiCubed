@@ -4,7 +4,7 @@
 #include "ModHandler.h"
 #include "World.h"
 
-Entity::Entity(float entityX, float entityY, float entityZ, World* world) : entityStats(EntityStats()), entityData(EntityData()), entityTransform(EntityTransform()), world(world) {
+Entity::Entity(float entityX, float entityY, float entityZ, World* world, unsigned long long entityAUID, EntityType* type) : entityStats(EntityStats()), entityData(EntityData()), entityTransform(EntityTransform()), world(world), type(type) {
 	entityTransform.position.x = entityX;
 	entityTransform.position.y = entityY;
 	entityTransform.position.z = entityZ;
@@ -16,7 +16,10 @@ Entity::Entity(float entityX, float entityY, float entityZ, World* world) : enti
     entityRenderData.oldPositionOffset = entityRenderData.positionOffset;
     entityRenderData.oldOrientationOffset = entityRenderData.orientationOffset;
 
-	protectedEntityData.AUID = CreateAUID();
+	entityData.name = "Entity";
+	entityData.isPlayer = false;
+
+	protectedEntityData.AUID = entityAUID;
 }
 
 void Entity::SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID) {
@@ -49,22 +52,32 @@ void Entity::SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID,
 	vertexBufferObject.SetupBuffer();
 	vertexArrayObject.SetupArrayObject();
 	indexBufferObject.SetupBuffer();
+
+	renderComponentsSetup = true;
 }
 
-EntityStats Entity::GetEntityStats() const {
+const EntityStats& Entity::GetEntityStats() const {
 	return entityStats;
 }
 
-EntityData Entity::GetEntityData() const {
+const EntityData& Entity::GetEntityData() const {
 	return entityData;
 }
 
-EntityTransform Entity::GetEntityTransform() const {
+const EntityTransform& Entity::GetEntityTransform() const {
 	return entityTransform;
 }
 
-ProtectedEntityData Entity::GetProtectedEntityData() const {
+const ProtectedEntityData& Entity::GetProtectedEntityData() const {
 	return protectedEntityData;
+}
+
+const EntityType* Entity::GetEntityType() const {
+	return type;
+}
+
+bool Entity::GetRenderComponentsSetup() const {
+	return renderComponentsSetup;
 }
 
 void Entity::SetEntityStats(EntityStats newEntityStats) {
@@ -111,6 +124,10 @@ void Entity::Update() {
 }
 
 void Entity::Render() {
+	if (!renderComponentsSetup) {
+		return;
+	}
+
 	Shader* shader = assetManager.GetShaderProgram(AssetStringID{"kiwicubed", "entity_shader"});
 
 	shader->Bind();

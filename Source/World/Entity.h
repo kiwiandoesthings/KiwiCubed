@@ -116,16 +116,19 @@ class Entity {
 		EntityTransform entityTransform;
 		EntityRenderData entityRenderData;
 		ProtectedEntityData protectedEntityData;
+		EntityType* type;
 
 	public:
-		Entity(float entityX, float entityY, float entityZ, World* world);
+		Entity(float entityX, float entityY, float entityZ, World* world, unsigned long long entityAUID, EntityType* type);
 
 		void SetupRenderComponents(AssetStringID modelID, AssetStringID atlasID, AssetStringID textureID);
 	
-		EntityStats GetEntityStats() const;
-		EntityData GetEntityData() const;
-		EntityTransform GetEntityTransform() const;
-		ProtectedEntityData GetProtectedEntityData() const;
+		const EntityStats& GetEntityStats() const;
+		const EntityData& GetEntityData() const;
+		const EntityTransform& GetEntityTransform() const;
+		const ProtectedEntityData& GetProtectedEntityData() const;
+		const EntityType* GetEntityType() const;
+		bool GetRenderComponentsSetup() const;
 	
 		void SetEntityStats(EntityStats newEntityStats);
 		void SetEntityData(EntityData newEntityData);
@@ -137,7 +140,7 @@ class Entity {
 	
 		virtual void Render();
 
-		unsigned long long CreateAUID();
+		static unsigned long long CreateAUID();
 	
 		virtual void Delete();
 		
@@ -151,4 +154,6 @@ class Entity {
 		VertexBufferObject vertexBufferObject;
         VertexArrayObject vertexArrayObject;
         IndexBufferObject indexBufferObject;
+
+		bool renderComponentsSetup = false;
 };

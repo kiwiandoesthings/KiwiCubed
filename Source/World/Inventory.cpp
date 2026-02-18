@@ -17,18 +17,40 @@ bool Inventory::AddItem(InventorySlot newItemSlot) {
         InventorySlot& itemSlot = iterator->second;
         if (itemSlot.itemStringID.AssetName() == "block/air") {
             itemSlot.itemStringID = newItemSlot.itemStringID;
-            itemSlot.itemCount++;
+            itemSlot.itemCount += newItemSlot.itemCount;
             return true;
         }
         if (itemSlot.itemStringID == newItemSlot.itemStringID && itemSlot.itemCount + newItemSlot.itemCount <= 64) {
-            itemSlot.itemCount++;
+            itemSlot.itemCount += newItemSlot.itemCount;
             return true;
         }
     }
     return false;
 }
 
+bool Inventory::AddItem(InventorySlot newItemSlot, AssetStringID slotStringID) {
+	OVERRIDE_LOG_NAME("Inventory");
+    auto itemSlot = inventorySlots.find(slotStringID);
+	if (itemSlot == inventorySlots.end()) {
+		WARN("Tried to add item to inventory slot \"" + slotStringID.CanonicalName() + "\" that didn't exist");
+		return false;
+	}
+	InventorySlot& slot = itemSlot->second;
+    if (slot.itemStringID.AssetName() == "block/air") {
+        slot.itemStringID = newItemSlot.itemStringID;
+        slot.itemCount += newItemSlot.itemCount;
+        return true;
+    }
+    if (slot.itemStringID == newItemSlot.itemStringID && slot.itemCount + newItemSlot.itemCount <= 64) {
+        slot.itemCount += newItemSlot.itemCount;
+        return true;
+    }
+    return false;
+}
+
 void Inventory::SetSlot(AssetStringID slotStringID, InventorySlot newItem) {
+	INFO("Set " + std::to_string(inventorySlots.size()));
+	OVERRIDE_LOG_NAME("Inventory");
     auto slot = inventorySlots.find(slotStringID);
     if (slot != inventorySlots.end()) {
         inventorySlots[slotStringID] = newItem;

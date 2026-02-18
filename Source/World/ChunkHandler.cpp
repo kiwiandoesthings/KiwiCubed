@@ -22,14 +22,19 @@ void ChunkHandler::CleanChunks() {
 }
 
 Chunk* ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotFound) {
-    OVERRIDE_LOG_NAME("ChunkHandler");
+    if (chunkX == 0 && chunkY == 0 && chunkZ == 0) {
+		//owo;
+		int x = 2;
+	}
+	
+	OVERRIDE_LOG_NAME("ChunkHandler");
     std::lock_guard<std::mutex> lock(ChunkMutex);
     auto chunk = chunks.find(std::make_tuple(chunkX, chunkY, chunkZ));
     if (chunk != chunks.end()) {
         return chunk->second.get();
     }
     else {
-        DEBUG("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
+        INFO("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
         if (addIfNotFound) {
             Chunk* chunk = AddChunkUnlocked(chunkX, chunkY, chunkZ);
             return chunk;
@@ -147,7 +152,7 @@ Chunk* ChunkHandler::GetChunkUnlocked(int chunkX, int chunkY, int chunkZ, bool a
         return chunk->second.get();
     }
     else {
-        DEBUG("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
+        INFO("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
         if (addIfNotFound) {
             Chunk* chunk = AddChunkUnlocked(chunkX, chunkY, chunkZ);
             return chunk;

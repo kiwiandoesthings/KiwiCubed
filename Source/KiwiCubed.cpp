@@ -142,8 +142,7 @@ int KiwiCubedEngine::StartEngine() {
 			return;
 		}
 
-		Player& player = singleplayerHandler.GetWorld()->GetPlayer();
-		player.fov = globals.fov;
+		singleplayerHandler.GetWorld()->GetPlayer()->fov = globals.fov;
 	}, "Change FOV"));
 	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
 		ui.MoveScreenBack();
@@ -221,11 +220,11 @@ bool KiwiCubedEngine::RunGameLoop() {
 
 		if (singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
 			World* singleplayerWorld = singleplayerHandler.GetWorld();
-			singleplayerWorld->GetPlayer().Update();
-			singleplayerWorld->GetPlayer().UpdateCameraMatrix(*terrainShaderProgram);
-			singleplayerWorld->GetPlayer().UpdateCameraMatrix(*wireframeShaderProgram);
-			singleplayerWorld->GetPlayer().UpdateCameraMatrix(*chunkDebugShaderProgram);
-			singleplayerWorld->GetPlayer().UpdateCameraMatrix(*entityShaderProgram);
+			singleplayerWorld->GetPlayer()->Update();
+			singleplayerWorld->GetPlayer()->UpdateCameraMatrix(*terrainShaderProgram);
+			singleplayerWorld->GetPlayer()->UpdateCameraMatrix(*wireframeShaderProgram);
+			singleplayerWorld->GetPlayer()->UpdateCameraMatrix(*chunkDebugShaderProgram);
+			singleplayerWorld->GetPlayer()->UpdateCameraMatrix(*entityShaderProgram);
 			singleplayerWorld->GetChunkHandler().CleanChunks();
 			
 			terrainAtlas->SetActive();

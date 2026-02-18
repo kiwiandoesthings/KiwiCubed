@@ -6,7 +6,6 @@
 #include <stack>
 
 #include "AssetManager.h"
-#include "Events.h"
 #include "IndexBufferObject.h"
 #include "Input.h"
 #include "Renderer.h"

@@ -29,11 +29,19 @@ World::World(unsigned int worldSizeHorizontal, unsigned int worldSizeVertical, S
     noise.SetFractalGain(0.5f);
     noise.SetFractalWeightedStrength(5.0f);
 
-	EntityManager::GetInstance().Setup(this);
+	EntityManager& entityManager = EntityManager::GetInstance();
+	entityManager.Setup(this);
+	EntityType playerType = EntityType{AssetStringID{"kiwicubed", "entity/player"}};
+	entityManager.RegisterEntityType(playerType);
+
+	siv::handle<Entity*> playerHandle = entityManager.SpawnPlayer(glm::vec3(0, 0, 0));
+	player = dynamic_cast<Player*>(*playerHandle);
 }
 
 void World::Setup() {
-    player.Setup();
+	OVERRIDE_LOG_NAME("World Setup");
+
+    player->Setup();
 
     std::ifstream configFile("init_config.json");
     if (!configFile.is_open()) {
@@ -43,9 +51,10 @@ void World::Setup() {
     OrderedJSON configJSON;
     configFile >> configJSON;
 
-    player.fov = configJSON["init_settings"]["fov"];
+    player->fov = configJSON["init_settings"]["fov"];
 
     bool foundPosition = false;
+	glm::vec3 position = glm::vec3();
     for (int chunkX = 2; chunkX < worldSizeHorizontal - 2; chunkX++) {
         if (foundPosition) {
              continue;
@@ -73,7 +82,7 @@ void World::Setup() {
                     for (unsigned int z = 0; z < chunkSize; ++z) {
                         int level = chunk->GetHeightmapLevelAt(glm::vec2(x, z));
                         if (level != 0) {
-                            player.SetPosition(static_cast<float>((chunk->chunkX * chunkSize) + x), static_cast<float>((chunk->chunkY * chunkSize) + level - player.GetEntityData().physicsBoundingBox.corner1.y) + 1, static_cast<float>((chunk->chunkZ * chunkSize) + z));
+                            position = glm::vec3(static_cast<float>((chunk->chunkX * chunkSize) + x), static_cast<float>((chunk->chunkY * chunkSize) + level + 1), static_cast<float>((chunk->chunkZ * chunkSize) + z));
                             foundPosition = true;
                         }
                     }
@@ -85,6 +94,10 @@ void World::Setup() {
     if (!foundPosition) {
         WARN("Could not find suitable position to spawn player");
     }
+
+	EntityTransform transform = player->GetEntityTransform();
+	transform.position = position;
+	player->SetEntityTransform(transform);
 }
 
 void World::Render(Shader shaderProgram) {
@@ -105,8 +118,8 @@ void World::Render(Shader shaderProgram) {
     GLCall(glDisable(GL_CULL_FACE));
 
     assetManager.GetShaderProgram(AssetStringID{"kiwicubed", "entity_shader"})->Bind();
-    EntityManager::GetInstance().ForEachEntity([](Entity& entity) {
-        entity.Render();
+    EntityManager::GetInstance().ForEachEntity([](Entity* entity) {
+		entity->Render();
     });
 }
 
@@ -234,7 +247,7 @@ void World::RecalculateChunksToLoad(const EventData& eventData, unsigned short h
         }
         
         // this is bad code probably. maybe remove unload-needing chunks from gen/mesh queues in below loop instead of separate loops
-        glm::ivec3 playerPosition = player.GetEntityTransform().globalChunkPosition;
+        glm::ivec3 playerPosition = player->GetEntityTransform().globalChunkPosition;
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); iterator++) {
             auto& chunk = iterator->second;
             int distanceX = playerPosition.x - chunk->chunkX - 1;
@@ -309,8 +322,10 @@ void World::Update() {
 	{
 		EntityManager& entityManager = EntityManager::GetInstance();
 		std::lock_guard<std::mutex> lock(entityManager.GetEntitiesMutex());
-		entityManager.ForEachEntity([](Entity& entity) {
-			entity.Update();
+		entityManager.ForEachEntity([](Entity* entity) {
+			if (!entity->GetEntityData().isPlayer) {
+				entity->Update();
+			}
 		});
 	}
 
@@ -386,13 +401,13 @@ void World::Update() {
 // Pass 0 for world ImGui, 1 for chunk ImGui...
 void World::DisplayImGui(unsigned int option) {
     if (option == 0) {
-        EntityData playerData = player.GetEntityData();
-		EntityTransform playerTransform = player.GetEntityTransform();
+        EntityData playerData = player->GetEntityData();
+		EntityTransform playerTransform = player->GetEntityTransform();
 
-		ImGui::Text("Player name: %s", player.GetEntityData().name.c_str());
-        ImGui::Text("Player AUID: %d", player.GetProtectedEntityData().AUID);
-        ImGui::Text("Player gamemode: %s", player.GetGameModeString().c_str());
-		ImGui::Text("Player health: %d", static_cast<int>(player.GetEntityStats().health));
+		ImGui::Text("Player name: %s", player->GetEntityData().name.c_str());
+        ImGui::Text("Player AUID: %llu", player->GetProtectedEntityData().AUID);
+        ImGui::Text("Player gamemode: %s", player->GetGameModeString().c_str());
+		ImGui::Text("Player health: %d", static_cast<int>(player->GetEntityStats().health));
 		ImGui::Text("Player position: %.2f, %.2f, %.2f",
 			playerTransform.position.x,
 			playerTransform.position.y,
@@ -405,7 +420,7 @@ void World::DisplayImGui(unsigned int option) {
 			playerTransform.velocity.x,
 			playerTransform.velocity.y,
 			playerTransform.velocity.z);
-        ImGui::Text("Player grounded and jumping state: %d, %d", player.GetEntityData().isGrounded, player.GetEntityData().isJumping);
+        ImGui::Text("Player grounded and jumping state: %d, %d", player->GetEntityData().isGrounded, player->GetEntityData().isJumping);
 		ImGui::Text("Global chunk position: %d, %d, %d", 
 			static_cast<int>(playerTransform.globalChunkPosition.x), 
 			static_cast<int>(playerTransform.globalChunkPosition.y),
@@ -478,13 +493,8 @@ Chunk* World::GetChunk(int chunkX, int chunkY, int chunkZ) {
     return chunkHandler.GetChunk(chunkX, chunkY, chunkZ, false);
 }
 
-Entity* World::GetEntity(unsigned long long entityAUID) {
-    // Later
-    return nullptr;
-}
-
-Player& World::GetPlayer() {
-    return player;
+Player* World::GetPlayer() {
+	return player;
 }
 
 std::vector<float>& World::GetChunkDebugVisualizationVertices() {
@@ -569,7 +579,7 @@ void World::Tick() {
 
     if (duration >= 1000.0f) {
         ticksPerSecond = static_cast<float>(totalTicks % 20) / (duration / 1000.0f);
-        lastTickTime = end_time;
+		lastTickTime = end_time;
     }
 
     ++totalTicks;
@@ -596,5 +606,5 @@ void World::Delete() {
     StopTickThread();
     chunkHandler.Delete();
     chunkGenerationThreads.Delete();
-    player.Delete();
+    player->Delete();
 }

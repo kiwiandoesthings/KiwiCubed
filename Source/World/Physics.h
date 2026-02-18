@@ -81,7 +81,8 @@ class Physics {
 
     	Physics(const Physics&) = delete;
     	Physics& operator=(const Physics&) = delete;
-
+		
+		static void MakeCollisionQueue(const EntityData& entityData, const EntityTransform& entityTransform, ChunkHandler& chunkHandler);
 		static bool CollideAxis(unsigned char axis, EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler);
 		static float CollideAxisFloat(unsigned char axis, EntityTransform& newEntityData, EntityData& entityData, ChunkHandler& chunkHandler);
 		static bool ApplyTerrainCollision(EntityTransform& newTransform, EntityData& entityData, ChunkHandler& chunkHandler);

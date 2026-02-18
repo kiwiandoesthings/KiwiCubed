@@ -19,8 +19,8 @@ class Inventory {
         Inventory(std::vector<AssetStringID> slotStringIDs);
         void Delete();
 
-        bool AddItem(InventorySlot itemStringID);
-        bool AddItem(InventorySlot itemStringID, AssetStringID slotStringID);
+        bool AddItem(InventorySlot newItemSlot);
+        bool AddItem(InventorySlot newItemSlot, AssetStringID slotStringID);
 
         void SetSlot(AssetStringID slotStringID, InventorySlot newItem);
         InventorySlot* GetSlot(AssetStringID slotStringID);

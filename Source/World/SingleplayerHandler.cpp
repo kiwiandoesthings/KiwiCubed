@@ -14,7 +14,7 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 		psnip_trap();
 	}
 
-	singleplayerWorld = std::make_unique<World>(2, 2, this);
+	singleplayerWorld = std::make_unique<World>(3, 2, this);
 	isLoadedIntoSingleplayerWorld = true;
 	singleplayerWorld->GenerateWorld();
 	singleplayerWorld->Setup();
@@ -30,6 +30,12 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 	EventManager& eventManager = EventManager::GetInstance();
 	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_MOVE, [=](const EventData& eventData) {
 		const EventData moveEventCopy = eventData;
+		const EventWorldPlayerMove* moveEvent = moveEventCopy.GetDataStruct<EventWorldPlayerMove>();
+		glm::ivec3 oldChunkPosition = glm::ivec3(moveEvent->oldPlayerX / 32, moveEvent->oldPlayerY / 32, moveEvent->oldPlayerZ / 32);
+		glm::ivec3 newChunkPosition = glm::ivec3(moveEvent->newPlayerX / 32, moveEvent->newPlayerY / 32, moveEvent->newPlayerZ / 32);
+		if (oldChunkPosition == newChunkPosition) {
+			return;
+		}
 
 		singleplayerWorld->QueueTickTask([this, moveEventCopy]() -> void {
     		singleplayerWorld->RecalculateChunksToLoad(moveEventCopy);
