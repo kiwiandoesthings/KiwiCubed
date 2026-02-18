@@ -556,22 +556,7 @@ bool ModHandler::LoadModScripts() {
 	}), asCALL_CDECL);
 	engine->RegisterGlobalFunction("AssetStringID GetBlockTextureAtFace(const AssetStringID& in, const int& in)", asFUNCTION(+[](const AssetStringID& blockStringID, const int& face) {
 		BlockType* blockType = BlockManager::GetInstance().GetBlockType(blockStringID);
-		int faceID = 0;
-		switch (face) {
-			case 0:
-				faceID = blockType->frontFaceID;
-			case 1:
-				faceID = blockType->backFaceID;
-			case 2:
-				faceID = blockType->leftFaceID;
-			case 3:
-				faceID = blockType->rightFaceID;
-			case 4:
-				faceID = blockType->topFaceID;
-			case 5:
-				faceID = blockType->bottomFaceID;
-		}
-		return blockType->metaTextures[faceID].stringID;
+		return blockType->metaTextures[face].stringID;
 	}), asCALL_CDECL);
 	engine->RegisterGlobalFunction("EntityTransform GetEntityTransform(const uint64 &in)", asFUNCTION(+[](const uint64_t& entityAUID) {
 		return EntityManager::GetInstance().GetEntity(entityAUID)->GetEntityTransform();

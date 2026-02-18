@@ -109,10 +109,18 @@ void World::Render(Shader shaderProgram) {
         GLCall(glEnable(GL_CULL_FACE));
     }
     shaderProgram.Bind();
+	renderedChunks = 0;
+	const Camera* camera = player->GetCamera();
+	Frustum playerFrustum = player->GetCamera()->frustum;
     for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
         auto& chunk = iterator->second;
         if (!chunk->isEmpty) {
-            chunk->Render();
+			glm::ivec3 min = {chunk->chunkX * 32, chunk->chunkY * 32, chunk->chunkZ * 32};
+            glm::ivec3 max = min + glm::ivec3(32);
+			if(playerFrustum.IsBoxVisible(min, max)) {
+            	chunk->Render();
+				renderedChunks++;
+			}
         }
     }
     GLCall(glDisable(GL_CULL_FACE));
@@ -398,7 +406,7 @@ void World::Update() {
     }
 }
 
-// Pass 0 for world ImGui, 1 for chunk ImGui...
+// Pass 0 for player ImGui, 1 for world ImGui, 2 for chunk ImGui...
 void World::DisplayImGui(unsigned int option) {
     if (option == 0) {
         EntityData playerData = player->GetEntityData();
@@ -451,31 +459,9 @@ void World::DisplayImGui(unsigned int option) {
         }
         ImGui::Text("%d tasks currently queued for tick thread", tasks);
         ImGui::Text("Total chunks: %d", Chunk::totalChunks);
+		ImGui::Text("Rendered chunks: %d", renderedChunks);
+		ImGui::Text("%% of chunks rendered: %.2f", (static_cast<float>(renderedChunks) / Chunk::totalChunks) * 100);
         ImGui::Text("Rough memory usage: %.2f MB", totalMemoryUsage / (1024.0f * 1024.0f));
-        if (ImGui::CollapsingHeader("Chunk Generation Queue")) {
-            std::vector<glm::ivec3> temporaryQueue = chunkGenerationQueue;
-            while (!temporaryQueue.empty()) {
-                const glm::ivec3& pos = temporaryQueue.front();
-                ImGui::Text("{%d, %d, %d}", pos.x, pos.y, pos.z);
-                temporaryQueue.erase(temporaryQueue.begin());
-            }
-        }
-        if (ImGui::CollapsingHeader("Chunk Meshing Queue")) {
-            std::vector<glm::ivec3> temporaryQueue = chunkMeshingQueue;
-            while (!temporaryQueue.empty()) {
-                const glm::ivec3& pos = temporaryQueue.front();
-                ImGui::Text("{%d, %d, %d}", pos.x, pos.y, pos.z);
-                temporaryQueue.erase(temporaryQueue.begin());
-            }
-        }
-        if (ImGui::CollapsingHeader("Chunk Unloading Queue")) {
-            std::queue<glm::ivec3> temporaryQueue = chunkUnloadingQueue;
-            while (!temporaryQueue.empty()) {
-                const glm::ivec3& pos = temporaryQueue.front();
-                ImGui::Text("{%d, %d, %d}", pos.x, pos.y, pos.z);
-                temporaryQueue.pop();
-            }
-        }
     }
     else if (option == 2) {
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
@@ -567,7 +553,7 @@ void World::Tick() {
 
     auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - lastTickTime).count();
-    if (totalTicks % 20 == 1) {
+    if (totalTicks % targetTPS == 1) {
         totalMemoryUsage = 0;
         for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
             auto& chunk = iterator->second;
@@ -578,7 +564,7 @@ void World::Tick() {
     Update();
 
     if (duration >= 1000.0f) {
-        ticksPerSecond = static_cast<float>(totalTicks % 20) / (duration / 1000.0f);
+        ticksPerSecond = static_cast<float>(totalTicks % targetTPS) / (duration / 1000.0f);
 		lastTickTime = end_time;
     }
 
@@ -599,6 +585,8 @@ void World::RunTickThread() {
             Tick();
             tickAccumulator -= tickIntervalMs;
         }
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 

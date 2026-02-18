@@ -471,6 +471,10 @@ std::string Player::GetGameModeString() const {
 	return gameModeStrings[playerData.gameMode];
 }
 
+const Camera* Player::GetCamera() {
+	return camera.get();
+}
+
 void Player::UpdateCameraMatrix(Shader& shader) {
 	OVERRIDE_LOG_NAME("Camera Matrix");
 	if (!camera) {

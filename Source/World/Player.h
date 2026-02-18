@@ -55,6 +55,8 @@ class Player : public Entity {
 		GameMode GetGameMode() const;
 		bool SetGameMode(GameMode gameMode);
 		std::string GetGameModeString() const;
+
+		const Camera* GetCamera();
 	
 		void UpdateCameraMatrix(Shader& shader);
 	

@@ -27,6 +27,9 @@ class Chunk;
 class SingleplayerHandler;
 
 
+const unsigned char targetTPS = 20;
+
+
 struct ChunkData {
 	glm::vec3 position;
 };
@@ -78,7 +81,7 @@ class World {
 		std::atomic<bool> shouldTick;
 		std::thread tickThread;
 		std::mutex tickThreadMutex;
-		int tickIntervalMs = 1000 / 20;
+		int tickIntervalMs = 1000 / targetTPS;
 		unsigned long long totalTicks = 0;
 		float tickDeltaTime = 0.0f;
 		float ticksPerSecond = 0.0f;
@@ -109,6 +112,7 @@ class World {
 		SingleplayerHandler* singleplayerHandler;
 
 		Renderer renderer;
+		unsigned int renderedChunks = 0;
 
 		std::vector<GLfloat> chunkDebugVisualizationVertices;
 		std::vector<GLuint> chunkDebugVisualizationIndices;

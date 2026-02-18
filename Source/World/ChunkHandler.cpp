@@ -34,7 +34,7 @@ Chunk* ChunkHandler::GetChunk(int chunkX, int chunkY, int chunkZ, bool addIfNotF
         return chunk->second.get();
     }
     else {
-        INFO("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
+        //DEBUG("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
         if (addIfNotFound) {
             Chunk* chunk = AddChunkUnlocked(chunkX, chunkY, chunkZ);
             return chunk;
@@ -152,7 +152,7 @@ Chunk* ChunkHandler::GetChunkUnlocked(int chunkX, int chunkY, int chunkZ, bool a
         return chunk->second.get();
     }
     else {
-        INFO("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
+        //DEBUG("Chunk not found at {" + std::to_string(chunkX) + ", " + std::to_string(chunkY) + ", " + std::to_string(chunkZ) + "}", Globals::GetInstance().debugMode);
         if (addIfNotFound) {
             Chunk* chunk = AddChunkUnlocked(chunkX, chunkY, chunkZ);
             return chunk;
