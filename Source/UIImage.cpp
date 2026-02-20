@@ -2,7 +2,7 @@
 #include "UI.h"
 
 
-UIImage::UIImage(glm::vec2 position, glm::vec2 size, std::function<void()> functionToTrigger, AssetStringID imageStringID, AssetStringID textureAtlasStringID) : UIElement(position, size, functionToTrigger), image(MetaTexture{imageStringID, *assetManager.GetTextureAtlasData(imageStringID)}), textureAtlasStringID(textureAtlasStringID) {
+UIImage::UIImage(glm::vec2 position, glm::vec2 size, std::string functionToTrigger, AssetStringID imageStringID, AssetStringID textureAtlasStringID) : UIElement(position, size, functionToTrigger), image(MetaTexture{imageStringID, *assetManager.GetTextureAtlasData(imageStringID)}), textureAtlasStringID(textureAtlasStringID) {
     UIImage::size = glm::vec2(1, 1) * glm::vec2(scale.x, scale.y);
     return;
 }

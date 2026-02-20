@@ -1,6 +1,10 @@
 void Initialize() {
     Log("Initializing KiwiCubed default mod");
 
+	UIRegisterScreen("ui/main_menu");
+	UIAddButton("ui/main_menu", (GetWindowWidth() / 2) - 256, 700, 1, 1, "GenerateWorld", "Create World");
+	UISetCurrentScreen("ui/main_menu");
+
 	AssetStringID itemID("kiwicubed", "entity/dropped_item");
 	RegisterFunctionToEvent(EVENT_WORLD_PLAYER_BLOCK);
 	RegisterEventToEntityType(EVENT_WORLD_TICK, itemID);
@@ -9,12 +13,17 @@ void Initialize() {
 	Log("Finished initializing KiwiCubed default mod");
 }
 
+void GenerateWorld() {
+	StartSingleplayerWorld();
+}
+
 void GetEventWorldPlayerBlock(const EventWorldPlayerBlock &in event) {
 	AssetStringID item("kiwicubed", "entity/dropped_item");
 	AssetStringID model("kiwicubed", "model/dropped_item");
 	AssetStringID atlas("kiwicubed", "terrain_atlas");
-	uint64 id = SpawnEntity(item, model, atlas, GetBlockTextureAtFace(event.oldBlockStringID, 0), float((event.chunkX * 32) + event.blockX + 0.5), float((event.chunkY * 32) + event.blockY + 0.15), float((event.chunkZ * 32) + event.blockZ + 0.5));
-	itemOriginalY["" + id] = float((event.chunkY * 32) + event.blockY) + 0.15;
+	int chunkSize = GetChunkSize();
+	uint64 id = SpawnEntity(item, model, atlas, GetBlockTextureAtFace(event.oldBlockStringID, 0), float((event.chunkX * chunkSize) + event.blockX + 0.5), float((event.chunkY * chunkSize) + event.blockY + 0.15), float((event.chunkZ * chunkSize) + event.blockZ + 0.5));
+	itemOriginalY["" + id] = float((event.chunkY * chunkSize) + event.blockY) + 0.15;
 	itemBlock["" + id] = event.oldBlockStringID;
 }
 

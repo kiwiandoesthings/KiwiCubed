@@ -115,8 +115,8 @@ void World::Render(Shader shaderProgram) {
     for (auto iterator = chunkHandler.chunks.begin(); iterator != chunkHandler.chunks.end(); ++iterator) {
         auto& chunk = iterator->second;
         if (!chunk->isEmpty) {
-			glm::ivec3 min = {chunk->chunkX * 32, chunk->chunkY * 32, chunk->chunkZ * 32};
-            glm::ivec3 max = min + glm::ivec3(32);
+			glm::ivec3 min = {chunk->chunkX * chunkSize, chunk->chunkY * chunkSize, chunk->chunkZ * chunkSize};
+            glm::ivec3 max = min + glm::ivec3(chunkSize);
 			if(playerFrustum.IsBoxVisible(min, max)) {
             	chunk->Render();
 				renderedChunks++;
@@ -229,7 +229,7 @@ void World::RecalculateChunksToLoad(const EventData& eventData, unsigned short h
     if (verticalRadius == 0) {
         verticalRadius = playerChunkGenerationRadiusVertical;
     }
-	glm::ivec3 playerChunkPosition = glm::ivec3(static_cast<int>(moveEvent->newPlayerX / 32), static_cast<int>(moveEvent->newPlayerY / 32), static_cast<int>(moveEvent->newPlayerZ / 32));
+	glm::ivec3 playerChunkPosition = glm::ivec3(static_cast<int>(moveEvent->newPlayerX / chunkSize), static_cast<int>(moveEvent->newPlayerY / chunkSize), static_cast<int>(moveEvent->newPlayerZ / chunkSize));
     std::lock_guard<std::mutex> lock(ChunkQueueMutex);
     {
         for (int chunkX = playerChunkPosition.x - horizontalRadius; chunkX < playerChunkPosition.x + horizontalRadius; ++chunkX) {
@@ -564,11 +564,13 @@ void World::Tick() {
     Update();
 
     if (duration >= 1000.0f) {
-        ticksPerSecond = static_cast<float>(totalTicks % targetTPS) / (duration / 1000.0f);
+        ticksPerSecond = static_cast<float>(ticksInSecond) / (duration / 1000.0f);
 		lastTickTime = end_time;
+		ticksInSecond = 0;
     }
 
-    ++totalTicks;
+    totalTicks++;
+	ticksInSecond++;
 }
 
 void World::RunTickThread() {

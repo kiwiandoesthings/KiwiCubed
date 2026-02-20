@@ -30,6 +30,7 @@ class ModHandler {
         bool LoadModScripts();
         bool RunModEntrypoints();
 
+		void CallModFunction(const std::string& moduleName, const std::string& functionName);
 		void CallModFunction(const std::string& moduleName, const std::string& functionName, const std::vector<void*>& arguments, const std::vector<int>& argumentTypes);
 		void CallModFunction(asIScriptFunction* function);
 

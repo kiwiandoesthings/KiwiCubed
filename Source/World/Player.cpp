@@ -52,11 +52,11 @@ void Player::Setup() {
 	camera = std::make_shared<Camera>();
 
 	Window& globalWindow = Window::GetInstance();
-	UIScreen inventoryUI = UIScreen("ui/inventory");
+	UI::GetInstance().AddScreen("ui/inventory");
+	UIScreen* inventoryUI = UI::GetInstance().GetScreen("ui/inventory");
 	int containerX = (globalWindow.GetWidth() / 2) - 576;
 	int containerY = (globalWindow.GetHeight() / 2) - 192;
-	inventoryUI.AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), [&](){}, AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
-	UI::GetInstance().AddScreen(std::move(inventoryUI));
+	inventoryUI->AddUIElement(std::make_unique<UIImage>(glm::vec2(containerX, containerY), glm::vec2(1152, 384), "", AssetStringID{"kiwicubed", "texture/inventory"}, AssetStringID{"kiwicubed", "ui_atlas"}).release());
 
 	inputCallbackIDs.emplace_back(inputHandler.RegisterKeyCallback(GLFW_KEY_F4, [&](int key) {
 		if (playerData.gameMode == SURVIVAL) {
@@ -107,7 +107,9 @@ void Player::Update() {
 		QueryInputs();
 		QueryMouseInputs();
 		Entity::Update();
-		entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
+		if (entityData.currentChunkPtr != nullptr) {
+			entityData.isGrounded = Physics::GetGrounded(*this, *chunkHandler);
+		}
 		Physics::ApplyPhysics(*this, *chunkHandler, entityData.applyGravity, entityData.applyCollision);
         if (entityData.isGrounded) {
 			if (entityData.isJumping) {

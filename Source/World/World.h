@@ -83,6 +83,7 @@ class World {
 		std::mutex tickThreadMutex;
 		int tickIntervalMs = 1000 / targetTPS;
 		unsigned long long totalTicks = 0;
+		unsigned char ticksInSecond = 0;
 		float tickDeltaTime = 0.0f;
 		float ticksPerSecond = 0.0f;
 		float tickAccumulator = 0.0f;

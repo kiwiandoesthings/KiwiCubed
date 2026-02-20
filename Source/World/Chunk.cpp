@@ -120,7 +120,7 @@ bool Chunk::GenerateBlocks(World& world, Chunk* callerChunk, bool updateCallerCh
 
                 if (height + 4 < reach) {
                     block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/stone"});
-		            block.variant = (blockX * 73856093 ^ blockY * 19349663 ^ blockZ * 83492791) % GetCachedVariantCount(block.blockID);
+		            block.variant = rand() % GetCachedVariantCount(block.blockID);
                 } else if (height + 1 < reach) {
                     block.blockID = GetCachedID(AssetStringID{"kiwicubed", "block/dirt"});
 		            block.variant = 0;
@@ -365,7 +365,7 @@ bool Chunk::GenerateMesh(const bool remesh) {
     std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
     int time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     if (Globals::GetInstance().debugMode) {
-        //DEBUG("Chunk meshing took " + std::to_string(time) + "us", Globals::GetInstance().debugMode);
+        DEBUG("Chunk meshing took " + std::to_string(time) + "us", Globals::GetInstance().debugMode);
     }
 
     return true;

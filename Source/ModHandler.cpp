@@ -6,14 +6,13 @@
 #include "EntityManager.h"
 #include "Events.h"
 #include "GenerateAngelScriptLanguageData.cpp"
-
+#include "SingleplayerHandler.h"
 
 
 ModHandler& ModHandler::GetInstance() {
     static ModHandler instance;
     return instance;
 }
-
 
 bool ModHandler::LoadModData() {
     OVERRIDE_LOG_NAME("Mod Loading");
@@ -409,6 +408,7 @@ bool ModHandler::LoadModScripts() {
 		return false;
 	}
 
+	// TODO: figure out how to move this all outta here
 	// Types
 	//  AssetStringID
 	engine->RegisterObjectType("AssetStringID", sizeof(AssetStringID), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
@@ -545,19 +545,21 @@ bool ModHandler::LoadModScripts() {
 	engine->RegisterObjectMethod("EntityTransform", "Vec3 GetLocalChunkPosition() const", asMETHOD(EntityTransform, GetLocalChunkPosition), asCALL_THISCALL);
 
 	// Functions
+	//  Meta
 	engine->RegisterGlobalFunction("void Log(const string &in)", asFUNCTION(ModLog), asCALL_CDECL);
+	engine->RegisterGlobalFunction("int GetWindowWidth()", asFUNCTION(+[]() {
+		return Window::GetInstance().GetWidth();
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("int GetWindowHeight()", asFUNCTION(+[]() {
+		return Window::GetInstance().GetHeight();
+	}), asCALL_CDECL);
+	//  Events
 	engine->RegisterGlobalFunction("bool RegisterEventToEntityType(EventType, const AssetStringID &in)", asFUNCTION(EventManager::RegisterEventToEntityType), asCALL_CDECL);
 	engine->RegisterGlobalFunction("void RegisterFunctionToEvent(const EventType& in)", asFUNCTION(+[](const EventType& eventType) {
 		asIScriptContext* context = asGetActiveContext();
 		EventManager::GetInstance().RegisterScriptToEvent(eventType, context->GetFunction()->GetModule()->GetName());
 	}), asCALL_CDECL);
-	engine->RegisterGlobalFunction("int SpawnEntity(const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const float &in, const float &in, const float &in)", asFUNCTION(+[](const AssetStringID& entityType, const AssetStringID& entityModel, const AssetStringID& entityAtlas, const AssetStringID& entityTexture, const float& entityX, const float& entityY, const float& entityZ) {
-		return static_cast<int>(EntityManager::GetInstance().SpawnEntity(entityType, entityModel, entityAtlas, entityTexture, glm::vec3(entityX, entityY, entityZ)).getID());
-	}), asCALL_CDECL);
-	engine->RegisterGlobalFunction("AssetStringID GetBlockTextureAtFace(const AssetStringID& in, const int& in)", asFUNCTION(+[](const AssetStringID& blockStringID, const int& face) {
-		BlockType* blockType = BlockManager::GetInstance().GetBlockType(blockStringID);
-		return blockType->metaTextures[face].stringID;
-	}), asCALL_CDECL);
+	//  Entities
 	engine->RegisterGlobalFunction("EntityTransform GetEntityTransform(const uint64 &in)", asFUNCTION(+[](const uint64_t& entityAUID) {
 		return EntityManager::GetInstance().GetEntity(entityAUID)->GetEntityTransform();
 	}), asCALL_CDECL);
@@ -572,8 +574,33 @@ bool ModHandler::LoadModScripts() {
 		entity->SetEntityData(entityData);
 		return result;
 	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("int SpawnEntity(const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const AssetStringID &in, const float &in, const float &in, const float &in)", asFUNCTION(+[](const AssetStringID& entityType, const AssetStringID& entityModel, const AssetStringID& entityAtlas, const AssetStringID& entityTexture, const float& entityX, const float& entityY, const float& entityZ) {
+		return static_cast<int>(EntityManager::GetInstance().SpawnEntity(entityType, entityModel, entityAtlas, entityTexture, glm::vec3(entityX, entityY, entityZ)).getID());
+	}), asCALL_CDECL);
 	engine->RegisterGlobalFunction("void RemoveEntity(const uint64 &in)", asFUNCTION(+[](const uint64_t& entityAUID) {
 		EntityManager::GetInstance().RemoveEntity(entityAUID);
+	}), asCALL_CDECL);
+	//  AssetManager
+	engine->RegisterGlobalFunction("AssetStringID GetBlockTextureAtFace(const AssetStringID& in, const int& in)", asFUNCTION(+[](const AssetStringID& blockStringID, const int& face) {
+		BlockType* blockType = BlockManager::GetInstance().GetBlockType(blockStringID);
+		return blockType->metaTextures[face].stringID;
+	}), asCALL_CDECL);
+	//  UI
+	engine->RegisterGlobalFunction("void UISetCurrentScreen(const string &in)", asFUNCTION(+[](const std::string& screenName) {
+		UI::GetInstance().SetCurrentScreen(screenName);
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("void UIRegisterScreen(const string &in)", asFUNCTION(+[](const std::string& screenName) {
+		UI::GetInstance().AddScreen(screenName);
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("void UIAddButton(const string &in, const int &in, const int &in, const int &in, const int &in, const string &in, const string &in)", asFUNCTION(+[](const std::string& screenName, const int& buttonX, const int& buttonY, const int& buttonWidth, const int& buttonHeight, const std::string& buttonFunction, std::string& buttonLabel) {
+		UI::GetInstance().GetScreen(screenName)->AddUIElement(new UIButton(glm::vec2(buttonX, buttonY), glm::vec2(buttonWidth, buttonWidth), buttonFunction, buttonLabel));
+	}), asCALL_CDECL);
+	//  SingleplayerHandler + ChunkHandler
+	engine->RegisterGlobalFunction("void StartSingleplayerWorld()", asFUNCTION(+[]() {
+		SingleplayerHandler::GetInstance().StartSingleplayerWorld();
+	}), asCALL_CDECL);
+	engine->RegisterGlobalFunction("uint GetChunkSize()", asFUNCTION(+[]() {
+		return static_cast<unsigned int>(chunkSize);
 	}), asCALL_CDECL);
 
 	GenerateScriptPredefined(engine, "C:/Users/jonah/Downloads/Github Repos/kiwicubed/Mods/kiwicubed/Scripts/as.predefined");
@@ -629,6 +656,41 @@ bool ModHandler::RunModEntrypoints() {
 	}
 
     return true;
+}
+
+void ModHandler::CallModFunction(const std::string& moduleName, const std::string& functionName) {
+	OVERRIDE_LOG_NAME("Mod Script Execution");
+	asIScriptModule* module = modNamespacesToModules.find("kiwicubed")->second;
+	// TODO: valid module checking
+	asIScriptFunction* function = module->GetFunctionByName(functionName.c_str());
+	if (!function || function == nullptr) {
+		CRITICAL("Tried to call function \"" + functionName + "\" in module from namespace \"" + moduleName + "\" that didn't exist, aborting");
+		psnip_trap();
+	}
+
+	asIScriptContext* context = engine->CreateContext();
+	int prepareResult = context->Prepare(function);
+	if (prepareResult != asSUCCESS) {
+		CRITICAL("Failed to prepare function \"" + functionName + "\" from module \"" + moduleName + "\", with result enum of {" + std::to_string(prepareResult) + "}");
+		psnip_trap();
+	}
+
+	int executionResult = context->Execute();
+	if (executionResult != asEXECUTION_FINISHED) {
+		if (executionResult == asEXECUTION_EXCEPTION) {
+			asIScriptFunction* exceptionFunction = context->GetExceptionFunction();
+
+			const char* module = exceptionFunction->GetModuleName();
+			int line = context->GetExceptionLineNumber();
+			const char* description = context->GetExceptionString();
+
+			CRITICAL("Error occured while calling function \"" + functionName + "\" in module \"" + std::string(module) + "\" from namespace\"" + moduleName + "\" at line {" + std::to_string(line) + "} with description \"" + std::string(description) + "\"");
+		} else {
+			CRITICAL("Error occured while calling function \"" + functionName + "\" in module from namespace \"" + moduleName + "\" with result enum of {" + std::to_string(executionResult) + "}, aborting");
+		}
+		context->Release();
+		psnip_trap();
+	}
 }
 
 void ModHandler::CallModFunction(const std::string& moduleName, const std::string& functionName, const std::vector<void*>& arguments, const std::vector<int>& argumentTypes) {

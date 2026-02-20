@@ -74,6 +74,8 @@ int KiwiCubedEngine::StartEngine() {
 
 	textRenderer.Setup(ft, face, AssetStringID{"kiwicubed", "text_shader"});
 
+	singleplayerHandler.Setup(&debugRenderer);
+
 	// MAIN PROGRAM SETUP FINISHED - Most of the rest of this is able to be moved into other places to make this more modular
 	
 	// Create shader programs (needs to be modularized)
@@ -105,61 +107,61 @@ int KiwiCubedEngine::StartEngine() {
 	LOG_CHECK_RETURN_BAD_CRITICAL(modHandler.RunModEntrypoints(), "Failed to run mod entrypoints, exiting", -1);
 
 	ui.Setup(*uiShaderProgram, uiAtlas, &textRenderer);
-	UIScreen mainMenuUI = UIScreen("ui/main_menu");
-	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), [&]() {
-		if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
-			singleplayerHandler.StartSingleplayerWorld();
-		}
-	}, "Create World"));
-	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
-		ui.SetCurrentScreen("ui/settings");
-	}, "Settings"));
-	mainMenuUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), [&]() {
-		glfwSetWindowShouldClose(glfwWindow, true);
-	}, "Exit"));
-	ui.AddScreen(std::move(mainMenuUI));
-	ui.SetCurrentScreen("ui/main_menu");
+	//ui.AddScreen("ui/main_menu");
+	//UIScreen* mainMenuUI = ui.GetScreen("ui/main_menu");
+	//mainMenuUI->AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "", "Create Word"));//[&]() {
+	////	  if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
+	////	  	singleplayerHandler.StartSingleplayerWorld();
+	////	  }
+	////}, "Create World"));
+	//mainMenuUI->AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "", "Settings"));//[&]() {
+	////	ui.SetCurrentScreen("ui/settings");
+	////}, "Settings"));
+	//mainMenuUI->AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "", "Exit"));//[&]() {
+	////	glfwSetWindowShouldClose(glfwWindow, true);
+	////}, "Exit"));
+	//ui.SetCurrentScreen("ui/main_menu");
 
-	UIScreen settingsUI = UIScreen("ui/settings");
-	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), [&]() {
-		OVERRIDE_LOG_NAME("Settings");
-		OrderedJSON configJSON = globals.GetConfigJSON();
+	ui.AddScreen("ui/settings");
+	UIScreen* settingsUI = ui.GetScreen("ui/settings");
+	settingsUI->AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "", "Change FOV"));//[&]() {
+	//	OVERRIDE_LOG_NAME("Settings");
+	//	OrderedJSON configJSON = globals.GetConfigJSON();
+	//
+	//	globals.fov += 10;
+	//	if (globals.fov > 120) {
+	//		globals.fov = 30;
+	//	}
+	//		configJSON["init_settings"]["fov"] = globals.fov;
+	//	std::ofstream configWrite("init_config.json");
+	//	if (!configWrite.is_open()) {
+	//		CRITICAL("Could not open the JSON config file, aborting");
+	//		psnip_trap();
+	//	}
+	//	configWrite << configJSON.dump(1, '\t');
+	//	configWrite.close();
+	//
+	//	if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
+	//		return;
+	//	}
+	//
+	//	singleplayerHandler.GetWorld()->GetPlayer()->fov = globals.fov;
+	//}, "Change FOV"));
+	settingsUI->AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "", "Back"));//[&]() {
+	//	ui.MoveScreenBack();
+	//}, "Back"));
 
-		globals.fov += 10;
-		if (globals.fov > 120) {
-			globals.fov = 30;
-		}
-			configJSON["init_settings"]["fov"] = globals.fov;
-		std::ofstream configWrite("init_config.json");
-		if (!configWrite.is_open()) {
-			CRITICAL("Could not open the JSON config file, aborting");
-			psnip_trap();
-		}
-		configWrite << configJSON.dump(1, '\t');
-		configWrite.close();
-
-		if (!singleplayerHandler.IsLoadedIntoSingleplayerWorld()) {
-			return;
-		}
-
-		singleplayerHandler.GetWorld()->GetPlayer()->fov = globals.fov;
-	}, "Change FOV"));
-	settingsUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
-		ui.MoveScreenBack();
-	}, "Back"));
-	ui.AddScreen(std::move(settingsUI));
-
-	UIScreen gamePauseUI = UIScreen("ui/game_pause");
-	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), [&]() {
-		ui.DisableUI();
-	}, "Resume game"));
-	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), [&]() {
-		ui.SetCurrentScreen("ui/settings");
-	}, "Settings"));
-	gamePauseUI.AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), [&]() {
-		singleplayerHandler.EndSingleplayerWorld();
-	}, "Quit Game"));
-	ui.AddScreen(std::move(gamePauseUI));
+	ui.AddScreen("ui/game_pause");
+	UIScreen* gamePauseUI = ui.GetScreen("ui/game_pause");
+	gamePauseUI->AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 700), glm::vec2(1, 1), "", "Resume Game"));//[&]() {
+	//	ui.DisableUI();
+	//}, "Resume game"));
+	gamePauseUI->AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 500), glm::vec2(1, 1), "", "Settings"));//[&]() {
+	//	ui.SetCurrentScreen("ui/settings");
+	//}, "Settings"));
+	gamePauseUI->AddUIElement(new UIButton(glm::vec2((globalWindow.GetWidth() / 2) - 256, 300), glm::vec2(1, 1), "", "Quit Game"));//[&]() {
+	//	singleplayerHandler.EndSingleplayerWorld();
+	//}, "Quit Game"));
 
 	return 0;
 }

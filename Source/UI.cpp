@@ -68,11 +68,18 @@ void UI::Render() {
     stackedScreens.top()->Render();
 }
 
-void UI::AddScreen(UIScreen screen) {
-    uiScreens.push_back(std::make_unique<UIScreen>(std::move(screen)));
+void UI::AddScreen(const std::string& screenName) {
+	OVERRIDE_LOG_NAME("UI");
+	for (int iterator = 0; iterator < uiScreens.size(); ++iterator) {
+        if (uiScreens[iterator]->screenName == screenName) {
+            CRITICAL("Tried to register UI screen with same name \"" + screenName + "\" twice, aborting");
+			psnip_trap();
+        }
+    }
+    uiScreens.push_back(std::make_unique<UIScreen>(UIScreen(screenName)));
 }
 
-void UI::SetCurrentScreen(const std::string screenName) {
+void UI::SetCurrentScreen(const std::string& screenName) {
     UIScreen* uiScreen = GetScreen(screenName);
     stackedScreens.push(uiScreen);
     currentScreen = uiScreen;
@@ -199,7 +206,7 @@ glm::vec2 UIElement::PixelsToNDC(glm::vec2 pixelPosition) {
     return glm::vec2((pixelPosition.x / Window::GetInstance().GetWidth()) * 2 - 1, (pixelPosition.y / Window::GetInstance().GetHeight()) * 2 - 1);
 }
 
-UIElement::UIElement(glm::vec2 position, glm::vec2 scale, std::function<void()> functionToTrigger) : position(position), scale(scale), functionToTrigger(functionToTrigger) {
+UIElement::UIElement(glm::vec2 position, glm::vec2 scale, std::string functionToTrigger) : position(position), scale(scale), functionToTrigger(functionToTrigger) {
     return;
 }
 
@@ -208,11 +215,11 @@ void UIElement::Render() {
 }
 
 void UIElement::Trigger() {
-    functionToTrigger();
+	ModHandler::GetInstance().CallModFunction("kiwicubed", functionToTrigger);
 }
 
 bool UIElement::OnClick() {
-    if (!GetHovered() || functionToTrigger == nullptr) {
+    if (!GetHovered() || functionToTrigger == "") {
         return false;
     }
 

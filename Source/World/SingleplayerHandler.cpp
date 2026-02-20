@@ -1,10 +1,14 @@
 #include "SingleplayerHandler.h"
 #include "Events.h"
 
-SingleplayerHandler::SingleplayerHandler(DebugRenderer& debugRenderer) : singleplayerWorld(nullptr), isLoadedIntoSingleplayerWorld(false), debugRenderer(debugRenderer) {
+
+SingleplayerHandler& SingleplayerHandler::GetInstance() {
+    static SingleplayerHandler instance;
+    return instance;
 }
 
-void SingleplayerHandler::Setup() {
+void SingleplayerHandler::Setup(DebugRenderer* debugRenderer) {
+	this->debugRenderer = debugRenderer;
 }
 
 void SingleplayerHandler::StartSingleplayerWorld() {
@@ -14,12 +18,12 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 		psnip_trap();
 	}
 
-	singleplayerWorld = std::make_unique<World>(3, 2, this);
+	singleplayerWorld = std::make_unique<World>(5, 2, this);
 	isLoadedIntoSingleplayerWorld = true;
 	singleplayerWorld->GenerateWorld();
 	singleplayerWorld->Setup();
 	isLoadedIntoSingleplayerWorld = true;
-	debugRenderer.SetupBuffers(singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerWorld->GetChunkOrigins());
+	debugRenderer->SetupBuffers(singleplayerWorld->GetChunkDebugVisualizationVertices(), singleplayerWorld->GetChunkDebugVisualizationIndices(), singleplayerWorld->GetChunkOrigins());
 
 	if (UI::GetInstance().GetCurrentScreenName() == "ui/main_menu") {
 		UI::GetInstance().DisableUI();
@@ -31,8 +35,8 @@ void SingleplayerHandler::StartSingleplayerWorld() {
 	eventManager.RegisterFunctionToEvent(EVENT_WORLD_PLAYER_MOVE, [=](const EventData& eventData) {
 		const EventData moveEventCopy = eventData;
 		const EventWorldPlayerMove* moveEvent = moveEventCopy.GetDataStruct<EventWorldPlayerMove>();
-		glm::ivec3 oldChunkPosition = glm::ivec3(moveEvent->oldPlayerX / 32, moveEvent->oldPlayerY / 32, moveEvent->oldPlayerZ / 32);
-		glm::ivec3 newChunkPosition = glm::ivec3(moveEvent->newPlayerX / 32, moveEvent->newPlayerY / 32, moveEvent->newPlayerZ / 32);
+		glm::ivec3 oldChunkPosition = glm::ivec3(moveEvent->oldPlayerX / chunkSize, moveEvent->oldPlayerY / chunkSize, moveEvent->oldPlayerZ / chunkSize);
+		glm::ivec3 newChunkPosition = glm::ivec3(moveEvent->newPlayerX / chunkSize, moveEvent->newPlayerY / chunkSize, moveEvent->newPlayerZ / chunkSize);
 		if (oldChunkPosition == newChunkPosition) {
 			return;
 		}
@@ -70,8 +74,4 @@ World* SingleplayerHandler::GetWorld() {
 
 bool SingleplayerHandler::IsLoadedIntoSingleplayerWorld() {
 	return isLoadedIntoSingleplayerWorld;
-}
-
-void SingleplayerHandler::Delete() {
-	EndSingleplayerWorld();
 }

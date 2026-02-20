@@ -17,6 +17,7 @@
 #include "UI.h"
 #include "Window.h"
 
+
 class KiwiCubedEngine {
     public:
         KiwiCubedEngine();
@@ -38,7 +39,7 @@ class KiwiCubedEngine {
         // Other Members
         DebugRenderer debugRenderer = DebugRenderer();
         Renderer renderer = Renderer();
-        SingleplayerHandler singleplayerHandler = SingleplayerHandler(debugRenderer);
+        SingleplayerHandler& singleplayerHandler = SingleplayerHandler::GetInstance();
         TextRenderer textRenderer = TextRenderer();
 
         // Temporary

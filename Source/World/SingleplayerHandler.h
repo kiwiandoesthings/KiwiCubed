@@ -11,9 +11,10 @@
 
 class SingleplayerHandler {
 	public:
-		SingleplayerHandler(DebugRenderer& debugRenderer);
+		static SingleplayerHandler& GetInstance();
+        static void Delete();
 		
-		void Setup();
+		void Setup(DebugRenderer* debugRenderer);
 		void StartSingleplayerWorld();
 		void EndSingleplayerWorld();
 
@@ -21,12 +22,16 @@ class SingleplayerHandler {
 
 		World* GetWorld();
 		bool IsLoadedIntoSingleplayerWorld();
-
-		void Delete();
 	
 	private:
+		SingleplayerHandler() = default;
+        ~SingleplayerHandler() = default;
+
+        SingleplayerHandler(const SingleplayerHandler&) = delete;
+        SingleplayerHandler& operator=(const SingleplayerHandler&) = delete;
+
 		std::unique_ptr<World> singleplayerWorld = nullptr;
-		DebugRenderer& debugRenderer;
+		DebugRenderer* debugRenderer;
 		bool isLoadedIntoSingleplayerWorld = false;
 		bool shouldUnloadWorld = false;
 };
